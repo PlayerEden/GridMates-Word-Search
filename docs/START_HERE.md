@@ -50,13 +50,13 @@ The full original portrait provenance lives in the Sudoku branch's design/woodla
 
 ## Starter message for a fresh coding chat
 
-> Continue GridMates: Word Search in https://github.com/PlayerEden/GridMates-Word-Search. Read README, docs/START_HERE.md, docs/MASTER_GAME_DESIGN.md and docs/DEVELOPMENT_ROADMAP.md. Current state is a planning-only baseline. First pursue WS-01: inspect the latest Sudoku v0.11C source/QA PR #28 and its actual reusable assets, then create a distinct native Kotlin/Jetpack Compose Word Search Android foundation. Keep source, package, saves, LAN identity, QA signing and repository independent of Sudoku. Build and test a small native UI/asset proof, preserve SHA/checkpoint/QA evidence, and update the roadmap and handoff. Do not claim the game or LAN is already implemented. The product includes both Shared Board Race and Speed Duel as future Versus modes, but build progressively.
+> Continue GridMates: Word Search in https://github.com/PlayerEden/GridMates-Word-Search. Read README, docs/START_HERE.md, docs/MASTER_GAME_DESIGN.md and docs/DEVELOPMENT_ROADMAP.md. Current state: WS-01 scaffold exists in draft PR #3, with a successful package-verified Android QA build at run 42131133443. Before changes, read the branch QA receipt and latest Sudoku v0.11C source/QA PR #28; complete on-device WS-01 checks, then begin WS-02 tactile puzzle generation. Keep source, package, saves, LAN identity, QA signing and repository independent of Sudoku. Preserve the green source checkpoint, then document every additional verified test and update the roadmap/handoff. Do not claim the game or LAN is already implemented. The product includes both Shared Board Race and Speed Duel as future Versus modes, but build progressively.
 
 ## Design changes log
 
-- **2026-11-05:** First planning baseline created; next source development is WS-01.
+- **2026-11-05:** Master design established. WS-01 native source scaffold created in draft PR #3; complete source-build/Android UI-test compile/AAPT-verified QA build #42131133443. Physical UI/device co-install QA and gameplay engine are pending.
 
 ## Live first-step work tracking
 
-- [GitHub issue #1 — WS-01 Native foundation and safe reuse](https://github.com/PlayerEden/GridMates-Word-Search/issues/1) — **next**.
+- [GitHub issue #1 — WS-01 Native foundation and safe reuse](https://github.com/PlayerEden/GridMates-Word-Search/issues/1) — **CI green; on-device tests next**.
 - [GitHub issue #2 — WS-02 Word Search generator and input](https://github.com/PlayerEden/GridMates-Word-Search/issues/2) — follows verified WS-01.
