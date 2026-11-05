@@ -37,11 +37,14 @@ jobs:
           test -n "$SDKMANAGER" || { echo "Android sdkmanager is missing on the runner"; exit 1; }
           "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
       - name: Core + app unit tests, lint and QA APK
-        run: gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
-      - name: Show built QA APK identity and checksum
+        run: gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:compileDebugAndroidTestKotlin :app:assembleDebug
+      - name: Verify QA package identity and checksum
         run: |
-          ls -lah app/build/outputs/apk/debug/
-          sha256sum app/build/outputs/apk/debug/*.apk
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -f "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep '^package:'
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "name='com.playereden.gridmates.wordsearch.qa'"
+          sha256sum "$APK"
       - uses: actions/upload-artifact@v4
         with:
           name: GridMates-WordSearch-WS01-QA
