@@ -2,7 +2,7 @@
 
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **As of:** November 5, 2026  
-**Status:** Design baseline only. No Word Search Android app, APK, game engine, content pack, or multiplayer implementation has been verified in this repository.
+**Status:** WS-01 native Android app scaffold is committed on [draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3). [Run #42131133443](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42131133443) passed core tests, Android lint, Android UI-test compilation and QA APK assembly with package-ID verification. **Not yet a playable Word Search:** no puzzle engine or real-phone QA. [Full branch QA receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws01-native-foundation-2026-11-05/docs/WS01_BUILD_QA_2026-11-05.md).
 
 ## Three documents that control the project
 
@@ -10,7 +10,7 @@
 2. [Development Roadmap](DEVELOPMENT_ROADMAP.md) — what to build next, in order, with acceptance gates.
 3. [README](../README.md) — concise public entry point and repo navigation.
 
-**Next actionable milestone: WS-01 — create an independent native Android foundation and safe Sudoku reuse inventory.** Do not start by writing a giant Word Search engine and all five modes at once. Make an installable, testable project shell first.
+**Next actionable gate: complete WS-01 on-device install/navigation QA; after that, WS-02 Word Search generation and tactile letter-grid input.** The source foundation already exists on the draft feature branch and its initial CI is green. Do not build all modes at once.
 
 ## Locked player decisions
 
