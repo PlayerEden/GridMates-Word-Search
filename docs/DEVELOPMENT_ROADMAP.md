@@ -177,3 +177,10 @@ Before WS-08: exact Play listing, privacy, test eligibility, signed artifact, ad
 
 - **November 5, 2026:** New separate Word Search repo chosen; both Shared Board Race and Speed Duel agreed for Versus; existing Sudoku portraits/systems are references, not proof of a built cross-game library; master design established.
 - Latest Sudoku accepted baseline relevant to reuse: v0.11C draft PR #28, with owner-reported basic two-phone success on preceding v0.11B. A renewed complete physical LAN checklist remains open.
+
+## Tracked starting issues
+
+- [#1 — WS-01 Native Android foundation and Sudoku reuse audit](https://github.com/PlayerEden/GridMates-Word-Search/issues/1)
+- [#2 — WS-02 Word-search engine and tactile input prototype](https://github.com/PlayerEden/GridMates-Word-Search/issues/2)
+
+Later milestone issues should be opened as work approaches, rather than creating a large unattended backlog.
