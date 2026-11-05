@@ -20,16 +20,22 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Install pinned SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install pinned Android platform and build tools
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER="$(command -v sdkmanager || true)"
+          if [ -z "$SDKMANAGER" ]; then
+            SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          fi
+          test -n "$SDKMANAGER" || { echo "Android sdkmanager is missing on the runner"; exit 1; }
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
       - name: Core + app unit tests, lint and QA APK
         run: gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
       - name: Show built QA APK identity and checksum
