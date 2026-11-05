@@ -23,3 +23,8 @@
 **Next:** WS-01 — independent Android foundation and source-backed Sudoku reuse audit.
 
 **Sister project:** [GridMates: Sudoku](https://github.com/PlayerEden/SudokuTogether) — do not treat its default main as the latest Android gameplay source; see the handoff for current references.
+
+## First development tickets
+
+- [WS-01 — Native Android foundation and safe Sudoku reuse](https://github.com/PlayerEden/GridMates-Word-Search/issues/1)
+- [WS-02 — Deterministic word-search engine and touch prototype](https://github.com/PlayerEden/GridMates-Word-Search/issues/2)
