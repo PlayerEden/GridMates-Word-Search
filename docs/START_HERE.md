@@ -55,3 +55,8 @@ The full original portrait provenance lives in the Sudoku branch's design/woodla
 ## Design changes log
 
 - **2026-11-05:** First planning baseline created; next source development is WS-01.
+
+## Live first-step work tracking
+
+- [GitHub issue #1 — WS-01 Native foundation and safe reuse](https://github.com/PlayerEden/GridMates-Word-Search/issues/1) — **next**.
+- [GitHub issue #2 — WS-02 Word Search generator and input](https://github.com/PlayerEden/GridMates-Word-Search/issues/2) — follows verified WS-01.
