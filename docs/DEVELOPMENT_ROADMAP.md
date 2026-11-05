@@ -1,6 +1,8 @@
 # GridMates: Word Search — Development Roadmap
 
-**Baseline:** November 5, 2026  
+**Baseline:** November 5, 2026
+
+**Latest WS-01 evidence:** [Draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3); [successful build and package-ID verification](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42131133443). Android UI test execution and actual phone installation remain open. A native shell exists on the WS-01 branch, not yet on `main`.  
 **State:** Planning; no Word Search gameplay implementation or Android build is claimed.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
@@ -16,7 +18,7 @@ A milestone is done only when its acceptance evidence exists in **this** reposit
 | ID | Stage | Status | Core deliverable | Acceptance gate |
 | --- | --- | --- | --- | --- |
 | **WS-00** | Master design / repo setup | **COMPLETE (docs only)** | Master spec, this roadmap, readme, session handoff | Documents committed and linked on default branch |
-| **WS-01** | Native app and safe reuse | **NEXT** | Independent Kotlin/Compose app skeleton, GridMates UI, separate Android identity, starter asset audit | Clean build, basic navigation captures, distinct package from Sudoku |
+| **WS-01** | Native app and safe reuse | **IN PROGRESS — CI GREEN; DEVICE QA OPEN** | Independent Kotlin/Compose app skeleton, GridMates UI, separate Android identity, starter asset audit | Clean build, basic navigation captures, distinct package from Sudoku |
 | **WS-02** | Puzzle engine and touch prototype | PLANNED | Deterministic word placement/validation, word-list content, drag selection, basic game loop | Unit tests + real input/UI smoke |
 | **WS-03** | Complete Solo experience | PLANNED | Difficulty/theme selection, resume, hints, results, player-friendly interactions | Save/restart, narrow-phone, long-session, accessibility checks |
 | **WS-04** | Daily, profile, collections | PLANNED | Dated puzzle/history, local stats/achievements, original portraits and settings | Upgrade tests, no duplicate Daily rewards, asset/hash checks |
