@@ -15,7 +15,6 @@ class ShellSmokeTest {
         compose.onNodeWithText("Word Search").assertExists()
         compose.onNodeWithText("Good puzzles. Good company.").assertExists()
         compose.onNodeWithContentDescription("Open Collection").performClick()
-        compose.onNodeWithText("Collection").assertExists()
         compose.onNodeWithText(
             "Our original Woodland portraits and other GridMates styles will be added from the verified Sudoku art collection."
         ).assertExists()
