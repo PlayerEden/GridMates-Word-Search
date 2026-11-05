@@ -58,3 +58,9 @@ The Sudoku default main is mostly documentation and workflow scaffolding. Do **n
 5. Record stable commit and checkpoint after acceptance.
 
 **Next stage:** WS-02 deterministic Word Search engine and tactile grid input.
+
+## Review checkpoint — CI registration
+
+- [Draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3) now tracks the independent source branch.
+- The same pull-request QA workflow was registered on the default `main` branch so the new repository can discover it. This is CI configuration only; **the Word Search app source remains in the draft feature branch**.
+- Build/installation evidence is still outstanding. Check actual workflow runs and keep this document honest if Actions is disabled or fails to start.
