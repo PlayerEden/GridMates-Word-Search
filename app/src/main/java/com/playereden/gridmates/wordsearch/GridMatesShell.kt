@@ -269,7 +269,9 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
         Text("Nearby co-op · Early access",
             color = Gold, style = MaterialTheme.typography.labelMedium)
         Button(onClick = onNearby,
-            modifier = Modifier.fillMaxWidth().height(50.dp)) {
+            modifier = Modifier.fillMaxWidth().height(50.dp).semantics {
+                contentDescription = "Open Nearby co-op"
+            }) {
             Text("Play Together")
         }
     }
