@@ -50,7 +50,7 @@ class NearbyChatTest {
     }
 
     @Test fun rejectsMaliciousOrImpossibleReplayedHistory() {
-        val good = NearbyChatLine(1, CoopSeat.HOST, "Hi", 100)
+        val good = NearbyChatLine(1, CoopSeat.HOST, "Hi", 100, "id-one")
         assertEquals(listOf(good), NearbyChatLog.validateHistory(listOf(good)))
         assertTrue(runCatching { NearbyChatLog.validateHistory(listOf(good,good)) }.isFailure)
         assertTrue(runCatching {
@@ -60,4 +60,41 @@ class NearbyChatTest {
             NearbyChatLog.validateHistory(listOf(good.copy(text = "x".repeat(141))))
         }.isFailure)
     }
+    @Test fun retryingSameAcceptedIdReturnsOriginalReceiptEvenAfterRateWindow() {
+        val log = NearbyChatLog()
+        val accepted = log.add(CoopSeat.GUEST, "stable-123", "Hello!", true, 4_000)
+        assertEquals(NearbyChatStatus.ACCEPTED, accepted.status)
+        val repeated = log.add(CoopSeat.GUEST, "stable-123", "Different text", true, 40_000)
+        assertEquals(NearbyChatStatus.DUPLICATE, repeated.status)
+        assertEquals(accepted.line, repeated.line)
+        assertEquals(1, log.history().size)
+        assertEquals("Hello!", log.history().single().text)
+    }
+
+    @Test fun guestPendingClearsOnlyOnMatchingConfirmedOriginId() {
+        val pending = PendingNearbyChat("guest-12", "Hey")
+        val hostLine = NearbyChatLine(1, CoopSeat.HOST, "Hey", 1000, "guest-12")
+        val another = NearbyChatLine(2, CoopSeat.GUEST, "Other", 1100, "guest-13")
+        val matching = NearbyChatLine(3, CoopSeat.GUEST, "Hey", 1200, "guest-12")
+        assertFalse(NearbyChatDelivery.confirmed(pending, hostLine))
+        assertFalse(NearbyChatDelivery.confirmed(pending, another))
+        assertTrue(NearbyChatDelivery.confirmed(pending, matching))
+        assertFalse(NearbyChatDelivery.confirmedInHistory(pending, listOf(hostLine, another)))
+        assertTrue(NearbyChatDelivery.confirmedInHistory(pending, listOf(another, matching)))
+        assertFalse(NearbyChatDelivery.confirmedInHistory(null, listOf(matching)))
+    }
+
+    @Test fun malformedRequestIdsDoNotEnterChatHistory() {
+        val log = NearbyChatLog()
+        for (bad in listOf("", "contains space", "!bad", "x".repeat(65))) {
+            assertEquals(NearbyChatStatus.BAD_REQUEST,
+                log.add(CoopSeat.HOST, bad, "Test", true, 2_000).status)
+        }
+        assertTrue(log.history().isEmpty())
+        assertTrue(runCatching {
+            NearbyChatLog.validateHistory(listOf(
+                NearbyChatLine(1, CoopSeat.HOST, "hello", 1000, "bad id")))
+        }.isFailure)
+    }
+
 }

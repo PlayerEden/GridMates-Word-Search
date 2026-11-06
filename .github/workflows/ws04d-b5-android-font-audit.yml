@@ -1,4 +1,4 @@
-name: Word Search B5 + WS05B Chat Android Runtime Audit
+name: Word Search B5 + WS05C Chat Delivery Emulator Audit
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
@@ -9,6 +9,7 @@ on:
       - feature/ws04d-b5-board-fonts-free-achievements-2026-11-06
       - feature/ws05a-coop-session-engine-2026-11-06
       - feature/ws05b-nearby-chat-and-presence-2026-11-06
+      - feature/ws05c-chat-delivery-and-connection-reliability-2026-11-06
     paths:
       - '.github/workflows/ws04d-b5-android-font-audit.yml'
 
