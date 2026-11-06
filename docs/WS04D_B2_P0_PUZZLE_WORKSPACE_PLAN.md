@@ -1,6 +1,6 @@
 # WS-04D-B2 — Puzzle Workspace Repair & Competitive UX Implementation Plan
 
-**Date:** November 6, 2026 · **Priority:** P0 · **Status:** In implementation, not yet phone-accepted.  
+**Date:** November 6, 2026 · **Priority:** P0 · **Status:** CI-green implementation as of November 6, 2026; not yet phone-accepted.  
 **Owner evidence:** Eight Android v0.4.4 screenshots showing 15×15 and 20×20 layouts at 100%–250% zoom.  
 **External research:** [Competitor Word Search UX Benchmark](COMPETITOR_WORD_SEARCH_UX_RESEARCH_2026-11-06.md) · [P0 issue #24](https://github.com/PlayerEden/GridMates-Word-Search/issues/24) · [book board issue #23](https://github.com/PlayerEden/GridMates-Word-Search/issues/23).  
 **Current source baseline:** [WS-04D book presets draft PR #22](https://github.com/PlayerEden/GridMates-Word-Search/pull/22) at protected CI-green checkpoint [v0.4.4](https://github.com/PlayerEden/GridMates-Word-Search/tree/checkpoint/ws04d-book-board-presets-v044-ci-green-2026-11-06).
@@ -61,3 +61,8 @@ GridMates should offer a **real book-sized search** with readable cells and word
 5. Do not equate a green Android compile with a passed physical UI test. Mark both states separately.
 
 **Success definition:** On a real 15×15 or 20×20 puzzle, magnification makes the entire grid truly larger, word selection remains accurate, the title and controls are immediately understandable, and the words to find remain accessible while playing.
+
+## CI source checkpoint
+
+**Latest WS-04D-B2 verified source checkpoint (November 6, 2026):** The compact puzzle workspace and unified whole-grid zoom implementation are **CI green** in [draft PR #25](https://github.com/PlayerEden/GridMates-Word-Search/pull/25), [run #42182216221](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42182216221) at SHA `6a8f6426fb6df3cfa145643ecccd06e8a27aeb27`; [QA APK artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42182216221/artifacts/13486481273), [QA receipt and checksum](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws04d-b2-true-zoom-compact-workspace-2026-11-06/docs/WS04D_B2_BUILD_QA_2026-11-06.md) and [rollback branch](https://github.com/PlayerEden/GridMates-Word-Search/tree/checkpoint/ws04d-b2-workspace-v045-ci-green-2026-11-06). Original puzzles, saves, QA ID and Woodland art preserved. **No Android instrumentation runtime or real phone visual acceptance yet**; do not close [P0 issue #24](https://github.com/PlayerEden/GridMates-Word-Search/issues/24).
+
