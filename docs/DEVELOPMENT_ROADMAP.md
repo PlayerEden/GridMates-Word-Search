@@ -2,6 +2,8 @@
 
 **Baseline:** November 5, 2026
 
+**WS-02 source QA:** [Draft PR #4](https://github.com/PlayerEden/GridMates-Word-Search/pull/4), [CI run #42138730965](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42138730965), [build and physical playtest receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws02-word-engine-touch-prototype-2026-11-05/docs/WS02_FIRST_PLAYABLE_QA_2026-11-05.md). Deterministic generator and native touch-grid prototype exist **on a stacked draft branch**. No saved game or physical UX approval yet.
+
 **Latest WS-01 evidence:** [Draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3); [successful build and package-ID verification](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42131133443). Android UI test execution and actual phone installation remain open. A native shell exists on the WS-01 branch, not yet on `main`.  
 **State:** Planning; no Word Search gameplay implementation or Android build is claimed.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
@@ -19,7 +21,7 @@ A milestone is done only when its acceptance evidence exists in **this** reposit
 | --- | --- | --- | --- | --- |
 | **WS-00** | Master design / repo setup | **COMPLETE (docs only)** | Master spec, this roadmap, readme, session handoff | Documents committed and linked on default branch |
 | **WS-01** | Native app and safe reuse | **IN PROGRESS — CI GREEN; DEVICE QA OPEN** | Independent Kotlin/Compose app skeleton, GridMates UI, separate Android identity, starter asset audit | Clean build, basic navigation captures, distinct package from Sudoku |
-| **WS-02** | Puzzle engine and touch prototype | PLANNED | Deterministic word placement/validation, word-list content, drag selection, basic game loop | Unit tests + real input/UI smoke |
+| **WS-02** | Puzzle engine and touch prototype | **CI GREEN; PHONE QA OPEN** | Deterministic word placement/validation, word-list content, drag selection, basic game loop | Unit tests + real input/UI smoke |
 | **WS-03** | Complete Solo experience | PLANNED | Difficulty/theme selection, resume, hints, results, player-friendly interactions | Save/restart, narrow-phone, long-session, accessibility checks |
 | **WS-04** | Daily, profile, collections | PLANNED | Dated puzzle/history, local stats/achievements, original portraits and settings | Upgrade tests, no duplicate Daily rewards, asset/hash checks |
 | **WS-05** | Nearby Co-op | PLANNED | Open Nearby host/join, optional code, shared word claims, chat/presence, reconnect | Two actual Android phones + protocol/failure tests |
