@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.playereden.gridmates.wordsearch.core.DailyChallenge
 import com.playereden.gridmates.wordsearch.core.DailyProgress
+import com.playereden.gridmates.wordsearch.core.PlayerIdentity
+import com.playereden.gridmates.wordsearch.core.WoodlandCollection
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.SoloProfile
@@ -72,7 +74,7 @@ internal class SoloStore(
 
     private fun decode(raw: String): SoloProfile {
         val root = JSONObject(raw)
-        require(root.getInt("schema") in 1..2) { "Unsupported save schema" }
+        require(root.getInt("schema") in 1..3) { "Unsupported save schema" }
         val active = root.getJSONObject("active")
         val run = readRun(active)
         val clean = SoloProgressRules.validate(run)
@@ -108,7 +110,13 @@ internal class SoloStore(
         require(daily.map { it.date }.distinct().size == daily.size) {
             "Duplicate daily date in backup"
         }
-        return SoloProfile(clean, valid, daily)
+        val identityData = root.optJSONObject("identity")
+        val rawIdentity = PlayerIdentity(
+            displayName = identityData?.optString("name", "Player") ?: "Player",
+            portraitId = identityData?.optString("portraitId", "woodland_owl") ?: "woodland_owl"
+        )
+        val loadedProfile = SoloProfile(clean, valid, daily, rawIdentity)
+        return loadedProfile.copy(identity = WoodlandCollection.sanitize(rawIdentity, loadedProfile))
     }
 
     private fun readRun(source: JSONObject): SoloRun = SoloRun(
@@ -156,8 +164,11 @@ internal class SoloStore(
             entry.completedAtMs?.let { item.put("completedAt", it) }
             daily.put(item)
         }
-        return JSONObject().put("schema", 2).put("active", active)
-            .put("results", results).put("daily", daily)
+        val identity = JSONObject()
+            .put("name", value.identity.displayName)
+            .put("portraitId", value.identity.portraitId)
+        return JSONObject().put("schema", 3).put("active", active)
+            .put("results", results).put("daily", daily).put("identity", identity)
             .toString().toByteArray(StandardCharsets.UTF_8)
     }
 
@@ -177,7 +188,12 @@ internal class SoloStore(
 
     /** Manual Android document backup for QA installs without stable signing. */
     fun exportBackup(): String {
+        // If the existing on-device save is unreadable, 'profile' is only a
+        // temporary in-memory fallback. Never export it as if it were a valid
+        // recovered backup; this would mislead a player into losing history.
+        check(!blocked) { "Unreadable save is protected; export unavailable" }
         flush()
+        check(warning == null) { "Could not safely save current progress before export" }
         return encode(profile).toString(StandardCharsets.UTF_8)
     }
 
@@ -194,7 +210,8 @@ internal class SoloStore(
                 "The original data is still protected."
             return false
         }
-        profile = restored.copy(active = SoloProgressRules.validate(restored.active))
+        val checked = restored.copy(active = SoloProgressRules.validate(restored.active))
+        profile = checked.copy(identity = WoodlandCollection.sanitize(checked.identity, checked))
         flush()
         return warning == null
     }
@@ -252,6 +269,23 @@ internal class SoloStore(
             if (it.date == current.date) updated else it
         })
         if (updated.run.elapsedSeconds % 10L == 0L) flush()
+    }
+
+    fun updateDisplayName(input: String) {
+        if (blocked) return
+        profile = profile.copy(
+            identity = profile.identity.copy(displayName = WoodlandCollection.sanitizeName(input))
+        )
+        flush()
+    }
+
+    /** The collection is a catalogue; locked portraits never equip. */
+    fun equipPortrait(id: String): Boolean {
+        if (blocked) return false
+        val updated = WoodlandCollection.equip(profile, id) ?: return false
+        profile = updated
+        flush()
+        return warning == null
     }
 
     fun choose(theme: WordTheme, difficulty: WordDifficulty) {

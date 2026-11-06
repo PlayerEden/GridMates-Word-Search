@@ -70,7 +70,9 @@ internal fun SoloSettingsScreen(store: SoloStore) {
             title = { Text("Restore this backup?") },
             text = {
                 Text(
-                    "This backup has " + preview.completions + " completed Solo puzzles, " +
+                    "This backup includes the profile '" + preview.identity.displayName + "', " +
+                        "portrait " + preview.identity.portraitId + ", " +
+                        preview.completions + " completed Solo puzzles, " +
                         preview.dailyCompletions + " completed Daily puzzles, " +
                         preview.dailyEntries.size + " dated entries, and " +
                         preview.active.foundIds.size + " words in the current Solo puzzle. " +
