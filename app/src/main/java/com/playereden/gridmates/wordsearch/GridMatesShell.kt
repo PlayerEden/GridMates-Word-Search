@@ -103,7 +103,7 @@ private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
 }
 
 @Composable
-internal fun GridMatesShell() {
+internal fun GridMatesShell(soloStore: SoloStore) {
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
 
@@ -127,7 +127,9 @@ internal fun GridMatesShell() {
     ) { contentPadding ->
         if (page == Page.PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
-                WordSearchScreen(onBack = { pageName = Page.PLAY.name })
+                WordSearchScreen(soloStore,
+                    onBack = { pageName = Page.PLAY.name },
+                    onRecords = { pageName = Page.RECORDS.name })
             }
         } else Column(
             modifier = Modifier
@@ -138,18 +140,15 @@ internal fun GridMatesShell() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             when (page) {
-                Page.PLAY -> HomeScreen(onHelp = { pageName = Page.HELP.name },
+                Page.PLAY -> HomeScreen(soloStore,
+                    onHelp = { pageName = Page.HELP.name },
                     onSolo = { pageName = Page.PUZZLE.name })
                 Page.PUZZLE -> Unit
-                Page.RECORDS -> PlaceholderScreen(
-                    "Records", "Your achievements and completed puzzles will appear here after Solo gameplay is built."
-                )
+                Page.RECORDS -> SoloRecordsScreen(soloStore.profile)
                 Page.COLLECTION -> PlaceholderScreen(
                     "Collection", "Our original Woodland portraits and other GridMates styles will be added from the verified Sudoku art collection."
                 )
-                Page.SETTINGS -> PlaceholderScreen(
-                    "Settings", "Touch feedback, readable letter sizes, color and font preferences are planned. No unsaved controls are shown as working settings."
-                )
+                Page.SETTINGS -> SoloSettingsScreen(soloStore)
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }
         }
@@ -172,8 +171,13 @@ private fun Heading(eyebrow: String, heading: String) {
 }
 
 @Composable
-private fun HomeScreen(onHelp: () -> Unit, onSolo: () -> Unit) {
+private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit) {
     Heading("GridMates", "Word Search")
+    store.warning?.let { warning ->
+        Card(Modifier.fillMaxWidth()) {
+            Text(warning, Modifier.padding(12.dp), color = Gold)
+        }
+    }
     Text(
         "Good puzzles. Good company.",
         color = Muted,
@@ -184,12 +188,16 @@ private fun HomeScreen(onHelp: () -> Unit, onSolo: () -> Unit) {
             Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Find your first words", style = MaterialTheme.typography.titleMedium)
+            Text("Your next puzzle", style = MaterialTheme.typography.titleMedium)
             Text(
-                "Our first playable letter grid is ready to try. This prototype does not save completed puzzles yet.",
+                store.profile.active.theme.label + " · " + store.profile.active.difficulty.label +
+                    " · " + store.profile.active.foundIds.size + " words found" +
+                    " · " + store.profile.completions + " completed",
                 color = Muted
             )
             Button(onClick = onSolo) { Text("Try Solo Word Search") }
+            Text("Progress saves automatically on this device.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
             Button(onClick = onHelp) { Text("How to Play") }
         }
     }
