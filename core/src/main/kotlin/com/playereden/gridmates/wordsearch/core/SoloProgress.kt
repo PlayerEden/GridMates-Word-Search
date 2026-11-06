@@ -69,6 +69,15 @@ object WordHintPolicy {
 }
 
 object SoloProgressRules {
+    // Rebuilding 20x20 layouts for every find/hint creates avoidable work.
+    // The immutable puzzle ID includes content version, theme, board, challenge
+    // and seed. Cache is small and independent of saved profiles or Android.
+    private val puzzleCache = object : LinkedHashMap<String, WordSearchPuzzle>(8, 0.75f, true) {
+        override fun removeEldestEntry(
+            eldest: MutableMap.MutableEntry<String, WordSearchPuzzle>
+        ): Boolean = size > 6
+    }
+
     fun fresh(
         theme: WordTheme = WordTheme.WOODLAND,
         difficulty: WordDifficulty = WordDifficulty.EASY,
@@ -82,15 +91,23 @@ object SoloProgressRules {
         boardSize = board, challenge = challenge)
 
     /** Version dispatch is the only place that reconstructs a saved puzzle. */
+    @Synchronized
     fun puzzle(run: SoloRun): WordSearchPuzzle {
         require((run.boardSize == null) == (run.challenge == null)) {
             "Partially specified v2 puzzle; preserve original save"
         }
-        return if (run.boardSize == null) {
+        val id = run.puzzleId
+        puzzleCache[id]?.let { return it }
+        val generated = if (run.boardSize == null) {
             WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
         } else {
-            WordSearchGeneratorV2.generate(run.theme, run.boardSize, requireNotNull(run.challenge), run.seed)
+            WordSearchGeneratorV2.generate(
+                run.theme, run.boardSize, requireNotNull(run.challenge), run.seed
+            )
         }
+        check(generated.id == id) { "Puzzle ID mismatch for cached seed" }
+        puzzleCache[id] = generated
+        return generated
     }
 
     fun validate(run: SoloRun): SoloRun {

@@ -109,4 +109,23 @@ class SoloProgressTest {
         assertEquals(clean, SoloProgressRules.hint(clean).first)
     }
 
+    @Test fun repeatedFindAndHintReadsReuseSameImmutableSeededGrid() {
+        val big = SoloProgressRules.freshV2(
+            WordTheme.WOODLAND, PuzzleBoardSize.BOOK_BIG,
+            PuzzleChallenge.CLASSIC, 445571L
+        )
+        val first = SoloProgressRules.puzzle(big)
+        assertEquals(20, first.size)
+        repeat(30) {
+            assertSame("A find or hint should not regenerate the 20x20 puzzle",
+                first, SoloProgressRules.puzzle(big))
+        }
+        val other = SoloProgressRules.puzzle(big.copy(seed = big.seed + 1))
+        assertNotSame(first, other)
+        assertNotEquals(first.id, other.id)
+        val old = SoloProgressRules.puzzle(
+            SoloProgressRules.fresh(WordTheme.WOODLAND, WordDifficulty.EASY, 42L))
+        assertEquals(1, old.contentVersion)
+    }
+
 }

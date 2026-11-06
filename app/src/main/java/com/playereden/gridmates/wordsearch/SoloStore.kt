@@ -38,6 +38,26 @@ internal class SoloStore(
     saveName: String = "gridmates_wordsearch_solo_v1.json"
 ) {
     private val atomic = AtomicFile(File(context.filesDir, saveName))
+    // Gameplay feedback is a tiny local preference, not puzzle/save data.
+    // A profile import or new game must not unexpectedly reset user settings.
+    private val feedbackPrefs = context.getSharedPreferences(
+        saveName + "_feedback", Context.MODE_PRIVATE
+    )
+    var hapticsEnabled by mutableStateOf(feedbackPrefs.getBoolean("haptics", true))
+        private set
+    var soundEnabled by mutableStateOf(feedbackPrefs.getBoolean("sound", false))
+        private set
+
+    fun updateHapticsPreference(enabled: Boolean) {
+        hapticsEnabled = enabled
+        feedbackPrefs.edit().putBoolean("haptics", enabled).apply()
+    }
+
+    fun updateSoundPreference(enabled: Boolean) {
+        soundEnabled = enabled
+        feedbackPrefs.edit().putBoolean("sound", enabled).apply()
+    }
+
     private var blocked = false
     private var inForeground = false
     fun setForeground(value: Boolean) {

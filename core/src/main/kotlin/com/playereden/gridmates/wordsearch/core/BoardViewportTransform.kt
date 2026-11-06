@@ -15,6 +15,9 @@ data class BoardViewportTransform(
 
     fun clamped(viewportPx: Float): BoardViewportTransform {
         require(viewportPx > 0f && viewportPx.isFinite())
+        // Exact fit has zero pan (and no signed -0f); otherwise changing
+        // zoom repeatedly can leave a fractional/negative-zero offset.
+        if (zoom == 1f) return copy(panX = 0f, panY = 0f)
         val limit = -(viewportPx * (zoom - 1f))
         return copy(panX = panX.coerceIn(limit, 0f), panY = panY.coerceIn(limit, 0f))
     }
@@ -22,18 +25,26 @@ data class BoardViewportTransform(
     fun panned(dx: Float, dy: Float, viewportPx: Float): BoardViewportTransform =
         copy(panX = panX + dx, panY = panY + dy).clamped(viewportPx)
 
-    /** Keep the same content point under viewport center when magnifying. */
-    fun zoomed(requested: Float, viewportPx: Float): BoardViewportTransform {
+    /** Keep the same content point under the user's fingers as the grid zooms. */
+    fun zoomedAt(
+        requested: Float, viewportPx: Float, focusX: Float, focusY: Float
+    ): BoardViewportTransform {
         require(viewportPx > 0f && viewportPx.isFinite())
+        require(focusX.isFinite() && focusY.isFinite())
         val next = requested.coerceIn(1f, 2.5f)
-        val focus = viewportPx / 2f
         val factor = next / zoom
+        val x = focusX.coerceIn(0f, viewportPx)
+        val y = focusY.coerceIn(0f, viewportPx)
         return BoardViewportTransform(
             zoom = next,
-            panX = focus - (focus - panX) * factor,
-            panY = focus - (focus - panY) * factor
+            panX = x - (x - panX) * factor,
+            panY = y - (y - panY) * factor
         ).clamped(viewportPx)
     }
+
+    /** Zoom buttons use the viewport center, unlike pinch gestures. */
+    fun zoomed(requested: Float, viewportPx: Float): BoardViewportTransform =
+        zoomedAt(requested, viewportPx, viewportPx / 2f, viewportPx / 2f)
 
     /** Inverse transformation mirrors Compose graphics-layer hit testing. */
     fun cellAt(screenX: Float, screenY: Float, viewportPx: Float, cells: Int): GridPoint? {

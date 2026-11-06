@@ -7,23 +7,32 @@ import androidx.compose.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 
+/**
+ * Assertions reflect currently playable Home, Solo and Collection screens.
+ * Old prototype-only texts must not become false launch regressions.
+ */
 class ShellSmokeTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
-    @Test fun soloWordGridOpensWithVisibleWordList() {
-        compose.onNodeWithText("Try Solo Word Search").performClick()
-        compose.onNodeWithText("Words to find").assertExists()
-        compose.onNodeWithText("New Puzzle").assertExists()
+    @Test fun soloBoardOpensAndCurrentOptionsAreDiscoverable() {
+        compose.onNodeWithText("Continue Solo").performClick()
+        compose.onNodeWithText("Words to find", substring = true).assertExists()
+        compose.onNodeWithText("Hint (3)").assertExists()
         compose.onNodeWithText("Home").performClick()
-        compose.onNodeWithText("Try Solo Word Search").assertExists()
+        compose.onNodeWithText("Continue Solo").assertExists()
+        compose.onNodeWithText("Continue Solo").performClick()
+        compose.onNodeWithText("Options").performClick()
+        compose.onNodeWithText("Customize puzzle").assertExists()
+        compose.onNodeWithText("New puzzle").assertExists()
+        compose.onNodeWithText("Feedback settings").assertExists()
     }
 
-    @Test fun appHasGridMatesIdentityAndAWorkingCollectionTab() {
+    @Test fun collectionTabContainsRealWoodlandProfilesNotPrototypeCopy() {
         compose.onNodeWithText("Word Search").assertExists()
         compose.onNodeWithText("Good puzzles. Good company.").assertExists()
         compose.onNodeWithContentDescription("Open Collection").performClick()
-        compose.onNodeWithText(
-            "Our original Woodland portraits and other GridMates styles will be added from the verified Sudoku art collection."
-        ).assertExists()
+        compose.onNodeWithText("Your Collection").assertExists()
+        compose.onNodeWithText("Portraits").assertExists()
+        compose.onNodeWithText("Achievements").assertExists()
     }
 }
