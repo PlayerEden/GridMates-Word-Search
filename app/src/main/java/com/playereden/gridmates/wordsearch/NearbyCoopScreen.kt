@@ -35,10 +35,12 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
     var manualPort by rememberSaveable { mutableStateOf("") }
     var pin by rememberSaveable { mutableStateOf("") }
     var selectedRoom by remember { mutableStateOf<NearbyListing?>(null) }
+    var chatOpen by rememberSaveable { mutableStateOf(false) }
+    var chatDraft by rememberSaveable { mutableStateOf("") }
     val ownName = store.profile.identity.displayName.trim().ifBlank { "Player" }
     val snapshot = state.snapshot
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+    Column(Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())
         .padding(horizontal = 18.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
         TextButton(onClick = onBack) { Text("← Back to Play") }
@@ -178,6 +180,8 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
             val partnerFound = snapshot.claims.filter { it.seat != localSeat }
                 .map { it.wordId }.toSet()
             val connected = snapshot.guestConnected && snapshot.hostConnected && !state.disconnected
+            val lastPartnerWord = snapshot.claims.lastOrNull { it.seat != localSeat }
+                ?.wordId?.let { id -> puzzle.targets.firstOrNull { it.id == id }?.word }
             val boardDp = (LocalConfiguration.current.screenWidthDp - 36)
                 .coerceIn(180, 440).dp
 
@@ -195,6 +199,10 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
                         fontWeight = FontWeight.SemiBold)
                     Text(if (connected) "● Partner connected" else "○ Partner offline / not joined",
                         color = if (connected) Forest else Muted)
+                    if (lastPartnerWord != null) {
+                        Text("Partner most recently found: " + lastPartnerWord,
+                            color = Forest, style = MaterialTheme.typography.bodyMedium)
+                    }
                     if (state.role == NearbyRole.HOST) {
                         Text("Host: " + state.address + ":" + state.port,
                             color = Muted, style = MaterialTheme.typography.bodySmall)
@@ -211,6 +219,70 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
                     Text("Green = your finds · Blue = partner's finds. " +
                         "First valid selection counts for the shared board.",
                         color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Partner chat", color = Forest,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold)
+                        TextButton(onClick = { chatOpen = !chatOpen }) {
+                            Text(if (chatOpen) "Hide chat" else
+                                "Open chat (" + state.chat.size + ")")
+                        }
+                    }
+                    val recent = state.chat.lastOrNull()
+                    if (!chatOpen && recent != null) {
+                        val sender = if (recent.seat == localSeat) "You" else "Partner"
+                        Text(sender + ": " + recent.text,
+                            color = Muted, style = MaterialTheme.typography.bodySmall,
+                            maxLines = 2)
+                    }
+                    if (chatOpen) {
+                        if (state.chat.isEmpty()) {
+                            Text("No messages yet. Say hello to your partner.",
+                                color = Muted, style = MaterialTheme.typography.bodySmall)
+                        }
+                        state.chat.takeLast(5).forEach { line ->
+                            val sender = if (line.seat == localSeat) "You" else
+                                if (state.role == NearbyRole.HOST)
+                                    state.guestName.ifBlank { "Partner" }
+                                else state.hostName.ifBlank { "Partner" }
+                            Text(sender + ": " + line.text,
+                                color = if (line.seat == localSeat) Forest else Muted,
+                                style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(
+                                value = chatDraft,
+                                onValueChange = { chatDraft = it.take(NearbyChatPolicy.MAX_CHARS) },
+                                label = { Text("Message") },
+                                placeholder = { Text("Say hello…") },
+                                modifier = Modifier.weight(1f),
+                                maxLines = 2,
+                                enabled = connected
+                            )
+                            Button(
+                                onClick = {
+                                    val text = NearbyChatPolicy.clean(chatDraft)
+                                    if (text.isNotBlank()) {
+                                        runtime.sendChat(text)
+                                        chatDraft = ""
+                                    }
+                                },
+                                enabled = connected && NearbyChatPolicy.clean(chatDraft).isNotBlank()
+                            ) { Text("Send") }
+                        }
+                        Text("Only the last 24 room messages are kept while the host remains open. " +
+                            "Chat is shared on your Wi-Fi, not encrypted or stored online.",
+                            color = Muted, style = MaterialTheme.typography.bodySmall)
+                    }
                 }
             }
 
