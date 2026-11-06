@@ -48,12 +48,12 @@ internal class SoloStore(
     var soundEnabled by mutableStateOf(feedbackPrefs.getBoolean("sound", false))
         private set
 
-    fun setHapticsEnabled(enabled: Boolean) {
+    fun updateHapticsPreference(enabled: Boolean) {
         hapticsEnabled = enabled
         feedbackPrefs.edit().putBoolean("haptics", enabled).apply()
     }
 
-    fun setSoundEnabled(enabled: Boolean) {
+    fun updateSoundPreference(enabled: Boolean) {
         soundEnabled = enabled
         feedbackPrefs.edit().putBoolean("sound", enabled).apply()
     }

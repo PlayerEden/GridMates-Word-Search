@@ -1,4 +1,4 @@
-name: Word Search B4 Android Runtime Audit (re-run current UI smoke)
+name: Word Search B4 Android Runtime Audit (corrected feedback methods)
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.

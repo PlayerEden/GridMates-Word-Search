@@ -226,13 +226,13 @@ internal fun WordSearchScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically) {
                         Text("Gentle vibration")
-                        Switch(checked = hapticsEnabled, onCheckedChange = store::setHapticsEnabled)
+                        Switch(checked = hapticsEnabled, onCheckedChange = store::updateHapticsPreference)
                     }
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically) {
                         Text("Word-found click")
-                        Switch(checked = soundEnabled, onCheckedChange = store::setSoundEnabled)
+                        Switch(checked = soundEnabled, onCheckedChange = store::updateSoundPreference)
                     }
                     Text("Your feedback preferences stay set on this device.",
                         style = MaterialTheme.typography.bodySmall, color = Muted)
