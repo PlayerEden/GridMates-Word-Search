@@ -232,7 +232,7 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                 when (result.status) {
                     ClaimStatus.FOUND -> {
                         val target = requireNotNull(result.target)
-                        status = "Found " + target.word + "! Saved."
+                        status = "Found " + target.word + "!"
                         if (hapticsEnabled) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         if (soundEnabled) view.playSoundEffect(SoundEffectConstants.CLICK)
                     }
