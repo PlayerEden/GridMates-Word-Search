@@ -1,4 +1,4 @@
-name: WS-01 Android QA
+name: GridMates Word Search Android QA
 
 on:
   workflow_dispatch:
@@ -9,6 +9,8 @@ on:
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
       - 'gradle.properties'
+      - 'scripts/**'
+      - 'design/woodland/**'
       - '.github/workflows/ws01-android-qa.yml'
 
 permissions:
@@ -20,6 +22,18 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      # Byte-for-byte reuse of the 12 already-approved Sudoku portraits.
+      # Pinned source commit prevents an upstream branch edit changing QA art.
+      - name: Checkout approved Sudoku Woodland art (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: PlayerEden/SudokuTogether
+          ref: 975e31a1e8cbfebad1fbbc7602b3340c357da7ef
+          path: _approved_sudoku
+          persist-credentials: false
+      - name: Verify and import the 12 approved Woodland portraits
+        run: |
+          python3 scripts/import_woodland_portraits.py --source _approved_sudoku
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -44,9 +58,16 @@ jobs:
           test -f "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep '^package:'
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "name='com.playereden.gridmates.wordsearch.qa'"
+          echo "Checking all original Woodland portraits are present in APK..."
+          unzip -Z1 "$APK" > /tmp/ws04c-apk-entries.txt
+          for name in owl fox rabbit bear badger hedgehog robin deer squirrel otter tortoise cat; do
+            grep -F "woodland_${name}" /tmp/ws04c-apk-entries.txt > /dev/null || {
+              echo "::error::Missing original Woodland portrait $name in APK"; exit 1;
+            }
+          done
           sha256sum "$APK"
       - uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS01-QA
+          name: GridMates-WordSearch-Woodland-Verified-QA
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 7
