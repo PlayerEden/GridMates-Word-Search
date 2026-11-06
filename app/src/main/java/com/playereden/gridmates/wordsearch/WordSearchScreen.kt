@@ -56,6 +56,9 @@ import androidx.compose.ui.unit.sp
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.DragDirection
 import com.playereden.gridmates.wordsearch.core.GridPoint
+import com.playereden.gridmates.wordsearch.core.PuzzleBoardSize
+import com.playereden.gridmates.wordsearch.core.PuzzleChallenge
+import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.WordDifficulty
 import com.playereden.gridmates.wordsearch.core.WordDragSnap
 import com.playereden.gridmates.wordsearch.core.WordSearchGenerator
@@ -83,9 +86,10 @@ internal fun WordSearchScreen(
     }
     val theme = run.theme
     val difficulty = run.difficulty
-    val puzzle = remember(run.puzzleId) {
-        WordSearchGenerator.generate(theme, difficulty, run.seed)
-    }
+    val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
+    val challengeLabel = run.challenge?.label ?: difficulty.label
+    val sizeLabel = run.boardSize?.let { "${it.cells}×${it.cells}" } ?:
+        "${difficulty.gridSize}×${difficulty.gridSize}"
     val found = run.foundIds
     LaunchedEffect(daily, run.puzzleId) {
         while (true) {
@@ -100,7 +104,24 @@ internal fun WordSearchScreen(
     var feelOpen by rememberSaveable { mutableStateOf(false) }
     var newPuzzleOpen by rememberSaveable { mutableStateOf(false) }
     var pendingTheme by rememberSaveable { mutableStateOf(theme.name) }
-    var pendingDifficulty by rememberSaveable { mutableStateOf(difficulty.name) }
+    var pendingBoard by rememberSaveable {
+        mutableStateOf(
+            (run.boardSize ?: when(difficulty) {
+                WordDifficulty.EASY -> PuzzleBoardSize.COMPACT
+                WordDifficulty.MEDIUM -> PuzzleBoardSize.STANDARD
+                WordDifficulty.HARD -> PuzzleBoardSize.LARGE
+            }).name
+        )
+    }
+    var pendingChallenge by rememberSaveable {
+        mutableStateOf(
+            (run.challenge ?: when(difficulty) {
+                WordDifficulty.EASY -> PuzzleChallenge.RELAXED
+                WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
+                WordDifficulty.HARD -> PuzzleChallenge.EXPERT
+            }).name
+        )
+    }
     var hapticsEnabled by rememberSaveable { mutableStateOf(true) }
     var soundEnabled by rememberSaveable { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -132,22 +153,38 @@ internal fun WordSearchScreen(
                             Text(item.label)
                         }
                     }
-                    Text("Difficulty", style = MaterialTheme.typography.titleSmall, color = Forest)
-                    WordDifficulty.entries.forEach { item ->
-                        Row(Modifier.fillMaxWidth().clickable { pendingDifficulty = item.name },
+                    Text("Board size", style = MaterialTheme.typography.titleSmall, color = Forest)
+                    PuzzleBoardSize.entries.forEach { item ->
+                        Row(Modifier.fillMaxWidth().clickable { pendingBoard = item.name },
                             verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(selected = pendingDifficulty == item.name,
-                                onClick = { pendingDifficulty = item.name })
-                            Text(item.label + " · " + item.gridSize + "×" + item.gridSize)
+                            RadioButton(selected = pendingBoard == item.name,
+                                onClick = { pendingBoard = item.name })
+                            Text("${item.label} · ${item.cells}×${item.cells} · ${item.targets} words")
                         }
                     }
-                    Text("Changing this starts a new puzzle. Completed results remain in Records.",
+                    Text("Challenge", style = MaterialTheme.typography.titleSmall, color = Forest)
+                    PuzzleChallenge.entries.forEach { item ->
+                        Row(Modifier.fillMaxWidth().clickable { pendingChallenge = item.name },
+                            verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(selected = pendingChallenge == item.name,
+                                onClick = { pendingChallenge = item.name })
+                            Column {
+                                Text(item.label)
+                                Text(item.description, color = Muted,
+                                    style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                    Text("Board size sets the space and number of words. Challenge changes " +
+                        "the directions and word mix. Starting replaces your unfinished Solo board.",
                         style = MaterialTheme.typography.bodySmall, color = Muted)
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    store.choose(WordTheme.valueOf(pendingTheme), WordDifficulty.valueOf(pendingDifficulty))
+                    store.chooseV2(WordTheme.valueOf(pendingTheme),
+                        PuzzleBoardSize.valueOf(pendingBoard),
+                        PuzzleChallenge.valueOf(pendingChallenge))
                     changeOpen = false
                 }) { Text("Start puzzle") }
             },
@@ -173,7 +210,7 @@ internal fun WordSearchScreen(
                         Text("Word-found click")
                         Switch(checked = soundEnabled, onCheckedChange = { soundEnabled = it })
                     }
-                    Text("These preferences are local to this prototype; permanent settings come later.",
+                    Text("These feedback options apply to this play session.",
                         style = MaterialTheme.typography.bodySmall, color = Muted)
                 }
             },
@@ -205,16 +242,25 @@ internal fun WordSearchScreen(
                 verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = { store.flush(); onBack() }) { Text("Home") }
                 Text((if (daily) "Daily · " + store.selectedDailyDate + " · " else "") +
-                    theme.label + " · " + difficulty.label,
+                    theme.label + " · " + sizeLabel + " · " + challengeLabel,
                     style = MaterialTheme.typography.titleSmall,
                     color = Forest, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f).padding(horizontal = 4.dp))
                 if (!daily) {
                     TextButton(onClick = {
                         pendingTheme = theme.name
-                        pendingDifficulty = difficulty.name
+                        pendingBoard = (run.boardSize ?: when (difficulty) {
+                            WordDifficulty.EASY -> PuzzleBoardSize.COMPACT
+                            WordDifficulty.MEDIUM -> PuzzleBoardSize.STANDARD
+                            WordDifficulty.HARD -> PuzzleBoardSize.LARGE
+                        }).name
+                        pendingChallenge = (run.challenge ?: when (difficulty) {
+                            WordDifficulty.EASY -> PuzzleChallenge.RELAXED
+                            WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
+                            WordDifficulty.HARD -> PuzzleChallenge.EXPERT
+                        }).name
                         changeOpen = true
-                    }) { Text("Change") }
+                    }) { Text("Customize") }
                 }
             }
             Row(Modifier.fillMaxWidth(),
@@ -245,11 +291,11 @@ internal fun WordSearchScreen(
                 }) { Text("Hint") }
             }
             Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = { feelOpen = true }) { Text("Feel") }
+                TextButton(onClick = { feelOpen = true }) { Text("Feedback settings") }
                 if (!daily) {
-                    TextButton(onClick = { newPuzzleOpen = true }) { Text("New Puzzle") }
+                    TextButton(onClick = { newPuzzleOpen = true }) { Text("New puzzle") }
                 }
             }
 
