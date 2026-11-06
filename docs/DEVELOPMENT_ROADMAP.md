@@ -2,6 +2,8 @@
 
 **Baseline:** November 5, 2026
 
+**WS-04B Profile & Collections:** [Draft PR #12](https://github.com/PlayerEden/GridMates-Word-Search/pull/12) has an offline display name, 12 stable Woodland avatar IDs, completion-based unlockable selection, eight evidence-based achievements, Collection UI and backward-compatible save schema 3. [WS-04B plan / QA gates](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws04b-profile-woodland-achievements-2026-11-05/docs/WS04B_PROFILE_COLLECTION_PLAN.md). Original approved Woodland PNGs are **not yet packaged**; placeholder monograms are intentional while safe original art migration is pending. Android CI and physical QA must still be checked.
+
 **WS-04A Daily alpha:** [Draft PR #9](https://github.com/PlayerEden/GridMates-Word-Search/pull/9) adds device-local deterministic Daily, persistent dated history, schema-1→2 migration and backup that includes Solo + Daily. [GitHub CI #42152990119](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42152990119) is green; [QA receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws04a-offline-daily-2026-11-05/docs/WS04A_BUILD_QA_2026-11-05.md). Physical UX/migration checks and all other WS-04 collections/profile/rewards work remain open.
 
 **WS-03 Solo beta:** [Draft PR #7](https://github.com/PlayerEden/GridMates-Word-Search/pull/7) and [issue #8](https://github.com/PlayerEden/GridMates-Word-Search/issues/8) contain local save/resume, completion records, hint ladder and manual export/import. The [phone test playbook](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws03-solo-save-results-2026-11-05/docs/WS03_SOLO_BETA_PLAYTEST.md) is the acceptance checklist. **Source CI is green** at [build #42149214204](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42149214204); [QA and APK receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws03-solo-save-results-2026-11-05/docs/WS03_BUILD_QA_2026-11-05.md). Physical testing and seamless update signing remain open.
@@ -28,7 +30,7 @@ A milestone is done only when its acceptance evidence exists in **this** reposit
 | **WS-02** | Puzzle engine and touch prototype | **CI GREEN; PHONE QA OPEN** | Deterministic word placement/validation, word-list content, drag selection, basic game loop | Unit tests + real input/UI smoke |
 | **WS-02B** | Input feel, marker highlights, compact play layout | CI GREEN; PHONE QA OPEN | Snapping, ink-like highlight, haptics, word list near grid, art pipeline | Automated checks + real-device drag/visual acceptance |
 | **WS-03** | Complete Solo experience | **CI GREEN — PHONE QA OPEN** | Difficulty/theme selection, resume, hints, results, player-friendly interactions | Save/restart, narrow-phone, long-session, accessibility checks |
-| **WS-04** | Daily, profile, collections | **WS-04A DAILY CI GREEN; remaining features PLANNED** | Dated puzzle/history, local stats/achievements, original portraits and settings | Upgrade tests, no duplicate Daily rewards, asset/hash checks |
+| **WS-04** | Daily, profile, collections | **WS-04A CI GREEN; WS-04B IN PROGRESS** | Dated puzzle/history, local stats/achievements, original portraits and settings | Upgrade tests, no duplicate Daily rewards, asset/hash checks |
 | **WS-05** | Nearby Co-op | PLANNED | Open Nearby host/join, optional code, shared word claims, chat/presence, reconnect | Two actual Android phones + protocol/failure tests |
 | **WS-06** | Both Versus modes | PLANNED | Shared Board Race and Speed Duel, separate records, fair completion logic | Two-phone races, same-word collisions, near-ties and disconnect QA |
 | **WS-07** | Content and UX polish | PLANNED | More themes, hint refinements, device-consistent fonts, profile/collection polish; optional sharing and rewards if approved | Physical UX/accessibility/art/content quality audit |
@@ -94,6 +96,9 @@ Work:
 **Acceptance:** airplane mode works; installed app survives background/kill/restart without losing or mutating board; assisted/unassisted stats do not fabricate scores; narrow/landscape/200%-font device paths pass.
 
 ## WS-04 — Daily + identity that feels like GridMates
+
+**Sequencing:** WS-04A delivers Daily gameplay and schema-2 saves; WS-04B adds local identity, collections and achievements with schema-3 migration. The original approved Woodland PNGs are scheduled for a separate **WS-04C art import** so the asset provenance and checksum gate cannot be skipped. Ocean and Bugs art, profile share cards and optional daily rewards remain future design decisions.
+
 
 **Goal:** familiar, rewarding long-term use without an account.
 
