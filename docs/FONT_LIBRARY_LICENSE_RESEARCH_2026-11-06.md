@@ -85,3 +85,11 @@ For **each** candidate font, keep a machine-readable ledger row including:
 - The eight families above have directly verifiable official OFL-1.1 notices, but exact built binaries have **not yet been retrieved and audited** or copied into the app.
 - License notice provenance needs to be matched to the **exact approved binary revision**, not inferred from a live GitHub `main` URL at a future release date.
 - This is engineering/legal-license research, not a substitute for a lawyer's review of a final paid catalog or consumer disclosures.
+
+## Google Play monetization compliance (separate from font copyright)
+
+When the **Google Play-distributed** version charges money to unlock a **digital in-app cosmetic**, Google Play's payments policy generally requires the Play Billing system, subject to defined alternative-billing exceptions/programs. This is **a different legal requirement** from OFL font redistribution rights. We should not activate paid font entitlements until the billing, purchase acknowledgment, restore and consumer disclosure paths have been implemented and tested. A game may use earned/free font cosmetics without Play Billing.
+
+- Official [Google Play Payments policy](https://support.google.com/googleplay/android-developer/answer/9858738?hl=en) and [explanation for digital goods](https://support.google.com/googleplay/android-developer/answer/10281818?hl=en-en).
+- Advertise the item honestly as an **in-game appearance option**, not sale of the underlying font file or exclusive rights to its copyright. Keep a license notice reachable even while a cosmetic is locked.
+- Avoid misleading “rare/exclusive font ownership” claims for an openly licensed typeface. Exclusivity can refer only to the game's own presentation/reward event, if applicable, not the open font's redistribution rights.
