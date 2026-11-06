@@ -60,14 +60,15 @@ object WordLibraryV2 {
     fun count(theme: WordTheme): Int = packs.getValue(theme).size
 
     internal fun words(theme: WordTheme, board: PuzzleBoardSize,
-                       challenge: PuzzleChallenge, seed: Long): List<String> {
-        val max = if (board == PuzzleBoardSize.COMPACT) 7 else board.cells
+                       challenge: PuzzleChallenge, seed: Long, attempt: Int = 0): List<String> {
+        val max = (board.cells - 1).coerceAtLeast(4)
         val eligible = packs.getValue(theme).filter { it.spelling.length <= max }
         val pool = if (challenge == PuzzleChallenge.RELAXED) eligible.filter {
             it.familiarity <= 2
         } else eligible
         val rng = Random(seed xor (theme.ordinal.toLong() shl 31)
-            xor (board.ordinal.toLong() shl 16) xor (challenge.ordinal + 41).toLong())
+            xor (board.ordinal.toLong() shl 16) xor (challenge.ordinal + 41).toLong()
+            xor (attempt.toLong() * 0x7EE21L))
         val lessCommon = when (challenge) {
             PuzzleChallenge.RELAXED -> emptyList()
             PuzzleChallenge.CLASSIC -> pool.filter { it.familiarity == 3 }.shuffled(rng).take(1)
@@ -90,7 +91,8 @@ object WordSearchGeneratorV2 {
     fun generate(theme: WordTheme, board: PuzzleBoardSize,
                  challenge: PuzzleChallenge, seed: Long): WordSearchPuzzle {
         val size = board.cells
-        val words = WordLibraryV2.words(theme, board, challenge, seed)
+        // A rare crowded layout must not make an otherwise valid puzzle fail.
+        // Each retry explores a different deterministic word subset.
         val rng = Random(seed xor 0x4725AF01L xor ((theme.ordinal + 1L) shl 32)
             xor ((board.ordinal + 1L) shl 21) xor challenge.ordinal.toLong())
         val directions = when(challenge) {
@@ -98,7 +100,8 @@ object WordSearchGeneratorV2 {
             PuzzleChallenge.CLASSIC -> classic
             PuzzleChallenge.EXPERT -> all
         }
-        repeat(160) {
+        repeat(160) { attempt ->
+            val words = WordLibraryV2.words(theme, board, challenge, seed, attempt)
             val grid = Array(size) { CharArray(size) { ' ' } }
             val targets = mutableListOf<WordTarget>()
             var placed = true
