@@ -1,5 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -25,6 +27,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +43,63 @@ import com.playereden.gridmates.wordsearch.core.GameMode
 private enum class Page(val label: String) {
     PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
     SETTINGS("Settings"), HELP("Help"), PUZZLE("Puzzle")
+}
+
+@Composable
+private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
+    val ink = if (selected) Forest else Muted
+    Canvas(Modifier.size(22.dp)) {
+        val w = size.width
+        val h = size.height
+        val stroke = 2.dp.toPx()
+        when (page) {
+            Page.PLAY -> {
+                val roof = Path().apply {
+                    moveTo(w * 0.12f, h * 0.46f)
+                    lineTo(w * 0.50f, h * 0.14f)
+                    lineTo(w * 0.88f, h * 0.46f)
+                }
+                drawPath(roof, ink, style = Stroke(width = stroke,
+                    cap = StrokeCap.Round, join = StrokeJoin.Round))
+                drawRect(ink, topLeft = Offset(w * 0.24f, h * 0.46f),
+                    size = Size(w * 0.52f, h * 0.40f),
+                    style = Stroke(width = stroke))
+            }
+            Page.RECORDS -> {
+                for (i in 0..2) {
+                    val barHeight = h * (0.25f + i * 0.20f)
+                    drawRoundRect(ink,
+                        topLeft = Offset(w * (0.13f + i * 0.27f), h * 0.89f - barHeight),
+                        size = Size(w * 0.16f, barHeight),
+                        cornerRadius = CornerRadius(stroke * 0.5f))
+                }
+            }
+            Page.COLLECTION -> {
+                for (row in 0..1) for (col in 0..1) {
+                    drawRoundRect(ink,
+                        topLeft = Offset(w * (0.16f + col * 0.39f),
+                            h * (0.16f + row * 0.39f)),
+                        size = Size(w * 0.28f, h * 0.28f),
+                        cornerRadius = CornerRadius(stroke),
+                        style = Stroke(width = stroke))
+                }
+            }
+            Page.SETTINGS -> {
+                drawCircle(ink, radius = w * 0.29f, style = Stroke(width = stroke))
+                drawCircle(ink, radius = w * 0.11f)
+                for (i in 0..7) {
+                    val angle = i * Math.PI / 4.0
+                    val dx = kotlin.math.cos(angle).toFloat()
+                    val dy = kotlin.math.sin(angle).toFloat()
+                    drawLine(ink,
+                        Offset(w * 0.5f + dx * w * 0.33f, h * 0.5f + dy * h * 0.33f),
+                        Offset(w * 0.5f + dx * w * 0.44f, h * 0.5f + dy * h * 0.44f),
+                        strokeWidth = stroke, cap = StrokeCap.Round)
+                }
+            }
+            else -> Unit
+        }
+    }
 }
 
 @Composable
@@ -52,7 +118,7 @@ internal fun GridMatesShell() {
                         },
                         selected = item == page,
                         onClick = { pageName = item.name },
-                        icon = { Text(if (item == page) "●" else "○") },
+                        icon = { GridMatesNavGlyph(item, item == page) },
                         label = { Text(item.label) }
                     )
                 }
