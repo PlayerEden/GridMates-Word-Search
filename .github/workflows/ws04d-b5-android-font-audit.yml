@@ -1,4 +1,4 @@
-name: Word Search B5 + WS05D Admission Lifecycle Android Audit
+name: Word Search B5 + WS05D Ordered Admission Emulator Audit
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
