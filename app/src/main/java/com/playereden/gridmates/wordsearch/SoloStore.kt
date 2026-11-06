@@ -131,6 +131,30 @@ internal class SoloStore(context: Context) {
         }
     }
 
+    /** Manual Android document backup for QA installs without stable signing. */
+    fun exportBackup(): String {
+        flush()
+        return encode(profile).toString(StandardCharsets.UTF_8)
+    }
+
+    /** Parse and validate without modifying existing progress. */
+    fun previewBackup(raw: String): SoloProfile = decode(raw)
+
+    /**
+     * Only invoke following an explicit confirmation screen.
+     * A failed write does not intentionally discard the old atomic backup.
+     */
+    fun restoreBackup(restored: SoloProfile): Boolean {
+        if (blocked) {
+            warning = "Recovery of an unreadable save must be handled separately. " +
+                "The original data is still protected."
+            return false
+        }
+        profile = restored.copy(active = SoloProgressRules.validate(restored.active))
+        flush()
+        return warning == null
+    }
+
     fun choose(theme: WordTheme, difficulty: WordDifficulty) {
         if (blocked) return
         profile = profile.copy(active = SoloProgressRules.fresh(theme, difficulty, nextSeed()))
