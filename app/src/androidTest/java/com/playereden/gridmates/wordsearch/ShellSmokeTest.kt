@@ -35,4 +35,13 @@ class ShellSmokeTest {
         compose.onNodeWithText("Portraits").assertExists()
         compose.onNodeWithText("Achievements").assertExists()
     }
+    @Test fun fontCollectionTabShowsFreeEarnedAndDefaultStyles() {
+        compose.onNodeWithContentDescription("Open Collection").performClick()
+        compose.onNodeWithText("Fonts").performClick()
+        compose.onNodeWithText("board fonts unlocked", substring = true).assertExists()
+        compose.onNodeWithText("Readable Print").assertExists()
+        compose.onNodeWithText("Classic Typewriter").assertExists()
+        compose.onNodeWithText("Pencil Notes").assertExists()
+    }
+
 }

@@ -12,6 +12,7 @@ on:
       - 'scripts/**'
       - 'design/woodland/**'
       - '.github/workflows/ws01-android-qa.yml'
+      - 'design/font-library-approved-b5.json'
 
 permissions:
   contents: read
@@ -34,6 +35,23 @@ jobs:
       - name: Verify and import the 12 approved Woodland portraits
         run: |
           python3 scripts/import_woodland_portraits.py --source _approved_sudoku
+      - name: Checkout reviewed OFL fonts (pinned, sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: google/fonts
+          ref: 24ddc1f324cac5d9f5aedca126d298f56e3f1640
+          path: _approved_fonts
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            ofl/atkinsonhyperlegible
+            ofl/ibmplexmono
+            ofl/dmmono
+            ofl/patrickhand
+      - name: Verify and bundle font binaries and license notices
+        run: |
+          python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
+          python3 scripts/import_font_library.py --source _approved_fonts
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -58,6 +76,17 @@ jobs:
           test -f "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep '^package:'
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "name='com.playereden.gridmates.wordsearch.qa'"
+          echo "Checking four bundled OFL fonts and licenses..."
+          for id in atkinson plex_mono dm_mono patrick_hand; do
+            unzip -Z1 "$APK" | grep -F "gm_${id}" >/dev/null || {
+              echo "::error::Missing packaged font gm_$id"; exit 1;
+            }
+          done
+          for id in atkinson plex dmmono patrick; do
+            unzip -Z1 "$APK" | grep -F "font_licenses/${id}_ofl.txt" >/dev/null || {
+              echo "::error::Missing bundled font license $id"; exit 1;
+            }
+          done
           echo "Checking all original Woodland portraits are present in APK..."
           unzip -Z1 "$APK" > /tmp/ws04c-apk-entries.txt
           for name in owl fox rabbit bear badger hedgehog robin deer squirrel otter tortoise cat; do

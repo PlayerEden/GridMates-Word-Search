@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "status": "pinned_approved_for_B5_source_intake_not_phone_accepted",
+  "sourceRepository": "google/fonts",
+  "sourceCommit": "24ddc1f324cac5d9f5aedca126d298f56e3f1640",
+  "license": "OFL-1.1",
+  "policy": "All fonts free. Three optional styles unlock only through existing achievement evidence. No shop, ads, IAP or currency.",
+  "entries": [
+    {
+      "id": "atkinson",
+      "family": "Atkinson Hyperlegible",
+      "sourcePath": "ofl/atkinsonhyperlegible/AtkinsonHyperlegible-Regular.ttf",
+      "sourceGitBlobSha1": "b3cc4200fcf09d600eac74002ab4ea65b404a536",
+      "sourceBytes": 54348,
+      "sourceSha256": "7fb917c89019896d0b52ee84b7cbb3304c18cb90b19a62f5e32712bd23e97669",
+      "licensePath": "ofl/atkinsonhyperlegible/OFL.txt",
+      "licenseGitBlobSha1": "2befc89b0ee81d5a37e6ca6503bb0db099feb70f",
+      "licenseBytes": 4352,
+      "licenseSha256": "f32d22b3908fcad2c86a74000614ec22e6a7f66ea7e867e616026a27aebdc143",
+      "androidFile": "gm_atkinson.ttf",
+      "unlockAchievementId": null,
+      "licenseNoticeAsset": "font_licenses/atkinson_ofl.txt"
+    },
+    {
+      "id": "plex",
+      "family": "IBM Plex Mono",
+      "sourcePath": "ofl/ibmplexmono/IBMPlexMono-Regular.ttf",
+      "sourceGitBlobSha1": "0c9770d5183ba60dc4350d3e011b782a320761ae",
+      "sourceBytes": 135580,
+      "sourceSha256": "6a3412f058c7d8dfd9170c41e85ade48e5156ecb89356110ca57a0a27734af46",
+      "licensePath": "ofl/ibmplexmono/OFL.txt",
+      "licenseGitBlobSha1": "c35c4c618fab33da8695177b3a6cefe0810b7b28",
+      "licenseBytes": 4456,
+      "licenseSha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da",
+      "androidFile": "gm_plex_mono.ttf",
+      "unlockAchievementId": "first_puzzle",
+      "licenseNoticeAsset": "font_licenses/plex_ofl.txt"
+    },
+    {
+      "id": "dmmono",
+      "family": "DM Mono",
+      "sourcePath": "ofl/dmmono/DMMono-Regular.ttf",
+      "sourceGitBlobSha1": "1cdda9146d31e5dfb28cf299548b73f502142ccc",
+      "sourceBytes": 49744,
+      "sourceSha256": "55b4c98f123daebb3ed27947ba47b2af00554fc6284d639a540bcef5e6258ad2",
+      "licensePath": "ofl/dmmono/OFL.txt",
+      "licenseGitBlobSha1": "01450afc0769581ef9548569b1214d88ee28cd1a",
+      "licenseBytes": 4484,
+      "licenseSha256": "2bada5ea45c3c63b7f1ea1f88ce9672c9e4f0c42b2c3b7378949084fe55a3066",
+      "androidFile": "gm_dm_mono.ttf",
+      "unlockAchievementId": "five_puzzles",
+      "licenseNoticeAsset": "font_licenses/dmmono_ofl.txt"
+    },
+    {
+      "id": "patrick",
+      "family": "Patrick Hand",
+      "sourcePath": "ofl/patrickhand/PatrickHand-Regular.ttf",
+      "sourceGitBlobSha1": "fb45ccdbd344ab7f9f4ae98792521405e48cda3e",
+      "sourceBytes": 214772,
+      "sourceSha256": "0f173b3e6cb6d1af25babf7f0057c5ac4ee11f9992b0469bb817e967ef4ad0fc",
+      "licensePath": "ofl/patrickhand/OFL.txt",
+      "licenseGitBlobSha1": "4d5f9447f48357b6a4ac294604954b274059d119",
+      "licenseBytes": 4376,
+      "licenseSha256": "377f4f9c19e935228552478eb68cc2ed82910988a60ba60e2ac73b09f32d02d1",
+      "androidFile": "gm_patrick_hand.ttf",
+      "unlockAchievementId": "one_daily",
+      "licenseNoticeAsset": "font_licenses/patrick_ofl.txt"
+    }
+  ]
+}

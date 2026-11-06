@@ -5,6 +5,7 @@ import android.util.AtomicFile
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.playereden.gridmates.wordsearch.core.BoardFontCollection
 import com.playereden.gridmates.wordsearch.core.DailyChallenge
 import com.playereden.gridmates.wordsearch.core.DailyProgress
 import com.playereden.gridmates.wordsearch.core.PlayerIdentity
@@ -56,6 +57,26 @@ internal class SoloStore(
     fun updateSoundPreference(enabled: Boolean) {
         soundEnabled = enabled
         feedbackPrefs.edit().putBoolean("sound", enabled).apply()
+    }
+
+    private val fontPrefs = context.getSharedPreferences(
+        saveName + "_board_fonts", Context.MODE_PRIVATE
+    )
+    var selectedBoardFontId by mutableStateOf(
+        fontPrefs.getString("selected_id", BoardFontCollection.DEFAULT_ID)
+            ?: BoardFontCollection.DEFAULT_ID
+    )
+        private set
+
+    /** Unknown/locked IDs fall back safely without corrupting a saved puzzle. */
+    val effectiveBoardFontId: String
+        get() = BoardFontCollection.effective(profile, selectedBoardFontId)
+
+    fun equipBoardFont(id: String): Boolean {
+        if (blocked || !BoardFontCollection.allowed(profile, id)) return false
+        selectedBoardFontId = id
+        fontPrefs.edit().putString("selected_id", id).apply()
+        return true
     }
 
     private var blocked = false

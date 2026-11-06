@@ -2,12 +2,16 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -15,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -38,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.AchievementProgress
+import com.playereden.gridmates.wordsearch.core.BoardFontCollection
+import com.playereden.gridmates.wordsearch.core.BoardFontProgress
 import com.playereden.gridmates.wordsearch.core.PortraitProgress
 import com.playereden.gridmates.wordsearch.core.WoodlandCollection
 import com.playereden.gridmates.wordsearch.core.WordSearchAchievements
@@ -62,7 +69,36 @@ internal fun CollectionScreen(store: SoloStore) {
     var draftName by remember(profile.identity.displayName) {
         mutableStateOf(profile.identity.displayName)
     }
-    var showAchievements by rememberSaveable { mutableStateOf(false) }
+    var collectionTab by rememberSaveable { mutableStateOf("Portraits") }
+    var licenseFontId by rememberSaveable { mutableStateOf<String?>(null) }
+    val fonts = remember(profile, store.selectedBoardFontId) {
+        BoardFontCollection.progress(profile, store.selectedBoardFontId)
+    }
+
+    if (licenseFontId != null) {
+        val fontId = requireNotNull(licenseFontId)
+        val label = BoardFontCollection.definitions.firstOrNull { it.id == fontId }?.label
+            ?: "Typeface"
+        val notice = remember(fontId) {
+            runCatching {
+                context.assets.open("font_licenses/${fontId}_ofl.txt")
+                    .bufferedReader(Charsets.UTF_8).use { it.readText() }
+            }.getOrElse { "License notice could not be opened." }
+        }
+        AlertDialog(
+            onDismissRequest = { licenseFontId = null },
+            title = { Text("$label · Open Font License") },
+            text = {
+                Column(Modifier.heightIn(max = 440.dp)
+                    .verticalScroll(rememberScrollState())) {
+                    Text(notice, style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { licenseFontId = null }) { Text("Close") }
+            }
+        )
+    }
 
     if (showNameDialog) {
         AlertDialog(
@@ -121,21 +157,38 @@ internal fun CollectionScreen(store: SoloStore) {
         }
     }
 
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (showAchievements) {
-            OutlinedButton(onClick = { showAchievements = false },
-                modifier = Modifier.weight(1f)) { Text("Portraits") }
-            Button(onClick = { showAchievements = true },
-                modifier = Modifier.weight(1f)) { Text("Achievements") }
-        } else {
-            Button(onClick = { showAchievements = false },
-                modifier = Modifier.weight(1f)) { Text("Portraits") }
-            OutlinedButton(onClick = { showAchievements = true },
-                modifier = Modifier.weight(1f)) { Text("Achievements") }
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        for (label in listOf("Portraits", "Fonts", "Achievements")) {
+            FilterChip(
+                selected = collectionTab == label,
+                onClick = { collectionTab = label },
+                label = { Text(label) }
+            )
         }
     }
 
-    if (showAchievements) {
+    if (collectionTab == "Fonts") {
+        Text(fonts.count { it.unlocked }.toString() + " / " +
+            fonts.size + " board fonts unlocked",
+            color = Forest, style = MaterialTheme.typography.titleMedium)
+        Text("All styles are free. Earn fonts through achievements, then equip " +
+            "one to change your puzzle letters. The readable default is always available.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+        fonts.chunked(2).forEach { pair ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                pair.forEach { item ->
+                    BoardFontCard(item, Modifier.weight(1f),
+                        onEquip = { store.equipBoardFont(item.font.id) },
+                        onLicense = { licenseFontId = item.font.id })
+                }
+                if (pair.size == 1) Box(Modifier.weight(1f))
+            }
+        }
+        Text("Every font is bundled for offline use under its own Open Font License. " +
+            "Tap License to read the full copyright and redistribution terms.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+    } else if (collectionTab == "Achievements") {
         Text(achievements.count { it.unlocked }.toString() +
             " / " + achievements.size + " achievements",
             color = Forest, style = MaterialTheme.typography.titleMedium)
@@ -169,6 +222,43 @@ internal fun CollectionScreen(store: SoloStore) {
         Text("Unlocks depend on completed Solo and Daily puzzles. " +
             "No random purchases, streak deadlines or paid portraits.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+private fun BoardFontCard(
+    item: BoardFontProgress,
+    modifier: Modifier,
+    onEquip: () -> Unit,
+    onLicense: () -> Unit
+) {
+    Card(modifier) {
+        Column(Modifier.padding(9.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            BoardFontPreview(item.font.id)
+            Text(item.font.label, color = Forest,
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2)
+            Text(when {
+                item.equipped -> "Equipped"
+                item.unlocked -> "Unlocked · Free"
+                else -> "Earn: " + (item.achievementName ?: "Achievement")
+            }, color = Muted, style = MaterialTheme.typography.labelMedium)
+            Text(item.font.description, color = Muted,
+                style = MaterialTheme.typography.bodySmall)
+            TextButton(
+                onClick = onEquip,
+                enabled = item.unlocked && !item.equipped,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(if (item.equipped) "Selected" else
+                    if (item.unlocked) "Equip" else "Locked")
+            }
+            TextButton(onClick = onLicense, modifier = Modifier.fillMaxWidth()) {
+                Text("License")
+            }
+        }
     }
 }
 
