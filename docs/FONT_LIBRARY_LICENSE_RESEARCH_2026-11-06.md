@@ -5,6 +5,12 @@
 **Product:** GridMates: Word Search (Android), with a future family of GridMates puzzle apps.  
 **Related:** [B5 typography and unlockables issue #29](https://github.com/PlayerEden/GridMates-Word-Search/issues/29) · [Game Design roadmap](DEVELOPMENT_ROADMAP.md).
 
+## Current product decision: earned-only cosmetics (November 6, 2026)
+
+**All font unlockables are free during development and for the current product plan.** Players unlock additional face styles through game achievements and permanent, clear milestones; no money, ads, gacha rolls, consumable tokens, timers, premium fonts or font shop. Maintain a readable default available to everyone. Proposed mechanics: a one-time, idempotent achievement awards a font entitlement; profile/Collection tracks `locked → owned → equipped`; retroactive checks award qualifying fonts when existing achievements already show progress. **Exact achievements and thresholds will be designed and audited in B5/B7**, not invented as completed features here. The same policy can apply to portrait and marker cosmetics until the user explicitly changes direction.
+
+Monetization and Google Play Billing analysis below is **future legal contingency research**, not an instruction to implement purchases now. Font license notices, redistribution terms, glyph validation and cross-device bundling apply even to free unlocks.
+
 ## Executive decision
 
 **Build a reusable, legally tracked library of bundled fonts before introducing paid cosmetics.** The license and a font's visual quality are separate gates. A font can be legally distributable yet unsuitable for a 20×20 word-search grid. Keep the default readable and free; unlocking another look must never hide letters, change generator output or affect a player's accuracy.
