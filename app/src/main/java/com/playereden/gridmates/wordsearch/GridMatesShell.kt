@@ -107,7 +107,7 @@ private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
 }
 
 @Composable
-internal fun GridMatesShell(soloStore: SoloStore) {
+internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel) {
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
 
@@ -134,7 +134,10 @@ internal fun GridMatesShell(soloStore: SoloStore) {
     ) { contentPadding ->
         if (page == Page.NEARBY) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
-                NearbyCoopScreen(soloStore, onBack = { pageName = Page.PLAY.name })
+                NearbyCoopScreen(soloStore, nearbyRooms, onBack = {
+                    nearbyRooms.leaveRoom()
+                    pageName = Page.PLAY.name
+                })
             }
         } else if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
