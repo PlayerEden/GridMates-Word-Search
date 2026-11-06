@@ -660,8 +660,10 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             override fun onServiceFound(service: NsdServiceInfo) {
                 if (discovery !== this || closed ||
                     !service.serviceType.startsWith("_gridmatesws._tcp")) return
+                val first = discoveryQueue.found(service.serviceName)
+                if (!discoveryQueue.isLive(service.serviceName)) return
                 discoveredInfos[service.serviceName] = service
-                discoveryQueue.found(service.serviceName)?.let { resolveQueued(it, this) }
+                first?.let { resolveQueued(it, this) }
             }
             override fun onServiceLost(service: NsdServiceInfo) {
                 if (discovery !== this || closed) return
