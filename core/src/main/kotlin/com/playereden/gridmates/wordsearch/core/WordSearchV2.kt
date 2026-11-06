@@ -12,8 +12,8 @@ enum class PuzzleBoardSize(val label: String, val cells: Int, val targets: Int) 
 
     // Paperback-sized choices for NEW Solo puzzles. Old v2 puzzles remain valid.
     BOOK_SHORT("Short", 12, 12),
-    BOOK_CLASSIC("Classic book", 15, 16),
-    BOOK_BIG("Big book", 20, 24);
+    BOOK_CLASSIC("Standard", 15, 16),
+    BOOK_BIG("Extended", 20, 24);
 
     companion object {
         val bookPresets: List<PuzzleBoardSize> =
