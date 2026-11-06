@@ -29,7 +29,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 /** Only protocol-compatible devices on a trusted local network can join. */
-private const val WS_WIRE_VERSION = 2
+private const val WS_WIRE_VERSION = 3
 private const val WS_NSD_TYPE = "_gridmatesws._tcp."
 private const val WS_PACKET_MAX = 16_384
 
@@ -55,6 +55,7 @@ internal data class NearbyUiState(
     val guestName: String = "",
     val snapshot: CoopSnapshot? = null,
     val chat: List<NearbyChatLine> = emptyList(),
+    val pendingChat: PendingNearbyChat? = null,
     val disconnected: Boolean = false
 )
 
@@ -103,12 +104,14 @@ internal object NearbyPacket {
         JSONObject().put("type", "chat")
             .put("sequence", line.sequence).put("seat", line.seat.name)
             .put("text", line.text).put("sentAt", line.sentAtMs)
+            .put("requestId", line.requestId)
 
     fun readChatLine(json: JSONObject): NearbyChatLine {
         require(json.getString("type") == "chat")
         val line = NearbyChatLine(json.getLong("sequence"),
             CoopSeat.valueOf(json.getString("seat")),
-            json.getString("text"), json.getLong("sentAt"))
+            json.getString("text"), json.getLong("sentAt"),
+            json.getString("requestId"))
         NearbyChatLog.validateHistory(listOf(line))
         return line
     }
@@ -166,12 +169,13 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         Thread(runnable, "ws05-heartbeat").apply { isDaemon = true }
     }
     private val lock = Any()
-    private var closed = false
+    @Volatile private var closed = false
     private var listener: ServerSocket? = null
     private var peer: Socket? = null
     private var client: Socket? = null
     private var authority: NearbyCoopSession? = null
     private var reservedToken: String? = null
+    private var pendingGuestChat: PendingNearbyChat? = null
     private var registration: NsdManager.RegistrationListener? = null
     private var discovery: NsdManager.DiscoveryListener? = null
     private val invalidCodes = mutableMapOf<String, MutableList<Long>>()
@@ -351,15 +355,17 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 if (synchronized(lock) { peer !== socket }) break
                 when (msg.optString("type")) {
                     "pong" -> Unit
-                    "chat_send" -> {
+                    "chat_send" -> synchronized(lock) {
                         val accepted = chatLog.add(CoopSeat.GUEST, msg.optString("id"),
                             msg.optString("text"), true, System.currentTimeMillis())
-                        if (accepted.status == NearbyChatStatus.ACCEPTED) {
-                            publishChat(requireNotNull(accepted.line))
-                        } else if (accepted.status != NearbyChatStatus.DUPLICATE) {
+                        if (accepted.status == NearbyChatStatus.ACCEPTED ||
+                            accepted.status == NearbyChatStatus.DUPLICATE) {
+                            // A repeated request gets the exact same host receipt.
+                            accepted.line?.let(::publishChat)
+                        } else {
                             runCatching {
                                 NearbyPacket.write(socket, JSONObject()
-                                    .put("type", "chat_error")
+                                    .put("type", "chat_error").put("id", msg.optString("id"))
                                     .put("message", when (accepted.status) {
                                         NearbyChatStatus.TOO_FAST -> "Send messages a little slower."
                                         NearbyChatStatus.EMPTY -> "Write a message first."
@@ -387,46 +393,116 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         }
     }
 
-    private fun publishChat(line: NearbyChatLine) {
+    private fun publishChat(line: NearbyChatLine) = synchronized(lock) {
         post { current ->
             if (current.chat.any { it.sequence == line.sequence }) current else
                 current.copy(chat = (current.chat + line).takeLast(NearbyChatPolicy.MAX_HISTORY))
         }
-        val current = synchronized(lock) { peer } ?: return
-        runCatching { NearbyPacket.write(current, NearbyPacket.chatLine(line)) }
-            .onFailure { dropGuest(current) }
+        peer?.let { current ->
+            runCatching { NearbyPacket.write(current, NearbyPacket.chatLine(line)) }
+                .onFailure { dropGuest(current) }
+        }
     }
 
-    /** Input is limited at the host; never mark unsent guest chat as delivered. */
-    fun sendChat(raw: String) {
-        val current = state.snapshot ?: return
+    /** Only one guest chat at a time: show unconfirmed text until host confirms. */
+    fun sendChat(raw: String): Boolean {
+        val clean = NearbyChatPolicy.clean(raw)
+        if (clean.isEmpty()) return false
+        val current = state.snapshot ?: return false
         if (!current.guestConnected || state.disconnected) {
             post { it.copy(message = "Wait for your partner to connect before chatting.") }
-            return
+            return false
         }
-        when (state.role) {
-            NearbyRole.HOST -> io.execute {
-                val decision = chatLog.add(CoopSeat.HOST, UUID.randomUUID().toString(),
-                    raw, true, System.currentTimeMillis())
-                if (decision.status == NearbyChatStatus.ACCEPTED)
-                    publishChat(requireNotNull(decision.line))
-                else post { it.copy(message = if (decision.status == NearbyChatStatus.TOO_FAST)
-                    "Send messages a little slower." else "Write a message first.") }
-            }
-            NearbyRole.GUEST -> {
-                val socket = synchronized(lock) { client } ?: return
-                val clean = NearbyChatPolicy.clean(raw)
-                if (clean.isBlank()) return
+        return when (state.role) {
+            NearbyRole.HOST -> {
                 io.execute {
-                    runCatching {
-                        NearbyPacket.write(socket, JSONObject().put("type", "chat_send")
-                            .put("id", UUID.randomUUID().toString()).put("text", clean))
-                    }.onFailure {
-                        post { it.copy(message = "Chat could not be sent. Reconnect to try again.") }
+                    synchronized(lock) {
+                        val decision = chatLog.add(CoopSeat.HOST, UUID.randomUUID().toString(),
+                            clean, true, System.currentTimeMillis())
+                        if (decision.status == NearbyChatStatus.ACCEPTED)
+                            publishChat(requireNotNull(decision.line))
+                        else post { it.copy(message = if (decision.status == NearbyChatStatus.TOO_FAST)
+                            "Send messages a little slower." else "Write a message first.") }
                     }
                 }
+                true
             }
-            NearbyRole.NONE -> Unit
+            NearbyRole.GUEST -> {
+                val socket: Socket
+                val pending: PendingNearbyChat
+                synchronized(lock) {
+                    socket = client ?: return false
+                    if (pendingGuestChat != null) return false
+                    pending = PendingNearbyChat(UUID.randomUUID().toString(), clean)
+                    pendingGuestChat = pending
+                }
+                post { it.copy(pendingChat = pending) }
+                dispatchGuestChat(socket, pending)
+                true
+            }
+            NearbyRole.NONE -> false
+        }
+    }
+
+    private fun dispatchGuestChat(socket: Socket, pending: PendingNearbyChat) {
+        io.execute {
+            runCatching {
+                NearbyPacket.write(socket, JSONObject().put("type", "chat_send")
+                    .put("id", pending.requestId).put("text", pending.text))
+            }.onFailure {
+                markChatNeedsRetry(pending.requestId,
+                    "Message not confirmed. Reconnect or retry.")
+            }
+        }
+        // No automatic re-send: a lost receipt can mean the host already stored it.
+        heartbeat.schedule({
+            markChatNeedsRetry(pending.requestId,
+                "No chat confirmation yet. Tap Retry to check safely.")
+        }, 9, TimeUnit.SECONDS)
+    }
+
+    private fun markChatNeedsRetry(id: String, message: String) {
+        val pending = synchronized(lock) {
+            val old = pendingGuestChat
+            if (old?.requestId != id || old.needsRetry) null
+            else old.copy(needsRetry = true).also { pendingGuestChat = it }
+        } ?: return
+        post { current ->
+            if (current.pendingChat?.requestId != id) current
+            else current.copy(pendingChat = pending, message = message)
+        }
+    }
+
+    /** Retry uses the exact same request ID, so the host cannot double-award it. */
+    fun retryChat(): Boolean {
+        if (state.role != NearbyRole.GUEST || state.disconnected || state.busy) return false
+        val socket: Socket
+        val retry: PendingNearbyChat
+        synchronized(lock) {
+            socket = client ?: return false
+            val existing = pendingGuestChat ?: return false
+            if (!existing.needsRetry) return false
+            retry = existing.copy(needsRetry = false)
+            pendingGuestChat = retry
+        }
+        post { current -> if (current.pendingChat?.requestId == retry.requestId)
+            current.copy(pendingChat = retry, message = "Checking message delivery…")
+            else current }
+        dispatchGuestChat(socket, retry)
+        return true
+    }
+
+    private fun confirmGuestChat(line: NearbyChatLine) {
+        val confirmed = synchronized(lock) {
+            if (NearbyChatDelivery.confirmed(pendingGuestChat, line)) {
+                pendingGuestChat = null
+                true
+            } else false
+        }
+        if (confirmed) post { current ->
+            if (current.pendingChat?.requestId == line.requestId)
+                current.copy(pendingChat = null, message = "Message delivered.")
+            else current
         }
     }
 
@@ -526,9 +602,15 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     lastPort = port
                 }
                 prefs.edit().putString("token_" + snapshot.roomId, credential).apply()
+                val outstanding = synchronized(lock) {
+                    if (NearbyChatDelivery.confirmedInHistory(pendingGuestChat, recentChat))
+                        pendingGuestChat = null
+                    else pendingGuestChat = pendingGuestChat?.copy(needsRetry = true)
+                    pendingGuestChat
+                }
                 post { it.copy(role = NearbyRole.GUEST, busy = false, disconnected = false,
                     snapshot = snapshot, roomId = snapshot.roomId,
-                    chat = recentChat,
+                    chat = recentChat, pendingChat = outstanding,
                     hostName = welcome.optString("hostName", "Host"),
                     address = address, port = port,
                     message = "Connected! You both share this puzzle.") }
@@ -550,6 +632,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     "ping" -> NearbyPacket.write(socket, JSONObject().put("type", "pong"))
                     "chat" -> {
                         val line = NearbyPacket.readChatLine(msg)
+                        confirmGuestChat(line)
                         post { current ->
                             val latest = current.chat.lastOrNull()?.sequence ?: 0L
                             if (line.sequence <= latest) current
@@ -557,8 +640,11 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                                 (current.chat + line).takeLast(NearbyChatPolicy.MAX_HISTORY))
                         }
                     }
-                    "chat_error" -> post { it.copy(message =
-                        msg.optString("message", "Could not send message.")) }
+                    "chat_error" -> {
+                        val id = msg.optString("id")
+                        markChatNeedsRetry(id,
+                            msg.optString("message", "Message was not accepted."))
+                    }
                     "state" -> {
                         val incoming = NearbyPacket.parseState(msg)
                         post { current ->
@@ -581,10 +667,16 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 if (client === socket) { client = null; true } else false
             }
             runCatching { socket.close() }
-            if (wasCurrent) post { if (it.role == NearbyRole.GUEST) it.copy(
-                disconnected = true,
-                message = "Connection lost. Tap Reconnect to restore your shared board.")
-                else it }
+            if (wasCurrent) {
+                val pending = synchronized(lock) {
+                    pendingGuestChat = pendingGuestChat?.copy(needsRetry = true)
+                    pendingGuestChat
+                }
+                post { if (it.role == NearbyRole.GUEST) it.copy(
+                    disconnected = true, pendingChat = pending,
+                    message = "Connection lost. Tap Reconnect to restore your shared board.")
+                    else it }
+            }
         }
     }
 
