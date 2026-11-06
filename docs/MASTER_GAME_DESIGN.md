@@ -128,6 +128,7 @@ Initial themed pack candidates: Animals, Nature, Food, Places, Seasons, Space, H
 - Distinguish family-friendly themes from material requiring age/content consideration. Avoid accidentally offensive filler strings.
 - Expand content packs incrementally; deduplicate recent puzzles locally where practical, but do not claim globally unique endless puzzles.
 - Future localization requires its own alphabet, word segmentation, input, clue display, and content-quality review; do not assume English A–Z works for every language.
+- **Research completed for future expansion (November 6, 2026):** [Multilingual & Spanish Research and Development Plan](MULTILINGUAL_SPANISH_RESEARCH_AND_DEV_PLAN.md), [future issue #19](https://github.com/PlayerEden/GridMates-Word-Search/issues/19). **App language and puzzle language must be independent**. Spanish content gets versioned locale-specific packs, preserved Ñ and accents, grapheme-aware grid representation and real editorial/licensing review. Do not modify v1 seeded English saves/Daily during this preparation. Spanish implementation is **deferred** until the Sudoku-parity gameplay/Android QA and multiplayer goals; this is a guardrail, not a shipped feature.
 
 ---
 
