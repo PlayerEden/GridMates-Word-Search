@@ -10,9 +10,14 @@ data class SoloRun(
     val seed: Long,
     val foundIds: Set<String> = emptySet(),
     val hints: Map<String, Int> = emptyMap(),
-    val elapsedSeconds: Long = 0L
+    val elapsedSeconds: Long = 0L,
+    val boardSize: PuzzleBoardSize? = null,
+    val challenge: PuzzleChallenge? = null
 ) {
-    val puzzleId: String get() = "wordsearch:v1:" + theme.name + ":" + difficulty.name + ":" + seed
+    val puzzleId: String get() =
+        if (boardSize != null && challenge != null)
+            WordSearchGeneratorV2.puzzleId(theme, boardSize, challenge, seed)
+        else "wordsearch:v1:" + theme.name + ":" + difficulty.name + ":" + seed
 }
 
 data class SoloResult(
@@ -22,7 +27,9 @@ data class SoloResult(
     val wordCount: Int,
     val elapsedSeconds: Long,
     val hintSteps: Int,
-    val completedAtMs: Long
+    val completedAtMs: Long,
+    val boardSize: PuzzleBoardSize? = null,
+    val challenge: PuzzleChallenge? = null
 ) {
     val assisted: Boolean get() = hintSteps > 0
 }
@@ -46,8 +53,26 @@ object SoloProgressRules {
         seed: Long
     ): SoloRun = SoloRun(theme, difficulty, seed)
 
+    fun freshV2(
+        theme: WordTheme, board: PuzzleBoardSize,
+        challenge: PuzzleChallenge, seed: Long
+    ): SoloRun = SoloRun(theme, challenge.legacyDifficulty, seed,
+        boardSize = board, challenge = challenge)
+
+    /** Version dispatch is the only place that reconstructs a saved puzzle. */
+    fun puzzle(run: SoloRun): WordSearchPuzzle {
+        require((run.boardSize == null) == (run.challenge == null)) {
+            "Partially specified v2 puzzle; preserve original save"
+        }
+        return if (run.boardSize == null) {
+            WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
+        } else {
+            WordSearchGeneratorV2.generate(run.theme, run.boardSize, requireNotNull(run.challenge), run.seed)
+        }
+    }
+
     fun validate(run: SoloRun): SoloRun {
-        val puzzle = WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
+        val puzzle = puzzle(run)
         val allowed = puzzle.targets.map { it.id }.toSet()
         return run.copy(
             foundIds = run.foundIds.intersect(allowed),
@@ -57,7 +82,7 @@ object SoloProgressRules {
     }
 
     fun find(run: SoloRun, start: GridPoint, end: GridPoint): Pair<SoloRun, WordClaim> {
-        val puzzle = WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
+        val puzzle = puzzle(run)
         val claim = WordSearchRules.claim(puzzle, run.foundIds, start, end)
         return if (claim.status == ClaimStatus.FOUND) {
             run.copy(foundIds = run.foundIds + requireNotNull(claim.target).id) to claim
@@ -69,7 +94,7 @@ object SoloProgressRules {
      * zone -> starting cell -> full path preview. No auto-completion.
      */
     fun hint(run: SoloRun): Pair<SoloRun, WordTarget?> {
-        val puzzle = WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
+        val puzzle = puzzle(run)
         // Finish the three increasingly helpful clues for the selected word
         // before opening a different target. Already fully revealed words are
         // skipped until all other unfinished targets receive their clues.
@@ -87,7 +112,7 @@ object SoloProgressRules {
 
     fun complete(profile: SoloProfile, nowMs: Long): SoloProfile {
         val run = profile.active
-        val puzzle = WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
+        val puzzle = puzzle(run)
         if (!WordSearchRules.complete(puzzle, run.foundIds)) return profile
         if (profile.results.any { it.puzzleId == run.puzzleId }) return profile
         val record = SoloResult(
@@ -97,7 +122,9 @@ object SoloProgressRules {
             wordCount = puzzle.targets.size,
             elapsedSeconds = run.elapsedSeconds,
             hintSteps = run.hints.values.sum(),
-            completedAtMs = nowMs
+            completedAtMs = nowMs,
+            boardSize = run.boardSize,
+            challenge = run.challenge
         )
         return profile.copy(results = listOf(record) + profile.results)
     }
