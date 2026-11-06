@@ -611,6 +611,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     private fun resolveQueued(name: String, owner: NsdManager.DiscoveryListener) {
         if (closed || discovery !== owner) return
         val info = discoveredInfos[name]
+        val ticket = discoveryQueue.ticket(name)
         if (info == null) {
             discoveryQueue.finished(name)?.let { resolveQueued(it, owner) }
             return
@@ -624,7 +625,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             override fun onResolveFailed(service: NsdServiceInfo, code: Int) = advance()
             override fun onServiceResolved(result: NsdServiceInfo) {
                 try {
-                    if (closed || discovery !== owner || !discoveryQueue.isLive(name)) return
+                    if (closed || discovery !== owner || !discoveryQueue.isLive(name) ||
+                        discoveryQueue.ticket(name) != ticket) return
                     val ip = result.host?.hostAddress ?: return
                     val id = result.attributes["room"]?.toString(Charsets.UTF_8) ?: return
                     if (result.attributes["proto"]?.toString(Charsets.UTF_8) !=
@@ -634,7 +636,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                         result.attributes["pin"]?.toString(Charsets.UTF_8) != "0")
                     post { current ->
                         if (discovery !== owner || current.role != NearbyRole.NONE ||
-                            !discoveryQueue.isLive(name)) current
+                            !discoveryQueue.isLive(name) ||
+                            discoveryQueue.ticket(name) != ticket) current
                         else current.copy(listings =
                             (current.listings.filterNot {
                                 it.roomId == id || it.name == entry.name
@@ -664,8 +667,11 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 if (discovery !== this || closed) return
                 discoveredInfos.remove(service.serviceName)
                 discoveryQueue.lost(service.serviceName)
-                post { current -> current.copy(listings =
-                    current.listings.filterNot { it.name == service.serviceName }) }
+                post { current ->
+                    if (discovery !== this || current.role != NearbyRole.NONE) current
+                    else current.copy(listings =
+                        current.listings.filterNot { it.name == service.serviceName })
+                }
             }
             override fun onDiscoveryStopped(type: String) {
                 if (discovery === this) discovery = null
