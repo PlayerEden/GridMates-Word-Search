@@ -362,11 +362,15 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 peer = socket
                 peerLastReadNanos = System.nanoTime()
                 admitted = true
-                session.admitOrRejoinGuest()
+                val finalState = session.admitOrRejoinGuest()
+                // Send Joined before exposing this socket to heartbeat/host
+                // updates. The lock is reentrant and bounds this short frame.
+                NearbyPacket.write(socket, JSONObject().put("type", "joined")
+                    .put("roomState", NearbyPacket.state(finalState)))
+                admissionPending = false
+                offered = false
+                finalState
             }
-            synchronized(lock) { admissionPending = false; offered = false }
-            NearbyPacket.write(socket, JSONObject().put("type", "joined")
-                .put("roomState", NearbyPacket.state(accepted)))
             post { it.copy(guestName = name, snapshot = accepted,
                 message = "Connected with " + name + ". Find words together!") }
             socket.soTimeout = 11_000
