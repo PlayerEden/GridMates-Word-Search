@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "title": "GridMates: Word Search",
+  "intent": "Asset provenance, review, and packaging. Entries marked planned do not represent packaged artwork.",
+  "brand": {
+    "paper": "#FFFDF8",
+    "cream": "#F4F3EB",
+    "forest": "#214F3F",
+    "ink": "#263D36",
+    "gold": "#8A6729"
+  },
+  "assets": [
+    {
+      "id": "highlight_soft_marker",
+      "kind": "procedural_ui",
+      "status": "implemented_in_ws02b_branch_pending_ci",
+      "source": "app/src/main/java/com/playereden/gridmates/wordsearch/WordSearchScreen.kt",
+      "visual": "Soft gold active path and muted green confirmed path drawn behind grid glyphs",
+      "future_sprite_slot": "marker_stroke_texture",
+      "fallback": "native_draw_line_round_caps"
+    },
+    {
+      "id": "marker_stroke_texture",
+      "kind": "raster_or_vector_overlay",
+      "status": "planned_uncreated",
+      "purpose": "Optional light organic paper-marker grain behind valid selected path",
+      "target_pack": "highlight-styles-v1",
+      "requirements": "transparent alpha; no glyphs; must keep letter contrast; optional and easy fallback"
+    },
+    {
+      "id": "marker_check_seal",
+      "kind": "raster_or_vector",
+      "status": "planned_uncreated",
+      "purpose": "Short verified-word success flourish",
+      "target_pack": "feedback-v1",
+      "requirements": "consistent GridMates palette; 24-64dp scalable"
+    },
+    {
+      "id": "navigation_icons",
+      "kind": "vector",
+      "status": "planned_uncreated",
+      "purpose": "Home, records, collection and settings vector controls",
+      "target_pack": "navigation-v1",
+      "requirements": "native vector preferred; 24dp and accessibility labels"
+    },
+    {
+      "id": "woodland_original_portraits",
+      "kind": "original_existing_art",
+      "status": "planned_reuse_not_copied",
+      "purpose": "12 Woodland profile portraits; stable IDs and original source hashes from Sudoku",
+      "source_repo": "PlayerEden/SudokuTogether",
+      "source_ref": "feat/gridmates-nearby-animals",
+      "source_manifest": "design/woodland/packaged-assets.json",
+      "requirements": "do not regenerate approximations; copy approved originals with provenance"
+    },
+    {
+      "id": "theme_pack_cards",
+      "kind": "illustration",
+      "status": "planned_uncreated",
+      "purpose": "Coordinated Woodland, Ocean, Bugs, Garden, Space theme cards",
+      "target_pack": "wordsearch-themes-v1",
+      "requirements": "create coherent batches and inspect small mobile-size compositions"
+    }
+  ],
+  "review_process": [
+    "Create shared brief and one small batch first",
+    "Record generated/original provenance and permissions",
+    "Check alpha/scaling/contrast on at least two densities",
+    "Save packaged SHA-256 and original source references",
+    "Test disabled/missing asset procedural fallback",
+    "Mark status approved only after actual owner review"
+  ]
+}
