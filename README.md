@@ -4,7 +4,17 @@
 
 **GridMates: Word Search** is a planned standalone native Android game in the **GridMates** puzzle family, featuring classic offline Solo and Daily puzzles, same-Wi-Fi two-phone Co-op, and two Versus modes: **Shared Board Race** and **Speed Duel**.
 
-**Status:** **First playable Solo word-search prototype is CI-built** in [stacked draft PR #4](https://github.com/PlayerEden/GridMates-Word-Search/pull/4), with a [verified QA APK from run #42138730965](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42138730965/artifacts/13467085867). The generator and native letter grid are implemented for testing, but physical input testing, saved progress, Daily, profiles and multiplayer are not complete. This is not a Google Play release.
+**Status:** **WS-03 Solo Beta is CI-built and ready for physical QA; first playable Solo word-search prototype was CI-built** in [stacked draft PR #4](https://github.com/PlayerEden/GridMates-Word-Search/pull/4), with a [verified QA APK from run #42138730965](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42138730965/artifacts/13467085867). The generator and native letter grid are implemented for testing, but physical input testing, saved progress, Daily, profiles and multiplayer are not complete. This is not a Google Play release.
+
+## Current playable checkpoint
+
+**WS-03 Solo Beta** is CI-green on [draft PR #7](https://github.com/PlayerEden/GridMates-Word-Search/pull/7), stacked on the independent native foundation and the WS-02B touch-feel work. Its verified Android QA APK has offline Solo save/resume, a three-step hint ladder, a Records journal, progress backup/restore and smoother marker-style gameplay. **Physical on-phone acceptance is still open; this is not a production Google Play release.**
+
+- [Get the latest Solo Beta QA APK from GitHub](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42149214204/artifacts/13471921695)
+- [Build evidence and SHA-256](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws03-solo-save-results-2026-11-05/docs/WS03_BUILD_QA_2026-11-05.md)
+- [Phone test playbook](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws03-solo-save-results-2026-11-05/docs/WS03_SOLO_BETA_PLAYTEST.md)
+
+**Caution:** QA APK signing can differ between GitHub runs. Before uninstalling any build that contains saved progress, use **Settings → Export** to preserve your local Word Search JSON backup, then use **Settings → Import** after reinstalling.
 
 ## Start here
 
