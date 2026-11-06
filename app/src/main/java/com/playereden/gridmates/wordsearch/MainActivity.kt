@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
     private val soloStore by lazy { SoloStore(applicationContext) }
+    private val nearbyRooms by lazy { ViewModelProvider(this)[NearbyRoomViewModel::class.java] }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,7 +19,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             GridMatesTheme {
-                GridMatesShell(soloStore)
+                GridMatesShell(soloStore, nearbyRooms)
             }
         }
     }

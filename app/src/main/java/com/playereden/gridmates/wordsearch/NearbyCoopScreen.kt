@@ -1,5 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -21,10 +22,10 @@ import com.playereden.gridmates.wordsearch.core.*
  * We keep this in an isolated screen so Solo/Daily are unchanged.
  */
 @Composable
-internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
-    val ctx = LocalContext.current
-    val runtime = remember(ctx) { NearbyCoopRuntime(ctx) }
-    DisposableEffect(runtime) { onDispose { runtime.close() } }
+internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBack: () -> Unit) {
+    val ctx = LocalContext.current.applicationContext
+    val runtime = remember(rooms) { rooms.runtime(ctx) }
+    BackHandler { onBack() }
     val state = runtime.state
     var theme by rememberSaveable { mutableStateOf(WordTheme.WOODLAND.name) }
     var board by rememberSaveable { mutableStateOf(PuzzleBoardSize.BOOK_CLASSIC.name) }
