@@ -1,0 +1,80 @@
+name: Word Search B5 Font Rendering Android Runtime Audit
+
+# This workflow is intentionally opt-in / branch-scoped so the free-tier
+# Actions budget is not consumed by an emulator on every stacked draft PR.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws04d-b5-board-fonts-free-achievements-2026-11-06
+    paths:
+      - '.github/workflows/ws04d-b5-android-font-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  emulator-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout original Woodland portraits from approved Sudoku source
+        uses: actions/checkout@v4
+        with:
+          repository: PlayerEden/SudokuTogether
+          ref: 975e31a1e8cbfebad1fbbc7602b3340c357da7ef
+          path: _approved_sudoku
+          persist-credentials: false
+      - name: Verify imported artwork
+        run: python3 scripts/import_woodland_portraits.py --source _approved_sudoku
+      - name: Checkout OFL font sources at approved revision
+        uses: actions/checkout@v4
+        with:
+          repository: google/fonts
+          ref: 24ddc1f324cac5d9f5aedca126d298f56e3f1640
+          path: _approved_fonts
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            ofl/atkinsonhyperlegible
+            ofl/ibmplexmono
+            ofl/dmmono
+            ofl/patrickhand
+      - name: Verify font binary, license, glyphs and import
+        run: |
+          python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
+          python3 scripts/import_font_library.py --source _approved_fonts
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Enable KVM virtualization on Linux runner
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=static_node"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+      - name: Execute actual Android instrumentation on API 35
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_4
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: gradle --no-daemon :app:connectedDebugAndroidTest
+      - name: Upload instrumented test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GridMates-WordSearch-B5-Font-Android-Instrumentation
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+          if-no-files-found: ignore
+          retention-days: 7
