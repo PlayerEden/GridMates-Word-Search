@@ -59,6 +59,23 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
         if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
 
         if (snapshot == null && state.role == NearbyRole.NONE) {
+            state.recovery?.let {
+                Card(Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Resume interrupted join",
+                            color = Forest, style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold)
+                        Text("Your phone saved its room credential. Retry the same " +
+                            "host without starting over.",
+                            style = MaterialTheme.typography.bodySmall, color = Muted)
+                        Button(onClick = { runtime.retryInterruptedJoin(ownName) },
+                            enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                            Text("Retry joining this game")
+                        }
+                    }
+                }
+            }
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Start a shared puzzle",
@@ -123,8 +140,14 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         Text(if (showJoin) "Find nearby games" else "Join nearby game")
                     }
                     if (showJoin) {
-                        Text(if (state.scanning) "Looking on your Wi-Fi…" else "Nearby rooms",
-                            color = Muted, style = MaterialTheme.typography.bodyMedium)
+                        Row(Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(if (state.scanning) "Looking on your Wi-Fi…" else "Nearby rooms",
+                                color = Muted, style = MaterialTheme.typography.bodyMedium)
+                            TextButton(onClick = { runtime.refreshSearch() },
+                                enabled = !state.busy) { Text("Refresh") }
+                        }
                         if (state.listings.isEmpty()) {
                             Text("No rooms found yet. Check that both phones use the same Wi-Fi.",
                                 color = Muted, style = MaterialTheme.typography.bodySmall)
