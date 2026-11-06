@@ -46,6 +46,28 @@ data class SoloProfile(
     val dailyCompletions: Int get() = dailyEntries.count { it.completed }
 }
 
+/**
+ * A small, non-monetized allowance per puzzle. Existing saved hint levels
+ * remain intact; upgrading never erases a prior clue or completion.
+ * Unlike Sudoku's generous hints, Word Search rewards independent searching.
+ */
+object WordHintPolicy {
+    fun allowance(run: SoloRun, daily: Boolean = false): Int {
+        if (daily) return 2
+        val cells = run.boardSize?.cells ?: run.difficulty.gridSize
+        return when {
+            cells >= 20 -> 4
+            cells >= 15 -> 3
+            else -> 2
+        }
+    }
+
+    fun used(run: SoloRun): Int = run.hints.values.sum()
+
+    fun remaining(run: SoloRun, daily: Boolean = false): Int =
+        (allowance(run, daily) - used(run)).coerceAtLeast(0)
+}
+
 object SoloProgressRules {
     fun fresh(
         theme: WordTheme = WordTheme.WOODLAND,
@@ -93,7 +115,10 @@ object SoloProgressRules {
      * Three-step help ladder, always selecting an unfinished word:
      * zone -> starting cell -> full path preview. No auto-completion.
      */
-    fun hint(run: SoloRun): Pair<SoloRun, WordTarget?> {
+    fun hint(run: SoloRun, daily: Boolean = false): Pair<SoloRun, WordTarget?> {
+        // A caller cannot bypass the allowance by requesting more levels.
+        // Old saves with more used hints remain readable but receive no extras.
+        if (WordHintPolicy.remaining(run, daily) == 0) return run to null
         val puzzle = puzzle(run)
         // Finish the three increasingly helpful clues for the selected word
         // before opening a different target. Already fully revealed words are

@@ -273,7 +273,7 @@ internal class SoloStore(
         if (blocked) return selectedDaily?.run to null
         val current = selectedDaily ?: return null to null
         if (current.completed) return current.run to null
-        val (updated, target) = SoloProgressRules.hint(current.run)
+        val (updated, target) = SoloProgressRules.hint(current.run, daily = true)
         if (updated != current.run) replaceDaily(current.copy(run = updated))
         return updated to target
     }
