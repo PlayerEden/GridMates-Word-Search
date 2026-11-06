@@ -10,6 +10,14 @@ import org.junit.Test
 class ShellSmokeTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
+    @Test fun soloWordGridOpensWithVisibleWordList() {
+        compose.onNodeWithText("Try Solo Word Search").performClick()
+        compose.onNodeWithText("Words to find").assertExists()
+        compose.onNodeWithText("New Puzzle").assertExists()
+        compose.onNodeWithText("Home").performClick()
+        compose.onNodeWithText("Try Solo Word Search").assertExists()
+    }
+
     @Test fun appHasGridMatesIdentityAndAWorkingCollectionTab() {
         compose.onNodeWithText("Word Search").assertExists()
         compose.onNodeWithText("Good puzzles. Good company.").assertExists()

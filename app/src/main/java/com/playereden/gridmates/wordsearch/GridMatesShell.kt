@@ -32,7 +32,7 @@ import com.playereden.gridmates.wordsearch.core.GameMode
 
 private enum class Page(val label: String) {
     PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
-    SETTINGS("Settings"), HELP("Help")
+    SETTINGS("Settings"), HELP("Help"), PUZZLE("Puzzle")
 }
 
 @Composable
@@ -43,8 +43,8 @@ internal fun GridMatesShell() {
     Scaffold(
         containerColor = Cream,
         bottomBar = {
-            NavigationBar(containerColor = Paper) {
-                Page.entries.filter { it != Page.HELP }.forEach { item ->
+            if (page != Page.PUZZLE) NavigationBar(containerColor = Paper) {
+                Page.entries.filter { it != Page.HELP && it != Page.PUZZLE }.forEach { item ->
                     NavigationBarItem(
                         modifier = Modifier.semantics {
                             contentDescription = "Open " + item.label
@@ -67,7 +67,9 @@ internal fun GridMatesShell() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             when (page) {
-                Page.PLAY -> HomeScreen(onHelp = { pageName = Page.HELP.name })
+                Page.PLAY -> HomeScreen(onHelp = { pageName = Page.HELP.name },
+                    onSolo = { pageName = Page.PUZZLE.name })
+                Page.PUZZLE -> WordSearchScreen(onBack = { pageName = Page.PLAY.name })
                 Page.RECORDS -> PlaceholderScreen(
                     "Records", "Your achievements and completed puzzles will appear here after Solo gameplay is built."
                 )
@@ -99,7 +101,7 @@ private fun Heading(eyebrow: String, heading: String) {
 }
 
 @Composable
-private fun HomeScreen(onHelp: () -> Unit) {
+private fun HomeScreen(onHelp: () -> Unit, onSolo: () -> Unit) {
     Heading("GridMates", "Word Search")
     Text(
         "Good puzzles. Good company.",
@@ -111,17 +113,16 @@ private fun HomeScreen(onHelp: () -> Unit) {
             Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("A new puzzle book is taking shape", style = MaterialTheme.typography.titleMedium)
+            Text("Find your first words", style = MaterialTheme.typography.titleMedium)
             Text(
-                "This is the native app foundation. Our first real word-search puzzle and touch controls are next.",
+                "Our first playable letter grid is ready to try. This prototype does not save completed puzzles yet.",
                 color = Muted
             )
-            Button(onClick = onHelp) {
-                Text("See how Word Search will work")
-            }
+            Button(onClick = onSolo) { Text("Try Solo Word Search") }
+            Button(onClick = onHelp) { Text("How to Play") }
         }
     }
-    Text("Planned ways to play", style = MaterialTheme.typography.titleMedium)
+    Text("Ways to play", style = MaterialTheme.typography.titleMedium)
     val modes = listOf(
         GameMode.SOLO to "Solve a themed puzzle at your own pace",
         GameMode.DAILY to "A fresh offline challenge every day",
@@ -143,7 +144,8 @@ private fun HomeScreen(onHelp: () -> Unit) {
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(detail, color = Muted)
-                Text("Planned", style = MaterialTheme.typography.labelSmall, color = Gold)
+                Text(if (mode == GameMode.SOLO) "Try Solo above" else "Planned",
+                    style = MaterialTheme.typography.labelSmall, color = Gold)
             }
         }
     }
@@ -173,7 +175,7 @@ private fun HelpScreen(onBack: () -> Unit) {
     Text(
         "In classic Word Search, trace a straight line across the letters to find each listed word. " +
             "Words can run across, down, or diagonally, sometimes backward. " +
-            "Found words will be crossed off and highlighted when the game engine arrives.",
+            "Found words are crossed off and highlighted.",
         style = MaterialTheme.typography.bodyLarge
     )
     Text(
