@@ -257,6 +257,20 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
                                 color = if (line.seat == localSeat) Forest else Muted,
                                 style = MaterialTheme.typography.bodyMedium)
                         }
+                        state.pendingChat?.let { pending ->
+                            Text("You: " + pending.text,
+                                color = Forest, style = MaterialTheme.typography.bodyMedium)
+                            Text(if (pending.needsRetry)
+                                "Not confirmed — your partner may already have this. Retry safely."
+                            else "Sending · awaiting host confirmation…",
+                                color = Muted, style = MaterialTheme.typography.bodySmall)
+                            if (pending.needsRetry) {
+                                OutlinedButton(onClick = { runtime.retryChat() },
+                                    enabled = connected && !state.busy) {
+                                    Text("Retry message")
+                                }
+                            }
+                        }
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedTextField(
@@ -272,11 +286,11 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
                                 onClick = {
                                     val text = NearbyChatPolicy.clean(chatDraft)
                                     if (text.isNotBlank()) {
-                                        runtime.sendChat(text)
-                                        chatDraft = ""
+                                        if (runtime.sendChat(text)) chatDraft = ""
                                     }
                                 },
-                                enabled = connected && NearbyChatPolicy.clean(chatDraft).isNotBlank()
+                                enabled = connected && state.pendingChat == null &&
+                                    NearbyChatPolicy.clean(chatDraft).isNotBlank()
                             ) { Text("Send") }
                         }
                         Text("Only the last 24 room messages are kept while the host remains open. " +
