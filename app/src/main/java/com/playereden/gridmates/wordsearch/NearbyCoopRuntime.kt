@@ -162,7 +162,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         main.post { if (!closed) state = update(state) }
     }
 
-    fun setRequireCodePreference(yes: Boolean) {
+    fun updateRequireCodePreference(yes: Boolean) {
         requireCodePreference = yes
         prefs.edit().putBoolean("requires_code", yes).apply()
     }
