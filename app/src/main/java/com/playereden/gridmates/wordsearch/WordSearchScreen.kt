@@ -129,7 +129,7 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                             Text(item.label + " · " + item.gridSize + "×" + item.gridSize)
                         }
                     }
-                    Text("Changing these starts a fresh puzzle. Unsaved progress will be replaced.",
+                    Text("Changing this starts a new puzzle. Completed results remain in Records.",
                         style = MaterialTheme.typography.bodySmall, color = Muted)
                 }
             },
@@ -173,7 +173,7 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
         AlertDialog(
             onDismissRequest = { newPuzzleOpen = false },
             title = { Text("Start another puzzle?") },
-            text = { Text("Your current word selections are not saved yet.") },
+            text = { Text("Starting a new puzzle replaces your unfinished board. Completed results remain in Records.") },
             confirmButton = { TextButton(onClick = { startNew() }) { Text("New puzzle") } },
             dismissButton = { TextButton(onClick = { newPuzzleOpen = false }) { Text("Keep playing") } }
         )
@@ -182,9 +182,9 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp)) {
         val landscape = maxWidth > maxHeight * 1.25f
         val boardSize = if (landscape) {
-            minOf(maxHeight - 118.dp, maxWidth * 0.52f).coerceAtLeast(130.dp)
+            minOf(maxHeight - (if (finished) 195.dp else 118.dp), maxWidth * 0.52f).coerceAtLeast(130.dp)
         } else {
-            minOf(maxWidth, (maxHeight - 185.dp) * 0.83f).coerceAtLeast(130.dp)
+            minOf(maxWidth, (maxHeight - (if (finished) 270.dp else 185.dp)) * 0.83f).coerceAtLeast(130.dp)
         }
 
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -205,7 +205,9 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
-                Text(found.size.toString() + " / " + puzzle.targets.size + " words",
+                Text(found.size.toString() + " / " + puzzle.targets.size + " words · " +
+                    (run.elapsedSeconds / 60L) + ":" +
+                    (run.elapsedSeconds % 60L).toString().padStart(2, '0'),
                     style = MaterialTheme.typography.titleMedium, color = Forest,
                     fontWeight = FontWeight.SemiBold)
                 Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
