@@ -1,4 +1,4 @@
-name: Word Search B5 Font Rendering Android Runtime Audit (final test imports)
+name: Word Search B5 Font Rendering Android Runtime Audit (stable UI assertions)
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
