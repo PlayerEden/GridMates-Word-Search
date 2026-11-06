@@ -15,6 +15,9 @@ data class BoardViewportTransform(
 
     fun clamped(viewportPx: Float): BoardViewportTransform {
         require(viewportPx > 0f && viewportPx.isFinite())
+        // Exact fit has zero pan (and no signed -0f); otherwise changing
+        // zoom repeatedly can leave a fractional/negative-zero offset.
+        if (zoom == 1f) return copy(panX = 0f, panY = 0f)
         val limit = -(viewportPx * (zoom - 1f))
         return copy(panX = panX.coerceIn(limit, 0f), panY = panY.coerceIn(limit, 0f))
     }
