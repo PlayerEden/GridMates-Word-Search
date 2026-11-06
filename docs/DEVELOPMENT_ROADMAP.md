@@ -6,6 +6,9 @@
 
 # GridMates: Word Search — Development Roadmap
 
+**Future multilingual expansion (deferred until parity):** Research and implementation plan: [Multilingual & Spanish Development Plan](MULTILINGUAL_SPANISH_RESEARCH_AND_DEV_PLAN.md) and [issue #19](https://github.com/PlayerEden/GridMates-Word-Search/issues/19). Plan app UI language separately from puzzle language, preserve existing seeded English puzzles/Daily and their saved data, and keep future pack/network IDs language/version aware. **No Spanish implementation or new APK is authorized yet.** Align with [Big Word Library issue #18](https://github.com/PlayerEden/GridMates-Word-Search/issues/18); quality parity remains the priority.
+
+
 **Baseline:** November 5, 2026
 
 **WS-04B Profile & Collections:** [Draft PR #12](https://github.com/PlayerEden/GridMates-Word-Search/pull/12) has an offline display name, 12 stable Woodland avatar IDs, completion-based unlockable selection, eight evidence-based achievements, Collection UI and backward-compatible save schema 3. [WS-04B plan / QA gates](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws04b-profile-woodland-achievements-2026-11-05/docs/WS04B_PROFILE_COLLECTION_PLAN.md). Original approved Woodland PNGs are **not yet packaged**; placeholder monograms are intentional while safe original art migration is pending. Android source CI [#42159209553](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42159209553) passed; [WS-04B source QA receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws04b-profile-woodland-achievements-2026-11-05/docs/WS04B_BUILD_QA_2026-11-05.md). Physical QA and approved original art import remain open.
@@ -42,7 +45,9 @@ A milestone is done only when its acceptance evidence exists in **this** reposit
 | **WS-07** | Content and UX polish | PLANNED | More themes, hint refinements, device-consistent fonts, profile/collection polish; optional sharing and rewards if approved | Physical UX/accessibility/art/content quality audit |
 | **WS-08** | Beta, launch, monetization | PLANNED | Production signing/build, privacy/store preparation, optional ads and Remove Ads after clean beta | Play test eligibility, AAB, real-device signoff, policy disclosures |
 
-Milestone sequence can be rearranged for risk reduction, but **no stage is marked passed without evidence**. Do not promise an app release date or skip compatibility gates just because automation is green.
+| **ML-FUTURE** | Spanish and multilingual packs, UI localization, Unicode-safe engine | **RESEARCHED / DEFERRED** | Legacy-safe puzzle v2, reviewed Spanish vocab, independent UI/puzzle language, locale-aware Daily & LAN | Unicode, pack/license, real Android, save and two-phone tests |
+
+Milestone sequence can be rearr for risk reduction, but **no stage is marked passed without evidence**. Do not promise an app release date or skip compatibility gates just because automation is green.
 
 ---
 
