@@ -97,7 +97,7 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
                                 color = Muted, style = MaterialTheme.typography.bodySmall)
                         }
                         Switch(checked = runtime.requireCodePreference,
-                            onCheckedChange = runtime::setRequireCodePreference)
+                            onCheckedChange = runtime::updateRequireCodePreference)
                     }
                     Button(onClick = {
                         runtime.host(ownName, WordTheme.valueOf(theme),
