@@ -244,8 +244,8 @@ internal fun WordSearchScreen(
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 2.dp)) {
         val landscape = maxWidth > maxHeight * 1.25f
         val boardViewport = if (landscape) {
-            minOf(maxHeight - (if (finished) 188.dp else 144.dp),
-                maxWidth * 0.51f).coerceAtLeast(118.dp)
+            minOf(maxHeight - (if (finished) 222.dp else 196.dp),
+                maxWidth * 0.51f).coerceAtLeast(106.dp)
         } else {
             minOf(maxWidth, maxHeight * (if (finished) 0.43f else 0.54f))
                 .coerceAtLeast(145.dp)
@@ -327,7 +327,7 @@ internal fun WordSearchScreen(
                 Text(found.size.toString() + " / " + puzzle.targets.size + " found",
                     style = MaterialTheme.typography.titleSmall,
                     color = Forest, fontWeight = FontWeight.SemiBold)
-                Text((run.elapsedSeconds / 60L) + ":" +
+                Text((run.elapsedSeconds / 60L).toString() + ":" +
                     (run.elapsedSeconds % 60L).toString().padStart(2, '0'),
                     color = Muted, style = MaterialTheme.typography.bodyMedium)
                 TextButton(onClick = {
@@ -476,35 +476,55 @@ private fun ZoomableWordGrid(
 
     Column(Modifier.width(viewport),
         verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Row(Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
-            TextButton(
-                onClick = { transform = transform.zoomed(transform.zoom - 0.25f, viewportPx) },
-                enabled = transform.zoom > 1f,
-                modifier = Modifier.width(40.dp)
-                    .semantics { contentDescription = "Zoom out" }
-            ) { Text("−") }
-            Text("${(transform.zoom * 100f).roundToInt()}%",
-                color = Muted, style = MaterialTheme.typography.labelMedium)
-            TextButton(
-                onClick = { transform = transform.zoomed(transform.zoom + 0.25f, viewportPx) },
-                enabled = transform.zoom < 2.5f,
-                modifier = Modifier.width(40.dp)
-                    .semantics { contentDescription = "Zoom in" }
-            ) { Text("+") }
-            if (viewport >= 280.dp) {
+        if (viewport < 240.dp) {
+            // Landscape can leave less than 240dp for the board; don't squeeze
+            // five controls across a 106dp-wide column.
+            Row(Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = {
+                    transform = transform.zoomed(transform.zoom - 0.25f, viewportPx)
+                }, enabled = transform.zoom > 1f,
+                    modifier = Modifier.width(40.dp)
+                        .semantics { contentDescription = "Zoom out" }) {
+                    Text("−")
+                }
+                Text("${(transform.zoom * 100f).roundToInt()}%",
+                    color = Muted, style = MaterialTheme.typography.labelSmall)
+                TextButton(onClick = {
+                    transform = transform.zoomed(transform.zoom + 0.25f, viewportPx)
+                }, enabled = transform.zoom < 2.5f,
+                    modifier = Modifier.width(40.dp)
+                        .semantics { contentDescription = "Zoom in" }) {
+                    Text("+")
+                }
+            }
+            TextButton(onClick = { moving = !moving },
+                modifier = Modifier.fillMaxWidth().semantics {
+                    contentDescription = if (moving)
+                        "Mode: Move. Tap to find words."
+                    else "Mode: Find. Tap to move the board."
+                }) { Text(if (moving) "Mode: Move" else "Mode: Find") }
+        } else {
+            Row(Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = {
+                    transform = transform.zoomed(transform.zoom - 0.25f, viewportPx)
+                }, enabled = transform.zoom > 1f,
+                    modifier = Modifier.width(40.dp)
+                        .semantics { contentDescription = "Zoom out" }) { Text("−") }
+                Text("${(transform.zoom * 100f).roundToInt()}%",
+                    color = Muted, style = MaterialTheme.typography.labelMedium)
+                TextButton(onClick = {
+                    transform = transform.zoomed(transform.zoom + 0.25f, viewportPx)
+                }, enabled = transform.zoom < 2.5f,
+                    modifier = Modifier.width(40.dp)
+                        .semantics { contentDescription = "Zoom in" }) { Text("+") }
                 FilterChip(selected = !moving, onClick = { moving = false },
                     label = { Text("Find") })
                 FilterChip(selected = moving, onClick = { moving = true },
                     label = { Text("Move") })
-            } else {
-                TextButton(onClick = { moving = !moving },
-                    modifier = Modifier.semantics {
-                        contentDescription = if (moving)
-                            "Mode: Move. Tap to return to finding words."
-                        else "Mode: Find. Tap to move the board."
-                    }) { Text(if (moving) "Mode: Move" else "Mode: Find") }
             }
         }
         Box(Modifier.size(viewport).clipToBounds()) {
