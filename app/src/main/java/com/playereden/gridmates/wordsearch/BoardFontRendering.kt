@@ -3,6 +3,7 @@ package com.playereden.gridmates.wordsearch
 import android.content.Context
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -61,12 +62,13 @@ internal class BoardGlyphPainter(private val typeface: Typeface) {
         isDither = true
     }
     private val bounds = Rect()
-    private var cachedCell = -1f
+    private var cachedCellWidth = -1f
+    private var cachedCellHeight = -1f
     private var cachedFontSize = 0f
 
     private fun fitFontSize(cellWidth: Float, cellHeight: Float): Float {
-        val cell = minOf(cellWidth, cellHeight)
-        if (cell == cachedCell) return cachedFontSize
+        if (cellWidth == cachedCellWidth && cellHeight == cachedCellHeight)
+            return cachedFontSize
         paint.textSize = 100f
         var maxInkW = 1f
         var maxInkH = 1f
@@ -80,9 +82,25 @@ internal class BoardGlyphPainter(private val typeface: Typeface) {
             100f * (cellWidth * 0.69f) / maxInkW,
             100f * (cellHeight * 0.68f) / maxInkH
         ).coerceAtLeast(1f)
-        cachedCell = cell
+        cachedCellWidth = cellWidth
+        cachedCellHeight = cellHeight
         cachedFontSize = px
         return px
+    }
+
+    /**
+     * Exact tight-ink bounds inside one cell, useful for real Android tests.
+     * Unlike advances/line box bounds, this measures the actual letter shape.
+     */
+    fun inkBoundsInCell(letter: Char, cellWidth: Float, cellHeight: Float): RectF {
+        require(cellWidth > 0f && cellHeight > 0f)
+        paint.textSize = fitFontSize(cellWidth, cellHeight)
+        val glyph = letter.toString()
+        paint.getTextBounds(glyph, 0, glyph.length, bounds)
+        val x = cellWidth / 2f - (bounds.left + bounds.right) / 2f
+        val y = cellHeight / 2f - (bounds.top + bounds.bottom) / 2f
+        return RectF(bounds.left + x, bounds.top + y,
+            bounds.right + x, bounds.bottom + y)
     }
 
     fun drawLetters(scope: DrawScope, rows: List<List<Char>>, ink: Color) {
