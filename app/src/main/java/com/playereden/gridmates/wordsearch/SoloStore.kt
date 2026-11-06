@@ -151,6 +151,7 @@ internal class SoloStore(context: Context) {
     }
 
     fun claim(start: GridPoint, end: GridPoint): WordClaim {
+        if (blocked) return WordClaim(ClaimStatus.INVALID)
         val current = profile.active
         val (next, claim) = SoloProgressRules.find(current, start, end)
         if (claim.status == ClaimStatus.FOUND && !blocked) {
@@ -173,8 +174,7 @@ internal class SoloStore(context: Context) {
     fun tick() {
         if (blocked) return
         val p = profile
-        val puzzle = WordSearchGenerator.generate(p.active.theme, p.active.difficulty, p.active.seed)
-        if (WordSearchRules.complete(puzzle, p.active.foundIds)) return
+        if (p.active.foundIds.size >= p.active.difficulty.targetCount) return
         profile = p.copy(active = p.active.copy(elapsedSeconds = p.active.elapsedSeconds + 1))
         if (profile.active.elapsedSeconds % 10L == 0L) flush()
     }
