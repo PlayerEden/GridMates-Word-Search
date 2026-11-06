@@ -632,7 +632,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     if (result.attributes["proto"]?.toString(Charsets.UTF_8) !=
                         WS_WIRE_VERSION.toString()) return
                     if (id.isBlank() || id.length > 120 || result.port !in 1..65535) return
-                    val entry = NearbyListing(id, result.serviceName, ip, result.port,
+                    val entry = NearbyListing(id, name, ip, result.port,
                         result.attributes["pin"]?.toString(Charsets.UTF_8) != "0")
                     post { current ->
                         if (discovery !== owner || current.role != NearbyRole.NONE ||
