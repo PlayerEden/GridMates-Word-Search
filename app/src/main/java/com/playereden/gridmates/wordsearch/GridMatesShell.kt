@@ -161,9 +161,7 @@ internal fun GridMatesShell(soloStore: SoloStore) {
                     },
                     onBack = { pageName = Page.PLAY.name })
                 Page.RECORDS -> SoloRecordsScreen(soloStore.profile)
-                Page.COLLECTION -> PlaceholderScreen(
-                    "Collection", "Our original Woodland portraits and other GridMates styles will be added from the verified Sudoku art collection."
-                )
+                Page.COLLECTION -> CollectionScreen(soloStore)
                 Page.SETTINGS -> SoloSettingsScreen(soloStore)
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }
@@ -190,6 +188,8 @@ private fun Heading(eyebrow: String, heading: String) {
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     onDaily: () -> Unit) {
     Heading("GridMates", "Word Search")
+    Text("Welcome back, " + store.profile.identity.displayName + ".",
+        color = Forest, style = MaterialTheme.typography.bodyLarge)
     store.warning?.let { warning ->
         Card(Modifier.fillMaxWidth()) {
             Text(warning, Modifier.padding(12.dp), color = Gold)
