@@ -6,6 +6,8 @@
 
 **Status:** **WS-03 Solo Beta is CI-built and ready for physical QA; first playable Solo word-search prototype was CI-built** in [stacked draft PR #4](https://github.com/PlayerEden/GridMates-Word-Search/pull/4), with a [verified QA APK from run #42138730965](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42138730965/artifacts/13467085867). The generator and native letter grid are implemented for testing, but physical input testing, saved progress, Daily, profiles and multiplayer are not complete. This is not a Google Play release.
 
+**Latest Daily Alpha:** [WS-04A draft PR #9](https://github.com/PlayerEden/GridMates-Word-Search/pull/9) has CI-verified offline Daily puzzles, dated completion history and migration-friendly Solo + Daily backups. [Android QA APK](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42152990119/artifacts/13473941256) · [QA report and phone checklist](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws04a-offline-daily-2026-11-05/docs/WS04A_BUILD_QA_2026-11-05.md). **The build is not yet phone-tested or publicly released; export local progress before any QA uninstall.**
+
 ## Current playable checkpoint
 
 **WS-03 Solo Beta** is CI-green on [draft PR #7](https://github.com/PlayerEden/GridMates-Word-Search/pull/7), stacked on the independent native foundation and the WS-02B touch-feel work. Its verified Android QA APK has offline Solo save/resume, a three-step hint ladder, a Records journal, progress backup/restore and smoother marker-style gameplay. **Physical on-phone acceptance is still open; this is not a production Google Play release.**
