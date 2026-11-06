@@ -385,7 +385,10 @@ internal fun WordSearchScreen(
                         }
                     }
                     if (!finished || reviewingCompletedBoard) {
-                        WordList(puzzle, found, daily, Modifier.weight(1f).fillMaxSize())
+                        WordList(puzzle, found, daily,
+                            Modifier.weight(1f).fillMaxSize(),
+                            onShowResults = if (finished) { { reviewingCompletedBoard = false } }
+                                else null)
                     } else {
                         CompletionPanel(
                             puzzle = puzzle, run = run, daily = daily,
@@ -410,7 +413,10 @@ internal fun WordSearchScreen(
                             else FontWeight.Normal,
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    WordList(puzzle, found, daily, Modifier.weight(1f).fillMaxWidth())
+                    WordList(puzzle, found, daily,
+                        Modifier.weight(1f).fillMaxWidth(),
+                        onShowResults = if (finished) { { reviewingCompletedBoard = false } }
+                            else null)
                 } else {
                     CompletionPanel(
                         puzzle = puzzle, run = run, daily = daily,
@@ -445,7 +451,7 @@ private fun CompletionPanel(
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("✓ " + if (daily) "Daily complete!" else "Puzzle complete!",
+                Text("✓ " + (if (daily) "Daily complete!" else "Puzzle complete!"),
                     style = MaterialTheme.typography.titleLarge,
                     color = Forest, fontWeight = FontWeight.Bold)
                 Text("Every word is found. Nicely done.",
@@ -490,7 +496,8 @@ private fun WordList(
     puzzle: WordSearchPuzzle,
     found: Set<String>,
     daily: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onShowResults: (() -> Unit)? = null
 ) {
     var remainingOnly by remember(puzzle.id) { mutableStateOf(false) }
     val targets = if (remainingOnly) puzzle.targets.filter { it.id !in found }
@@ -502,9 +509,13 @@ private fun WordList(
             Text("Words to find · " + (puzzle.targets.size - found.size) + " left",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold, color = Forest)
-            FilterChip(selected = remainingOnly,
-                onClick = { remainingOnly = !remainingOnly },
-                label = { Text("Remaining") })
+            if (onShowResults != null) {
+                TextButton(onClick = onShowResults) { Text("Results") }
+            } else {
+                FilterChip(selected = remainingOnly,
+                    onClick = { remainingOnly = !remainingOnly },
+                    label = { Text("Remaining") })
+            }
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp)) {
