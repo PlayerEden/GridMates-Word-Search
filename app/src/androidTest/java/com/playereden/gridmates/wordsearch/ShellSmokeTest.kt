@@ -42,7 +42,7 @@ class ShellSmokeTest {
         compose.onNodeWithText("Readable Print").assertExists()
         compose.onNodeWithText("Classic Typewriter").assertExists()
         compose.onNodeWithText("Pencil Notes").assertExists()
-        compose.onNodeWithText("License").assertExists()
+        compose.onAllNodesWithText("License").assertCountEquals(4)
     }
 
 }
