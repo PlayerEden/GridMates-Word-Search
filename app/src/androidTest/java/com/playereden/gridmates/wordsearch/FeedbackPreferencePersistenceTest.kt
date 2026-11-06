@@ -16,6 +16,7 @@ class FeedbackPreferencePersistenceTest {
             assertFalse(first.soundEnabled)
             first.setHapticsEnabled(false)
             first.setSoundEnabled(true)
+            first.flush() // Persist the fresh seed before simulating a full store restart.
             val second = SoloStore(context, name)
             assertFalse(second.hapticsEnabled)
             assertTrue(second.soundEnabled)
