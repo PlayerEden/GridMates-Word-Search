@@ -92,6 +92,7 @@ class NearbyChatLog {
         fun validateHistory(lines: List<NearbyChatLine>): List<NearbyChatLine> {
             require(lines.size <= NearbyChatPolicy.MAX_HISTORY)
             require(lines.zipWithNext().all { (a, b) -> a.sequence < b.sequence })
+            require(lines.map { it.seat to it.requestId }.distinct().size == lines.size)
             require(lines.all {
                 it.sequence > 0L && it.sentAtMs >= 0L &&
                     NearbyChatPolicy.validRequestId(it.requestId) &&
