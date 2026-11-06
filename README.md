@@ -4,7 +4,7 @@
 
 **GridMates: Word Search** is a planned standalone native Android game in the **GridMates** puzzle family, featuring classic offline Solo and Daily puzzles, same-Wi-Fi two-phone Co-op, and two Versus modes: **Shared Board Race** and **Speed Duel**.
 
-**Status:** Design/planning baseline. No playable Word Search APK or completed implementation is claimed yet.
+**Status:** **First playable Solo word-search prototype is CI-built** in [stacked draft PR #4](https://github.com/PlayerEden/GridMates-Word-Search/pull/4), with a [verified QA APK from run #42138730965](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42138730965/artifacts/13467085867). The generator and native letter grid are implemented for testing, but physical input testing, saved progress, Daily, profiles and multiplayer are not complete. This is not a Google Play release.
 
 ## Start here
 
@@ -20,7 +20,7 @@
 - Respectful help, long-term progress, optional cosmetic rewards, and no ads interrupting puzzles.
 - The design remains iterative: proposals should change when real phone playtests show a better answer.
 
-**Next:** WS-01 — independent Android foundation and source-backed Sudoku reuse audit.
+**Next:** Test WS-02 finger-drag and tap selection on real Android phones, improve the board based on feedback, then add durable Solo save/resume in WS-03. The underlying WS-01 foundation is [draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3).
 
 **Sister project:** [GridMates: Sudoku](https://github.com/PlayerEden/SudokuTogether) — do not treat its default main as the latest Android gameplay source; see the handoff for current references.
 
