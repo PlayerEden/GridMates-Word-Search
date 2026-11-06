@@ -17,7 +17,13 @@ class WordSearchGeneratorV2Test {
             for (board in PuzzleBoardSize.entries)
                 for (challenge in PuzzleChallenge.entries)
                     for (seed in listOf(1L, 43L, 2002L, 10991L)) {
-                        val p = WordSearchGeneratorV2.generate(theme, board, challenge, seed)
+                        val p = try {
+                            WordSearchGeneratorV2.generate(theme, board, challenge, seed)
+                        } catch (ex: Exception) {
+                            throw IllegalStateException(
+                                "V2 generation failed: $theme / $board / $challenge / seed=$seed", ex
+                            )
+                        }
                         assertEquals(board.cells, p.size)
                         assertEquals(board.targets, p.targets.size)
                         assertEquals(2, p.contentVersion)
