@@ -26,7 +26,7 @@ class IdentityPersistenceTest {
             assertEquals(18L, revived.profile.active.elapsedSeconds)
             assertEquals("A Puzzle Friend", revived.profile.identity.displayName)
             assertEquals("woodland_fox", revived.profile.identity.portraitId)
-            assertTrue(revived.exportBackup().contains("\"schema\":3"))
+            assertTrue(revived.exportBackup().contains("\"schema\":4"))
         } finally {
             file.delete()
             File(context.filesDir, name + ".bak").delete()
