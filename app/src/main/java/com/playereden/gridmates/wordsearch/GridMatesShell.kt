@@ -1,5 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -111,6 +112,15 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
 
+    // Every nested page should honor Android's system Back gesture rather
+    // than unexpectedly exiting the application. Nearby owns its own
+    // confirmation dialog and remains handled by NearbyCoopScreen.
+    BackHandler(enabled = page != Page.PLAY && page != Page.NEARBY) {
+        if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) soloStore.flush()
+        pageName = if (page == Page.DAILY_PUZZLE) Page.DAILY.name
+            else Page.PLAY.name
+    }
+
     Scaffold(
         containerColor = Cream,
         bottomBar = {
@@ -206,52 +216,66 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     val finished = WordSearchRules.complete(puzzle, run.foundIds)
     val challengeLabel = run.challenge?.label ?: run.difficulty.label
     val boardLabel = run.boardSize?.cells ?: run.difficulty.gridSize
+    val name = store.profile.identity.displayName
 
-    Heading("GridMates", "Word Search")
-    Text("Good puzzles. Good company.", color = Muted,
-        style = MaterialTheme.typography.bodyLarge)
-    store.warning?.let { msg ->
-        Card(Modifier.fillMaxWidth()) { Text(msg, Modifier.padding(14.dp), color = Gold) }
+    PaperbackCover(name)
+    store.warning?.let { message ->
+        PaperPanel(Modifier.fillMaxWidth()) {
+            Text(message, color = Gold, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(if (finished) "Another little adventure?" else "Pick up where you left off",
-                color = Forest, style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold)
-            Text(run.theme.label + " · " + boardLabel + "×" + boardLabel +
-                " · " + challengeLabel, color = Muted)
-            Text(run.foundIds.size.toString() + " of " + puzzle.targets.size +
-                " words found · Autosaved", color = Muted,
-                style = MaterialTheme.typography.bodySmall)
-            Button(onClick = onSolo, modifier = Modifier.fillMaxWidth()) {
-                Text(if (finished) "Play Solo" else "Continue Solo")
-            }
-            TextButton(onClick = onHelp) { Text("How to play") }
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("01 · Your current puzzle")
+        Text(if (finished) "Ready for another?" else "Pick up where you left off",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold, color = Forest)
+        Text(run.theme.label + " · " + boardLabel + "×" + boardLabel +
+            " · " + challengeLabel,
+            color = Muted, style = MaterialTheme.typography.bodyMedium)
+        PaperProgress(run.foundIds.size, puzzle.targets.size)
+        Text(if (finished) "All " + puzzle.targets.size + " words found"
+            else run.foundIds.size.toString() + " of " + puzzle.targets.size +
+                " words found · Saved on this device",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+        Button(onClick = onSolo,
+            modifier = Modifier.fillMaxWidth().height(50.dp)) {
+            Text(if (finished) "Play Solo" else "Continue Solo")
         }
     }
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Daily puzzle", style = MaterialTheme.typography.titleLarge,
-                color = Forest, fontWeight = FontWeight.Bold)
-            Text("A fresh word search each day. No streak pressure.",
-                color = Muted, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onDaily, modifier = Modifier.fillMaxWidth()) {
-                Text("Open Daily")
-            }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("02 · A little every day")
+        Text("Daily puzzle", color = Forest,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold)
+        Text("A new word search each day. No streak pressure.",
+            color = Muted, style = MaterialTheme.typography.bodyMedium)
+        Text(store.profile.dailyCompletions.toString() + " daily puzzles completed",
+            color = Gold, style = MaterialTheme.typography.labelLarge)
+        Button(onClick = onDaily,
+            modifier = Modifier.fillMaxWidth().height(50.dp)) {
+            Text("Open Daily")
         }
     }
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Play Together — Nearby Co-op", color = Forest,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold)
-            Text("Try sharing one word search on two phones over the same Wi-Fi. Versus modes are still planned.",
-                color = Muted, style = MaterialTheme.typography.bodySmall)
-            Button(onClick = onNearby, modifier = Modifier.fillMaxWidth()) {
-                Text("Play Together (QA preview)")
-            }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("03 · Together is better")
+        Text("Play Together", color = Forest,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold)
+        Text("Share one puzzle on two phones connected to the same Wi-Fi.",
+            color = Muted, style = MaterialTheme.typography.bodyMedium)
+        Text("Nearby co-op · Early access",
+            color = Gold, style = MaterialTheme.typography.labelMedium)
+        Button(onClick = onNearby,
+            modifier = Modifier.fillMaxWidth().height(50.dp)) {
+            Text("Play Together")
         }
+    }
+
+    TextButton(onClick = onHelp, modifier = Modifier.fillMaxWidth()) {
+        Text("How to play")
     }
 }
 
