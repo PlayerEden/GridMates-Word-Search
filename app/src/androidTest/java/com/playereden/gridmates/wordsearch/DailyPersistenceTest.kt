@@ -45,7 +45,7 @@ class DailyPersistenceTest {
             val parsed = reopened.previewBackup(exported)
             assertEquals(2, parsed.dailyEntries.size)
             assertEquals(12L, parsed.active.elapsedSeconds)
-            assertTrue(exported.contains("\"schema\":2"))
+            assertTrue(exported.contains("\"schema\":3"))
 
             // An in-progress past date must never be deleted when today changes.
             reopened.openDaily(day2)
