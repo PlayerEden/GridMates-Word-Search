@@ -1,6 +1,7 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -62,7 +63,8 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
                     Text("Pick a puzzle, then your partner taps it under Nearby games.",
                         color = Muted)
                     Text("Theme", fontWeight = FontWeight.SemiBold)
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         WordTheme.entries.forEach { entry ->
                             FilterChip(selected = theme == entry.name,
                                 onClick = { theme = entry.name },
