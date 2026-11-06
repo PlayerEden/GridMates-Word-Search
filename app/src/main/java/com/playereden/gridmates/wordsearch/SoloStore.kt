@@ -371,7 +371,8 @@ internal class SoloStore(
     fun tick() {
         if (blocked || !inForeground) return
         val p = profile
-        if (p.active.foundIds.size >= SoloProgressRules.puzzle(p.active).targets.size) return
+        if (p.active.foundIds.size >=
+            (p.active.boardSize?.targets ?: p.active.difficulty.targetCount)) return
         profile = p.copy(active = p.active.copy(elapsedSeconds = p.active.elapsedSeconds + 1))
         if (profile.active.elapsedSeconds % 10L == 0L) flush()
     }
