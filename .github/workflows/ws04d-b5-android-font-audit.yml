@@ -1,4 +1,4 @@
-name: Word Search B5 + WS05D Ordered Admission Emulator Audit
+name: Word Search WS05E Final Full-Suite Android QA
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
@@ -11,6 +11,7 @@ on:
       - feature/ws05b-nearby-chat-and-presence-2026-11-06
       - feature/ws05c-chat-delivery-and-connection-reliability-2026-11-06
       - feature/ws05d-host-admission-and-room-lifecycle-2026-11-06
+      - feature/ws05e-nearby-discovery-and-rejoin-2026-11-06
     paths:
       - '.github/workflows/ws04d-b5-android-font-audit.yml'
 
@@ -71,14 +72,26 @@ jobs:
           profile: pixel_4
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: gradle --no-daemon :app:connectedDebugAndroidTest
+          script: gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:connectedDebugAndroidTest
       - name: Upload instrumented test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-B5-Font-Android-Instrumentation
+          name: GridMates-WordSearch-WS05E-Android-Tests
           path: |
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
           if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Verify final installable QA APK SHA256
+        run: |
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload source-matched WS05E QA APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GridMates-WordSearch-WS05E-QA-v054
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
           retention-days: 7
