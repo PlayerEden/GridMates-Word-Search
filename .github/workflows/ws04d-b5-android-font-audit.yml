@@ -1,4 +1,4 @@
-name: Word Search B5 + WS05 Android Runtime Audit
+name: Word Search B5 + WS05A Android Emulator Verification
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
