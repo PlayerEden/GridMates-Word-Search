@@ -5,6 +5,8 @@ import android.util.AtomicFile
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.playereden.gridmates.wordsearch.core.DailyChallenge
+import com.playereden.gridmates.wordsearch.core.DailyProgress
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.SoloProfile
@@ -33,6 +35,18 @@ internal class SoloStore(
 ) {
     private val atomic = AtomicFile(File(context.filesDir, saveName))
     private var blocked = false
+    private var inForeground = false
+    fun setForeground(value: Boolean) {
+        inForeground = value
+        if (!value) flush()
+    }
+
+    var selectedDailyDate by mutableStateOf(DailyChallenge.today())
+        private set
+
+    val selectedDaily: DailyProgress?
+        get() = profile.dailyEntries.firstOrNull { it.date == selectedDailyDate }
+
     var warning by mutableStateOf<String?>(null)
         private set
 
@@ -58,16 +72,9 @@ internal class SoloStore(
 
     private fun decode(raw: String): SoloProfile {
         val root = JSONObject(raw)
-        require(root.getInt("schema") == 1) { "Unsupported save schema" }
+        require(root.getInt("schema") in 1..2) { "Unsupported save schema" }
         val active = root.getJSONObject("active")
-        val run = SoloRun(
-            theme = WordTheme.valueOf(active.getString("theme")),
-            difficulty = WordDifficulty.valueOf(active.getString("difficulty")),
-            seed = active.getLong("seed"),
-            foundIds = active.optJSONArray("found").strings().toSet(),
-            hints = active.optJSONObject("hints").toIntMap(),
-            elapsedSeconds = active.optLong("seconds", 0L)
-        )
+        val run = readRun(active)
         val clean = SoloProgressRules.validate(run)
         val results = root.optJSONArray("results")
         val loaded = mutableListOf<SoloResult>()
@@ -87,8 +94,31 @@ internal class SoloStore(
             it.puzzleId.isNotBlank() && it.wordCount in 1..30 &&
                 it.completedAtMs > 0 && it.hintSteps >= 0
         }.distinctBy { it.puzzleId }
-        return SoloProfile(clean, valid)
+        val daily = mutableListOf<DailyProgress>()
+        val dailyRaw = root.optJSONArray("daily")
+        if (dailyRaw != null) for (i in 0 until dailyRaw.length()) {
+            val item = dailyRaw.getJSONObject(i)
+            val entry = DailyProgress(
+                date = item.getString("date"),
+                run = readRun(item.getJSONObject("run")),
+                completedAtMs = item.optLong("completedAt", 0L).takeIf { it > 0L }
+            )
+            daily += DailyChallenge.validate(entry)
+        }
+        require(daily.map { it.date }.distinct().size == daily.size) {
+            "Duplicate daily date in backup"
+        }
+        return SoloProfile(clean, valid, daily)
     }
+
+    private fun readRun(source: JSONObject): SoloRun = SoloRun(
+        theme = WordTheme.valueOf(source.getString("theme")),
+        difficulty = WordDifficulty.valueOf(source.getString("difficulty")),
+        seed = source.getLong("seed"),
+        foundIds = source.optJSONArray("found").strings().toSet(),
+        hints = source.optJSONObject("hints").toIntMap(),
+        elapsedSeconds = source.optLong("seconds", 0L)
+    )
 
     private fun JSONArray?.strings(): List<String> {
         if (this == null) return emptyList()
@@ -105,20 +135,30 @@ internal class SoloStore(
         return data
     }
 
-    private fun encode(value: SoloProfile): ByteArray {
-        val run = value.active
-        val active = JSONObject().put("theme", run.theme.name)
+    private fun writeRun(run: SoloRun): JSONObject =
+        JSONObject().put("theme", run.theme.name)
             .put("difficulty", run.difficulty.name).put("seed", run.seed)
             .put("seconds", run.elapsedSeconds)
             .put("found", JSONArray(run.foundIds.sorted()))
             .put("hints", JSONObject(run.hints))
+
+    private fun encode(value: SoloProfile): ByteArray {
+        val active = writeRun(value.active)
         val results = JSONArray()
         for (r in value.results) results.put(JSONObject().put("id", r.puzzleId)
             .put("theme", r.theme.name).put("difficulty", r.difficulty.name)
             .put("words", r.wordCount).put("seconds", r.elapsedSeconds)
             .put("hints", r.hintSteps).put("completedAt", r.completedAtMs))
-        return JSONObject().put("schema", 1).put("active", active)
-            .put("results", results).toString().toByteArray(StandardCharsets.UTF_8)
+        val daily = JSONArray()
+        for (entry in value.dailyEntries) {
+            val item = JSONObject().put("date", entry.date)
+                .put("run", writeRun(entry.run))
+            entry.completedAtMs?.let { item.put("completedAt", it) }
+            daily.put(item)
+        }
+        return JSONObject().put("schema", 2).put("active", active)
+            .put("results", results).put("daily", daily)
+            .toString().toByteArray(StandardCharsets.UTF_8)
     }
 
     fun flush() {
@@ -157,6 +197,61 @@ internal class SoloStore(
         profile = restored.copy(active = SoloProgressRules.validate(restored.active))
         flush()
         return warning == null
+    }
+
+    /** Opens today's puzzle or a previously started date, without touching Solo. */
+    fun openDaily(date: String = DailyChallenge.today()) {
+        DailyChallenge.day(date)
+        if (blocked) return
+        selectedDailyDate = date
+        if (profile.dailyEntries.none { it.date == date }) {
+            profile = profile.copy(
+                dailyEntries = profile.dailyEntries + DailyChallenge.start(date)
+            )
+            flush()
+        }
+    }
+
+    private fun replaceDaily(entry: DailyProgress) {
+        profile = profile.copy(dailyEntries = profile.dailyEntries.map {
+            if (it.date == entry.date) entry else it
+        })
+        flush()
+    }
+
+    fun dailyClaim(start: GridPoint, end: GridPoint): WordClaim {
+        if (blocked) return WordClaim(ClaimStatus.INVALID)
+        val current = selectedDaily ?: return WordClaim(ClaimStatus.INVALID)
+        val (updated, claim) = SoloProgressRules.find(current.run, start, end)
+        if (claim.status == ClaimStatus.FOUND) {
+            replaceDaily(DailyChallenge.complete(
+                current.copy(run = updated), System.currentTimeMillis()
+            ))
+        }
+        return claim
+    }
+
+    fun dailyHint(): Pair<SoloRun?, com.playereden.gridmates.wordsearch.core.WordTarget?> {
+        if (blocked) return selectedDaily?.run to null
+        val current = selectedDaily ?: return null to null
+        if (current.completed) return current.run to null
+        val (updated, target) = SoloProgressRules.hint(current.run)
+        if (updated != current.run) replaceDaily(current.copy(run = updated))
+        return updated to target
+    }
+
+    fun tickDaily() {
+        if (blocked || !inForeground) return
+        val current = selectedDaily ?: return
+        if (current.completed || current.run.foundIds.size >=
+            current.run.difficulty.targetCount) return
+        val updated = current.copy(run = current.run.copy(
+            elapsedSeconds = current.run.elapsedSeconds + 1L
+        ))
+        profile = profile.copy(dailyEntries = profile.dailyEntries.map {
+            if (it.date == current.date) updated else it
+        })
+        if (updated.run.elapsedSeconds % 10L == 0L) flush()
     }
 
     fun choose(theme: WordTheme, difficulty: WordDifficulty) {
@@ -200,7 +295,7 @@ internal class SoloStore(
     }
 
     fun tick() {
-        if (blocked) return
+        if (blocked || !inForeground) return
         val p = profile
         if (p.active.foundIds.size >= p.active.difficulty.targetCount) return
         profile = p.copy(active = p.active.copy(elapsedSeconds = p.active.elapsedSeconds + 1))
