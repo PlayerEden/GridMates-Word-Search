@@ -526,6 +526,13 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         }
     }
 
+    private fun stopDiscovery() {
+        val active = discovery ?: return
+        discovery = null
+        runCatching { nsd.stopServiceDiscovery(active) }
+        post { it.copy(scanning = false) }
+    }
+
     fun search() {
         if (state.role != NearbyRole.NONE || discovery != null) return
         val cb = object : NsdManager.DiscoveryListener {
@@ -556,6 +563,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             }
             override fun onDiscoveryStopped(type: String) { post { it.copy(scanning = false) } }
             override fun onStartDiscoveryFailed(type: String, code: Int) {
+                discovery = null
                 post { it.copy(scanning = false,
                     message = "Nearby search failed. Try manual address entry.") }
             }
@@ -569,6 +577,10 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
 
     fun join(address: String, port: Int, roomId: String, code: String, name: String) {
         if (state.busy || state.role != NearbyRole.NONE && !state.disconnected) return
+        if (state.role == NearbyRole.GUEST && roomId != state.roomId) {
+            post { it.copy(message = "Leave this game before joining a different room.") }
+            return
+        }
         if (port !in 1..65535 || address.isBlank()) {
             post { it.copy(message = "Enter a valid host address and port.") }; return
         }
@@ -602,6 +614,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     lastPort = port
                 }
                 prefs.edit().putString("token_" + snapshot.roomId, credential).apply()
+                main.post { if (!closed) stopDiscovery() }
                 val outstanding = synchronized(lock) {
                     if (NearbyChatDelivery.confirmedInHistory(pendingGuestChat, recentChat))
                         pendingGuestChat = null
