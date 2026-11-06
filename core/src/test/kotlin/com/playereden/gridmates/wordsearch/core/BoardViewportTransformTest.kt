@@ -46,4 +46,30 @@ class BoardViewportTransformTest {
         assertEquals(GridPoint(5, 5), t.cellAt(18f, 18f, view, 20))
         assertNull(t.cellAt(-1f, 200f, view, 20))
     }
+    @Test fun pinchRetainsFocalPointEvenAwayFromCenter() {
+        val original = BoardViewportTransform(1.5f, -60f, -45f)
+        val focusX = 110f
+        val focusY = 230f
+        val priorX = (focusX - original.panX) / original.zoom
+        val priorY = (focusY - original.panY) / original.zoom
+        val after = original.zoomedAt(1.9f, view, focusX, focusY)
+        assertEquals(priorX, (focusX - after.panX) / after.zoom, 0.001f)
+        assertEquals(priorY, (focusY - after.panY) / after.zoom, 0.001f)
+        assertEquals(BoardViewportTransform(1f),
+            after.zoomedAt(1f, view, focusX, focusY))
+    }
+
+    @Test fun constrainedPinchAndPanNeverRevealOutsideBoard() {
+        var t = BoardViewportTransform(1f)
+        repeat(40) {
+            t = t.zoomedAt(2.5f, view, 10f, 350f)
+                .panned(-700f, 700f, view)
+            assertTrue(t.panX >= -view * (t.zoom - 1f))
+            assertTrue(t.panY <= 0f)
+            assertTrue(t.panX <= 0f)
+            assertTrue(t.panY >= -view * (t.zoom - 1f))
+        }
+        assertEquals(BoardViewportTransform(1f), t.zoomed(1f, view))
+    }
+
 }
