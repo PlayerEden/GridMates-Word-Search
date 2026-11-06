@@ -95,7 +95,7 @@ class NearbyCoopAndroidTest {
             NearbyPacket.chatLine(history.first())))
         assertTrue(runCatching {
             NearbyPacket.readChatLine(NearbyPacket.chatLine(history.first())
-                .put("text", "bad\\nmessage"))
+                .put("text", "bad\nmessage"))
         }.isFailure)
         val forged = NearbyPacket.chatHistory(history)
         forged.put(NearbyPacket.chatLine(history.first()))
