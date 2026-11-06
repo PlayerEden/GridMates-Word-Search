@@ -56,7 +56,11 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(record.theme.label + " · " + record.difficulty.label,
+                        Text(record.theme.label + " · " +
+                            (record.boardSize?.let { it.cells.toString() + "×" + it.cells } ?: 
+                                (record.difficulty.gridSize.toString() + "×" +
+                                    record.difficulty.gridSize)) +
+                            " · " + (record.challenge?.label ?: record.difficulty.label),
                             color = Forest, fontWeight = FontWeight.SemiBold)
                         Text(if (record.assisted) "Assisted" else "No hints",
                             color = Gold, style = MaterialTheme.typography.labelMedium)

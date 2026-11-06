@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +41,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.GameMode
+import com.playereden.gridmates.wordsearch.core.SoloProgressRules
+import com.playereden.gridmates.wordsearch.core.WordSearchRules
 
 private enum class Page(val label: String) {
     PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
@@ -187,67 +191,55 @@ private fun Heading(eyebrow: String, heading: String) {
 @Composable
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     onDaily: () -> Unit) {
+    val run = store.profile.active
+    val puzzle = androidx.compose.runtime.remember(run.puzzleId) {
+        SoloProgressRules.puzzle(run)
+    }
+    val finished = WordSearchRules.complete(puzzle, run.foundIds)
+    val challengeLabel = run.challenge?.label ?: run.difficulty.label
+    val boardLabel = run.boardSize?.cells ?: run.difficulty.gridSize
+
     Heading("GridMates", "Word Search")
-    Text("Welcome back, " + store.profile.identity.displayName + ".",
-        color = Forest, style = MaterialTheme.typography.bodyLarge)
-    store.warning?.let { warning ->
-        Card(Modifier.fillMaxWidth()) {
-            Text(warning, Modifier.padding(12.dp), color = Gold)
-        }
+    Text("Good puzzles. Good company.", color = Muted,
+        style = MaterialTheme.typography.bodyLarge)
+    store.warning?.let { msg ->
+        Card(Modifier.fillMaxWidth()) { Text(msg, Modifier.padding(14.dp), color = Gold) }
     }
-    Text(
-        "Good puzzles. Good company.",
-        color = Muted,
-        style = MaterialTheme.typography.bodyLarge
-    )
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text("Your next puzzle", style = MaterialTheme.typography.titleMedium)
-            Text(
-                store.profile.active.theme.label + " · " + store.profile.active.difficulty.label +
-                    " · " + store.profile.active.foundIds.size + " words found" +
-                    " · " + store.profile.completions + " completed",
-                color = Muted
-            )
-            Button(onClick = onSolo) { Text("Try Solo Word Search") }
-            Text("Progress saves automatically on this device.",
-                color = Muted, style = MaterialTheme.typography.bodySmall)
-            Button(onClick = onDaily) { Text("Daily Puzzle") }
-            Button(onClick = onHelp) { Text("How to Play") }
-        }
-    }
-    Text("Ways to play", style = MaterialTheme.typography.titleMedium)
-    val modes = listOf(
-        GameMode.SOLO to "Solve a themed puzzle at your own pace",
-        GameMode.DAILY to "A fresh offline challenge every day",
-        GameMode.COOP to "Find words together on two nearby phones",
-        GameMode.SHARED_BOARD_RACE to "Race to claim words first",
-        GameMode.SPEED_DUEL to "Race on matching private boards"
-    )
-    modes.forEach { (mode, detail) ->
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(14.dp)) {
-                Text(
-                    when (mode) {
-                        GameMode.SOLO -> "Solo"
-                        GameMode.DAILY -> "Daily"
-                        GameMode.COOP -> "Co-op"
-                        GameMode.SHARED_BOARD_RACE -> "Shared Board Race"
-                        GameMode.SPEED_DUEL -> "Speed Duel"
-                    },
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(detail, color = Muted)
-                Text(when (mode) {
-                    GameMode.SOLO -> "Try Solo above"
-                    GameMode.DAILY -> "Play today's puzzle above"
-                    else -> "Planned"
-                },
-                    style = MaterialTheme.typography.labelSmall, color = Gold)
+
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(if (finished) "Another little adventure?" else "Pick up where you left off",
+                color = Forest, style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold)
+            Text(run.theme.label + " · " + boardLabel + "×" + boardLabel +
+                " · " + challengeLabel, color = Muted)
+            Text(run.foundIds.size.toString() + " of " + puzzle.targets.size +
+                " words found · Autosaved", color = Muted,
+                style = MaterialTheme.typography.bodySmall)
+            Button(onClick = onSolo, modifier = Modifier.fillMaxWidth()) {
+                Text(if (finished) "Play Solo" else "Continue Solo")
             }
+            TextButton(onClick = onHelp) { Text("How to play") }
+        }
+    }
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Daily puzzle", style = MaterialTheme.typography.titleLarge,
+                color = Forest, fontWeight = FontWeight.Bold)
+            Text("A fresh word search each day. No streak pressure.",
+                color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Button(onClick = onDaily, modifier = Modifier.fillMaxWidth()) {
+                Text("Open Daily")
+            }
+        }
+    }
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("Nearby play is in development", color = Forest,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold)
+            Text("Co-op and two friendly race modes are coming after the Solo experience is polished.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
         }
     }
 }

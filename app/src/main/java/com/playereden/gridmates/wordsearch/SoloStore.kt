@@ -8,6 +8,8 @@ import androidx.compose.runtime.setValue
 import com.playereden.gridmates.wordsearch.core.DailyChallenge
 import com.playereden.gridmates.wordsearch.core.DailyProgress
 import com.playereden.gridmates.wordsearch.core.PlayerIdentity
+import com.playereden.gridmates.wordsearch.core.PuzzleBoardSize
+import com.playereden.gridmates.wordsearch.core.PuzzleChallenge
 import com.playereden.gridmates.wordsearch.core.WoodlandCollection
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.GridPoint
@@ -56,7 +58,10 @@ internal class SoloStore(
         private set
 
     private fun initial(): SoloProfile =
-        SoloProfile(SoloProgressRules.fresh(seed = System.currentTimeMillis()))
+        SoloProfile(SoloProgressRules.freshV2(
+            WordTheme.WOODLAND, PuzzleBoardSize.STANDARD,
+            PuzzleChallenge.CLASSIC, System.currentTimeMillis()
+        ))
 
     private fun readInitial(): SoloProfile {
         if (!atomic.baseFile.exists() && !File(atomic.baseFile.path + ".bak").exists())
@@ -74,7 +79,7 @@ internal class SoloStore(
 
     private fun decode(raw: String): SoloProfile {
         val root = JSONObject(raw)
-        require(root.getInt("schema") in 1..3) { "Unsupported save schema" }
+        require(root.getInt("schema") in 1..4) { "Unsupported save schema" }
         val active = root.getJSONObject("active")
         val run = readRun(active)
         val clean = SoloProgressRules.validate(run)
@@ -89,7 +94,11 @@ internal class SoloStore(
                 wordCount = item.getInt("words"),
                 elapsedSeconds = item.getLong("seconds").coerceAtLeast(0),
                 hintSteps = item.getInt("hints").coerceAtLeast(0),
-                completedAtMs = item.getLong("completedAt")
+                completedAtMs = item.getLong("completedAt"),
+                boardSize = item.optString("board", "").takeIf { it.isNotBlank() }
+                    ?.let { PuzzleBoardSize.valueOf(it) },
+                challenge = item.optString("challenge", "").takeIf { it.isNotBlank() }
+                    ?.let { PuzzleChallenge.valueOf(it) }
             )
         }
         val valid = loaded.filter {
@@ -125,7 +134,11 @@ internal class SoloStore(
         seed = source.getLong("seed"),
         foundIds = source.optJSONArray("found").strings().toSet(),
         hints = source.optJSONObject("hints").toIntMap(),
-        elapsedSeconds = source.optLong("seconds", 0L)
+        elapsedSeconds = source.optLong("seconds", 0L),
+        boardSize = source.optString("board", "").takeIf { it.isNotBlank() }
+            ?.let { PuzzleBoardSize.valueOf(it) },
+        challenge = source.optString("challenge", "").takeIf { it.isNotBlank() }
+            ?.let { PuzzleChallenge.valueOf(it) }
     )
 
     private fun JSONArray?.strings(): List<String> {
@@ -143,12 +156,16 @@ internal class SoloStore(
         return data
     }
 
-    private fun writeRun(run: SoloRun): JSONObject =
-        JSONObject().put("theme", run.theme.name)
+    private fun writeRun(run: SoloRun): JSONObject {
+        val data = JSONObject().put("theme", run.theme.name)
             .put("difficulty", run.difficulty.name).put("seed", run.seed)
             .put("seconds", run.elapsedSeconds)
             .put("found", JSONArray(run.foundIds.sorted()))
             .put("hints", JSONObject(run.hints))
+        run.boardSize?.let { data.put("board", it.name) }
+        run.challenge?.let { data.put("challenge", it.name) }
+        return data
+    }
 
     private fun encode(value: SoloProfile): ByteArray {
         val active = writeRun(value.active)
@@ -156,7 +173,11 @@ internal class SoloStore(
         for (r in value.results) results.put(JSONObject().put("id", r.puzzleId)
             .put("theme", r.theme.name).put("difficulty", r.difficulty.name)
             .put("words", r.wordCount).put("seconds", r.elapsedSeconds)
-            .put("hints", r.hintSteps).put("completedAt", r.completedAtMs))
+            .put("hints", r.hintSteps).put("completedAt", r.completedAtMs)
+            .apply {
+                r.boardSize?.let { put("board", it.name) }
+                r.challenge?.let { put("challenge", it.name) }
+            })
         val daily = JSONArray()
         for (entry in value.dailyEntries) {
             val item = JSONObject().put("date", entry.date)
@@ -167,7 +188,7 @@ internal class SoloStore(
         val identity = JSONObject()
             .put("name", value.identity.displayName)
             .put("portraitId", value.identity.portraitId)
-        return JSONObject().put("schema", 3).put("active", active)
+        return JSONObject().put("schema", 4).put("active", active)
             .put("results", results).put("daily", daily).put("identity", identity)
             .toString().toByteArray(StandardCharsets.UTF_8)
     }
@@ -288,18 +309,37 @@ internal class SoloStore(
         return warning == null
     }
 
+    /** Compatibility path used by historical QA fixtures. Never mutates v1 rules. */
     fun choose(theme: WordTheme, difficulty: WordDifficulty) {
         if (blocked) return
         profile = profile.copy(active = SoloProgressRules.fresh(theme, difficulty, nextSeed()))
         flush()
     }
 
+    fun chooseV2(theme: WordTheme, board: PuzzleBoardSize, challenge: PuzzleChallenge) {
+        if (blocked) return
+        // Build before replacing the previous saved board. Invalid input cannot
+        // discard the active session, and no new game is started without action.
+        val candidate = SoloProgressRules.freshV2(theme, board, challenge, nextSeed())
+        SoloProgressRules.puzzle(candidate)
+        profile = profile.copy(active = candidate)
+        flush()
+    }
+
     fun newPuzzle() {
         if (blocked) return
         val current = profile.active
-        profile = profile.copy(active = SoloProgressRules.fresh(current.theme,
-            current.difficulty, nextSeed()))
-        flush()
+        val board = current.boardSize ?: when (current.difficulty) {
+            WordDifficulty.EASY -> PuzzleBoardSize.COMPACT
+            WordDifficulty.MEDIUM -> PuzzleBoardSize.STANDARD
+            WordDifficulty.HARD -> PuzzleBoardSize.LARGE
+        }
+        val challenge = current.challenge ?: when (current.difficulty) {
+            WordDifficulty.EASY -> PuzzleChallenge.RELAXED
+            WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
+            WordDifficulty.HARD -> PuzzleChallenge.EXPERT
+        }
+        chooseV2(current.theme, board, challenge)
     }
 
     private fun nextSeed(): Long {
@@ -331,7 +371,8 @@ internal class SoloStore(
     fun tick() {
         if (blocked || !inForeground) return
         val p = profile
-        if (p.active.foundIds.size >= p.active.difficulty.targetCount) return
+        if (p.active.foundIds.size >=
+            (p.active.boardSize?.targets ?: p.active.difficulty.targetCount)) return
         profile = p.copy(active = p.active.copy(elapsedSeconds = p.active.elapsedSeconds + 1))
         if (profile.active.elapsedSeconds % 10L == 0L) flush()
     }
