@@ -125,6 +125,7 @@ internal class SoloStore(context: Context) {
             stream = atomic.startWrite()
             stream.write(encode(profile))
             atomic.finishWrite(stream)
+            warning = null
         } catch (ex: Exception) {
             if (stream != null) atomic.failWrite(stream)
             warning = "Unable to save Word Search progress. Please free device storage."
