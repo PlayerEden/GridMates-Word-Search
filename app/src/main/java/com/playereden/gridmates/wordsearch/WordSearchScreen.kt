@@ -137,8 +137,8 @@ internal fun WordSearchScreen(
             }).name
         )
     }
-    var hapticsEnabled by rememberSaveable { mutableStateOf(true) }
-    var soundEnabled by rememberSaveable { mutableStateOf(false) }
+    val hapticsEnabled = store.hapticsEnabled
+    val soundEnabled = store.soundEnabled
     val haptics = LocalHapticFeedback.current
     val view = LocalView.current
     val hintsRemaining = WordHintPolicy.remaining(run, daily)
@@ -226,15 +226,15 @@ internal fun WordSearchScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically) {
                         Text("Gentle vibration")
-                        Switch(checked = hapticsEnabled, onCheckedChange = { hapticsEnabled = it })
+                        Switch(checked = hapticsEnabled, onCheckedChange = store::setHapticsEnabled)
                     }
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically) {
                         Text("Word-found click")
-                        Switch(checked = soundEnabled, onCheckedChange = { soundEnabled = it })
+                        Switch(checked = soundEnabled, onCheckedChange = store::setSoundEnabled)
                     }
-                    Text("These feedback options apply to this play session.",
+                    Text("Your feedback preferences stay set on this device.",
                         style = MaterialTheme.typography.bodySmall, color = Muted)
                 }
             },
