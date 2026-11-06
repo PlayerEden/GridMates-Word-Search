@@ -13,7 +13,7 @@
     "stress 12x12/15x15/20x20 at multiple zooms",
     "cross-device offline rendering",
     "expose third party font notices",
-    "review digital cosmetic billing"
+    "verify earned-only grant, persistent equip/preview, retroactive achievements and default fallback"
   ],
   "candidates": [
     {
@@ -32,7 +32,7 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Readability-focused; test distinct I/l and O/0 on 20x20"
     },
@@ -52,7 +52,7 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Reserved Font Name Plex; carefully review before modifying"
     },
@@ -72,7 +72,7 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Minimal monospaced; verify thin-stroke visibility at 20x20"
     },
@@ -92,7 +92,7 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Turn off ligatures for one-glyph cells; individual font OFL distinct from source code license"
     },
@@ -112,7 +112,7 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Variable family; RFN RevReading Lexend; verify selected weight Android render"
     },
@@ -132,7 +132,7 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Friendly forms, proportional width; test optical center with M/W/I"
     },
@@ -152,7 +152,7 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Serifs may crowd cells, especially 20x20; prefer UI first"
     },
@@ -172,9 +172,25 @@
       "glyphCoverageChecked": false,
       "inAppPreviewApproved": false,
       "bundledInAndroid": false,
-      "entitlement": "candidate_only",
+      "entitlement": "candidate_only_free_achievement_or_default",
       "reviewStatus": "official_license_text_located_binary_not_audited",
       "notes": "Hand-lettered charm; require readability gate before 15/20 boards"
     }
-  ]
+  ],
+  "currentMonetizationDecision": {
+    "status": "free_achievement_unlocks_only",
+    "decidedAt": "2026-11-06",
+    "allowed": [
+      "free_default",
+      "achievement_earned"
+    ],
+    "prohibitedForCurrentPlan": [
+      "paid_font_unlocks",
+      "in_app_purchases",
+      "watch_ads_to_unlock",
+      "gacha_unlocks",
+      "consumable_font_currency"
+    ],
+    "note": "No store, billing, or paid entitlement implementation. Each font's OFL/copyright redistribution duties still apply. Exact unlock milestones pending B5 design."
+  }
 }
