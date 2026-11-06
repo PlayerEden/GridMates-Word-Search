@@ -46,7 +46,7 @@ import com.playereden.gridmates.wordsearch.core.WordSearchRules
 
 private enum class Page(val label: String) {
     PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
-    SETTINGS("Settings"), HELP("Help"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle")
+    SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle")
 }
 
 @Composable
@@ -114,7 +114,7 @@ internal fun GridMatesShell(soloStore: SoloStore) {
     Scaffold(
         containerColor = Cream,
         bottomBar = {
-            if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE) NavigationBar(containerColor = Paper) {
+            if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE && page != Page.NEARBY) NavigationBar(containerColor = Paper) {
                 Page.entries.filter {
                     it == Page.PLAY || it == Page.RECORDS ||
                         it == Page.COLLECTION || it == Page.SETTINGS
@@ -132,7 +132,11 @@ internal fun GridMatesShell(soloStore: SoloStore) {
             }
         }
     ) { contentPadding ->
-        if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
+        if (page == Page.NEARBY) {
+            Box(Modifier.fillMaxSize().padding(contentPadding)) {
+                NearbyCoopScreen(soloStore, onBack = { pageName = Page.PLAY.name })
+            }
+        } else if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 WordSearchScreen(
                     soloStore,
@@ -156,8 +160,9 @@ internal fun GridMatesShell(soloStore: SoloStore) {
                 Page.PLAY -> HomeScreen(soloStore,
                     onHelp = { pageName = Page.HELP.name },
                     onSolo = { pageName = Page.PUZZLE.name },
-                    onDaily = { pageName = Page.DAILY.name })
-                Page.PUZZLE, Page.DAILY_PUZZLE -> Unit
+                    onDaily = { pageName = Page.DAILY.name },
+                    onNearby = { pageName = Page.NEARBY.name })
+                Page.PUZZLE, Page.DAILY_PUZZLE, Page.NEARBY -> Unit
                 Page.DAILY -> DailyLandingScreen(soloStore,
                     onPlay = { date ->
                         soloStore.openDaily(date)
@@ -190,7 +195,7 @@ private fun Heading(eyebrow: String, heading: String) {
 
 @Composable
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
-    onDaily: () -> Unit) {
+    onDaily: () -> Unit, onNearby: () -> Unit) {
     val run = store.profile.active
     val puzzle = androidx.compose.runtime.remember(run.puzzleId) {
         SoloProgressRules.puzzle(run)
@@ -235,11 +240,14 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     }
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Nearby play is in development", color = Forest,
+            Text("Play Together — Nearby Co-op", color = Forest,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold)
-            Text("Co-op and two friendly race modes are coming after the Solo experience is polished.",
+            Text("Try sharing one word search on two phones over the same Wi-Fi. Versus modes are still planned.",
                 color = Muted, style = MaterialTheme.typography.bodySmall)
+            Button(onClick = onNearby, modifier = Modifier.fillMaxWidth()) {
+                Text("Play Together (QA preview)")
+            }
         }
     }
 }
@@ -272,7 +280,7 @@ private fun HelpScreen(onBack: () -> Unit) {
         style = MaterialTheme.typography.bodyLarge
     )
     Text(
-        "When nearby multiplayer arrives, one phone will host and another will join over the same Wi-Fi.",
+        "For nearby co-op, both phones use the same Wi-Fi. One hosts, and the other joins to find words together.",
         color = Muted
     )
     Button(onClick = onBack) {

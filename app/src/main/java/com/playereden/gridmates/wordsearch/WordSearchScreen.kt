@@ -82,6 +82,7 @@ import com.playereden.gridmates.wordsearch.core.WordTheme
 import kotlin.math.roundToInt
 
 private val FoundMarker = Color(0xFF9FC5AA)
+private val PartnerMarker = Color(0xFF91B7DF)
 private val ActiveMarker = Color(0xFFE4B957)
 private val GridRule = Color(0xFFD8DFD2)
 
@@ -558,14 +559,15 @@ private fun WordList(
  * This avoids ambiguity between panning and a word-selection gesture.
  */
 @Composable
-private fun ZoomableWordGrid(
+internal fun ZoomableWordGrid(
     puzzle: WordSearchPuzzle,
     found: Set<String>,
     hintPaths: List<List<GridPoint>>,
     viewport: Dp,
     onSelect: (GridPoint, GridPoint) -> Unit,
     onStep: (Int) -> Unit,
-    boardFontId: String
+    boardFontId: String,
+    partnerFoundIds: Set<String> = emptySet()
 ) {
     val viewportPx = with(LocalDensity.current) { viewport.toPx() }
     val initialZoom = when {
@@ -660,7 +662,7 @@ private fun ZoomableWordGrid(
                         translationY = transform.panY
                     },
                 onSelect = onSelect, onStep = onStep,
-                boardFontId = boardFontId
+                boardFontId = boardFontId, partnerFoundIds = partnerFoundIds
             )
             if (moving) {
                 Box(Modifier.fillMaxSize()
@@ -693,7 +695,8 @@ private fun WordGrid(
     modifier: Modifier = Modifier,
     onSelect: (GridPoint, GridPoint) -> Unit,
     onStep: (Int) -> Unit,
-    boardFontId: String
+    boardFontId: String,
+    partnerFoundIds: Set<String> = emptySet()
 ) {
     val glyphPainter = rememberBoardGlyphPainter(boardFontId)
     var sizePx by remember(puzzle.id) { mutableStateOf(IntSize.Zero) }
@@ -713,8 +716,10 @@ private fun WordGrid(
         )
     }
 
-    val confirmed = remember(puzzle.id, found) {
-        puzzle.targets.filter { it.id in found }.map { it.positions }
+    val confirmed = remember(puzzle.id, found, partnerFoundIds) {
+        puzzle.targets.filter { it.id in found }.map { target ->
+            target.positions to (target.id in partnerFoundIds)
+        }
     }
     val active = remember(puzzle.id, dragStart, dragEnd, tapStart) {
         when {
@@ -748,9 +753,9 @@ private fun WordGrid(
                         cap = StrokeCap.Round
                     )
                 }
-                confirmed.forEach { path ->
+                confirmed.forEach { (path, isPartner) ->
                     if (path.size > 1) drawLine(
-                        FoundMarker.copy(alpha = 0.58f),
+                        (if (isPartner) PartnerMarker else FoundMarker).copy(alpha = 0.58f),
                         center(path.first()), center(path.last()),
                         strokeWidth = cell * 0.54f,
                         cap = StrokeCap.Round

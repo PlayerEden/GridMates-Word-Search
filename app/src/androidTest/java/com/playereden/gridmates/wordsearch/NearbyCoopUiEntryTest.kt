@@ -1,0 +1,25 @@
+package com.playereden.gridmates.wordsearch
+
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+
+/** UI reachability does not require a second phone or a successful Wi-Fi host. */
+class NearbyCoopUiEntryTest {
+    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+
+    @Test fun nearbyRoomControlsAreReachableWithoutStartingAConnection() {
+        compose.onNodeWithText("Play Together (QA preview)")
+            .performScrollTo().performClick()
+        compose.onNodeWithText("Play Together").assertExists()
+        compose.onNodeWithText("Host a game").assertExists()
+        compose.onNodeWithText("Join nearby game").assertExists()
+        compose.onNodeWithText("Require a room code").assertExists()
+        compose.onNodeWithText("← Back to Play").performClick()
+        compose.onNodeWithText("Continue Solo").assertExists()
+    }
+}
