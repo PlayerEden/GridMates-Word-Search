@@ -1,4 +1,4 @@
-name: Word Search WS05F Final Paperback UX and Screenshot Audit
+name: Word Search WS05F Verified Screenshots and Android Suite
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
@@ -75,6 +75,10 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
             gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:connectedDebugAndroidTest
+            # Gradle instrumentation uninstalls the target package on some
+            # runners; reinstall the exact APK before launcher screenshots.
+            gradle --no-daemon :app:installDebug
+            adb shell pm list packages | grep -F com.playereden.gridmates.wordsearch.qa
             mkdir -p qa-screenshots
             adb shell settings put system font_scale 1.0
             adb shell am force-stop com.playereden.gridmates.wordsearch.qa
