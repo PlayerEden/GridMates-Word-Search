@@ -103,9 +103,9 @@ internal class BoardGlyphPainter(private val typeface: Typeface) {
             bounds.right + x, bounds.bottom + y)
     }
 
-    fun drawLetters(scope: DrawScope, rows: List<List<Char>>, ink: Color) {
+    fun drawLetters(scope: DrawScope, rows: List<String>, ink: Color) {
         if (rows.isEmpty()) return
-        val width = scope.size.width / rows[0].size
+        val width = scope.size.width / rows[0].length
         val height = scope.size.height / rows.size
         if (width <= 0f || height <= 0f) return
         paint.color = android.graphics.Color.argb(
@@ -144,6 +144,6 @@ internal fun BoardFontPreview(fontId: String, modifier: Modifier = Modifier) {
                 Offset(i * cellW, 0f), Offset(i * cellW, size.height),
                 strokeWidth = 1.dp.toPx())
         }
-        painter.drawLetters(this, listOf("MWIOQ".toList()), Ink)
+        painter.drawLetters(this, listOf("MWIOQ"), Ink)
     }
 }
