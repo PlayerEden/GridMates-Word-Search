@@ -3,7 +3,7 @@ package com.playereden.gridmates.wordsearch
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +43,7 @@ class ShellSmokeTest {
         compose.onNodeWithText("Readable Print").assertExists()
         compose.onNodeWithText("Classic Typewriter").assertExists()
         compose.onNodeWithText("Pencil Notes").assertExists()
-        compose.onAllNodesWithText("License").assertCountEquals(4)
+        compose.onAllNodes(hasText("License")).assertCountEquals(4)
     }
 
 }
