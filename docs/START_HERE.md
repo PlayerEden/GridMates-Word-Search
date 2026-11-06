@@ -2,7 +2,9 @@
 
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **As of:** November 5, 2026  
-**Status:** WS-01 native Android app scaffold is committed on [draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3). [Run #42131133443](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42131133443) passed core tests, Android lint, Android UI-test compilation and QA APK assembly with package-ID verification. **Not yet a playable Word Search:** no puzzle engine or real-phone QA. [Full branch QA receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws01-native-foundation-2026-11-05/docs/WS01_BUILD_QA_2026-11-05.md).
+**Status:** WS-02 **first playable Word Search** is committed to [stacked draft PR #4](https://github.com/PlayerEden/GridMates-Word-Search/pull/4), with [CI green #42138730965](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42138730965), reproducible word generation, touch/tap selection and an APK artifact. **Real-phone drag/layout testing and full Solo saving are still pending.** [WS-02 QA receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws02-word-engine-touch-prototype-2026-11-05/docs/WS02_FIRST_PLAYABLE_QA_2026-11-05.md).
+
+**Earlier foundation:** WS-01 native Android app scaffold is committed on [draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3). [Run #42131133443](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42131133443) passed core tests, Android lint, Android UI-test compilation and QA APK assembly with package-ID verification. **Not yet a playable Word Search:** no puzzle engine or real-phone QA. [Full branch QA receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws01-native-foundation-2026-11-05/docs/WS01_BUILD_QA_2026-11-05.md).
 
 ## Three documents that control the project
 
@@ -10,7 +12,7 @@
 2. [Development Roadmap](DEVELOPMENT_ROADMAP.md) — what to build next, in order, with acceptance gates.
 3. [README](../README.md) — concise public entry point and repo navigation.
 
-**Next actionable gate: complete WS-01 on-device install/navigation QA; after that, WS-02 Word Search generation and tactile letter-grid input.** The source foundation already exists on the draft feature branch and its initial CI is green. Do not build all modes at once.
+**Next actionable gate: physically playtest WS-02's first working grid (including accurate drag, tap, diagonals and compact phones), while preserving open WS-01 coexistence testing. After corrections, progress to WS-03 durable Solo saving/results.** The source is in draft PR #4 stacked on PR #3, not on main. Do not treat either as a verified Play release.
 
 ## Locked player decisions
 
@@ -50,7 +52,7 @@ The full original portrait provenance lives in the Sudoku branch's design/woodla
 
 ## Starter message for a fresh coding chat
 
-> Continue GridMates: Word Search in https://github.com/PlayerEden/GridMates-Word-Search. Read README, docs/START_HERE.md, docs/MASTER_GAME_DESIGN.md and docs/DEVELOPMENT_ROADMAP.md. Current state: WS-01 scaffold exists in draft PR #3, with a successful package-verified Android QA build at run 42131133443. Before changes, read the branch QA receipt and latest Sudoku v0.11C source/QA PR #28; complete on-device WS-01 checks, then begin WS-02 tactile puzzle generation. Keep source, package, saves, LAN identity, QA signing and repository independent of Sudoku. Preserve the green source checkpoint, then document every additional verified test and update the roadmap/handoff. Do not claim the game or LAN is already implemented. The product includes both Shared Board Race and Speed Duel as future Versus modes, but build progressively.
+> Continue GridMates: Word Search in https://github.com/PlayerEden/GridMates-Word-Search. Read README, docs/START_HERE.md, docs/MASTER_GAME_DESIGN.md and docs/DEVELOPMENT_ROADMAP.md. Current state: WS-02 playable prototype exists in draft PR #4 stacked on WS-01 PR #3, with verified Android QA build at run 42138730965 and real-device gesture QA still pending. Before changes, read the branch QA receipt and latest Sudoku v0.11C source/QA PR #28; complete WS-02 physical puzzle input/layout testing, then plan WS-03 durable save/resume and results. Keep source, package, saves, LAN identity, QA signing and repository independent of Sudoku. Preserve the green source checkpoint, then document every additional verified test and update the roadmap/handoff. Do not claim the game or LAN is already implemented. The product includes both Shared Board Race and Speed Duel as future Versus modes, but build progressively.
 
 ## Design changes log
 
@@ -59,4 +61,4 @@ The full original portrait provenance lives in the Sudoku branch's design/woodla
 ## Live first-step work tracking
 
 - [GitHub issue #1 — WS-01 Native foundation and safe reuse](https://github.com/PlayerEden/GridMates-Word-Search/issues/1) — **CI green; on-device tests next**.
-- [GitHub issue #2 — WS-02 Word Search generator and input](https://github.com/PlayerEden/GridMates-Word-Search/issues/2) — follows verified WS-01.
+- [GitHub issue #2 — WS-02 Word Search generator and input](https://github.com/PlayerEden/GridMates-Word-Search/issues/2) — CI-green on draft PR #4; physical UX QA open.
