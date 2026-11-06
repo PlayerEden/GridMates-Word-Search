@@ -676,9 +676,12 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 }
             }
             override fun onDiscoveryStopped(type: String) {
+                if (discovery !== this && stoppingDiscovery !== this) return
                 if (discovery === this) discovery = null
                 if (stoppingDiscovery === this) stoppingDiscovery = null
-                post { it.copy(scanning = false) }
+                discoveryQueue.reset()
+                discoveredInfos.clear()
+                post { it.copy(scanning = false, listings = emptyList()) }
                 if (refreshRequested) {
                     refreshRequested = false
                     main.post { if (!closed && state.role == NearbyRole.NONE) search() }
