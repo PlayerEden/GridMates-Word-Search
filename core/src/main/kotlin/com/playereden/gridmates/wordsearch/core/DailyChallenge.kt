@@ -45,6 +45,10 @@ object DailyChallenge {
     fun start(date: String): DailyProgress = DailyProgress(date, dailyRun(date))
 
     fun validate(entry: DailyProgress): DailyProgress {
+        // Published version-1 Daily puzzles remain English and immutable.
+        require(entry.run.boardSize == null && entry.run.challenge == null) {
+            "A new-generator puzzle cannot overwrite an English v1 Daily"
+        }
         val expected = dailyRun(entry.date)
         require(entry.run.theme == expected.theme &&
             entry.run.difficulty == expected.difficulty &&
