@@ -37,11 +37,14 @@ class SoloProgressTest {
     @Test fun hintLadderNeverCompletesOrAwardsWordsAutomatically() {
         val start = SoloProgressRules.fresh(seed = 31415L)
         var run = start
+        var firstId: String? = null
         repeat(3) {
             val (next, target) = SoloProgressRules.hint(run)
             assertNotNull(target)
+            if (firstId == null) firstId = target!!.id
+            else assertEquals("Hint must improve the same target first", firstId, target!!.id)
             run = next
-            assertEquals(it + 1, run.hints.values.sum())
+            assertEquals(it + 1, run.hints[firstId])
             assertTrue(run.foundIds.isEmpty())
         }
         val (next, _) = SoloProgressRules.hint(run)
