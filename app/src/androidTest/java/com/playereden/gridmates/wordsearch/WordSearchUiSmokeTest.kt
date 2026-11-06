@@ -1,6 +1,5 @@
 package com.playereden.gridmates.wordsearch
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
