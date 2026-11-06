@@ -172,8 +172,10 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
 
     private fun localWifiIp(): InetAddress? {
         val interfaces = Collections.list(NetworkInterface.getNetworkInterfaces())
-            .filter { runCatching { it.isUp && !it.isLoopback }.getOrDefault(false) }
-            .sortedBy { if (it.name.startsWith("wlan") || it.name.startsWith("ap")) 0 else 1 }
+            .filter { network ->
+                (network.name.startsWith("wlan") || network.name.startsWith("ap")) &&
+                    runCatching { network.isUp && !network.isLoopback }.getOrDefault(false)
+            }
         return interfaces.asSequence().flatMap { Collections.list(it.inetAddresses).asSequence() }
             .firstOrNull { it is Inet4Address && it.isSiteLocalAddress && !it.isLoopbackAddress }
     }
@@ -279,15 +281,17 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 val token = hello.optString("token")
                 if (current != null && token != current)
                     reject("This room is reserved for its previous partner.")
-                if (current == null && hostRoomCode.isNotBlank() &&
-                    hello.optString("code") != hostRoomCode) {
+                if (current == null && hostRoomCode.isNotBlank()) {
                     val address = socket.inetAddress.hostAddress ?: "unknown"
                     val now = System.currentTimeMillis()
                     val attempts = invalidCodes.getOrPut(address) { mutableListOf() }
                     attempts.removeAll { now - it > 60_000L }
                     if (attempts.size >= 5) reject("Too many incorrect codes. Try later.")
-                    attempts.add(now)
-                    reject("Incorrect room code.")
+                    if (hello.optString("code") != hostRoomCode) {
+                        attempts.add(now)
+                        reject("Incorrect room code.")
+                    }
+                    attempts.clear()
                 }
                 if (current == null) reservedToken = secret()
                 peer = socket
