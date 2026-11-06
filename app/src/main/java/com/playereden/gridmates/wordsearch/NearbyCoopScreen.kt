@@ -157,7 +157,7 @@ internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
                             Button(onClick = {
                                 val port = manualPort.toIntOrNull() ?: 0
                                 runtime.join(manualAddress, port, "", pin, ownName)
-                            }, enabled = !state.busy && manualPort.toIntOrNull() in 1..65535 &&
+                            }, enabled = !state.busy && (manualPort.toIntOrNull() ?: 0) in 1..65535 &&
                                 manualAddress.isNotBlank(),
                                 modifier = Modifier.fillMaxWidth()) { Text("Join with address") }
                         }
