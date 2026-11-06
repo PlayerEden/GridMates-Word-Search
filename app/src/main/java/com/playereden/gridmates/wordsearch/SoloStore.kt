@@ -188,7 +188,12 @@ internal class SoloStore(
 
     /** Manual Android document backup for QA installs without stable signing. */
     fun exportBackup(): String {
+        // If the existing on-device save is unreadable, 'profile' is only a
+        // temporary in-memory fallback. Never export it as if it were a valid
+        // recovered backup; this would mislead a player into losing history.
+        check(!blocked) { "Unreadable save is protected; export unavailable" }
         flush()
+        check(warning == null) { "Could not safely save current progress before export" }
         return encode(profile).toString(StandardCharsets.UTF_8)
     }
 
