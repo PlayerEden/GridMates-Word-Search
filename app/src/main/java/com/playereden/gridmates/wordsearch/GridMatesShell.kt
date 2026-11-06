@@ -148,9 +148,7 @@ internal fun GridMatesShell(soloStore: SoloStore) {
                 Page.COLLECTION -> PlaceholderScreen(
                     "Collection", "Our original Woodland portraits and other GridMates styles will be added from the verified Sudoku art collection."
                 )
-                Page.SETTINGS -> PlaceholderScreen(
-                    "Settings", "Touch feedback, readable letter sizes, color and font preferences are planned. No unsaved controls are shown as working settings."
-                )
+                Page.SETTINGS -> SoloSettingsScreen(soloStore)
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }
         }
