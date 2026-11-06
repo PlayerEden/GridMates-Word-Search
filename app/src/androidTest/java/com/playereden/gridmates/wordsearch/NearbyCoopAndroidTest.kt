@@ -83,6 +83,25 @@ class NearbyCoopAndroidTest {
         } finally { server.close() }
     }
 
+    @Test fun chatPacketsKeepRoomOrderAndRejectForgedHistory() {
+        val log = NearbyChatLog()
+        val host = log.add(CoopSeat.HOST, "h1", "Found one!", true, 1_000L)
+        val guest = log.add(CoopSeat.GUEST, "g1", "Great!", true, 1_001L)
+        assertEquals(NearbyChatStatus.ACCEPTED, host.status)
+        assertEquals(NearbyChatStatus.ACCEPTED, guest.status)
+        val history = log.history()
+        assertEquals(history, NearbyPacket.readChatHistory(NearbyPacket.chatHistory(history)))
+        assertEquals(history.first(), NearbyPacket.readChatLine(
+            NearbyPacket.chatLine(history.first())))
+        assertTrue(runCatching {
+            NearbyPacket.readChatLine(NearbyPacket.chatLine(history.first())
+                .put("text", "bad\\nmessage"))
+        }.isFailure)
+        val forged = NearbyPacket.chatHistory(history)
+        forged.put(NearbyPacket.chatLine(history.first()))
+        assertTrue(runCatching { NearbyPacket.readChatHistory(forged) }.isFailure)
+    }
+
     @Test fun oversizedOrWrongVersionPacketsFailClosed() {
         ServerSocket(0, 1, InetAddress.getLoopbackAddress()).use { server ->
             Socket(InetAddress.getLoopbackAddress(), server.localPort).use { client ->
