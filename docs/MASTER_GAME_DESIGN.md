@@ -1,3 +1,5 @@
+**Current cosmetic policy (Nov 6, 2026):** All portraits, board fonts and marker styles are **free unlockables earned through gameplay/achievements**; a usable, legible default remains free. No font shop, paid fonts, billing integration, watch-to-unlock ads or gacha in the active development plan. Future monetization references elsewhere in this specification are optional possibilities only and require a separate explicit decision. Keep earned entitlements idempotent and persisted across restart; unknown equipped font IDs must safely fall back to the default.
+
 # GridMates: Word Search — Master Game Design Document
 
 **Version:** Design baseline 0.1 — November 5, 2026  
