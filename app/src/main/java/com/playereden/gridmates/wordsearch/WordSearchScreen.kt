@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -37,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -45,12 +48,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
@@ -65,6 +71,7 @@ import com.playereden.gridmates.wordsearch.core.WordSearchGenerator
 import com.playereden.gridmates.wordsearch.core.WordSearchPuzzle
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
 import com.playereden.gridmates.wordsearch.core.WordTheme
+import kotlin.math.roundToInt
 
 private val FoundMarker = Color(0xFF9FC5AA)
 private val ActiveMarker = Color(0xFFE4B957)
@@ -106,11 +113,8 @@ internal fun WordSearchScreen(
     var pendingTheme by rememberSaveable { mutableStateOf(theme.name) }
     var pendingBoard by rememberSaveable {
         mutableStateOf(
-            (run.boardSize ?: when(difficulty) {
-                WordDifficulty.EASY -> PuzzleBoardSize.COMPACT
-                WordDifficulty.MEDIUM -> PuzzleBoardSize.STANDARD
-                WordDifficulty.HARD -> PuzzleBoardSize.LARGE
-            }).name
+            run.boardSize?.takeIf { it in PuzzleBoardSize.bookPresets }?.name
+                ?: PuzzleBoardSize.BOOK_CLASSIC.name
         )
     }
     var pendingChallenge by rememberSaveable {
@@ -154,7 +158,7 @@ internal fun WordSearchScreen(
                         }
                     }
                     Text("Board size", style = MaterialTheme.typography.titleSmall, color = Forest)
-                    PuzzleBoardSize.entries.forEach { item ->
+                    PuzzleBoardSize.bookPresets.forEach { item ->
                         Row(Modifier.fillMaxWidth().clickable { pendingBoard = item.name },
                             verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(selected = pendingBoard == item.name,
@@ -162,6 +166,8 @@ internal fun WordSearchScreen(
                             Text("${item.label} · ${item.cells}×${item.cells} · ${item.targets} words")
                         }
                     }
+                    Text("Larger boards use zoom and Move mode so letters remain readable.",
+                        style = MaterialTheme.typography.bodySmall, color = Muted)
                     Text("Challenge", style = MaterialTheme.typography.titleSmall, color = Forest)
                     PuzzleChallenge.entries.forEach { item ->
                         Row(Modifier.fillMaxWidth().clickable { pendingChallenge = item.name },
@@ -231,9 +237,9 @@ internal fun WordSearchScreen(
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp)) {
         val landscape = maxWidth > maxHeight * 1.25f
         val boardSize = if (landscape) {
-            minOf(maxHeight - (if (finished) 195.dp else 118.dp), maxWidth * 0.52f).coerceAtLeast(130.dp)
+            minOf(maxHeight - (if (finished) 235.dp else 165.dp), maxWidth * 0.52f).coerceAtLeast(130.dp)
         } else {
-            minOf(maxWidth, (maxHeight - (if (finished) 270.dp else 185.dp)) * 0.83f).coerceAtLeast(130.dp)
+            minOf(maxWidth, maxHeight - (if (finished) 315.dp else 240.dp)).coerceAtLeast(150.dp)
         }
 
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -249,11 +255,9 @@ internal fun WordSearchScreen(
                 if (!daily) {
                     TextButton(onClick = {
                         pendingTheme = theme.name
-                        pendingBoard = (run.boardSize ?: when (difficulty) {
-                            WordDifficulty.EASY -> PuzzleBoardSize.COMPACT
-                            WordDifficulty.MEDIUM -> PuzzleBoardSize.STANDARD
-                            WordDifficulty.HARD -> PuzzleBoardSize.LARGE
-                        }).name
+                        pendingBoard = run.boardSize?.takeIf {
+                            it in PuzzleBoardSize.bookPresets
+                        }?.name ?: PuzzleBoardSize.BOOK_CLASSIC.name
                         pendingChallenge = (run.challenge ?: when (difficulty) {
                             WordDifficulty.EASY -> PuzzleChallenge.RELAXED
                             WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
@@ -321,7 +325,7 @@ internal fun WordSearchScreen(
             if (landscape) {
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        WordGrid(puzzle, found, hintPaths, Modifier.size(boardSize), select, onStep)
+                        ZoomableWordGrid(puzzle, found, hintPaths, boardSize, select, onStep)
                         Text(status, color = Muted, style = MaterialTheme.typography.bodySmall,
                             maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
@@ -329,7 +333,7 @@ internal fun WordSearchScreen(
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    WordGrid(puzzle, found, hintPaths, Modifier.size(boardSize), select, onStep)
+                    ZoomableWordGrid(puzzle, found, hintPaths, boardSize, select, onStep)
                 }
                 Text(if (finished) "Puzzle Complete! Great work." else status,
                     color = if (finished) Forest else Muted,
@@ -403,6 +407,85 @@ private fun WordList(
     }
 }
 
+/**
+ * A compact, explicit Move/Find board viewer. One-finger word tracing remains
+ * untouched in Find mode; Move mode catches drag gestures above the grid.
+ * This avoids ambiguity between panning and a word-selection gesture.
+ */
+@Composable
+private fun ZoomableWordGrid(
+    puzzle: WordSearchPuzzle,
+    found: Set<String>,
+    hintPaths: List<List<GridPoint>>,
+    viewport: Dp,
+    onSelect: (GridPoint, GridPoint) -> Unit,
+    onStep: (Int) -> Unit
+) {
+    val initialZoom = when {
+        puzzle.size >= 20 -> 1.85f
+        puzzle.size >= 15 -> 1.45f
+        else -> 1f
+    }
+    var zoom by remember(puzzle.id) { mutableStateOf(initialZoom) }
+    var moving by remember(puzzle.id) { mutableStateOf(false) }
+    var panX by remember(puzzle.id) { mutableStateOf(0f) }
+    var panY by remember(puzzle.id) { mutableStateOf(0f) }
+    val viewportPx = with(LocalDensity.current) { viewport.toPx() }
+    val minimumPan = -(viewportPx * (zoom - 1f))
+    fun changeZoom(step: Float) {
+        zoom = (zoom + step).coerceIn(1f, 2.5f)
+        val limit = -(viewportPx * (zoom - 1f))
+        panX = panX.coerceIn(limit, 0f)
+        panY = panY.coerceIn(limit, 0f)
+    }
+
+    Column(
+        modifier = Modifier.width(viewport),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Row(Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+            Text("Board", color = Forest, style = MaterialTheme.typography.labelMedium)
+            TextButton(onClick = { changeZoom(-0.25f) }, enabled = zoom > 1f) {
+                Text("−")
+            }
+            Text("${(zoom * 100f).roundToInt()}%",
+                color = Muted, style = MaterialTheme.typography.labelMedium)
+            TextButton(onClick = { changeZoom(0.25f) }, enabled = zoom < 2.5f) {
+                Text("+")
+            }
+            TextButton(onClick = { moving = !moving }) {
+                Text(if (moving) "Find" else "Move")
+            }
+        }
+        Box(Modifier.size(viewport).clipToBounds()) {
+            WordGrid(
+                puzzle, found, hintPaths,
+                modifier = Modifier
+                    .offset { IntOffset(panX.roundToInt(), panY.roundToInt()) }
+                    .size(viewport * zoom),
+                onSelect = onSelect, onStep = onStep, fontScale = zoom
+            )
+            if (moving) {
+                Box(
+                    Modifier.fillMaxSize()
+                        .pointerInput(puzzle.id, zoom) {
+                            detectDragGestures { change, drag ->
+                                change.consume()
+                                panX = (panX + drag.x).coerceIn(minimumPan, 0f)
+                                panY = (panY + drag.y).coerceIn(minimumPan, 0f)
+                            }
+                        }
+                        .semantics {
+                            contentDescription = "Move board. Drag to explore. Tap Find to select letters."
+                        }
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun WordGrid(
     puzzle: WordSearchPuzzle,
@@ -410,7 +493,8 @@ private fun WordGrid(
     hintPaths: List<List<GridPoint>>,
     modifier: Modifier = Modifier,
     onSelect: (GridPoint, GridPoint) -> Unit,
-    onStep: (Int) -> Unit
+    onStep: (Int) -> Unit,
+    fontScale: Float = 1f
 ) {
     var sizePx by remember(puzzle.id) { mutableStateOf(IntSize.Zero) }
     var dragStart by remember(puzzle.id) { mutableStateOf<GridPoint?>(null) }
@@ -542,7 +626,8 @@ private fun WordGrid(
                         ) {
                             Text(
                                 char.toString(), color = Ink,
-                                fontSize = (26f - 0.8f * puzzle.size).sp,
+                                fontSize = ((26f - 0.8f * puzzle.size).coerceAtLeast(11f)
+                                     * fontScale).coerceAtMost(26f).sp,
                                 fontWeight = FontWeight.Medium, maxLines = 1
                             )
                         }
