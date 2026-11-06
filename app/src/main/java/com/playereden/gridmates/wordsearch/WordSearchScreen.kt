@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -69,6 +70,7 @@ import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.PuzzleBoardSize
 import com.playereden.gridmates.wordsearch.core.PuzzleChallenge
 import com.playereden.gridmates.wordsearch.core.SoloProgressRules
+import com.playereden.gridmates.wordsearch.core.WordHintPolicy
 import com.playereden.gridmates.wordsearch.core.WordDifficulty
 import com.playereden.gridmates.wordsearch.core.WordDragSnap
 import com.playereden.gridmates.wordsearch.core.WordSearchGenerator
@@ -135,6 +137,7 @@ internal fun WordSearchScreen(
     var soundEnabled by rememberSaveable { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
     val view = LocalView.current
+    val hintsRemaining = WordHintPolicy.remaining(run, daily)
     val finished = WordSearchRules.complete(puzzle, found)
     val hintPaths = puzzle.targets.filter { target ->
         target.id !in found && (run.hints[target.id] ?: 0) >= 3
@@ -345,7 +348,12 @@ internal fun WordSearchScreen(
                             else -> "Follow the faint gold guide for " + target.word + "."
                         }
                     }
-                }) { Text("Hint") }
+                }, enabled = hintsRemaining > 0 && !finished,
+                    modifier = Modifier.semantics {
+                        contentDescription = "Hint. $hintsRemaining of " +
+                            WordHintPolicy.allowance(run, daily) + " left for this puzzle."
+                    }
+                ) { Text("Hint ($hintsRemaining)") }
             }
 
             if (finished) {
@@ -679,11 +687,14 @@ private fun WordGrid(
     ) {
         Column(Modifier.fillMaxSize()) {
             puzzle.rows.forEachIndexed { row, letters ->
-                Row(Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth().weight(1f)) {
                     letters.forEachIndexed { col, char ->
                         val p = GridPoint(row, col)
                         Box(
-                            Modifier.weight(1f).aspectRatio(1f)
+                            // Use the exact height distributed by the outer
+                            // Column. 20 rounded square row heights used to
+                            // accumulate beyond viewport and crop the last row.
+                            Modifier.weight(1f).fillMaxHeight()
                                 .border(0.5.dp, GridRule)
                                 .clickable {
                                     val first = tapStart
