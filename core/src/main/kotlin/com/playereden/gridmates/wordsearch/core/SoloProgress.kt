@@ -30,7 +30,8 @@ data class SoloResult(
 data class SoloProfile(
     val active: SoloRun,
     val results: List<SoloResult> = emptyList(),
-    val dailyEntries: List<DailyProgress> = emptyList()
+    val dailyEntries: List<DailyProgress> = emptyList(),
+    val identity: PlayerIdentity = PlayerIdentity()
 ) {
     val completions: Int get() = results.size
     val assistedCompletions: Int get() = results.count { it.assisted }
