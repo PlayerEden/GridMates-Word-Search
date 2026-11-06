@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = 13
-        versionName = "0.5.1-nearby-chat-b-alpha"
+        versionCode = 14
+        versionName = "0.5.2-chat-confirmation-c-alpha"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
