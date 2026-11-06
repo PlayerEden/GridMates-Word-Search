@@ -4,7 +4,21 @@ import kotlin.random.Random
 
 /** Version 2 is separate from the frozen English v1 generator and Daily. */
 enum class PuzzleBoardSize(val label: String, val cells: Int, val targets: Int) {
-    COMPACT("Compact", 8, 6), STANDARD("Standard", 10, 8), LARGE("Large", 12, 10)
+    // Keep the original three values, names and ordinals intact. Players already
+    // have saved v2 boards that use these exact IDs and seeded word placements.
+    COMPACT("Legacy compact", 8, 6),
+    STANDARD("Legacy standard", 10, 8),
+    LARGE("Legacy large", 12, 10),
+
+    // Paperback-sized choices for NEW Solo puzzles. Old v2 puzzles remain valid.
+    BOOK_SHORT("Short", 12, 12),
+    BOOK_CLASSIC("Standard", 15, 16),
+    BOOK_BIG("Extended", 20, 24);
+
+    companion object {
+        val bookPresets: List<PuzzleBoardSize> =
+            listOf(BOOK_SHORT, BOOK_CLASSIC, BOOK_BIG)
+    }
 }
 enum class PuzzleChallenge(val label: String, val description: String) {
     RELAXED("Relaxed", "Forward across and down"),

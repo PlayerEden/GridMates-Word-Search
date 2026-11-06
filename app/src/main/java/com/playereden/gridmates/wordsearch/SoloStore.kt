@@ -59,7 +59,7 @@ internal class SoloStore(
 
     private fun initial(): SoloProfile =
         SoloProfile(SoloProgressRules.freshV2(
-            WordTheme.WOODLAND, PuzzleBoardSize.STANDARD,
+            WordTheme.WOODLAND, PuzzleBoardSize.BOOK_CLASSIC,
             PuzzleChallenge.CLASSIC, System.currentTimeMillis()
         ))
 
@@ -329,11 +329,10 @@ internal class SoloStore(
     fun newPuzzle() {
         if (blocked) return
         val current = profile.active
-        val board = current.boardSize ?: when (current.difficulty) {
-            WordDifficulty.EASY -> PuzzleBoardSize.COMPACT
-            WordDifficulty.MEDIUM -> PuzzleBoardSize.STANDARD
-            WordDifficulty.HARD -> PuzzleBoardSize.LARGE
-        }
+        // Fresh Solo plays use book-sized choices. Previously saved 8x8/10x10
+        // and original 12x12 v2 boards still load untouched until replaced.
+        val board = current.boardSize?.takeIf { it in PuzzleBoardSize.bookPresets }
+            ?: PuzzleBoardSize.BOOK_CLASSIC
         val challenge = current.challenge ?: when (current.difficulty) {
             WordDifficulty.EASY -> PuzzleChallenge.RELAXED
             WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
