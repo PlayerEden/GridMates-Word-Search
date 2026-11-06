@@ -22,7 +22,20 @@ private val gridMatesScheme = lightColorScheme(
     onSurface = Ink,
     secondary = Gold,
     onSecondary = Paper,
-    outline = Muted
+    outline = Muted,
+    primaryContainer = Color(0xFFD9E7D9),
+    onPrimaryContainer = Forest,
+    secondaryContainer = Color(0xFFF1E4C1),
+    onSecondaryContainer = Ink,
+    tertiary = Gold,
+    onTertiary = Paper,
+    tertiaryContainer = Color(0xFFF5E9CD),
+    onTertiaryContainer = Ink,
+    surfaceVariant = Cream,
+    onSurfaceVariant = Ink,
+    surfaceContainer = Paper,
+    surfaceContainerHigh = Cream,
+    surfaceContainerLow = Paper
 )
 
 @Composable
