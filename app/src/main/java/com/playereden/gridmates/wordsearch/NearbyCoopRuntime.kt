@@ -29,7 +29,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 /** Only protocol-compatible devices on a trusted local network can join. */
-private const val WS_WIRE_VERSION = 1
+private const val WS_WIRE_VERSION = 2
 private const val WS_NSD_TYPE = "_gridmatesws._tcp."
 private const val WS_PACKET_MAX = 16_384
 
@@ -264,6 +264,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             this.port = port
             setAttribute("room", id)
             setAttribute("pin", if (needsCode) "1" else "0")
+            setAttribute("proto", WS_WIRE_VERSION.toString())
         }
         val cb = object : NsdManager.RegistrationListener {
             override fun onServiceRegistered(info: NsdServiceInfo) = Unit
@@ -461,6 +462,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     override fun onServiceResolved(info: NsdServiceInfo) {
                         val ip = info.host?.hostAddress ?: return
                         val id = info.attributes["room"]?.toString(Charsets.UTF_8) ?: return
+                        if (info.attributes["proto"]?.toString(Charsets.UTF_8) !=
+                            WS_WIRE_VERSION.toString()) return
                         if (id.isBlank() || info.port !in 1..65535) return
                         val entry = NearbyListing(id, info.serviceName, ip, info.port,
                             info.attributes["pin"]?.toString(Charsets.UTF_8) != "0")
