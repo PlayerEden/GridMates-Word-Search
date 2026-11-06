@@ -29,7 +29,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 /** Only protocol-compatible devices on a trusted local network can join. */
-private const val WS_WIRE_VERSION = 3
+private const val WS_WIRE_VERSION = 4
 private const val WS_NSD_TYPE = "_gridmatesws._tcp."
 private const val WS_PACKET_MAX = 16_384
 
@@ -175,6 +175,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     private var client: Socket? = null
     private var authority: NearbyCoopSession? = null
     private var reservedToken: String? = null
+    private var admissionPending = false
     private var pendingGuestChat: PendingNearbyChat? = null
     private var registration: NsdManager.RegistrationListener? = null
     private var discovery: NsdManager.DiscoveryListener? = null
@@ -298,8 +299,14 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         }
     }
 
+    /**
+     * Initial admission is prepared, but NOT reserved, until the guest has
+     * durably saved the reconnect credential and explicitly acknowledges it.
+     * If the final "joined" packet is lost, the guest already has its token.
+     */
     private fun handleGuest(socket: Socket) {
         var admitted = false
+        var offered = false
         try {
             socket.soTimeout = 5_000
             socket.tcpNoDelay = true
@@ -314,9 +321,10 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             val session = synchronized(lock) { authority } ?: reject("Room closed.")
             if (hello.optString("room").isNotBlank() &&
                 hello.optString("room") != session.roomId) reject("This room has changed.")
-            synchronized(lock) {
+
+            val credential = synchronized(lock) {
                 if (closed || listener == null) reject("Room closed.")
-                if (peer != null) reject("This room already has two players.")
+                if (peer != null || admissionPending) reject("This room already has two players.")
                 val current = reservedToken
                 val token = hello.optString("token")
                 if (current != null && token != current)
@@ -333,20 +341,34 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     }
                     attempts.clear()
                 }
-                if (current == null) reservedToken = secret()
+                admissionPending = true
+                offered = true
+                current ?: secret()
+            }
+            // The guest can validate the proposed board before committing its token.
+            val preview = session.snapshot().copy(guestReserved = true, guestConnected = true)
+            NearbyPacket.write(socket, JSONObject().put("type", "welcome")
+                .put("token", credential).put("hostName", liveHostName)
+                .put("roomState", NearbyPacket.state(preview))
+                .put("chatHistory", NearbyPacket.chatHistory(chatLog.history())))
+            val receipt = NearbyPacket.read(socket)
+            if (!NearbyHandshake.accepts(receipt.optString("type"),
+                    receipt.optString("room"), receipt.optString("token"),
+                    session.roomId, credential)) reject("Join confirmation was not received.")
+            val accepted = synchronized(lock) {
+                if (closed || peer != null || !admissionPending) reject("Room closed.")
+                // This is the first point where a new guest can reserve the seat.
+                if (reservedToken == null) reservedToken = credential
                 peer = socket
                 peerLastReadNanos = System.nanoTime()
                 admitted = true
-                val snapshot = session.admitOrRejoinGuest()
-                val welcome = JSONObject().put("type", "welcome")
-                    .put("token", reservedToken).put("name", name)
-                    .put("hostName", liveHostName)
-                    .put("roomState", NearbyPacket.state(snapshot))
-                    .put("chatHistory", NearbyPacket.chatHistory(chatLog.history()))
-                NearbyPacket.write(socket, welcome)
-                post { it.copy(guestName = name, snapshot = snapshot,
-                    message = "Connected with " + name + ". Find words together!") }
+                session.admitOrRejoinGuest()
             }
+            synchronized(lock) { admissionPending = false; offered = false }
+            NearbyPacket.write(socket, JSONObject().put("type", "joined")
+                .put("roomState", NearbyPacket.state(accepted)))
+            post { it.copy(guestName = name, snapshot = accepted,
+                message = "Connected with " + name + ". Find words together!") }
             socket.soTimeout = 11_000
             while (!closed && !socket.isClosed) {
                 val msg = try { NearbyPacket.read(socket) }
@@ -356,17 +378,16 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 when (msg.optString("type")) {
                     "pong" -> Unit
                     "chat_send" -> synchronized(lock) {
-                        val accepted = chatLog.add(CoopSeat.GUEST, msg.optString("id"),
+                        val response = chatLog.add(CoopSeat.GUEST, msg.optString("id"),
                             msg.optString("text"), true, System.currentTimeMillis())
-                        if (accepted.status == NearbyChatStatus.ACCEPTED ||
-                            accepted.status == NearbyChatStatus.DUPLICATE) {
-                            // A repeated request gets the exact same host receipt.
-                            accepted.line?.let(::publishChat)
+                        if (response.status == NearbyChatStatus.ACCEPTED ||
+                            response.status == NearbyChatStatus.DUPLICATE) {
+                            response.line?.let(::publishChat)
                         } else {
                             runCatching {
                                 NearbyPacket.write(socket, JSONObject()
                                     .put("type", "chat_error").put("id", msg.optString("id"))
-                                    .put("message", when (accepted.status) {
+                                    .put("message", when (response.status) {
                                         NearbyChatStatus.TOO_FAST -> "Send messages a little slower."
                                         NearbyChatStatus.EMPTY -> "Write a message first."
                                         else -> "Message was not accepted."
@@ -387,8 +408,10 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 }
             }
         } catch (_: Exception) {
-            // Preserve room and all found words; a reserved guest can rejoin.
+            // A failed offer does not reserve a new guest. Confirmed guests
+            // still retain their session token for reconnect after any drop.
         } finally {
+            if (offered) synchronized(lock) { admissionPending = false }
             if (admitted) dropGuest(socket) else runCatching { socket.close() }
         }
     }
@@ -600,12 +623,27 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 if (welcome.optString("type") == "error")
                     throw IOException(welcome.optString("message", "Join declined."))
                 require(welcome.optString("type") == "welcome")
-                val snapshot = NearbyPacket.parseState(welcome.getJSONObject("roomState"))
-                val recentChat = NearbyPacket.readChatHistory(welcome.getJSONArray("chatHistory"))
-                if (roomId.isNotBlank() && snapshot.roomId != roomId)
+                val offered = NearbyPacket.parseState(welcome.getJSONObject("roomState"))
+                val offeredChat = NearbyPacket.readChatHistory(welcome.getJSONArray("chatHistory"))
+                if (roomId.isNotBlank() && offered.roomId != roomId)
                     throw IOException("The room changed. Find it again.")
                 val credential = welcome.getString("token")
-                require(credential.length == 40) { "Invalid session credential" }
+                require(credential.length == 40 && credential.all { it in '0'..'9' || it in 'a'..'f' }) {
+                    "Invalid session credential"
+                }
+                // Persist FIRST. If "joined" is lost the host may have reserved
+                // this seat, but our next connection already has its identity.
+                if (!prefs.edit().putString("token_" + offered.roomId, credential).commit())
+                    throw IOException("Could not save rejoin credential.")
+                NearbyPacket.write(socket, NearbyHandshake.receipt(offered.roomId, credential))
+                val joined = NearbyPacket.read(socket)
+                if (joined.optString("type") == "error")
+                    throw IOException(joined.optString("message", "Join declined."))
+                require(joined.optString("type") == "joined") { "Join was not confirmed." }
+                val snapshot = NearbyPacket.parseState(joined.getJSONObject("roomState"))
+                require(NearbyHandshake.matchesFinal(offered, snapshot)) {
+                    "The room changed during joining."
+                }
                 synchronized(lock) {
                     if (closed) throw IOException("Screen was closed.")
                     client?.close()
@@ -613,17 +651,16 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     lastHost = address
                     lastPort = port
                 }
-                prefs.edit().putString("token_" + snapshot.roomId, credential).apply()
                 main.post { if (!closed) stopDiscovery() }
                 val outstanding = synchronized(lock) {
-                    if (NearbyChatDelivery.confirmedInHistory(pendingGuestChat, recentChat))
+                    if (NearbyChatDelivery.confirmedInHistory(pendingGuestChat, offeredChat))
                         pendingGuestChat = null
                     else pendingGuestChat = pendingGuestChat?.copy(needsRetry = true)
                     pendingGuestChat
                 }
                 post { it.copy(role = NearbyRole.GUEST, busy = false, disconnected = false,
                     snapshot = snapshot, roomId = snapshot.roomId,
-                    chat = recentChat, pendingChat = outstanding,
+                    chat = offeredChat, pendingChat = outstanding,
                     hostName = welcome.optString("hostName", "Host"),
                     address = address, port = port,
                     message = "Connected! You both share this puzzle.") }
