@@ -102,6 +102,39 @@ class NearbyCoopAndroidTest {
         assertTrue(runCatching { NearbyPacket.readChatHistory(forged) }.isFailure)
     }
 
+    @Test fun confirmedGuestMessageCarriesOriginIdThroughActualSocket() {
+        val log = NearbyChatLog()
+        val first = log.add(CoopSeat.GUEST, "guest-msg-1", "Good find!", true, 1_000L)
+        val accepted = requireNotNull(first.line)
+        val server = ServerSocket(0, 1, InetAddress.getLoopbackAddress())
+        try {
+            Socket(InetAddress.getLoopbackAddress(), server.localPort).use { sender ->
+                server.accept().use { receiver ->
+                    sender.soTimeout = 5_000
+                    receiver.soTimeout = 5_000
+                    NearbyPacket.write(sender, NearbyPacket.chatLine(accepted))
+                    val restored = NearbyPacket.readChatLine(NearbyPacket.read(receiver))
+                    assertEquals("guest-msg-1", restored.requestId)
+                    assertTrue(NearbyChatDelivery.confirmed(
+                        PendingNearbyChat("guest-msg-1", "Good find!"), restored))
+                    assertEquals(NearbyChatStatus.DUPLICATE,
+                        log.add(CoopSeat.GUEST, "guest-msg-1", "Do not duplicate",
+                            true, 3_000L).status)
+                    assertEquals(1, log.history().size)
+                }
+            }
+        } finally { server.close() }
+    }
+
+    @Test fun malformedHostChatIdCannotConfirmUnrelatedMessage() {
+        val line = NearbyChatLine(1L, CoopSeat.GUEST, "Hi", 1_000L, "valid-1")
+        assertTrue(runCatching {
+            NearbyPacket.readChatLine(NearbyPacket.chatLine(line).put("requestId", "bad id"))
+        }.isFailure)
+        assertFalse(NearbyChatDelivery.confirmed(
+            PendingNearbyChat("other-2", "Hi"), line))
+    }
+
     @Test fun oversizedOrWrongVersionPacketsFailClosed() {
         ServerSocket(0, 1, InetAddress.getLoopbackAddress()).use { server ->
             Socket(InetAddress.getLoopbackAddress(), server.localPort).use { client ->
