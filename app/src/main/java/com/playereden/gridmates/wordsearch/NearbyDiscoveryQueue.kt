@@ -10,17 +10,21 @@ package com.playereden.gridmates.wordsearch
 internal class NearbyDiscoveryQueue(private val maxLive: Int = 32) {
     private val live = LinkedHashSet<String>()
     private val waiting = ArrayDeque<String>()
+    private val tickets = mutableMapOf<String, Long>()
+    private var nextTicket = 0L
     private var active: String? = null
 
     fun found(name: String): String? {
         if (name.isBlank() || name.length > 120 || live.size >= maxLive ||
             !live.add(name)) return null
+        tickets[name] = ++nextTicket
         waiting.addLast(name)
         return startNext()
     }
 
     fun lost(name: String) {
         live.remove(name)
+        tickets.remove(name)
         waiting.removeAll { it == name }
         // A resolve already in progress must complete before another starts.
     }
@@ -33,8 +37,12 @@ internal class NearbyDiscoveryQueue(private val maxLive: Int = 32) {
 
     fun isLive(name: String): Boolean = name in live
 
+    /** Distinguish a late resolution from a new ad with the same name. */
+    fun ticket(name: String): Long? = tickets[name]
+
     fun reset() {
         live.clear()
+        tickets.clear()
         waiting.clear()
         active = null
     }
