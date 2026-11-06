@@ -20,7 +20,7 @@
 - Respectful help, long-term progress, optional cosmetic rewards, and no ads interrupting puzzles.
 - The design remains iterative: proposals should change when real phone playtests show a better answer.
 
-**Next:** Test WS-02 finger-drag and tap selection on real Android phones, improve the board based on feedback, then add durable Solo save/resume in WS-03. The underlying WS-01 foundation is [draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3).
+**Next:** The [WS-02B feel-polish build](https://github.com/PlayerEden/GridMates-Word-Search/pull/6) has passed Android CI but needs hands-on review: smoother word dragging, new marker highlights, compact word-list layout and haptic feedback. [Download QA build from GitHub](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42146261876/artifacts/13469863578). Then address remaining phone feedback and begin WS-03 durable Solo saves/update-signing. The underlying WS-01 foundation is [draft PR #3](https://github.com/PlayerEden/GridMates-Word-Search/pull/3).
 
 **Sister project:** [GridMates: Sudoku](https://github.com/PlayerEden/SudokuTogether) — do not treat its default main as the latest Android gameplay source; see the handoff for current references.
 
