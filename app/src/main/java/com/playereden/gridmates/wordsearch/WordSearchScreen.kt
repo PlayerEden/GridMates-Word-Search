@@ -209,24 +209,28 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                     (run.elapsedSeconds / 60L) + ":" +
                     (run.elapsedSeconds % 60L).toString().padStart(2, '0'),
                     style = MaterialTheme.typography.titleMedium, color = Forest,
-                    fontWeight = FontWeight.SemiBold)
-                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-                    TextButton(onClick = {
-                        val (next, target) = store.hint()
-                        status = if (target == null) "All words found!" else {
-                            when (next.hints[target.id] ?: 0) {
-                                1 -> "Try " + target.word + " near row " +
-                                    (target.positions.first().row + 1) + "."
-                                2 -> target.word + " starts at row " +
-                                    (target.positions.first().row + 1) + ", col " +
-                                    (target.positions.first().col + 1) + "."
-                                else -> "Follow the faint gold guide for " + target.word + "."
-                            }
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f))
+                TextButton(onClick = {
+                    val (next, target) = store.hint()
+                    status = if (target == null) "All words found!" else {
+                        when (next.hints[target.id] ?: 0) {
+                            1 -> "Try " + target.word + " near row " +
+                                (target.positions.first().row + 1) + "."
+                            2 -> target.word + " starts at row " +
+                                (target.positions.first().row + 1) + ", col " +
+                                (target.positions.first().col + 1) + "."
+                            else -> "Follow the faint gold guide for " + target.word + "."
                         }
-                    }) { Text("Hint") }
-                    TextButton(onClick = { feelOpen = true }) { Text("Feel") }
-                    TextButton(onClick = { newPuzzleOpen = true }) { Text("New Puzzle") }
-                }
+                    }
+                }) { Text("Hint") }
+            }
+            Row(Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = { feelOpen = true }) { Text("Feel") }
+                TextButton(onClick = { newPuzzleOpen = true }) { Text("New Puzzle") }
             }
 
             val select: (GridPoint, GridPoint) -> Unit = { start, end ->
