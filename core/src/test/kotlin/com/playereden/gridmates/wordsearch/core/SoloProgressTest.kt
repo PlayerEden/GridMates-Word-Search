@@ -14,7 +14,7 @@ class SoloProgressTest {
         val clean = SoloProgressRules.validate(run)
         assertEquals(setOf(target.id), clean.foundIds)
         assertEquals(mapOf(target.id to 2), clean.hints)
-        assertEquals(0, clean.elapsedSeconds)
+        assertEquals(0L, clean.elapsedSeconds)
     }
 
     @Test fun claimOnlyUpdatesOnceAndCompletionRecordIsIdempotent() {
