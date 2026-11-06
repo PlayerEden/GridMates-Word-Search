@@ -705,14 +705,18 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
 
     fun join(address: String, port: Int, roomId: String, code: String, name: String) {
         if (state.busy || state.role != NearbyRole.NONE && !state.disconnected) return
+        if (!joinInProgress.compareAndSet(false, true)) return
         if (state.role == NearbyRole.GUEST && roomId != state.roomId) {
+            joinInProgress.set(false)
             post { it.copy(message = "Leave this game before joining a different room.") }
             return
         }
         if (port !in 1..65535 || address.isBlank()) {
+            joinInProgress.set(false)
             post { it.copy(message = "Enter a valid host address and port.") }; return
         }
-        post { it.copy(busy = true, message = "Connecting to your partner…") }
+        post { it.copy(busy = true, message = "Connecting to your partner…",
+            recovery = if (it.recovery?.roomId == roomId) it.recovery else null) }
         io.execute {
             val socket = Socket()
             try {
@@ -740,6 +744,10 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 // this seat, but our next connection already has its identity.
                 if (!prefs.edit().putString("token_" + offered.roomId, credential).commit())
                     throw IOException("Could not save rejoin credential.")
+                // This survives a lost Joined packet, including manual-IP joins
+                // where the initial lookup did not include a room ID.
+                val recovery = NearbyJoinRecovery(offered.roomId, address, port, code)
+                post { it.copy(recovery = recovery) }
                 NearbyPacket.write(socket, NearbyHandshake.receipt(offered.roomId, credential))
                 val joined = NearbyPacket.read(socket)
                 if (joined.optString("type") == "error")
@@ -765,17 +773,28 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 }
                 post { it.copy(role = NearbyRole.GUEST, busy = false, disconnected = false,
                     snapshot = snapshot, roomId = snapshot.roomId,
-                    chat = offeredChat, pendingChat = outstanding,
+                    chat = offeredChat, pendingChat = outstanding, recovery = null,
                     hostName = welcome.optString("hostName", "Host"),
                     address = address, port = port,
                     message = "Connected! You both share this puzzle.") }
                 io.execute { readHost(socket) }
             } catch (e: Exception) {
                 runCatching { socket.close() }
-                post { it.copy(busy = false, message = e.message ?: "Could not join.",
+                post { it.copy(busy = false,
+                    message = if (it.recovery != null)
+                        "Connection interrupted. Your room can be retried safely."
+                    else e.message ?: "Could not join.",
                     disconnected = it.role == NearbyRole.GUEST) }
+            } finally {
+                joinInProgress.set(false)
             }
         }
+    }
+
+    fun retryInterruptedJoin(name: String) {
+        val recovery = state.recovery ?: return
+        if (state.busy || state.role != NearbyRole.NONE) return
+        join(recovery.address, recovery.port, recovery.roomId, recovery.code, name)
     }
 
     private fun readHost(socket: Socket) {
