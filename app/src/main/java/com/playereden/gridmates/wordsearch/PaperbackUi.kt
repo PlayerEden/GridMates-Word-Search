@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,8 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -93,13 +91,13 @@ internal fun PaperbackCover(player: String) {
                 modifier = Modifier.size(98.dp).clip(RoundedCornerShape(12.dp))
                     .background(WarmPaper)
                     .padding(8.dp)
-                    .semantics { contentDescription = "Decorative letter-grid artwork" },
+                    .clearAndSetSemantics { },
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 letters.forEachIndexed { rowIndex, line ->
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly) {
-                        line.forEachIndexed { colIndex, letter ->
+                        line.forEach { letter ->
                             Text(letter.toString(), color = if (rowIndex == 0) Forest else Ink,
                                 fontWeight = if (rowIndex == 0) FontWeight.Bold else FontWeight.Medium,
                                 style = MaterialTheme.typography.labelSmall,
