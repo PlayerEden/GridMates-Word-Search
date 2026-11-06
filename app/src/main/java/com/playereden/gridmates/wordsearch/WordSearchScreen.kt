@@ -184,7 +184,7 @@ internal fun WordSearchScreen(onBack: () -> Unit) {
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onBack) { Text("‹ Home") }
+                TextButton(onClick = onBack) { Text("Home") }
                 Text(theme.label + " · " + difficulty.label,
                     style = MaterialTheme.typography.titleSmall,
                     color = Forest, maxLines = 1, overflow = TextOverflow.Ellipsis,
