@@ -1,0 +1,270 @@
+package com.playereden.gridmates.wordsearch
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.playereden.gridmates.wordsearch.core.*
+
+/**
+ * No account, server, or QR step: host on a trusted Wi-Fi, partner selects
+ * the nearby room. Manual address is a visible fallback only when needed.
+ * We keep this in an isolated screen so Solo/Daily are unchanged.
+ */
+@Composable
+internal fun NearbyCoopScreen(store: SoloStore, onBack: () -> Unit) {
+    val ctx = LocalContext.current
+    val runtime = remember(ctx) { NearbyCoopRuntime(ctx) }
+    DisposableEffect(runtime) { onDispose { runtime.close() } }
+    val state = runtime.state
+    var theme by rememberSaveable { mutableStateOf(WordTheme.WOODLAND.name) }
+    var board by rememberSaveable { mutableStateOf(PuzzleBoardSize.BOOK_CLASSIC.name) }
+    var challenge by rememberSaveable { mutableStateOf(PuzzleChallenge.CLASSIC.name) }
+    var showJoin by rememberSaveable { mutableStateOf(false) }
+    var manual by rememberSaveable { mutableStateOf(false) }
+    var manualAddress by rememberSaveable { mutableStateOf("") }
+    var manualPort by rememberSaveable { mutableStateOf("") }
+    var pin by rememberSaveable { mutableStateOf("") }
+    var selectedRoom by remember { mutableStateOf<NearbyListing?>(null) }
+    val ownName = store.profile.identity.displayName.trim().ifBlank { "Player" }
+    val snapshot = state.snapshot
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+        .padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        TextButton(onClick = onBack) { Text("← Back to Play") }
+        Text("Play Together", style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold, color = Forest)
+        Text("One word search, two phones. Same Wi-Fi, no sign-in.",
+            color = Muted, style = MaterialTheme.typography.bodyMedium)
+
+        if (state.message.isNotBlank()) {
+            Card(Modifier.fillMaxWidth()) {
+                Text(state.message, Modifier.padding(12.dp),
+                    color = Forest, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+        if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+
+        if (snapshot == null && state.role == NearbyRole.NONE) {
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Start a shared puzzle",
+                        color = Forest, style = MaterialTheme.typography.titleLarge)
+                    Text("Pick a puzzle, then your partner taps it under Nearby games.",
+                        color = Muted)
+                    Text("Theme", fontWeight = FontWeight.SemiBold)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        WordTheme.entries.forEach { entry ->
+                            FilterChip(selected = theme == entry.name,
+                                onClick = { theme = entry.name },
+                                label = { Text(entry.label, style = MaterialTheme.typography.labelSmall) })
+                        }
+                    }
+                    Text("Board", fontWeight = FontWeight.SemiBold)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        PuzzleBoardSize.bookPresets.forEach { entry ->
+                            FilterChip(selected = board == entry.name,
+                                onClick = { board = entry.name },
+                                label = { Text(entry.cells.toString() + "×" + entry.cells,
+                                    style = MaterialTheme.typography.labelSmall) })
+                        }
+                    }
+                    Text("Challenge", fontWeight = FontWeight.SemiBold)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        PuzzleChallenge.entries.forEach { entry ->
+                            FilterChip(selected = challenge == entry.name,
+                                onClick = { challenge = entry.name },
+                                label = { Text(entry.label,
+                                    style = MaterialTheme.typography.labelSmall) })
+                        }
+                    }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Require a room code", fontWeight = FontWeight.Medium)
+                            Text("Optional. Off by default; your choice is remembered.",
+                                color = Muted, style = MaterialTheme.typography.bodySmall)
+                        }
+                        Switch(checked = runtime.requireCodePreference,
+                            onCheckedChange = runtime::setRequireCodePreference)
+                    }
+                    Button(onClick = {
+                        runtime.host(ownName, WordTheme.valueOf(theme),
+                            PuzzleBoardSize.valueOf(board), PuzzleChallenge.valueOf(challenge))
+                    }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                        Text("Host a game")
+                    }
+                }
+            }
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Join someone", color = Forest,
+                        style = MaterialTheme.typography.titleLarge)
+                    Text("Ask your partner to host first.",
+                        color = Muted, style = MaterialTheme.typography.bodyMedium)
+                    Button(onClick = {
+                        showJoin = true
+                        runtime.search()
+                    }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                        Text(if (showJoin) "Find nearby games" else "Join nearby game")
+                    }
+                    if (showJoin) {
+                        Text(if (state.scanning) "Looking on your Wi-Fi…" else "Nearby rooms",
+                            color = Muted, style = MaterialTheme.typography.bodyMedium)
+                        if (state.listings.isEmpty()) {
+                            Text("No rooms found yet. Check that both phones use the same Wi-Fi.",
+                                color = Muted, style = MaterialTheme.typography.bodySmall)
+                        }
+                        state.listings.forEach { entry ->
+                            OutlinedButton(onClick = {
+                                selectedRoom = entry
+                                pin = ""
+                                if (!entry.requiresCode) {
+                                    runtime.join(entry.address, entry.port, entry.roomId, "",
+                                        ownName)
+                                }
+                            }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                                Column(Modifier.fillMaxWidth()) {
+                                    Text(entry.name)
+                                    Text(if (entry.requiresCode) "Code needed" else "Tap to join",
+                                        style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                        TextButton(onClick = { manual = !manual }) {
+                            Text(if (manual) "Hide manual entry" else "Join manually instead")
+                        }
+                        if (manual) {
+                            OutlinedTextField(manualAddress, { manualAddress = it.trim().take(80) },
+                                label = { Text("Host Wi-Fi address") },
+                                placeholder = { Text("192.168.1.24") },
+                                singleLine = true, modifier = Modifier.fillMaxWidth())
+                            OutlinedTextField(manualPort, { manualPort = it.filter(Char::isDigit).take(5) },
+                                label = { Text("Port from host's screen") },
+                                singleLine = true, modifier = Modifier.fillMaxWidth())
+                            OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(6) },
+                                label = { Text("Room code (only if required)") },
+                                singleLine = true, modifier = Modifier.fillMaxWidth())
+                            Button(onClick = {
+                                val port = manualPort.toIntOrNull() ?: 0
+                                runtime.join(manualAddress, port, "", pin, ownName)
+                            }, enabled = !state.busy && manualPort.toIntOrNull() in 1..65535 &&
+                                manualAddress.isNotBlank(),
+                                modifier = Modifier.fillMaxWidth()) { Text("Join with address") }
+                        }
+                    }
+                }
+            }
+            Text("Nearby rooms work on trusted local networks. Guest Wi-Fi may block devices " +
+                "from seeing each other. No messages or puzzles are sent to an internet server.",
+                style = MaterialTheme.typography.bodySmall, color = Muted)
+        } else if (snapshot != null) {
+            val spec = snapshot.spec
+            val puzzle = remember(spec.puzzleId, spec.boardFingerprint) { spec.regenerate() }
+            val localSeat = if (state.role == NearbyRole.HOST) CoopSeat.HOST else CoopSeat.GUEST
+            val ownFound = snapshot.claims.filter { it.seat == localSeat }
+                .map { it.wordId }.toSet()
+            val partnerFound = snapshot.claims.filter { it.seat != localSeat }
+                .map { it.wordId }.toSet()
+            val connected = snapshot.guestConnected && snapshot.hostConnected && !state.disconnected
+            val boardDp = (LocalConfiguration.current.screenWidthDp - 36)
+                .coerceIn(180, 440).dp
+
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(if (snapshot.finished) "Solved together!" else
+                        if (connected) "Finding words together" else "Waiting for your partner",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold, color = Forest)
+                    Text(spec.theme.label + " · " + spec.board.cells + "×" + spec.board.cells +
+                        " · " + spec.challenge.label, color = Muted)
+                    Text(snapshot.foundIds.size.toString() + " / " + puzzle.targets.size +
+                        " found  ·  You: " + ownFound.size +
+                        "  ·  Partner: " + partnerFound.size, color = Forest,
+                        fontWeight = FontWeight.SemiBold)
+                    Text(if (connected) "● Partner connected" else "○ Partner offline / not joined",
+                        color = if (connected) Forest else Muted)
+                    if (state.role == NearbyRole.HOST) {
+                        Text("Host: " + state.address + ":" + state.port,
+                            color = Muted, style = MaterialTheme.typography.bodySmall)
+                        Text(if (state.requiresCode) "Join code: " + state.code
+                            else "Open room · no code needed",
+                            color = Muted, style = MaterialTheme.typography.bodySmall)
+                    }
+                    if (state.disconnected) {
+                        Button(onClick = { runtime.reconnect(ownName) },
+                            enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                            Text("Reconnect to game")
+                        }
+                    }
+                    Text("Green = your finds · Blue = partner's finds. " +
+                        "First valid selection counts for the shared board.",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                ZoomableWordGrid(puzzle, snapshot.foundIds, emptyList(), boardDp,
+                    onSelect = { from, to ->
+                        if (connected && !snapshot.finished) runtime.claim(from, to)
+                    }, onStep = {}, boardFontId = store.effectiveBoardFontId,
+                    partnerFoundIds = partnerFound)
+            }
+            Text("Words to find", color = Forest,
+                fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            puzzle.targets.chunked(3).forEach { items ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items.forEach { target ->
+                        val label = when {
+                            target.id in ownFound -> "✓ " + target.word + " (you)"
+                            target.id in partnerFound -> "✓ " + target.word + " (partner)"
+                            else -> target.word
+                        }
+                        Text(label, Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (target.id in snapshot.foundIds) Forest else Muted)
+                    }
+                    repeat(3 - items.size) { Spacer(Modifier.weight(1f)) }
+                }
+            }
+            Text(if (snapshot.finished)
+                "Every word has been found. The room stays here until you leave."
+            else "Your Solo and Daily puzzles remain separate. A lost Wi-Fi connection " +
+                "doesn't erase the current host's shared progress.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+
+    val protected = selectedRoom
+    if (protected != null && protected.requiresCode && state.role == NearbyRole.NONE) {
+        AlertDialog(onDismissRequest = { selectedRoom = null },
+            title = { Text("Enter room code") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(protected.name)
+                    OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(6) },
+                        label = { Text("Six-digit code") },
+                        modifier = Modifier.fillMaxWidth(), singleLine = true)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    runtime.join(protected.address, protected.port, protected.roomId,
+                        pin, ownName)
+                    selectedRoom = null
+                }, enabled = pin.length == 6 && !state.busy) { Text("Join game") }
+            },
+            dismissButton = {
+                TextButton(onClick = { selectedRoom = null }) { Text("Cancel") }
+            })
+    }
+}
