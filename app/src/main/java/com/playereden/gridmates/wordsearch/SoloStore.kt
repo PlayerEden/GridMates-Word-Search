@@ -27,8 +27,11 @@ import java.nio.charset.StandardCharsets
  *
  * Malformed existing data is preserved, NEVER silently reset/overwritten.
  */
-internal class SoloStore(context: Context) {
-    private val atomic = AtomicFile(File(context.filesDir, "gridmates_wordsearch_solo_v1.json"))
+internal class SoloStore(
+    context: Context,
+    saveName: String = "gridmates_wordsearch_solo_v1.json"
+) {
+    private val atomic = AtomicFile(File(context.filesDir, saveName))
     private var blocked = false
     var warning by mutableStateOf<String?>(null)
         private set
