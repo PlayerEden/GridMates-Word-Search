@@ -67,8 +67,13 @@ object SoloProgressRules {
      */
     fun hint(run: SoloRun): Pair<SoloRun, WordTarget?> {
         val puzzle = WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
+        // Finish the three increasingly helpful clues for the selected word
+        // before opening a different target. Already fully revealed words are
+        // skipped until all other unfinished targets receive their clues.
         val next = puzzle.targets.firstOrNull {
-            it.id !in run.foundIds && (run.hints[it.id] ?: 0) < 3
+            it.id !in run.foundIds && (run.hints[it.id] ?: 0) in 1..2
+        } ?: puzzle.targets.firstOrNull {
+            it.id !in run.foundIds && (run.hints[it.id] ?: 0) == 0
         } ?: puzzle.targets.firstOrNull { it.id !in run.foundIds }
         if (next == null) return run to null
         val current = run.hints[next.id] ?: 0
