@@ -22,8 +22,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        soloStore.setForeground(true)
+    }
+
     override fun onStop() {
-        soloStore.flush()
+        // Compose's LaunchedEffect can survive the Activity moving to STOPPED.
+        // Never count background time as active puzzle play.
+        soloStore.setForeground(false)
         super.onStop()
     }
 }

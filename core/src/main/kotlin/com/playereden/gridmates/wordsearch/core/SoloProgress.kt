@@ -29,11 +29,13 @@ data class SoloResult(
 
 data class SoloProfile(
     val active: SoloRun,
-    val results: List<SoloResult> = emptyList()
+    val results: List<SoloResult> = emptyList(),
+    val dailyEntries: List<DailyProgress> = emptyList()
 ) {
     val completions: Int get() = results.size
     val assistedCompletions: Int get() = results.count { it.assisted }
     val totalWords: Int get() = results.sumOf { it.wordCount }
+    val dailyCompletions: Int get() = dailyEntries.count { it.completed }
 }
 
 object SoloProgressRules {

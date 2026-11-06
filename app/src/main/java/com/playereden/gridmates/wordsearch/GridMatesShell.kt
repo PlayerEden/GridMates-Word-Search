@@ -42,7 +42,7 @@ import com.playereden.gridmates.wordsearch.core.GameMode
 
 private enum class Page(val label: String) {
     PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
-    SETTINGS("Settings"), HELP("Help"), PUZZLE("Puzzle")
+    SETTINGS("Settings"), HELP("Help"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle")
 }
 
 @Composable
@@ -110,8 +110,11 @@ internal fun GridMatesShell(soloStore: SoloStore) {
     Scaffold(
         containerColor = Cream,
         bottomBar = {
-            if (page != Page.PUZZLE) NavigationBar(containerColor = Paper) {
-                Page.entries.filter { it != Page.HELP && it != Page.PUZZLE }.forEach { item ->
+            if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE) NavigationBar(containerColor = Paper) {
+                Page.entries.filter {
+                    it == Page.PLAY || it == Page.RECORDS ||
+                        it == Page.COLLECTION || it == Page.SETTINGS
+                }.forEach { item ->
                     NavigationBarItem(
                         modifier = Modifier.semantics {
                             contentDescription = "Open " + item.label
@@ -125,11 +128,17 @@ internal fun GridMatesShell(soloStore: SoloStore) {
             }
         }
     ) { contentPadding ->
-        if (page == Page.PUZZLE) {
+        if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
-                WordSearchScreen(soloStore,
-                    onBack = { pageName = Page.PLAY.name },
-                    onRecords = { pageName = Page.RECORDS.name })
+                WordSearchScreen(
+                    soloStore,
+                    daily = page == Page.DAILY_PUZZLE,
+                    onBack = {
+                        pageName = if (page == Page.DAILY_PUZZLE)
+                            Page.DAILY.name else Page.PLAY.name
+                    },
+                    onRecords = { pageName = Page.RECORDS.name }
+                )
             }
         } else Column(
             modifier = Modifier
@@ -142,8 +151,15 @@ internal fun GridMatesShell(soloStore: SoloStore) {
             when (page) {
                 Page.PLAY -> HomeScreen(soloStore,
                     onHelp = { pageName = Page.HELP.name },
-                    onSolo = { pageName = Page.PUZZLE.name })
-                Page.PUZZLE -> Unit
+                    onSolo = { pageName = Page.PUZZLE.name },
+                    onDaily = { pageName = Page.DAILY.name })
+                Page.PUZZLE, Page.DAILY_PUZZLE -> Unit
+                Page.DAILY -> DailyLandingScreen(soloStore,
+                    onPlay = { date ->
+                        soloStore.openDaily(date)
+                        pageName = Page.DAILY_PUZZLE.name
+                    },
+                    onBack = { pageName = Page.PLAY.name })
                 Page.RECORDS -> SoloRecordsScreen(soloStore.profile)
                 Page.COLLECTION -> PlaceholderScreen(
                     "Collection", "Our original Woodland portraits and other GridMates styles will be added from the verified Sudoku art collection."
@@ -171,7 +187,8 @@ private fun Heading(eyebrow: String, heading: String) {
 }
 
 @Composable
-private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit) {
+private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
+    onDaily: () -> Unit) {
     Heading("GridMates", "Word Search")
     store.warning?.let { warning ->
         Card(Modifier.fillMaxWidth()) {
@@ -198,6 +215,7 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit)
             Button(onClick = onSolo) { Text("Try Solo Word Search") }
             Text("Progress saves automatically on this device.",
                 color = Muted, style = MaterialTheme.typography.bodySmall)
+            Button(onClick = onDaily) { Text("Daily Puzzle") }
             Button(onClick = onHelp) { Text("How to Play") }
         }
     }
@@ -223,7 +241,11 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit)
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(detail, color = Muted)
-                Text(if (mode == GameMode.SOLO) "Try Solo above" else "Planned",
+                Text(when (mode) {
+                    GameMode.SOLO -> "Try Solo above"
+                    GameMode.DAILY -> "Play today's puzzle above"
+                    else -> "Planned"
+                },
                     style = MaterialTheme.typography.labelSmall, color = Gold)
             }
         }

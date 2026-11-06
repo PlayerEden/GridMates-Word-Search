@@ -29,6 +29,17 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
         MetricCard("With hints", profile.assistedCompletions.toString(), Modifier.weight(1f))
     }
 
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(12.dp)) {
+            Text("Daily Journal", color = Forest, fontWeight = FontWeight.SemiBold)
+            Text(profile.dailyCompletions.toString() + " dated challenges completed · " +
+                profile.dailyEntries.count { !it.completed } + " unfinished",
+                color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Text("Daily progress is saved separately from Solo records.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+
     Text("Recent puzzles", color = Forest,
         style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     if (profile.results.isEmpty()) {

@@ -70,8 +70,10 @@ internal fun SoloSettingsScreen(store: SoloStore) {
             title = { Text("Restore this backup?") },
             text = {
                 Text(
-                    "This backup has " + preview.completions + " completed puzzles and " +
-                        preview.active.foundIds.size + " words in the current puzzle. " +
+                    "This backup has " + preview.completions + " completed Solo puzzles, " +
+                        preview.dailyCompletions + " completed Daily puzzles, " +
+                        preview.dailyEntries.size + " dated entries, and " +
+                        preview.active.foundIds.size + " words in the current Solo puzzle. " +
                         "Restoring will replace the Word Search progress currently on this device. " +
                         "Export the current progress first if you want to keep both."
                 )
@@ -113,7 +115,8 @@ internal fun SoloSettingsScreen(store: SoloStore) {
                     import.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
                 }) { Text("Import") }
             }
-            Text("Completed Solo puzzles: " + store.profile.completions,
+            Text("Completed: " + store.profile.completions + " Solo · " +
+                    store.profile.dailyCompletions + " Daily",
                 color = Forest, fontWeight = FontWeight.SemiBold)
         }
     }

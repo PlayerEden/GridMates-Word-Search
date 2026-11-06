@@ -24,7 +24,9 @@ class SoloPersistenceTest {
             val target = puzzle.targets.first()
             assertEquals(ClaimStatus.FOUND,
                 first.claim(target.positions.first(), target.positions.last()).status)
+            first.setForeground(true)
             first.tick()
+            first.setForeground(false)
             first.flush()
 
             val resumed = SoloStore(context, name)

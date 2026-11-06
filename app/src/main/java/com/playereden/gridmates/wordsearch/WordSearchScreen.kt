@@ -68,18 +68,29 @@ private val ActiveMarker = Color(0xFFE4B957)
 private val GridRule = Color(0xFFD8DFD2)
 
 @Composable
-internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: () -> Unit) {
-    val run = store.profile.active
+internal fun WordSearchScreen(
+    store: SoloStore,
+    daily: Boolean = false,
+    onBack: () -> Unit,
+    onRecords: () -> Unit
+) {
+    val dailyEntry = if (daily) store.selectedDaily else null
+    val run = if (daily) dailyEntry?.run else store.profile.active
+    if (run == null) {
+        Text("No Daily puzzle selected.", color = Muted)
+        TextButton(onClick = onBack) { Text("Back") }
+        return
+    }
     val theme = run.theme
     val difficulty = run.difficulty
     val puzzle = remember(run.puzzleId) {
         WordSearchGenerator.generate(theme, difficulty, run.seed)
     }
     val found = run.foundIds
-    LaunchedEffect(run.puzzleId) {
+    LaunchedEffect(daily, run.puzzleId) {
         while (true) {
             delay(1000L)
-            store.tick()
+            if (daily) store.tickDaily() else store.tick()
         }
     }
     var status by remember(puzzle.id) {
@@ -98,14 +109,15 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
     val hintPaths = puzzle.targets.filter { target ->
         target.id !in found && (run.hints[target.id] ?: 0) >= 3
     }.map { it.positions }
-    val currentResult = store.profile.results.firstOrNull { it.puzzleId == puzzle.id }
+    val currentResult = if (daily) null else
+        store.profile.results.firstOrNull { it.puzzleId == puzzle.id }
 
     fun startNew() {
         store.newPuzzle()
         newPuzzleOpen = false
     }
 
-    if (changeOpen) {
+    if (changeOpen && !daily) {
         AlertDialog(
             onDismissRequest = { changeOpen = false },
             title = { Text("Choose a puzzle") },
@@ -169,7 +181,7 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
         )
     }
 
-    if (newPuzzleOpen) {
+    if (newPuzzleOpen && !daily) {
         AlertDialog(
             onDismissRequest = { newPuzzleOpen = false },
             title = { Text("Start another puzzle?") },
@@ -192,15 +204,18 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = { store.flush(); onBack() }) { Text("Home") }
-                Text(theme.label + " · " + difficulty.label,
+                Text((if (daily) "Daily · " + store.selectedDailyDate + " · " else "") +
+                    theme.label + " · " + difficulty.label,
                     style = MaterialTheme.typography.titleSmall,
                     color = Forest, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f).padding(horizontal = 4.dp))
-                TextButton(onClick = {
-                    pendingTheme = theme.name
-                    pendingDifficulty = difficulty.name
-                    changeOpen = true
-                }) { Text("Change") }
+                if (!daily) {
+                    TextButton(onClick = {
+                        pendingTheme = theme.name
+                        pendingDifficulty = difficulty.name
+                        changeOpen = true
+                    }) { Text("Change") }
+                }
             }
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -213,8 +228,11 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f))
                 TextButton(onClick = {
-                    val (next, target) = store.hint()
-                    status = if (target == null) "All words found!" else {
+                    val (next, target) = if (daily) store.dailyHint() else {
+                        val (updated, word) = store.hint()
+                        updated to word
+                    }
+                    status = if (target == null || next == null) "All words found!" else {
                         when (next.hints[target.id] ?: 0) {
                             1 -> "Try " + target.word + " near row " +
                                 (target.positions.first().row + 1) + "."
@@ -230,11 +248,14 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = { feelOpen = true }) { Text("Feel") }
-                TextButton(onClick = { newPuzzleOpen = true }) { Text("New Puzzle") }
+                if (!daily) {
+                    TextButton(onClick = { newPuzzleOpen = true }) { Text("New Puzzle") }
+                }
             }
 
             val select: (GridPoint, GridPoint) -> Unit = { start, end ->
-                val result = store.claim(start, end)
+                val result = if (daily) store.dailyClaim(start, end)
+                    else store.claim(start, end)
                 when (result.status) {
                     ClaimStatus.FOUND -> {
                         val target = requireNotNull(result.target)
@@ -258,7 +279,7 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                         Text(status, color = Muted, style = MaterialTheme.typography.bodySmall,
                             maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
-                    WordList(puzzle, found, Modifier.weight(1f).fillMaxSize())
+                    WordList(puzzle, found, daily, Modifier.weight(1f).fillMaxSize())
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -268,12 +289,12 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                     color = if (finished) Forest else Muted,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
-                WordList(puzzle, found, Modifier.weight(1f).fillMaxWidth())
+                WordList(puzzle, found, daily, Modifier.weight(1f).fillMaxWidth())
             }
 
             if (finished) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Puzzle Complete!  " +
+                    Text((if (daily) "Daily Complete!  " else "Puzzle Complete!  ") +
                         (if ((currentResult?.hintSteps ?: run.hints.values.sum()) > 0)
                             "Assisted" else "No hints"),
                         color = Forest, fontWeight = FontWeight.Bold)
@@ -282,7 +303,12 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
                         run.hints.values.sum() + " hint steps",
                         color = Muted, style = MaterialTheme.typography.bodySmall)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { startNew() }) { Text("Play Another") }
+                        if (!daily) {
+                            Button(onClick = { startNew() }) { Text("Play Another") }
+                        } else {
+                            Text("Recorded for " + store.selectedDailyDate,
+                                color = Forest, style = MaterialTheme.typography.bodyMedium)
+                        }
                         TextButton(onClick = { store.flush(); onRecords() }) { Text("Records") }
                     }
                 }
@@ -292,7 +318,12 @@ internal fun WordSearchScreen(store: SoloStore, onBack: () -> Unit, onRecords: (
 }
 
 @Composable
-private fun WordList(puzzle: WordSearchPuzzle, found: Set<String>, modifier: Modifier = Modifier) {
+private fun WordList(
+    puzzle: WordSearchPuzzle,
+    found: Set<String>,
+    daily: Boolean,
+    modifier: Modifier = Modifier
+) {
     Column(modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text("Words to find", style = MaterialTheme.typography.titleSmall,
@@ -320,7 +351,8 @@ private fun WordList(puzzle: WordSearchPuzzle, found: Set<String>, modifier: Mod
                 if (pair.size == 1) Box(Modifier.weight(1f))
             }
         }
-        Text("Saved on this device. Daily puzzles and multiplayer are coming later.",
+        Text(if (daily) "Daily progress saved here; no replay rewards."
+             else "Saved on this device. Nearby multiplayer is coming later.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
     }
 }
