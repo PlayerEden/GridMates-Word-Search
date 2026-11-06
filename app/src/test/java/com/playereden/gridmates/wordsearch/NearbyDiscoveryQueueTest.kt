@@ -58,4 +58,21 @@ class NearbyDiscoveryQueueTest {
         assertNull(queue.found("x".repeat(121)))
         assertEquals("hello", queue.found("hello"))
     }
+    @Test fun sameNameNewAdvertisementHasDifferentTicketAfterLoss() {
+        val queue = NearbyDiscoveryQueue()
+        assertEquals("room", queue.found("room"))
+        val original = queue.ticket("room")
+        assertNotNull(original)
+        queue.lost("room")
+        assertNull(queue.ticket("room"))
+        assertNull(queue.found("room")) // Wait for earlier resolve before retry.
+        val latest = queue.ticket("room")
+        assertNotEquals(original, latest)
+        assertEquals("room", queue.finished("room"))
+        assertTrue(queue.isLive("room"))
+        assertEquals(latest, queue.ticket("room"))
+        queue.reset()
+        assertNull(queue.ticket("room"))
+    }
+
 }
