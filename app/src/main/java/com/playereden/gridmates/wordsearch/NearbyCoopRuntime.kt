@@ -146,8 +146,9 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     private var registration: NsdManager.RegistrationListener? = null
     private var discovery: NsdManager.DiscoveryListener? = null
     private val invalidCodes = mutableMapOf<String, MutableList<Long>>()
-    private var peerLastReadNanos: Long = 0L
+    @Volatile private var peerLastReadNanos: Long = 0L
     private var hostRoomCode = ""
+    private var liveHostName = ""
     private var lastHost = ""
     private var lastPort = 0
 
@@ -193,6 +194,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 synchronized(lock) {
                     if (closed) { socket.close(); return@execute }
                     authority = session
+                    liveHostName = roomName
                     listener = socket
                     hostRoomCode = if (requireCodePreference)
                         SecureRandom().nextInt(1_000_000).toString().padStart(6, '0') else ""
@@ -294,6 +296,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 val snapshot = session.admitOrRejoinGuest()
                 val welcome = JSONObject().put("type", "welcome")
                     .put("token", reservedToken).put("name", name)
+                    .put("hostName", liveHostName)
                     .put("roomState", NearbyPacket.state(snapshot))
                 NearbyPacket.write(socket, welcome)
                 post { it.copy(guestName = name, snapshot = snapshot,
@@ -421,7 +424,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 prefs.edit().putString("token_" + snapshot.roomId, credential).apply()
                 post { it.copy(role = NearbyRole.GUEST, busy = false, disconnected = false,
                     snapshot = snapshot, roomId = snapshot.roomId,
-                    hostName = "Host", address = address, port = port,
+                    hostName = welcome.optString("hostName", "Host"),
+                    address = address, port = port,
                     message = "Connected! You both share this puzzle.") }
                 io.execute { readHost(socket) }
             } catch (e: Exception) {
@@ -441,14 +445,14 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     "ping" -> NearbyPacket.write(socket, JSONObject().put("type", "pong"))
                     "state" -> {
                         val incoming = NearbyPacket.parseState(msg)
-                        val old = state.snapshot
-                        if (old != null) {
-                            require(old.roomId == incoming.roomId)
-                            require(incoming.revision >= old.revision)
-                            if (incoming.revision == old.revision)
-                                require(incoming.claims == old.claims)
+                        post { current ->
+                            val old = current.snapshot
+                            if (old != null && (old.roomId != incoming.roomId ||
+                                incoming.revision < old.revision ||
+                                (incoming.revision == old.revision &&
+                                    incoming.claims != old.claims))) current
+                            else current.copy(snapshot = incoming)
                         }
-                        post { it.copy(snapshot = incoming) }
                     }
                     "error" -> throw IOException(msg.optString("message"))
                     else -> throw IOException("Unknown host message")
@@ -457,9 +461,12 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         } catch (_: Exception) {
             // The room remains on the host; leave the last accepted state visible.
         } finally {
-            synchronized(lock) { if (client === socket) client = null }
+            val wasCurrent = synchronized(lock) {
+                if (client === socket) { client = null; true } else false
+            }
             runCatching { socket.close() }
-            post { if (it.role == NearbyRole.GUEST) it.copy(disconnected = true,
+            if (wasCurrent) post { if (it.role == NearbyRole.GUEST) it.copy(
+                disconnected = true,
                 message = "Connection lost. Tap Reconnect to restore your shared board.")
                 else it }
         }
