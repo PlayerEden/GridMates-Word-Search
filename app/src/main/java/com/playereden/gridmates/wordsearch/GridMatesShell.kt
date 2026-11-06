@@ -58,7 +58,11 @@ internal fun GridMatesShell() {
             }
         }
     ) { contentPadding ->
-        Column(
+        if (page == Page.PUZZLE) {
+            Box(Modifier.fillMaxSize().padding(contentPadding)) {
+                WordSearchScreen(onBack = { pageName = Page.PLAY.name })
+            }
+        } else Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -69,7 +73,7 @@ internal fun GridMatesShell() {
             when (page) {
                 Page.PLAY -> HomeScreen(onHelp = { pageName = Page.HELP.name },
                     onSolo = { pageName = Page.PUZZLE.name })
-                Page.PUZZLE -> WordSearchScreen(onBack = { pageName = Page.PLAY.name })
+                Page.PUZZLE -> Unit
                 Page.RECORDS -> PlaceholderScreen(
                     "Records", "Your achievements and completed puzzles will appear here after Solo gameplay is built."
                 )
