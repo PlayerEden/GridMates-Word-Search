@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
@@ -119,8 +119,9 @@ internal fun WordSearchScreen(onBack: () -> Unit) {
         val result = WordSearchRules.claim(puzzle, found.toSet(), start, end)
         when (result.status) {
             ClaimStatus.FOUND -> {
-                found = found + requireNotNull(result.target).id
-                status = "Found " + result.target.word + "!"
+                val target = requireNotNull(result.target)
+                found = found + target.id
+                status = "Found " + target.word + "!"
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             }
             ClaimStatus.ALREADY_FOUND -> status = "You've already found that word."
@@ -183,6 +184,7 @@ private fun WordGrid(
     var dragStart by remember(puzzle.id) { mutableStateOf<GridPoint?>(null) }
     var dragEnd by remember(puzzle.id) { mutableStateOf<GridPoint?>(null) }
     var tapStart by remember(puzzle.id) { mutableStateOf<GridPoint?>(null) }
+    val updatedOnSelect by rememberUpdatedState(onSelect)
 
     fun position(offset: Offset): GridPoint? {
         if (sizePx.width <= 0 || sizePx.height <= 0) return null
@@ -210,7 +212,7 @@ private fun WordGrid(
             .background(Paper, RoundedCornerShape(12.dp))
             .border(2.dp, Forest, RoundedCornerShape(12.dp))
             .onSizeChanged { sizePx = it }
-            .pointerInput(puzzle.id, onSelect) {
+            .pointerInput(puzzle.id) {
                 detectDragGestures(
                     onDragStart = { offset ->
                         tapStart = null
@@ -224,7 +226,7 @@ private fun WordGrid(
                     onDragEnd = {
                         val start = dragStart
                         val end = dragEnd
-                        if (start != null && end != null) onSelect(start, end)
+                        if (start != null && end != null) updatedOnSelect(start, end)
                         dragStart = null
                         dragEnd = null
                     },
