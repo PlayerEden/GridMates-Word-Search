@@ -74,6 +74,10 @@ class IdentityPersistenceTest {
             val store = SoloStore(context, name)
             assertNotNull(store.warning)
             store.updateDisplayName("Should Not Write")
+            var exportRejected = false
+            try { store.exportBackup() }
+            catch (ex: IllegalStateException) { exportRejected = true }
+            assertTrue("Unreadable save must not be exported as a fake fresh profile", exportRejected)
             assertEquals(original, file.readText())
         } finally {
             file.delete()
