@@ -8,13 +8,15 @@
 
 **Latest development (WS-02B):** [Draft PR #6](https://github.com/PlayerEden/GridMates-Word-Search/pull/6) is CI-green in [run #42146261876](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42146261876) for touch snapping, marker highlights, compact board/list layout, sound/haptic options and custom nav icons. The [WS-02B QA receipt](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws02b-touch-highlights-layout-2026-11-05/docs/WS02B_BUILD_QA_2026-11-05.md) captures artifact checksum and phone acceptance. **Next:** the owner must test drag feel and layouts on an actual Android phone; only after this should we finalize UX and pursue WS-03 durable saves/update signing. Stable source checkpoint `checkpoint/ws02b-feel-polish-ci-green-2026-11-05`.
 
+**Latest checkpoint under construction — WS-03 Solo beta:** [Draft PR #7](https://github.com/PlayerEden/GridMates-Word-Search/pull/7) introduces private offline saves, resume, a three-step hint ladder, real Records, and manual JSON export/import. See [WS-03 phone-test playbook](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws03-solo-save-results-2026-11-05/docs/WS03_SOLO_BETA_PLAYTEST.md). This is stacked on WS-02B; verify current code-specific CI before providing an APK and never call physical on-device tests complete based solely on compilation. Debug QA signing is not stable across all runs; **export before uninstall** once WS-03 progress exists.
+
 ## Three documents that control the project
 
 1. [Master Game Design](MASTER_GAME_DESIGN.md) — the long-term vision, modes, UX, puzzle rules, planned architecture, QA and decisions.
 2. [Development Roadmap](DEVELOPMENT_ROADMAP.md) — what to build next, in order, with acceptance gates.
 3. [README](../README.md) — concise public entry point and repo navigation.
 
-**Next actionable gate: physically playtest the new WS-02B drag lock, marker ribbon, haptics, target-list proximity and landscape/narrow-phone layout. Also verify Sudoku co-installation. Following owner's feedback, begin WS-03 durable Solo save/resume/results and stable QA update signing.** The source is in draft PR #4 stacked on PR #3, not on main. Do not treat either as a verified Play release.
+**Next actionable gate: validate the WS-03 Solo beta on Android: dragging/markers, save on Home and force-stop/reopen, hint ladder, Records and export/import. Protect Sudoku. After owner feedback, fix blockers and move toward Daily/profiles/collections. Stable QA signing remains separate.** The source is in draft PR #4 stacked on PR #3, not on main. Do not treat either as a verified Play release.
 
 ## Locked player decisions
 
