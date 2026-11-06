@@ -4,7 +4,7 @@
   "sourceManifest": "design/woodland/packaged-assets.json",
   "referenceOnly": true,
   "packagedInWordSearch": false,
-  "transferStatus": "BLOCKED_BINARY_READ_UNSUPPORTED",
+  "transferStatus": "CI_SCRIPTED_VERIFIED_IMPORT_PENDING_GREEN_BUILD",
   "description": "Canonical original approved portraits and hashes for future binary-identical import. No PNG bytes are present in this Word Search branch.",
   "assets": [
     {
@@ -103,5 +103,7 @@
       "resourceSha256": "a809c2df86b3fd5c61cf1927816bf05f275f20d3ca68ef689ce555b2dee60a1a",
       "bytes": 96486
     }
-  ]
+  ],
+  "sourceCommit": "975e31a1e8cbfebad1fbbc7602b3340c357da7ef",
+  "packagingMode": "Pinned CI checkout and SHA-256 verified copy during build; no PNG files committed to Word Search repository"
 }

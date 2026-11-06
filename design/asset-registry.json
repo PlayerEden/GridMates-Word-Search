@@ -46,12 +46,16 @@
     {
       "id": "woodland_original_portraits",
       "kind": "original_existing_art",
-      "status": "planned_reuse_not_copied",
+      "status": "ci_import_implemented_pending_verification",
       "purpose": "12 Woodland profile portraits; stable IDs and original source hashes from Sudoku",
       "source_repo": "PlayerEden/SudokuTogether",
       "source_ref": "feat/gridmates-nearby-animals",
       "source_manifest": "design/woodland/packaged-assets.json",
-      "requirements": "do not regenerate approximations; copy approved originals with provenance"
+      "requirements": "do not regenerate approximations; copy approved originals with provenance",
+      "source_commit": "975e31a1e8cbfebad1fbbc7602b3340c357da7ef",
+      "build_import_script": "scripts/import_woodland_portraits.py",
+      "pinned_manifest": "design/woodland/approved-portrait-reference.json",
+      "shipment": "CI APK copies and verifies source PNGs; local builds use fallback until imported"
     },
     {
       "id": "theme_pack_cards",

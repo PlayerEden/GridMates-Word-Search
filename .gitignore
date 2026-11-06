@@ -14,3 +14,8 @@ captures/
 *.p12
 *.properties.private
 *.hprof
+
+# Original approved Sudoku Woodland PNGs are imported from a pinned source
+# checkout after SHA-256 verification. Do not accidentally re-commit them.
+_approved_sudoku/
+app/src/main/res/drawable-nodpi/woodland_*.png

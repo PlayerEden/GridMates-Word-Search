@@ -1,10 +1,12 @@
 package com.playereden.gridmates.wordsearch
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,6 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +47,17 @@ internal fun CollectionScreen(store: SoloStore) {
     val profile = store.profile
     val portraits = remember(profile) { WoodlandCollection.progress(profile) }
     val achievements = remember(profile) { WordSearchAchievements.progress(profile) }
-    val equippedName = portraits.firstOrNull { it.equipped }?.portrait?.label ?: "Owl"
+    val equipped = portraits.firstOrNull { it.equipped }
+    val equippedName = equipped?.portrait?.label ?: "Owl"
+    val equippedId = equipped?.portrait?.id ?: "woodland_owl"
+    val context = LocalContext.current
+    val originalImagesAvailable = remember(context) {
+        WoodlandCollection.portraits.all { portrait ->
+            context.resources.getIdentifier(
+                portrait.id, "drawable", context.packageName
+            ) != 0
+        }
+    }
     var showNameDialog by rememberSaveable { mutableStateOf(false) }
     var draftName by remember(profile.identity.displayName) {
         mutableStateOf(profile.identity.displayName)
@@ -86,9 +103,7 @@ internal fun CollectionScreen(store: SoloStore) {
     Card(Modifier.fillMaxWidth()) {
         Row(Modifier.padding(14.dp), horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            // Intentional readable placeholder until the approved Sudoku PNGs
-            // can be imported without replacing them with approximations.
-            PortraitMonogram(equippedName, 64)
+            PortraitBadge(equippedId, equippedName, 64)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(profile.identity.displayName, color = Forest,
                     style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
@@ -129,9 +144,15 @@ internal fun CollectionScreen(store: SoloStore) {
         Text(portraits.count { it.unlocked }.toString() +
             " / " + portraits.size + " Woodland portraits available",
             color = Forest, style = MaterialTheme.typography.titleMedium)
-        Text("The original Woodland artwork is reserved for this collection; " +
-            "simple letter badges are temporary previews until the approved PNGs are imported.",
-            color = Muted, style = MaterialTheme.typography.bodySmall)
+        Text(
+            if (originalImagesAvailable) {
+                "The original Woodland portraits from GridMates: Sudoku."
+            } else {
+                "The approved portrait PNGs are not present in this local build. " +
+                    "Letter badges are shown until the original art is imported."
+            },
+            color = Muted, style = MaterialTheme.typography.bodySmall
+        )
         portraits.chunked(2).forEach { pair ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 pair.forEach { item ->
@@ -148,6 +169,32 @@ internal fun CollectionScreen(store: SoloStore) {
         Text("Unlocks depend on completed Solo and Daily puzzles. " +
             "No random purchases, streak deadlines or paid portraits.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+private fun PortraitBadge(
+    id: String, label: String, sizeDp: Int, unlocked: Boolean = true
+) {
+    val context = LocalContext.current
+    val resource = remember(context, id) {
+        context.resources.getIdentifier(id, "drawable", context.packageName)
+    }
+    if (resource == 0) {
+        PortraitMonogram(label, sizeDp)
+    } else {
+        Box(
+            Modifier.size(sizeDp.dp).clip(CircleShape)
+                .background(ColorForestPale),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(resource),
+                contentDescription = "$label Woodland portrait",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize().alpha(if (unlocked) 1f else 0.45f)
+            )
+        }
     }
 }
 
@@ -179,7 +226,7 @@ private fun PortraitCard(
     Card(modifier) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(7.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            PortraitMonogram(item.portrait.label, 54)
+            PortraitBadge(item.portrait.id, item.portrait.label, 54, item.unlocked)
             Text(item.portrait.label, color = Forest, fontWeight = FontWeight.SemiBold,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(
