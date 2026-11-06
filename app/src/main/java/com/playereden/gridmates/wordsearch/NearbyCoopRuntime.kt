@@ -27,6 +27,7 @@ import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 /** Only protocol-compatible devices on a trusted local network can join. */
 private const val WS_WIRE_VERSION = 4
@@ -39,6 +40,10 @@ internal data class NearbyListing(
 )
 
 internal enum class NearbyRole { NONE, HOST, GUEST }
+
+internal data class NearbyJoinRecovery(
+    val roomId: String, val address: String, val port: Int, val code: String
+)
 
 internal data class NearbyUiState(
     val role: NearbyRole = NearbyRole.NONE,
@@ -56,6 +61,7 @@ internal data class NearbyUiState(
     val snapshot: CoopSnapshot? = null,
     val chat: List<NearbyChatLine> = emptyList(),
     val pendingChat: PendingNearbyChat? = null,
+    val recovery: NearbyJoinRecovery? = null,
     val disconnected: Boolean = false
 )
 
@@ -179,6 +185,11 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     private var pendingGuestChat: PendingNearbyChat? = null
     private var registration: NsdManager.RegistrationListener? = null
     private var discovery: NsdManager.DiscoveryListener? = null
+    private var stoppingDiscovery: NsdManager.DiscoveryListener? = null
+    private var refreshRequested = false
+    private val discoveredInfos = mutableMapOf<String, NsdServiceInfo>()
+    private val discoveryQueue = NearbyDiscoveryQueue()
+    private val joinInProgress = AtomicBoolean(false)
     private val invalidCodes = mutableMapOf<String, MutableList<Long>>()
     @Volatile private var peerLastReadNanos: Long = 0L
     private var hostRoomCode = ""
@@ -554,52 +565,142 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     }
 
     private fun stopDiscovery() {
-        val active = discovery ?: return
+        refreshRequested = false
+        val current = discovery ?: return
         discovery = null
-        runCatching { nsd.stopServiceDiscovery(active) }
+        stoppingDiscovery = current
+        discoveryQueue.reset()
+        discoveredInfos.clear()
+        runCatching { nsd.stopServiceDiscovery(current) }.onFailure {
+            stoppingDiscovery = null
+            post { it.copy(message = "Could not restart nearby search. Use manual join.") }
+        }
         post { it.copy(scanning = false) }
     }
 
-    fun search() {
-        if (state.role != NearbyRole.NONE || discovery != null) return
-        val cb = object : NsdManager.DiscoveryListener {
-            override fun onDiscoveryStarted(type: String) { post { it.copy(scanning = true) } }
-            override fun onServiceFound(service: NsdServiceInfo) {
-                if (!service.serviceType.startsWith("_gridmatesws._tcp")) return
-                @Suppress("DEPRECATION")
-                nsd.resolveService(service, object : NsdManager.ResolveListener {
-                    override fun onResolveFailed(service: NsdServiceInfo, code: Int) = Unit
-                    override fun onServiceResolved(info: NsdServiceInfo) {
-                        val ip = info.host?.hostAddress ?: return
-                        val id = info.attributes["room"]?.toString(Charsets.UTF_8) ?: return
-                        if (info.attributes["proto"]?.toString(Charsets.UTF_8) !=
-                            WS_WIRE_VERSION.toString()) return
-                        if (id.isBlank() || info.port !in 1..65535) return
-                        val entry = NearbyListing(id, info.serviceName, ip, info.port,
-                            info.attributes["pin"]?.toString(Charsets.UTF_8) != "0")
-                        post { current ->
-                            current.copy(listings =
-                                (current.listings.filterNot { it.roomId == id } + entry)
-                                    .sortedBy { it.name })
-                        }
+    /** Refresh without overlapping old and new discovery registrations. */
+    fun refreshSearch() {
+        if (state.role != NearbyRole.NONE || closed) return
+        post { it.copy(listings = emptyList(), message = "Refreshing nearby rooms…") }
+        if (stoppingDiscovery != null) {
+            refreshRequested = true
+            return
+        }
+        val active = discovery
+        if (active == null) {
+            search()
+            return
+        }
+        refreshRequested = true
+        discovery = null
+        stoppingDiscovery = active
+        discoveryQueue.reset()
+        discoveredInfos.clear()
+        runCatching { nsd.stopServiceDiscovery(active) }.onFailure {
+            stoppingDiscovery = null
+            refreshRequested = false
+            post { it.copy(scanning = false,
+                message = "Could not refresh discovery. Use manual join.") }
+        }
+    }
+
+    /**
+     * NsdManager's older resolveService API must be driven sequentially:
+     * simultaneous resolve requests are rejected on some Android versions.
+     */
+    private fun resolveQueued(name: String, owner: NsdManager.DiscoveryListener) {
+        if (closed || discovery !== owner) return
+        val info = discoveredInfos[name]
+        if (info == null) {
+            discoveryQueue.finished(name)?.let { resolveQueued(it, owner) }
+            return
+        }
+        fun advance() {
+            if (closed || discovery !== owner) return
+            discoveryQueue.finished(name)?.let { resolveQueued(it, owner) }
+        }
+        @Suppress("DEPRECATION")
+        val cb = object : NsdManager.ResolveListener {
+            override fun onResolveFailed(service: NsdServiceInfo, code: Int) = advance()
+            override fun onServiceResolved(result: NsdServiceInfo) {
+                try {
+                    if (closed || discovery !== owner || !discoveryQueue.isLive(name)) return
+                    val ip = result.host?.hostAddress ?: return
+                    val id = result.attributes["room"]?.toString(Charsets.UTF_8) ?: return
+                    if (result.attributes["proto"]?.toString(Charsets.UTF_8) !=
+                        WS_WIRE_VERSION.toString()) return
+                    if (id.isBlank() || id.length > 120 || result.port !in 1..65535) return
+                    val entry = NearbyListing(id, result.serviceName, ip, result.port,
+                        result.attributes["pin"]?.toString(Charsets.UTF_8) != "0")
+                    post { current ->
+                        if (discovery !== owner || current.role != NearbyRole.NONE ||
+                            !discoveryQueue.isLive(name)) current
+                        else current.copy(listings =
+                            (current.listings.filterNot {
+                                it.roomId == id || it.name == entry.name
+                            } + entry).sortedBy { it.name })
                     }
-                })
+                } finally { advance() }
+            }
+        }
+        runCatching { nsd.resolveService(info, cb) }
+            .onFailure { advance() }
+    }
+
+    fun search() {
+        if (closed || state.role != NearbyRole.NONE ||
+            discovery != null || stoppingDiscovery != null) return
+        val cb = object : NsdManager.DiscoveryListener {
+            override fun onDiscoveryStarted(type: String) {
+                if (discovery === this) post { it.copy(scanning = true) }
+            }
+            override fun onServiceFound(service: NsdServiceInfo) {
+                if (discovery !== this || closed ||
+                    !service.serviceType.startsWith("_gridmatesws._tcp")) return
+                discoveredInfos[service.serviceName] = service
+                discoveryQueue.found(service.serviceName)?.let { resolveQueued(it, this) }
             }
             override fun onServiceLost(service: NsdServiceInfo) {
-                post { it.copy(listings = it.listings.filterNot { r -> r.name == service.serviceName }) }
+                if (discovery !== this || closed) return
+                discoveredInfos.remove(service.serviceName)
+                discoveryQueue.lost(service.serviceName)
+                post { current -> current.copy(listings =
+                    current.listings.filterNot { it.name == service.serviceName }) }
             }
-            override fun onDiscoveryStopped(type: String) { post { it.copy(scanning = false) } }
+            override fun onDiscoveryStopped(type: String) {
+                if (discovery === this) discovery = null
+                if (stoppingDiscovery === this) stoppingDiscovery = null
+                post { it.copy(scanning = false) }
+                if (refreshRequested) {
+                    refreshRequested = false
+                    main.post { if (!closed && state.role == NearbyRole.NONE) search() }
+                }
+            }
             override fun onStartDiscoveryFailed(type: String, code: Int) {
+                if (discovery !== this) return
                 discovery = null
+                discoveryQueue.reset()
+                discoveredInfos.clear()
                 post { it.copy(scanning = false,
-                    message = "Nearby search failed. Try manual address entry.") }
+                    message = "Nearby search failed. Try refreshing or join manually.") }
             }
-            override fun onStopDiscoveryFailed(type: String, code: Int) = Unit
+            override fun onStopDiscoveryFailed(type: String, code: Int) {
+                if (stoppingDiscovery === this) stoppingDiscovery = null
+                refreshRequested = false
+                post { it.copy(scanning = false,
+                    message = "Could not stop nearby search. Use manual join.") }
+            }
         }
         discovery = cb
+        discoveryQueue.reset()
+        discoveredInfos.clear()
+        post { it.copy(listings = emptyList(), message = "Looking for nearby games…") }
         runCatching { nsd.discoverServices(WS_NSD_TYPE, NsdManager.PROTOCOL_DNS_SD, cb) }
-            .onFailure { discovery = null
-                post { it.copy(message = "Discovery unavailable. Join with a host address.") } }
+            .onFailure {
+                discovery = null
+                post { it.copy(scanning = false,
+                    message = "Discovery unavailable. Join with a host address.") }
+            }
     }
 
     fun join(address: String, port: Int, roomId: String, code: String, name: String) {
