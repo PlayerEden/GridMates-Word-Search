@@ -446,16 +446,24 @@ private fun ZoomableWordGrid(
         Row(Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
-            Text("Board", color = Forest, style = MaterialTheme.typography.labelMedium)
-            TextButton(onClick = { changeZoom(-0.25f) }, enabled = zoom > 1f) {
+            if (viewport >= 260.dp) {
+                Text("Board", color = Forest,
+                    style = MaterialTheme.typography.labelMedium)
+            }
+            TextButton(onClick = { changeZoom(-0.25f) },
+                enabled = zoom > 1f, modifier = Modifier.width(44.dp)) {
                 Text("−")
             }
-            Text("${(zoom * 100f).roundToInt()}%",
-                color = Muted, style = MaterialTheme.typography.labelMedium)
-            TextButton(onClick = { changeZoom(0.25f) }, enabled = zoom < 2.5f) {
+            if (viewport >= 190.dp) {
+                Text("${(zoom * 100f).roundToInt()}%",
+                    color = Muted, style = MaterialTheme.typography.labelMedium)
+            }
+            TextButton(onClick = { changeZoom(0.25f) },
+                enabled = zoom < 2.5f, modifier = Modifier.width(44.dp)) {
                 Text("+")
             }
-            TextButton(onClick = { moving = !moving }) {
+            TextButton(onClick = { moving = !moving },
+                modifier = Modifier.width(if (viewport < 190.dp) 68.dp else 78.dp)) {
                 Text(if (moving) "Find" else "Move")
             }
         }
