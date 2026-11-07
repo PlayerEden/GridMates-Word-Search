@@ -32,7 +32,8 @@ class IntegratedNavigationAndroidTest {
         rule.onNodeWithText("Restore backup").assertExists()
 
         rule.onNodeWithContentDescription("Open Play").performClick()
-        rule.onNodeWithText("Play Together").performScrollTo().performClick()
+        rule.onNodeWithContentDescription("Open Nearby co-op")
+            .performScrollTo().performClick()
         rule.onNodeWithText("Co-op board appearance").assertExists()
         rule.onNodeWithText("Host Co-op game").assertExists()
         rule.onNodeWithText("← Back to Play").performClick()
