@@ -121,7 +121,7 @@ internal fun WordSearchScreen(
         }
     }
     var status by remember(puzzle.id) {
-        mutableStateOf("Drag a word, or tap its first and last letters.")
+        mutableStateOf(PuzzleModeHelp.opening(puzzle.size))
     }
     var changeOpen by rememberSaveable { mutableStateOf(false) }
     var feelOpen by rememberSaveable { mutableStateOf(false) }
@@ -425,7 +425,10 @@ internal fun WordSearchScreen(
                     Column(Modifier.width(boardViewport),
                         verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         ZoomableWordGrid(puzzle, found, hintPaths,
-                            boardViewport, select, onStep, boardFontId)
+                            boardViewport, select, onStep, boardFontId,
+                            onModeChanged = { moving ->
+                                status = PuzzleModeHelp.selected(moving)
+                            })
                         PuzzleStatus(status, compact = true)
                     }
                     WordList(puzzle, found, daily,
@@ -436,7 +439,10 @@ internal fun WordSearchScreen(
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     ZoomableWordGrid(puzzle, found, hintPaths,
-                        boardViewport, select, onStep, boardFontId)
+                        boardViewport, select, onStep, boardFontId,
+                        onModeChanged = { moving ->
+                            status = PuzzleModeHelp.selected(moving)
+                        })
                 }
                 PuzzleStatus(status, compact = false)
                 WordList(puzzle, found, daily,
@@ -661,7 +667,8 @@ internal fun ZoomableWordGrid(
     onSelect: (GridPoint, GridPoint) -> Unit,
     onStep: (Int) -> Unit,
     boardFontId: String,
-    partnerFoundIds: Set<String> = emptySet()
+    partnerFoundIds: Set<String> = emptySet(),
+    onModeChanged: (Boolean) -> Unit = {}
 ) {
     val viewportPx = with(LocalDensity.current) { viewport.toPx() }
     val initialZoom = when {
@@ -706,7 +713,10 @@ internal fun ZoomableWordGrid(
                     Text("+")
                 }
             }
-            TextButton(onClick = { moving = !moving },
+            TextButton(onClick = {
+                moving = !moving
+                onModeChanged(moving)
+            },
                 modifier = Modifier.fillMaxWidth().semantics {
                     contentDescription = if (moving)
                         "Mode: Move. Tap to find words."
@@ -735,10 +745,14 @@ internal fun ZoomableWordGrid(
                 }, enabled = transform.zoom < 2.5f,
                     modifier = Modifier.width(40.dp)
                         .semantics { contentDescription = "Zoom in" }) { Text("+") }
-                FilterChip(selected = !moving, onClick = { moving = false },
-                    label = { Text("Find") })
-                FilterChip(selected = moving, onClick = { moving = true },
-                    label = { Text("Move") })
+                FilterChip(selected = !moving, onClick = {
+                    moving = false
+                    onModeChanged(false)
+                }, label = { Text("Find") })
+                FilterChip(selected = moving, onClick = {
+                    moving = true
+                    onModeChanged(true)
+                }, label = { Text("Move") })
             }
         }
         Box(Modifier.size(viewport).clipToBounds()) {
