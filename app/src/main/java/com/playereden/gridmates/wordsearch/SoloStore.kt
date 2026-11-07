@@ -15,6 +15,10 @@ import com.playereden.gridmates.wordsearch.core.WoodlandCollection
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.SoloProfile
+import com.playereden.gridmates.wordsearch.core.RaceResult
+import com.playereden.gridmates.wordsearch.core.RaceJournalRules
+import com.playereden.gridmates.wordsearch.core.CoopSnapshot
+import com.playereden.gridmates.wordsearch.core.CoopSeat
 import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.SoloResult
 import com.playereden.gridmates.wordsearch.core.SoloRun
@@ -165,7 +169,28 @@ internal class SoloStore(
             displayName = identityData?.optString("name", "Player") ?: "Player",
             portraitId = identityData?.optString("portraitId", "woodland_owl") ?: "woodland_owl"
         )
-        val loadedProfile = SoloProfile(clean, valid, daily, rawIdentity)
+        val races = mutableListOf<RaceResult>()
+        val raceRaw = root.optJSONArray("races")
+        if (raceRaw != null) {
+            require(raceRaw.length() <= 10_000) { "Too many race records" }
+            for (i in 0 until raceRaw.length()) {
+                val item = raceRaw.getJSONObject(i)
+                races += RaceResult(
+                    roomId = item.getString("room"),
+                    puzzleId = item.getString("puzzle"),
+                    boardFingerprint = item.getString("digest"),
+                    theme = WordTheme.valueOf(item.getString("theme")),
+                    board = PuzzleBoardSize.valueOf(item.getString("board")),
+                    challenge = PuzzleChallenge.valueOf(item.getString("challenge")),
+                    localSeat = CoopSeat.valueOf(item.getString("seat")),
+                    ownWords = item.getInt("own"),
+                    partnerWords = item.getInt("partner"),
+                    completedAtMs = item.getLong("completedAt")
+                ).validate()
+            }
+        }
+        val loadedProfile = SoloProfile(clean, valid, daily, rawIdentity,
+            RaceJournalRules.validateImported(races))
         return loadedProfile.copy(identity = WoodlandCollection.sanitize(rawIdentity, loadedProfile))
     }
 
@@ -229,8 +254,18 @@ internal class SoloStore(
         val identity = JSONObject()
             .put("name", value.identity.displayName)
             .put("portraitId", value.identity.portraitId)
+        val races = JSONArray()
+        for (r in value.raceResults) {
+            races.put(JSONObject()
+                .put("room", r.roomId).put("puzzle", r.puzzleId)
+                .put("digest", r.boardFingerprint).put("theme", r.theme.name)
+                .put("board", r.board.name).put("challenge", r.challenge.name)
+                .put("seat", r.localSeat.name).put("own", r.ownWords)
+                .put("partner", r.partnerWords).put("completedAt", r.completedAtMs))
+        }
         return JSONObject().put("schema", 4).put("active", active)
             .put("results", results).put("daily", daily).put("identity", identity)
+            .put("races", races)
             .toString().toByteArray(StandardCharsets.UTF_8)
     }
 
@@ -278,6 +313,27 @@ internal class SoloStore(
         flush()
         if (warning != null) {
             // Never present an uncommitted import as the user's saved data.
+            profile = previous
+            return false
+        }
+        return true
+    }
+
+    /**
+     * Called only for a completed host-verified nearby Race snapshot. The same
+     * room may be replayed repeatedly after rejoin or recomposition; its result
+     * is recorded once and stays in the existing atomic local save + JSON backup.
+     */
+    fun recordRace(snapshot: CoopSnapshot, localSeat: CoopSeat,
+                   nowMs: Long = System.currentTimeMillis()): Boolean {
+        if (blocked) return false
+        val result = RaceResult.fromVerifiedSnapshot(snapshot, localSeat, nowMs)
+        if (profile.raceResults.any { it.roomId == result.roomId }) return true
+        val previous = profile
+        profile = previous.copy(raceResults =
+            RaceJournalRules.addOnce(previous.raceResults, result))
+        flush()
+        if (warning != null) {
             profile = previous
             return false
         }
