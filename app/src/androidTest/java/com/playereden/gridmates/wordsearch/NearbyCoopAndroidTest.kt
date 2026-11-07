@@ -70,7 +70,9 @@ class NearbyCoopAndroidTest {
             NearbyPacket.parseState(JSONObject(encoded.toString()).put("match", "SPEED_DUEL"))
         }.isFailure)
         assertTrue(runCatching {
-            NearbyPacket.parseState(JSONObject(encoded.toString()).remove("match"))
+            val missingMode = JSONObject(encoded.toString())
+            missingMode.remove("match")
+            NearbyPacket.parseState(missingMode)
         }.isFailure)
         val offered = NearbyPacket.parseState(encoded)
         val changed = offered.copy(match = NearbyMatch.COOP)
