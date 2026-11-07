@@ -1,6 +1,6 @@
 # WS-06C — Speed Duel, private boards and ready/go
 
-**November 7, 2026 · Implementation in draft, automated/physical QA gates tracked below.**
+**November 7, 2026 · Implemented in draft, **57 API35 Android tests and real previous-APK update PASS**; physical two-phone acceptance still open. See [exact-source QA receipt](WS06C_BUILD_QA_2026-11-07.md).**
 
 ## Separate mode
 Speed Duel is a third distinct Nearby game alongside Co-op and Shared Board Race. Both players get the identical theme, board, challenge, deterministic seed, words and word positions, but play privately:
@@ -31,3 +31,7 @@ Speed Duel is a third distinct Nearby game alongside Co-op and Shared Board Race
 - Separate long-term **Speed Duel** win/loss records and share cards: later WS-06D. Existing Shared Board Race stats must not accidentally count Speed Duel.
 - Time-trial countdowns, rankings, remote play, paid cosmetics, cloud accounts or production Play signing.
 - All cumulative PRs stay draft/unmerged until owner physical acceptance.
+
+## Verified automation result
+
+[GitHub Android CI #42350347969](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42350347969) PASSED. [Full API35 emulator #42350506917](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42350506917) PASSED **57/57 tests**, including host/guest Duel privacy and result UI, and verified signed v0.6.1→v0.7.0 actual install-over preserving all previous profile fields and Race results. [Full APK/QA/checkpoint receipt](WS06C_BUILD_QA_2026-11-07.md). Physical two-device session remains deferred.
