@@ -515,7 +515,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                 else "Leave Play Together?") },
             text = { Text(
                 if (state.role == NearbyRole.HOST) {
-                    "Your partner will be disconnected. This shared board and its chat " +
+                    "Your partner will be disconnected. This nearby game and its chat " +
                         "end when you close the room. Your Solo and Daily puzzles are safe."
                 } else if (state.role == NearbyRole.GUEST) {
                     "Leaving will disconnect you from your partner. " +
