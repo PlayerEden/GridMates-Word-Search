@@ -7,6 +7,7 @@ name: WS-07F Records and Collections Android Emulator QA
 # Rerun all gates after final compact Solo word pages and win/save HUD adjustments.
 # Touch follow-up: include finger-UP final coordinates and report selected endpoints.
 # WS-07F: verify compact Records mode tabs, non-truncated history and fully paged Collection.
+# Source-matched rerun includes disambiguated Solo tab UI test and documented owner gates.
 # Source-matched v0.8.2 candidate includes prior 90 tests and new Records/Collections assertions.
 # Includes previous 90 tests plus 2 Records/Collection tests and v0.8.1 -> v0.8.2 signed upgrade.
 # includes the exact same-signer v0.8.1 -> v0.8.2 update and save checks.
