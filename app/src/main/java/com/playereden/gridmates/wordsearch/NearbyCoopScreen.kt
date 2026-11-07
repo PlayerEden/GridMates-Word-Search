@@ -302,7 +302,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
 
         }
     }
-
+    }
 
     if (exitPrompt) {
         AlertDialog(
