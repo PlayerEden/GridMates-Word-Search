@@ -28,7 +28,8 @@ data class RaceResult(
     /** Validate imported or stored records without regenerating historical boards. */
     fun validate(): RaceResult {
         require(roomId.length in 8..100 && roomId.all { it.isLetterOrDigit() || it == '-' || it == '_' })
-        require(puzzleId.length in 10..160 && puzzleId.startsWith("wordsearch:v2:"))
+        require(puzzleId.length in 10..160 &&
+            puzzleId.startsWith("wordsearch:v2:en:${theme.name}:${board.name}:${challenge.name}:"))
         require(boardFingerprint.length == 64 &&
             boardFingerprint.all { it in '0'..'9' || it in 'a'..'f' })
         require(board in PuzzleBoardSize.bookPresets) { "Unsupported race board" }
@@ -81,15 +82,16 @@ object RaceJournalRules {
     fun addOnce(records: List<RaceResult>, candidate: RaceResult): List<RaceResult> {
         candidate.validate()
         if (records.any { it.roomId == candidate.roomId }) return records
+        require(records.size < 1_000) { "Versus journal is full; back up results" }
         return listOf(candidate) + records
     }
 
     fun validateImported(records: List<RaceResult>): List<RaceResult> {
-        require(records.size <= 10_000) { "Too many race results" }
+        require(records.size <= 1_000) { "Too many race results" }
         require(records.map { it.roomId }.distinct().size == records.size) {
             "Duplicate race room in backup"
         }
-        records.forEach(RaceResult::validate)
+        records.forEach { it.validate() }
         return records
     }
 }
