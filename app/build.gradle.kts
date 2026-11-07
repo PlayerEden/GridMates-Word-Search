@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 30
-        versionName = "0.7.6-save-integrity-i-alpha"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 31
+        versionName = "0.7.7-touch-and-layout-j-alpha"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
