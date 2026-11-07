@@ -38,6 +38,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
@@ -68,6 +69,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -690,6 +692,7 @@ internal fun ZoomableWordGrid(
     // Allocate a truly square board using the height actually available AFTER
     // the toolbar. A requested 320dp square previously got squeezed to a shorter
     // rectangle on compact surfaces, disagreeing with letter and swipe geometry.
+    var preciseOpen by remember(puzzle.id) { mutableStateOf(false) }
     BoxWithConstraints(Modifier.width(viewport)) {
         val side = if (maxHeight == Dp.Infinity) viewport
             else minOf(viewport, (maxHeight - 56.dp).coerceAtLeast(96.dp))
@@ -708,22 +711,29 @@ internal fun ZoomableWordGrid(
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.labelSmall,
                     color = Muted, maxLines = 2)
-                TextButton(onClick = {
+                TextButton(
+                    onClick = { preciseOpen = true },
+                    modifier = Modifier.semantics {
+                        contentDescription = "Select a word without dragging"
+                    }
+                ) { Text("Select", maxLines = 1) }
+                IconButton(onClick = {
                     transform = transform.zoomed(transform.zoom - 0.25f, sidePx)
                 }, enabled = transform.zoom > 1f,
-                    modifier = Modifier.semantics { contentDescription = "Zoom out" }) {
-                    Text("−")
-                }
-                TextButton(onClick = { transform = BoardViewportTransform(1f) },
-                    modifier = Modifier.semantics {
-                        contentDescription = "Fit entire puzzle board"
-                    }) { Text("Fit") }
-                TextButton(onClick = {
+                    modifier = Modifier.size(48.dp).semantics {
+                        contentDescription = "Zoom out"
+                    }) { Text("−", style = MaterialTheme.typography.titleMedium) }
+                IconButton(onClick = {
+                    transform = BoardViewportTransform(1f)
+                }, modifier = Modifier.size(48.dp).semantics {
+                    contentDescription = "Fit entire puzzle board"
+                }) { Text("Fit") }
+                IconButton(onClick = {
                     transform = transform.zoomed(transform.zoom + 0.25f, sidePx)
                 }, enabled = transform.zoom < 2.5f,
-                    modifier = Modifier.semantics { contentDescription = "Zoom in" }) {
-                    Text("+")
-                }
+                    modifier = Modifier.size(48.dp).semantics {
+                        contentDescription = "Zoom in"
+                    }) { Text("+", style = MaterialTheme.typography.titleMedium) }
             }
             Box(Modifier.size(side).align(Alignment.CenterHorizontally)
                 .clipToBounds()
@@ -766,11 +776,17 @@ internal fun ZoomableWordGrid(
                     boardFontId = boardFontId,
                     partnerFoundIds = partnerFoundIds,
                     boardLookId = boardLookId,
-                    multiTouchActive = multiTouch
+                    multiTouchActive = multiTouch,
+                    onPreciseRequest = { preciseOpen = true }
                 )
             }
         }
     }
+    if (preciseOpen) {
+        PreciseWordPicker(puzzle, onSelect = onSelect,
+            onDismiss = { preciseOpen = false })
+    }
+
 }
 
 @Composable
@@ -784,7 +800,8 @@ private fun WordGrid(
     boardFontId: String,
     partnerFoundIds: Set<String> = emptySet(),
     boardLookId: String = "classic",
-    multiTouchActive: Boolean = false
+    multiTouchActive: Boolean = false,
+    onPreciseRequest: () -> Unit = {}
 ) {
     val palette = BoardLookPalettes.forId(boardLookId)
     val glyphPainter = rememberBoardGlyphPainter(boardFontId)
@@ -881,6 +898,16 @@ private fun WordGrid(
             .border(2.dp, palette.frame, RoundedCornerShape(12.dp))
             .onSizeChanged { sizePx = it }
             .testTag("word-grid-touch-area")
+            // One meaningful accessibility target rather than 400 small
+            // cells. The row/column picker supports non-drag input.
+            .semantics {
+                contentDescription = "Word-search grid, ${puzzle.size} by ${puzzle.size}. " +
+                    "Drag or tap letters, or choose precise selection."
+                onClick(label = "Select a word by row and column") {
+                    onPreciseRequest()
+                    true
+                }
+            }
             .pointerInput(puzzle.id) {
                 awaitEachGesture {
                     // Capture the actual DOWN cell, not the coordinate after
@@ -951,32 +978,8 @@ private fun WordGrid(
                 }
             }
     ) {
-        Column(Modifier.fillMaxSize()) {
-            puzzle.rows.forEachIndexed { row, letters ->
-                Row(Modifier.fillMaxWidth().weight(1f)) {
-                    letters.forEachIndexed { col, char ->
-                        val p = GridPoint(row, col)
-                        Box(
-                            // Use the exact height distributed by the outer
-                            // Column. 20 rounded square row heights used to
-                            // accumulate beyond viewport and crop the last row.
-                            Modifier.weight(1f).fillMaxHeight()
-                                .semantics {
-                                    contentDescription = "Row " + (row + 1) +
-                                        ", column " + (col + 1) + ", letter " + char
-                                    onClick(label = "Select letter") {
-                                        selectCell(p)
-                                        true
-                                    }
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            // Native Canvas paints the ink centered behind
-                            // this transparent semantic/tappable cell.
-                        }
-                    }
-                }
-            }
-        }
+        // Letter ink and grid lines are already drawn on the parent Canvas.
+        // No 400 empty child boxes / TalkBack focus stops are required.
+        // Physical pointer drag and two-tap selection still work unchanged.
     }
 }
