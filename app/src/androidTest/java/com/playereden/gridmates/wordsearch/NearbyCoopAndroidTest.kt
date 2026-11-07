@@ -53,6 +53,32 @@ class NearbyCoopAndroidTest {
         }.isFailure)
     }
 
+    @Test fun raceStateRoundTripsAndWrongOrMissingModeIsRejected() {
+        val game = SoloProgressRules.freshV2(WordTheme.GARDEN,
+            PuzzleBoardSize.BOOK_SHORT, PuzzleChallenge.RELAXED, 2607L)
+        val race = NearbyCoopSession(game, "ws06-race-codec",
+            NearbyMatch.SHARED_BOARD_RACE)
+        race.admitOrRejoinGuest()
+        val first = race.puzzle.targets.first()
+        race.submit(CoopSeat.GUEST, race.roomId, "guest-1",
+            first.positions.first(), first.positions.last())
+        val encoded = NearbyPacket.state(race.snapshot())
+        assertEquals(NearbyMatch.SHARED_BOARD_RACE,
+            NearbyPacket.parseState(encoded).match)
+        assertEquals(race.snapshot(), NearbyPacket.parseState(encoded))
+        assertTrue(runCatching {
+            NearbyPacket.parseState(JSONObject(encoded.toString()).put("match", "SPEED_DUEL"))
+        }.isFailure)
+        assertTrue(runCatching {
+            val missingMode = JSONObject(encoded.toString())
+            missingMode.remove("match")
+            NearbyPacket.parseState(missingMode)
+        }.isFailure)
+        val offered = NearbyPacket.parseState(encoded)
+        val changed = offered.copy(match = NearbyMatch.COOP)
+        assertFalse(NearbyHandshake.matchesFinal(offered, changed))
+    }
+
     @Test fun versionedLengthBoundedPacketSurvivesActualLocalSocket() {
         val server = ServerSocket(0, 1, InetAddress.getLoopbackAddress())
         val done = CountDownLatch(1)

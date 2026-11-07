@@ -21,6 +21,7 @@ internal object NearbyHandshake {
 
     fun matchesFinal(offered: CoopSnapshot, joined: CoopSnapshot): Boolean =
         offered.roomId == joined.roomId && offered.spec == joined.spec &&
+            offered.match == joined.match &&
             joined.guestReserved && joined.guestConnected &&
             joined.revision >= offered.revision &&
             joined.claims.take(offered.claims.size) == offered.claims

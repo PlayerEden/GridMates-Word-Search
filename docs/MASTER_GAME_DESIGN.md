@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Design baseline 0.1 — November 5, 2026  
-**Status:** Living design / pre-implementation; not a claim that features are built or tested  
+**Version:** Living master design — WS-06A implementation checkpoint, November 7, 2026  
+**Status:** Historical design baseline below plus current [WS-06A automated PASS receipt](WS06A_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -15,7 +15,7 @@
 - **DECIDED** = directly agreed in the planning conversation or inherited as an established GridMates series direction.
 - **BASELINE PROPOSAL** = recommended starting behavior; implementation and playtesting may change it.
 - **FUTURE / OPEN** = deliberately deferred or requires an explicit later design decision.
-- **IMPLEMENTED / TESTED** = may be used only after verified Word Search source/build/QA evidence exists. Nothing in this document is currently marked implemented.
+- **IMPLEMENTED / TESTED** = use only when a verified Word Search source/build/QA receipt supports it. See the current linked receipts and dated implementation appendix rather than assuming historical 2026-11-05 design descriptions are current implementation claims.
 
 **Decided on November 5, 2026:**
 1. Word Search is a **separate Android app and separate GitHub repository**, part of the GridMates family.
@@ -486,3 +486,18 @@ These are intentionally **not** silently decided by this document:
 5. Deliver verifiable result: commit/branch, what changed, tests and Android install QA, unresolved issues, artifact/checksum if built, rollback point.
 6. Update roadmap status and this document when decisions change. Do not replace player feedback with speculative polish.
 7. Never edit Sudoku's repo to complete Word Search work without explicit separate authorization.
+
+
+---
+
+## November 7, 2026 — implementation and QA status (supersedes original planning-only header)
+
+The original master design is preserved as a decision/reference document; it is not a current list of unimplemented features. For source-matched implementation evidence, start at [START HERE](START_HERE.md), the [roadmap](DEVELOPMENT_ROADMAP.md), and the [WS-06A full QA receipt](WS06A_BUILD_QA_2026-11-07.md).
+
+**Implemented in stacked draft code:** actual Solo/Daily word-search gameplay, active puzzle saves, profiles/achievements, free earned Woodland portraits and collectible board fonts, manual JSON backup/restore, same-Wi-Fi Nearby Co-op with discovery/admission/reconnect and partner chat, screenshot-driven visual/accessibility polish, and **Shared Board Race** (single shared board, first host-accepted word earns a point, match ends after every word, winner/tie). LAN protocol is v5; the QA build is v0.6.0 versionCode 22 with stable public test-only signing.
+
+**Automated evidence:** [49 real API35 Android emulator tests passed](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42343699693); original stable-signed v0.5.9→v0.6.0 APK update preserved existing local Solo/profile JSON. Exact SHA, artifact, checksum and rollback branch are in the [receipt](WS06A_BUILD_QA_2026-11-07.md). Physical two-phone Wi-Fi/race/rotation/TalkBack acceptance still deferred; an emulator cannot replace real devices.
+
+**Still future:** separately playable Speed Duel with coordinated ready/start and private boards; idempotently persisted Versus records and post-match comparison; production Play release/signing; online accounts/servers. Do not imply these are already implemented merely because they are in this master design.
+
+All PRs #30–#42 are still **DRAFT and UNMERGED** while the owner defers physical testing. The live feature stack is PR #42 on #41 on #40 on #39 and older; never develop from the tiny default main tree without reading the current handoff.

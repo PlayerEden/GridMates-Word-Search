@@ -33,6 +33,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
         else exitPrompt = true
     }
     BackHandler { requestExit() }
+    var match by rememberSaveable { mutableStateOf(NearbyMatch.COOP.name) }
     var theme by rememberSaveable { mutableStateOf(WordTheme.WOODLAND.name) }
     var board by rememberSaveable { mutableStateOf(PuzzleBoardSize.BOOK_CLASSIC.name) }
     var challenge by rememberSaveable { mutableStateOf(PuzzleChallenge.CLASSIC.name) }
@@ -55,7 +56,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
         PaperEyebrow("GridMates · Nearby Play")
         Text("Play Together", style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold, color = Forest)
-        Text("One word search, two phones. Same Wi-Fi, no sign-in.",
+        Text("One board, two phones. Play together or race for every word.",
             color = Muted, style = MaterialTheme.typography.bodyMedium)
 
         if (state.message.isNotBlank()) {
@@ -86,10 +87,23 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
             }
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Start a shared puzzle",
+                    Text("Host a nearby game",
                         color = Forest, style = MaterialTheme.typography.titleLarge)
-                    Text("Pick a puzzle, then your partner taps it under Nearby games.",
+                    Text("Choose how to play, then your partner joins from Nearby games.",
                         color = Muted)
+                    Text("Game mode", fontWeight = FontWeight.SemiBold)
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        NearbyMatch.entries.forEach { entry ->
+                            FilterChip(selected = match == entry.name,
+                                onClick = { match = entry.name },
+                                label = { Text(entry.label) })
+                        }
+                    }
+                    Text(if (match == NearbyMatch.SHARED_BOARD_RACE.name)
+                        "Race rules: first valid claim owns each word, 1 point per word. " +
+                            "The match ends only when all words are found; higher score wins or ties."
+                    else "Co-op rules: uncover every word together, without a winner.",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
                     Text("Theme", fontWeight = FontWeight.SemiBold)
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -129,9 +143,11 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                     }
                     Button(onClick = {
                         runtime.host(ownName, WordTheme.valueOf(theme),
-                            PuzzleBoardSize.valueOf(board), PuzzleChallenge.valueOf(challenge))
+                            PuzzleBoardSize.valueOf(board), PuzzleChallenge.valueOf(challenge),
+                            NearbyMatch.valueOf(match))
                     }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
-                        Text("Host a game")
+                        Text(if (match == NearbyMatch.SHARED_BOARD_RACE.name)
+                            "Host Shared Board Race" else "Host Co-op game")
                     }
                 }
             }
@@ -171,7 +187,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                             }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
                                 Column(Modifier.fillMaxWidth()) {
                                     Text(entry.name)
-                                    Text(if (entry.requiresCode) "Code needed" else "Tap to join",
+                                    Text(entry.match.label + " · " +
+                                        if (entry.requiresCode) "Code needed" else "Tap to join",
                                         style = MaterialTheme.typography.bodySmall)
                                 }
                             }
@@ -223,17 +240,45 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
 
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(if (snapshot.finished) "Solved together!" else
+                    Text(if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE) {
+                        when {
+                            snapshot.finished -> "Race finished!"
+                            connected -> "Race for every word!"
+                            else -> "Waiting for your opponent"
+                        }
+                    } else if (snapshot.finished) "Solved together!" else
                         if (connected) "Finding words together" else "Waiting for your partner",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold, color = Forest)
-                    Text(spec.theme.label + " · " + spec.board.cells + "×" + spec.board.cells +
+                    Text(snapshot.match.label + " · " + spec.theme.label + " · " +
+                        spec.board.cells + "×" + spec.board.cells +
                         " · " + spec.challenge.label, color = Muted)
                     PaperProgress(snapshot.foundIds.size, puzzle.targets.size)
                     Text(snapshot.foundIds.size.toString() + " / " + puzzle.targets.size +
                         " words found  ·  You: " + ownFound.size +
                         "  ·  Partner: " + partnerFound.size, color = Forest,
                         fontWeight = FontWeight.SemiBold)
+                    if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE) {
+                        val standing = snapshot.raceStanding
+                        if (standing != null) {
+                            Text(when {
+                                standing.tied -> "It's a tie! " +
+                                    standing.hostPoints + "–" + standing.guestPoints
+                                standing.winner == localSeat -> "You win! " +
+                                    ownFound.size + "–" + partnerFound.size
+                                else -> "Partner wins " +
+                                    partnerFound.size + "–" + ownFound.size
+                            }, color = Forest, fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleLarge)
+                            Text("Final score · 1 point per claimed word. " +
+                                "Both phones receive the host's result.",
+                                color = Muted, style = MaterialTheme.typography.bodySmall)
+                        } else {
+                            Text("Current score · first to claim each word scores. " +
+                                "No countdown ends the race.",
+                                color = Muted, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
                     Text(if (connected) "● Partner connected" else "○ Partner offline / not joined",
                         color = if (connected) Forest else Muted)
                     if (lastPartnerWord != null) {
@@ -267,7 +312,9 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         }
                     }
                     Text("Green = your finds · Blue = partner's finds. " +
-                        "First valid selection counts for the shared board.",
+                        if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE)
+                            "First valid selection earns one point; no duplicate awards."
+                        else "First valid selection counts for the shared board.",
                         color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
             }
@@ -384,9 +431,11 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                     }
                 }
             }
-            Text(if (snapshot.finished)
-                "Every word has been found. The room stays here until you leave."
-            else "Your Solo and Daily puzzles remain separate. A lost Wi-Fi connection " +
+            Text(if (snapshot.finished) {
+                if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE)
+                    "Final race score stays visible until you leave the room."
+                else "Every word has been found. The room stays here until you leave."
+            } else "Your Solo and Daily puzzles remain separate. A lost Wi-Fi connection " +
                 "doesn't erase the current host's shared progress.",
                 color = Muted, style = MaterialTheme.typography.bodySmall)
         }
