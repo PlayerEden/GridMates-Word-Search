@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State:** Active cumulative Android implementation (WS-06G v0.7.4 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06G exact QA receipt](WS06G_BUILD_QA_2026-11-07.md) for current truth.  
+**State (latest planning update 2026-11-07):** The historical WS-00–08 table below is preserved for traceability. Active work is now the **WS-07 physical playtest repair and usability arc**, stacked draft PR [#54](https://github.com/PlayerEden/GridMates-Word-Search/pull/54), following verified v0.7.6 / 76-emulator-test WS-06I baseline. **P0 physical two-phone word marking failure remains OPEN**; v0.7.7 is NOT accepted. See [WS-07 research and UX specification](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md).  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
@@ -265,3 +265,43 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Actual stable-signed v0.7.3 code27 QA APK updated in place to v0.7.4 code28, preserving old Solo/Daily/profile and completed Shared Board Race / Speed Duel journals. [Exact source, checksum, emulator QA report and rollback checkpoint](WS06G_BUILD_QA_2026-11-07.md).
 - Initial source test compile had a mistaken `JSONObject.remove` return type; corrected and fully retested in the separate green run. Prior failures do not count as accepted gates.
 - **Next WS-06H:** whole-game integration and eventual Play-test readiness audit, particularly physical two-handset Wi-Fi/ready/finish/reconnect, room theme agreement, 320dp/200%-text/TalkBack, backups, signed app update and release prerequisites. Keep all stacked drafts unmerged.
+
+## Live development priority — WS-07 refinement arc (November 7, 2026)
+
+**This table supersedes the planning-only WS-07 row above.** No new modes, advertising, currency, collections or cosmetic expansion until actual word marking and readability are proven. The accepted fallback remains v0.7.6 `4250198aff1faaca510fde90569a3148db591f8a` (76/76 emulator tests, signed install-over, real two-phone gameplay not signed off). The latest candidate remains a separate *unmerged* QA-only v0.7.7 / code31 draft. Read [physical evidence + current research](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md).
+
+| Priority / stage | Status | Deliverable | Required proof |
+| --- | --- | --- | --- |
+| **P0 / WS-07A — Accurate touch & connected Co-op** | **IN PROGRESS; BLOCKED on 2 failing gesture tests + physical retest** | One-finger tracing, start and end from actual touches, 2-tap selection, inverse transform, second-finger cancel; fixed in-game HUD candidate; clear local/host claim feedback | All pointer-injected host/guest 12/15/20 scenarios green; same-signer upgrade; both real phones can mark multiple valid words and see them on each other |
+| **P1 / WS-07B — No-scroll playing surfaces** | PLANNED (some code already drafted under 07A) | Fixed Solo/Daily/Co-op/Race/Duel gameplay, compact HUD, visible word preview, optional word list/chat/info sheets, simple Home Host/Join, settings outside gameplay | Portrait and compact-height landscape; no board clipped by full-page scroll; every task reachable at 320dp/200% text |
+| **P1 / WS-07C — Precision/accessibility** | PLANNED | Finger-up and slop edge cases, optional 20×20 loupe/crosshair prototype, Fit/zoom, 2-tap plus larger alternative cell navigator, TalkBack/Switch/keyboard path, contrast/haptics | No false claims during pinch/pan; older/novice users select clearly visible words; no 400-cell-only screen reader dead end |
+| **P0/P1 / WS-07D — Two-phone multiplayer acceptance** | BLOCKED until input gate | Co-op full round, Race simultaneous word arbitration, Duel Ready/GO/private paths, optional room code, discovery/rejoin/Wi-Fi interruption, friend presence, chat, post-match save/comparison | Two physical devices, swap host/guest, complete all three modes, per-mode journals agree, screenshots/video/logs redacted |
+| **P1 / WS-07E — Whole-app UX and content** | PLANNED | Home and Nearby first-time onboarding, meaningful hints through last word, difficulty/content review, Daily variety, records/collection/achievements/profile grouping, share previews and cosmetics clarity | Observe novice play, inspect screens for clarity, retain familiar paperback visual identity; no accidental extra monetization |
+| **P1 / WS-07F — Durability, accessibility & performance audit** | PLANNED | Large journal and 1/3/5-year Daily stress, malformed-result fail-closed protection, backup size boundary, old→new install-over, low-end frame/memory/ANR, TalkBack, 200% font | Run complete CI/emulator and real-device long-session matrix; export must also import successfully; record exact APK SHA and rollback |
+| **P1 / WS-07G — Integration & beta readiness gate** | BLOCKED until A–F verified | Audit stacked PR ancestry, fix docs/source of truth, checkpoint candidate, release QA/owner signoff and eventual private AAB signing/Play tracks | No auto-merge; all tests and physical P0 pass; production keys never use public QA signer, Play requirements verified near submission |
+
+### WS-07A regression detail, source-matched status
+
+- **Confirmed owner report:** two connected phones could not mark words; initial screenshots show auto-cropped zoom, confusing Find/Move selection, very long active Nearby page.
+- **Candidate implemented in draft #54:** fit-first zoom, one-/two-finger gesture separation, first-down/final-up handling, fixed active Nearby board, collapsed optional room styling/options, Solo word paging, contextual word and game status. These are **candidate changes**, not accepted behavior.
+- **First full [v0.7.7 emulator run #42410802309](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42410802309):** actual signed v0.7.6→v0.7.7 install-over preserved Solo/Daily/identity/Race/Duel; 78 Android tests executed, **76 pass / 2 fail**, specifically finger-swipes on 15×15 and 20×20 returned `INVALID_PATH`.
+- **Revised [emulator run #42411678348](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42411678348):** update protection passed again; **76/78 pass**; endpoint diagnostics show an expected 20×20 path `(5,17)→(11,11)` was received as `(6,17)→(12,11)`, and an expected 15×15 `(6,5)→(6,12)` was received as `(6,5)→(7,6)`. **Do not dismiss as a test-fixture problem until actual board bounds/coordinates and direction lock are independently proven.** Correct raw pointer coordinate mapping and direction locking; run target-level tests before rerunning the expensive full emulator suite.
+- **Latest standard Android CI #42411683407 passed**, which confirms code compiles but not gesture correctness. No passing full emulator run or accepted real-phone Co-op yet.
+- **Exit condition:** all designed gesture tests green at actual board coordinates, no accidental pinch claim, same signer and saved journal retention, then owner repeats on both physical phones. Pin the exact-green source and APK only *after* this.
+
+### Design constraints carried into every sub-milestone
+
+1. **Active play never requires scrolling the whole page.** Reflow or change layout, not shrink words beyond legibility. Histories/settings may scroll, and an explicitly opened word/chat sheet may scroll.
+2. **No forced Find/Move mode.** Default 1 finger = select; 2 fingers = zoom/pan; visible Fit/zoom and two-tap alternative. Additional assist for 20×20 subject to user tests. User's target word must be selected deliberately, never auto-guessed.
+3. **Ordinary controls aim for ≥48dp** per Android accessibility guidance. The grid is a spatial surface: provide accessible alternatives and test legibility; do not claim all 400 cells individually meet 48dp. Group semantics and support TalkBack, Switch Access, larger font and non-gesture navigation.
+4. **Feedback is immediate and true:** accepted/invalid/claimed/unready/disconnected; partner state and contribution are visible without burying the board. Keep Duel answers private and Race host-authoritative.
+5. **Preserve app history and independence:** same Word Search QA application ID/cert, no changed schema or network protocol without explicit compatibility/migration; don't affect GridMates Sudoku, don't merge draft PRs or overwrite `main`.
+6. **Quality gate cadence:** audit/a11y/backup at each major implementation; tests per PR, full cumulative replay at checkpoint and physical acceptance before calling milestone complete. A build must cite the *executable* SHA, not an unrelated later docs commit.
+
+### Reference and issue map
+
+- [Research evidence and UX specification](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md)
+- [WS-07 whole-game audit #52](https://github.com/PlayerEden/GridMates-Word-Search/issues/52)
+- [WS-07A physical P0 input/scroll issue #53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53)
+- [WS-07A draft implementation PR #54](https://github.com/PlayerEden/GridMates-Word-Search/pull/54)
+- [Two-phone acceptance checklist](WS07A_REAL_PHONE_TOUCH_ACCEPTANCE_2026-11-07.md)
