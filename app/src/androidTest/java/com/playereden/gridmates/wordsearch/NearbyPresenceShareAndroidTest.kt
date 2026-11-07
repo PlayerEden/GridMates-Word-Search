@@ -2,6 +2,7 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import com.playereden.gridmates.wordsearch.core.*
 import org.junit.Assert.assertEquals
@@ -15,15 +16,22 @@ class NearbyPresenceShareAndroidTest {
         var dismissals = 0
         compose.setContent {
             GridMatesTheme {
-                ShareResultPreview("GridMates: Word Search\nFriendly victory!\nNo secrets") {
+                ShareResultPreview(listOf(
+                    "GridMates: Word Search", "Solo Puzzle complete!",
+                    "Woodland · 10×10 · Classic", "12 words found · 2:35",
+                    "No hints used", "Good puzzles. Good company."
+                ).joinToString("\n")) {
                     dismissals++
                 }
             }
         }
         compose.onNodeWithText("Preview result to share").assertExists()
         compose.onNodeWithText("GridMates: Word Search", substring = true).assertExists()
-        compose.onNodeWithText("Only this text is offered", substring = true).assertExists()
-        compose.onNodeWithText("Share now").assertExists()
+        compose.onNodeWithText("Sharing is optional", substring = true).assertExists()
+        compose.onNodeWithContentDescription("Preview of your GridMates result postcard")
+            .assertExists()
+        compose.onNodeWithText("Share text").assertExists()
+        compose.onNodeWithText("Share image").assertExists()
         compose.onNodeWithText("Cancel").performClick()
         compose.runOnIdle { assertEquals(1, dismissals) }
     }
