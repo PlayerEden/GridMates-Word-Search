@@ -38,6 +38,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
     var board by rememberSaveable { mutableStateOf(PuzzleBoardSize.BOOK_CLASSIC.name) }
     var challenge by rememberSaveable { mutableStateOf(PuzzleChallenge.CLASSIC.name) }
     var preferredBoardLook by rememberSaveable { mutableStateOf(CoopBoardLook.CLASSIC.id) }
+    var showAppearanceOptions by rememberSaveable { mutableStateOf(false) }
+    var showHostOptions by rememberSaveable { mutableStateOf(false) }
     var classicOnThisPhone by rememberSaveable { mutableStateOf(false) }
     var showJoin by rememberSaveable { mutableStateOf(false) }
     var manual by rememberSaveable { mutableStateOf(false) }
@@ -91,7 +93,13 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
         if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
 
         if (snapshot == null && state.role == NearbyRole.NONE) {
-            Card(Modifier.fillMaxWidth()) {
+            TextButton(onClick = { showAppearanceOptions = !showAppearanceOptions },
+                modifier = Modifier.fillMaxWidth()) {
+                Text(if (showAppearanceOptions) "Hide board appearance options"
+                    else "Board appearance · " + CoopBoardLook.safe(preferredBoardLook).label +
+                        " (optional)")
+            }
+            if (showAppearanceOptions) Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Co-op board appearance",
@@ -139,13 +147,19 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                     Text("Choose how to play, then your partner joins from Nearby games.",
                         color = Muted)
                     Text("Game mode", fontWeight = FontWeight.SemiBold)
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         NearbyMatch.entries.forEach { entry ->
                             FilterChip(selected = match == entry.name,
                                 onClick = { match = entry.name },
-                                label = { Text(entry.label) })
+                                label = { Text(when (entry) {
+                                    NearbyMatch.COOP -> "Co-op"
+                                    NearbyMatch.SHARED_BOARD_RACE -> "Race"
+                                    NearbyMatch.SPEED_DUEL -> "Duel"
+                                }) })
                         }
                     }
+
                     Text(when (match) {
                         NearbyMatch.SPEED_DUEL.name ->
                             "Duel: both tap Ready. GO reveals identical private boards. " +
@@ -155,6 +169,25 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         else -> "Co-op: uncover every word together, without a winner."
                     },
                         color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Button(onClick = {
+                        runtime.host(ownName, WordTheme.valueOf(theme),
+                            PuzzleBoardSize.valueOf(board), PuzzleChallenge.valueOf(challenge),
+                            NearbyMatch.valueOf(match), preferredBoardLook)
+                    }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                        Text(when (match) {
+                            NearbyMatch.SPEED_DUEL.name -> "Host Speed Duel"
+                            NearbyMatch.SHARED_BOARD_RACE.name -> "Host Shared Board Race"
+                            else -> "Host Co-op game"
+                        })
+                    }
+                    TextButton(onClick = { showHostOptions = !showHostOptions },
+                        modifier = Modifier.fillMaxWidth()) {
+                        Text(if (showHostOptions) "Hide puzzle & room options"
+                            else "Puzzle & room options · " +
+                                PuzzleBoardSize.valueOf(board).cells + "×" +
+                                PuzzleBoardSize.valueOf(board).cells)
+                    }
+                    if (showHostOptions) {
                     Text("Theme", fontWeight = FontWeight.SemiBold)
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -192,17 +225,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         Switch(checked = runtime.requireCodePreference,
                             onCheckedChange = runtime::updateRequireCodePreference)
                     }
-                    Button(onClick = {
-                        runtime.host(ownName, WordTheme.valueOf(theme),
-                            PuzzleBoardSize.valueOf(board), PuzzleChallenge.valueOf(challenge),
-                            NearbyMatch.valueOf(match), preferredBoardLook)
-                    }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
-                        Text(when (match) {
-                            NearbyMatch.SPEED_DUEL.name -> "Host Speed Duel"
-                            NearbyMatch.SHARED_BOARD_RACE.name -> "Host Shared Board Race"
-                            else -> "Host Co-op game"
-                        })
                     }
+
                 }
             }
             Card(Modifier.fillMaxWidth()) {
