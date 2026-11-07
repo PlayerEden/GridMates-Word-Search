@@ -4,8 +4,11 @@ import android.view.SoundEffectConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -54,7 +57,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.awaitPointerEvent
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
@@ -64,6 +69,8 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -644,9 +651,11 @@ private fun WordList(
 }
 
 /**
- * A compact, explicit Move/Find board viewer. One-finger word tracing remains
- * untouched in Find mode; Move mode catches drag gestures above the grid.
- * This avoids ambiguity between panning and a word-selection gesture.
+ * Touch-first board. The whole puzzle starts fitted, then users can pinch
+ * with two fingers to zoom/pan while one finger always selects words.
+ * On-screen zoom buttons remain for switch access / people unable to pinch.
+ * The grid itself owns taps and drags; no transparent click targets steal
+ * physical word-selection gestures.
  */
 @Composable
 internal fun ZoomableWordGrid(
@@ -662,94 +671,61 @@ internal fun ZoomableWordGrid(
     boardLookId: String = "classic"
 ) {
     val viewportPx = with(LocalDensity.current) { viewport.toPx() }
-    val initialZoom = when {
-        puzzle.size >= 20 -> 1.85f
-        puzzle.size >= 15 -> 1.45f
-        else -> 1f
-    }
     var transform by remember(puzzle.id, viewportPx) {
-        mutableStateOf(BoardViewportTransform(1f).zoomed(initialZoom, viewportPx))
+        mutableStateOf(BoardViewportTransform(1f))
     }
-    var moving by remember(puzzle.id) { mutableStateOf(false) }
+    // A second finger cancels any in-progress single-finger word trace.
+    var multiTouch by remember(puzzle.id) { mutableStateOf(false) }
 
-    Column(Modifier.width(viewport),
-        verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        if (viewport < 240.dp) {
-            // Landscape can leave less than 240dp for the board; don't squeeze
-            // five controls across a 106dp-wide column.
-            Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = {
-                    transform = transform.zoomed(transform.zoom - 0.25f, viewportPx)
-                }, enabled = transform.zoom > 1f,
-                    modifier = Modifier.width(40.dp)
-                        .semantics { contentDescription = "Zoom out" }) {
-                    Text("−")
-                }
-                TextButton(
-                onClick = { transform = transform.zoomed(1f, viewportPx) },
+    Column(Modifier.width(viewport), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+            Text("Trace words · pinch to zoom", modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.labelSmall, color = Muted,
+                maxLines = 2)
+            TextButton(onClick = { transform = transform.zoomed(
+                    transform.zoom - 0.25f, viewportPx) },
                 enabled = transform.zoom > 1f,
-                modifier = Modifier.semantics {
-                    contentDescription = "Fit entire board. Current zoom " +
-                        (transform.zoom * 100f).roundToInt() + " percent."
-                }
-            ) { Text("${(transform.zoom * 100f).roundToInt()}%",
-                    style = MaterialTheme.typography.labelSmall) }
-                TextButton(onClick = {
-                    transform = transform.zoomed(transform.zoom + 0.25f, viewportPx)
-                }, enabled = transform.zoom < 2.5f,
-                    modifier = Modifier.width(40.dp)
-                        .semantics { contentDescription = "Zoom in" }) {
-                    Text("+")
-                }
-            }
-            TextButton(onClick = {
-                moving = !moving
-                onModeChanged(moving)
-            },
-                modifier = Modifier.fillMaxWidth().semantics {
-                    contentDescription = if (moving)
-                        "Mode: Move. Tap to find words."
-                    else "Mode: Find. Tap to move the board."
-                }) { Text(if (moving) "Mode: Move" else "Mode: Find") }
-        } else {
-            Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = {
-                    transform = transform.zoomed(transform.zoom - 0.25f, viewportPx)
-                }, enabled = transform.zoom > 1f,
-                    modifier = Modifier.width(40.dp)
-                        .semantics { contentDescription = "Zoom out" }) { Text("−") }
-                TextButton(
-                    onClick = { transform = transform.zoomed(1f, viewportPx) },
-                    enabled = transform.zoom > 1f,
-                    modifier = Modifier.semantics {
-                        contentDescription = "Fit entire board. Current zoom " +
-                            (transform.zoom * 100f).roundToInt() + " percent."
-                    }
-                ) { Text("${(transform.zoom * 100f).roundToInt()}%",
-                    style = MaterialTheme.typography.labelMedium) }
-                TextButton(onClick = {
-                    transform = transform.zoomed(transform.zoom + 0.25f, viewportPx)
-                }, enabled = transform.zoom < 2.5f,
-                    modifier = Modifier.width(40.dp)
-                        .semantics { contentDescription = "Zoom in" }) { Text("+") }
-                FilterChip(selected = !moving, onClick = {
-                    moving = false
-                    onModeChanged(false)
-                }, label = { Text("Find") })
-                FilterChip(selected = moving, onClick = {
-                    moving = true
-                    onModeChanged(true)
-                }, label = { Text("Move") })
-            }
+                modifier = Modifier.semantics { contentDescription = "Zoom out" }
+            ) { Text("−") }
+            TextButton(onClick = { transform = BoardViewportTransform(1f) },
+                modifier = Modifier.semantics { contentDescription = "Fit entire puzzle board" }
+            ) { Text("Fit") }
+            TextButton(onClick = { transform = transform.zoomed(
+                    transform.zoom + 0.25f, viewportPx) },
+                enabled = transform.zoom < 2.5f,
+                modifier = Modifier.semantics { contentDescription = "Zoom in" }
+            ) { Text("+") }
         }
-        Box(Modifier.size(viewport).clipToBounds()) {
-            // Compose renders, clips, and inverse-hit-tests the ENTIRE native grid
-            // as a single graphics layer. Never scale glyph font separately:
-            // that enlarged text alone and caused the v0.4.4 overlap screenshots.
+        Box(Modifier.size(viewport).clipToBounds()
+            .pointerInput(puzzle.id, viewportPx) {
+                // Parent sees extra fingers before the grid's single-pointer
+                // handler. One-finger word traces are never interpreted as pan.
+                awaitEachGesture {
+                    var sawMulti = false
+                    do {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        if (event.changes.count { it.pressed } >= 2) {
+                            sawMulti = true
+                            multiTouch = true
+                            val scale = event.calculateZoom()
+                            val pan = event.calculatePan()
+                            val center = event.calculateCentroid(useCurrent = false)
+                            if (center != Offset.Unspecified) {
+                                transform = transform
+                                    .zoomedAt(transform.zoom * scale, viewportPx,
+                                        center.x, center.y)
+                                    .panned(pan.x, pan.y, viewportPx)
+                            }
+                            event.changes.forEach { it.consume() }
+                        } else if (sawMulti) {
+                            event.changes.forEach { it.consume() }
+                        }
+                    } while (event.changes.any { it.pressed })
+                    multiTouch = false
+                }
+            }
+        ) {
             WordGrid(
                 puzzle, found, hintPaths,
                 modifier = Modifier.size(viewport)
@@ -762,29 +738,11 @@ internal fun ZoomableWordGrid(
                     },
                 onSelect = onSelect, onStep = onStep,
                 boardFontId = boardFontId, partnerFoundIds = partnerFoundIds,
-                boardLookId = boardLookId
+                boardLookId = boardLookId,
+                multiTouchActive = multiTouch
             )
-            if (moving) {
-                Box(Modifier.fillMaxSize()
-                    .pointerInput(puzzle.id, viewportPx) {
-                        // One finger pans; two fingers can pinch and pan in Move
-                        // mode. Find mode keeps word selection completely separate.
-                        detectTransformGestures(panZoomLock = true) { center, pan, scale, _ ->
-                            transform = transform
-                                .zoomedAt(transform.zoom * scale,
-                                    viewportPx, center.x, center.y)
-                                .panned(pan.x, pan.y, viewportPx)
-                        }
-                    }
-                    .semantics {
-                        contentDescription = "Move mode. Drag to pan or pinch to zoom. " +
-                            "Select Find to trace words."
-                    }
-                )
-            }
         }
     }
-
 }
 
 @Composable
@@ -797,7 +755,8 @@ private fun WordGrid(
     onStep: (Int) -> Unit,
     boardFontId: String,
     partnerFoundIds: Set<String> = emptySet(),
-    boardLookId: String = "classic"
+    boardLookId: String = "classic",
+    multiTouchActive: Boolean = false
 ) {
     val palette = BoardLookPalettes.forId(boardLookId)
     val glyphPainter = rememberBoardGlyphPainter(boardFontId)
@@ -808,6 +767,17 @@ private fun WordGrid(
     var tapStart by remember(puzzle.id) { mutableStateOf<GridPoint?>(null) }
     val latestOnSelect by rememberUpdatedState(onSelect)
     val latestOnStep by rememberUpdatedState(onStep)
+    val latestMultiTouch by rememberUpdatedState(multiTouchActive)
+
+    fun selectCell(cell: GridPoint) {
+        if (latestMultiTouch) return
+        val previous = tapStart
+        if (previous == null || previous == cell) tapStart = if (previous == cell) null else cell
+        else {
+            latestOnSelect(previous, cell)
+            tapStart = null
+        }
+    }
 
     fun point(offset: Offset): GridPoint? {
         if (sizePx.width <= 0 || sizePx.height <= 0 || offset.x < 0f || offset.y < 0f ||
@@ -883,43 +853,64 @@ private fun WordGrid(
             }
             .border(2.dp, palette.frame, RoundedCornerShape(12.dp))
             .onSizeChanged { sizePx = it }
+            .testTag("word-grid-touch-area")
             .pointerInput(puzzle.id) {
-                detectDragGestures(
-                    onDragStart = { offset ->
-                        tapStart = null
-                        dragStart = point(offset)
-                        dragEnd = dragStart
-                        locked = null
-                    },
-                    onDrag = { change, _ ->
-                        change.consume()
-                        val start = dragStart
-                        if (start != null && sizePx.width > 0) {
-                            val cell = sizePx.width.toFloat() / puzzle.size
-                            val dx = (change.position.x - (start.col + 0.5f) * cell) / cell
-                            val dy = (change.position.y - (start.row + 0.5f) * cell) / cell
-                            val snap = WordDragSnap.update(start, dx, dy, puzzle.size, locked)
-                            locked = snap.direction
-                            if (snap.end != dragEnd) {
-                                dragEnd = snap.end
-                                latestOnStep(snap.length)
-                            }
-                        }
-                    },
-                    onDragEnd = {
-                        val start = dragStart
-                        val end = dragEnd
-                        if (start != null && end != null && start != end) latestOnSelect(start, end)
-                        dragStart = null
-                        dragEnd = null
-                        locked = null
-                    },
-                    onDragCancel = {
-                        dragStart = null
-                        dragEnd = null
+                awaitEachGesture {
+                    // Capture the actual DOWN cell, not the coordinate after
+                    // Android's drag touch-slop. The latter can be a full
+                    // letter away on dense 15x15/20x20 boards.
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val firstCell = point(down.position)
+                    var latestCell = firstCell
+                    var cancelled = firstCell == null
+                    var sawSecondFinger = false
+                    if (firstCell != null) {
+                        dragStart = firstCell
+                        dragEnd = firstCell
                         locked = null
                     }
-                )
+                    var active = true
+                    while (active) {
+                        val event = awaitPointerEvent()
+                        val pointer = event.changes.firstOrNull { it.id == down.id }
+                        if (event.changes.count { it.pressed } >= 2 ||
+                            event.changes.any { it.id != down.id && it.pressed } ||
+                            latestMultiTouch) {
+                            cancelled = true
+                            sawSecondFinger = true
+                        }
+                        if (pointer == null || !pointer.pressed) {
+                            active = false
+                        } else if (!cancelled && firstCell != null) {
+                            val cellWidth = sizePx.width.toFloat() / puzzle.size
+                            if (cellWidth > 0f) {
+                                val dx = (pointer.position.x -
+                                    (firstCell.col + 0.5f) * cellWidth) / cellWidth
+                                val dy = (pointer.position.y -
+                                    (firstCell.row + 0.5f) * cellWidth) / cellWidth
+                                val snap = WordDragSnap.update(firstCell, dx, dy,
+                                    puzzle.size, locked)
+                                locked = snap.direction
+                                if (snap.end != latestCell) {
+                                    latestCell = snap.end
+                                    dragEnd = snap.end
+                                    latestOnStep(snap.length)
+                                }
+                            }
+                        }
+                    }
+                    if (!cancelled && !latestMultiTouch && firstCell != null) {
+                        if (latestCell != null && latestCell != firstCell) {
+                            tapStart = null
+                            latestOnSelect(firstCell, latestCell)
+                        } else if (!sawSecondFinger) {
+                            selectCell(firstCell)
+                        }
+                    }
+                    dragStart = null
+                    dragEnd = null
+                    locked = null
+                }
             }
     ) {
         Column(Modifier.fillMaxSize()) {
@@ -932,17 +923,13 @@ private fun WordGrid(
                             // Column. 20 rounded square row heights used to
                             // accumulate beyond viewport and crop the last row.
                             Modifier.weight(1f).fillMaxHeight()
-                                .clickable {
-                                    val first = tapStart
-                                    if (first == null) tapStart = p
-                                    else {
-                                        latestOnSelect(first, p)
-                                        tapStart = null
-                                    }
-                                }
                                 .semantics {
                                     contentDescription = "Row " + (row + 1) +
                                         ", column " + (col + 1) + ", letter " + char
+                                    onClick(label = "Select letter") {
+                                        selectCell(p)
+                                        true
+                                    }
                                 },
                             contentAlignment = Alignment.Center
                         ) {
