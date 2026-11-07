@@ -7,6 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.playereden.gridmates.wordsearch.core.*
 import org.junit.Assert.*
 import org.junit.Test
+import java.io.File
 
 /** PNG, FileProvider and preview safety checks on real Android framework. */
 class ResultPostcardAndroidTest {
@@ -98,4 +99,34 @@ class ResultPostcardAndroidTest {
             assertTrue(runCatching { ResultPostcard.render(ctx, value) }.isFailure)
         }
     }
+    @Test fun sharingPrunesOnlyExpiredPostcardsAndNeverOtherAppFiles() {
+        val folder = File(ctx.cacheDir, "result-postcards")
+        assertTrue(folder.isDirectory || folder.mkdirs())
+        val expired = File(folder, "gridmates-result-ws06h-expired.png")
+        val recent = File(folder, "gridmates-result-ws06h-recent.png")
+        val unrelated = File(folder, "ws06h-unrelated.dat")
+        expired.writeBytes(byteArrayOf(1, 2, 3))
+        recent.writeBytes(byteArrayOf(4, 5, 6))
+        unrelated.writeBytes(byteArrayOf(7, 8, 9))
+        assertTrue(expired.setLastModified(
+            System.currentTimeMillis() - 9L * 24L * 60L * 60L * 1000L))
+        val summary = listOf(
+            "GridMates: Word Search", "Solo Puzzle complete!",
+            "Woodland · 10×10 · Classic",
+            "12 words found · 1:33", "No hints used",
+            "Good puzzles. Good company.").joinToString("\\n")
+        try {
+            val bitmap = ResultPostcard.render(ctx, summary)
+            try { ResultPostcard.writeToPrivateCache(ctx, bitmap) }
+            finally { bitmap.recycle() }
+            assertFalse("Expired postcard should be removed", expired.exists())
+            assertTrue("A recently shared postcard may still be in use", recent.exists())
+            assertTrue("Unrelated local cache file must be untouched", unrelated.exists())
+        } finally {
+            expired.delete()
+            recent.delete()
+            unrelated.delete()
+        }
+    }
+
 }
