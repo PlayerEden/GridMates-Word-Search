@@ -283,9 +283,9 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
         Text("Play Together", color = Forest,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold)
-        Text("Share one puzzle on two phones connected to the same Wi-Fi.",
+        Text("Team up or race on two phones connected to the same Wi-Fi.",
             color = Muted, style = MaterialTheme.typography.bodyMedium)
-        Text("Nearby co-op · Early access",
+        Text("Co-op · Shared Race · Speed Duel",
             color = Gold, style = MaterialTheme.typography.labelMedium)
         Button(onClick = onNearby,
             modifier = Modifier.fillMaxWidth().height(50.dp).semantics {
