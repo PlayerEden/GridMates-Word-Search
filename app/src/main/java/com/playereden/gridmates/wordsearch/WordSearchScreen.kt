@@ -59,7 +59,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.awaitPointerEvent
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
@@ -860,6 +859,8 @@ private fun WordGrid(
                     // Android's drag touch-slop. The latter can be a full
                     // letter away on dense 15x15/20x20 boards.
                     val down = awaitFirstDown(requireUnconsumed = false)
+                    // Claim the initial press before a scrollable parent takes it.
+                    down.consume()
                     val firstCell = point(down.position)
                     var latestCell = firstCell
                     var cancelled = firstCell == null
@@ -882,6 +883,9 @@ private fun WordGrid(
                         if (pointer == null || !pointer.pressed) {
                             active = false
                         } else if (!cancelled && firstCell != null) {
+                            // Without consuming the drag here, the enclosing
+                            // Nearby verticalScroll wins over vertical words.
+                            pointer.consume()
                             val cellWidth = sizePx.width.toFloat() / puzzle.size
                             if (cellWidth > 0f) {
                                 val dx = (pointer.position.x -
