@@ -1,6 +1,6 @@
 # WS-06A — Shared Board Race (first Versus milestone)
 
-**Date:** November 7, 2026. **Status:** implemented source, Android QA pending, physical two-phone acceptance deferred.
+**Date:** November 7, 2026. **Status:** implementation and automated Android QA PASS; physical two-phone acceptance deferred. [49-test build receipt](WS06A_BUILD_QA_2026-11-07.md).
 
 ## Scope and rules
 
@@ -31,7 +31,7 @@ Shared Board Race uses the same visible puzzle and word list for host and guest.
 - SharedBoardRaceTest covers 8–4 win, 6–6 tie, idle/no automatic end, concurrent same-word race, replay deduplication, reconnect, and Co-op isolation.
 - Android NearbyCoopAndroidTest covers race packet roundtrip, rejection of missing/unknown mode, and mode consistency in join handshake.
 - NearbyCoopUiEntryTest checks default Co-op, Race selector and return to Co-op.
-- Regular GitHub Android CI, instrumented emulator, artifact/checkpoint remain required before marking WS-06A automation green.
+- **Automated PASS:** [standard Android CI](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42343700819), [API35 49-test emulator and real app upgrade](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42343699693), exact-source [QA receipt](WS06A_BUILD_QA_2026-11-07.md) and rollback checkpoint. Physical acceptance remains open.
 
 **Physical gate open:** two phones on same Wi-Fi; Race host/join, no duplicate score on near-simultaneous finger drags, both winners/ties, app background and reconnect, 200% system font, session exit and successful APK upgrade while preserving Solo/Daily.
 
