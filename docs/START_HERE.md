@@ -1,6 +1,6 @@
 # START HERE — GridMates: Word Search
 
-**Current implementation (November 7, 2026):** Working Android app remains in **stacked draft PRs**, not minimal `main`. **WS-07A v0.7.7 (code31) is now AUTOMATED VERIFIED: [full 78/78 API35 emulator tests and real signed v0.7.6→v0.7.7 upgrade #42413940520](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42413940520), no failed/skipped tests.** Standard CI [#42413610368](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42413610368) also passed. Exact tested source `f9e451b1921b004d7cec45bc28501b852e0df942`, APK checksum and artifact linked in [WS-07A verified QA receipt](WS07A_BUILD_QA_2026-11-07.md). **Physical P0 is still OPEN:** the owner's earlier two-phone match connected but neither could mark words. Do NOT claim hardware acceptance until both phones retest. Draft PR #54 remains unmerged; previously verified v0.7.6 / code30 rollback is preserved. [WS-07 research](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) and [A–G roadmap](DEVELOPMENT_ROADMAP.md) govern the next steps.
+**Current cumulative QA candidate (November 7, 2026):** [WS-07B v0.7.8 exact-source receipt](WS07B_BUILD_QA_2026-11-07.md) — **80/80 API35 emulator tests PASS** and real signed v0.7.7→v0.7.8 install-over preserving all saved Solo/Daily/identity/Race/Duel fields; tested SHA `4702543400ef499885dea7a033943974323aacab`, APK SHA-256 `0b0d997e28dbc3ec04eaffe08d59de8c7241c5289caec222c07b8f0f6882126f`. Compact Home and first-access Nearby Host/Join tested at 360×720dp; WS-07A gestures remain green. **Physical two-phone word-marking issue #53 is still OPEN**; actual visual and large-font experience need owner testing. [Draft PR #55](https://github.com/PlayerEden/GridMates-Word-Search/pull/55) remains stacked on #54 and `main` is untouched; previous v0.7.7 automated rollback pinned.
 
 ## Current state and documents
 
@@ -54,3 +54,8 @@ WS-06G added a **small, entirely free Co-op board appearance preview catalog** a
 ## Latest automated acceptance (supersedes historical 76/78 diagnostic paragraph above)
 
 [WS-07A exact-source build receipt](WS07A_BUILD_QA_2026-11-07.md): **78/78 Android emulator tests PASS** including formerly failing touch injection; v0.7.6→v0.7.7 same-signer update PASS; verified checkpoint and APK SHA recorded. **Two-phone hardware acceptance still OPEN; no `main` merge.**
+
+
+## Latest WS-07B checkpoint (supersedes older v0.7.7-only status above)
+
+**80/80 full emulator success and same-signed v0.7.7→v0.7.8 upgrade**; [build artifact, exact SHA and checksums](WS07B_BUILD_QA_2026-11-07.md), [real phone UI checklist](WS07B_COMPACT_NAVIGATION_ACCEPTANCE_2026-11-07.md). Start new implementation passes from draft #55; preserve its stacked relationship to #54. The two-phone physical P0 and 200% font/TalkBack remain owner gates. Do not rerun expensive full emulator on documentation-only commits.

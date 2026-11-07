@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
 **Version:** Living master design — WS-07 owner-playtest research addendum, November 7, 2026  
-**Status:** Historical design baseline plus [WS-07 research/UX spec](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) and [live development roadmap](DEVELOPMENT_ROADMAP.md). **Real two-phone word marking failed**; v0.7.7 has **78/78 automated API35 tests PASS** plus saved-data-preserving signed upgrade, but the **physical two-phone marking failure still needs re-test**. Both v0.7.7 and v0.7.6 source-matched QA checkpoints are preserved; no production release.  
+**Status:** Latest [WS-07B v0.7.8 automated QA receipt](WS07B_BUILD_QA_2026-11-07.md): **80/80 API35 tests PASS**, signed install-over v0.7.7→v0.7.8 preserves saved games, and Home/Host/Join compact entry tests pass at 360×720dp. Earlier physical connected two-phone word selection failure **not yet re-tested**; accessibility and large/small device acceptance still OPEN. [WS-07 roadmap](DEVELOPMENT_ROADMAP.md) guides next phases, draft PRs unmerged, no production release.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -565,3 +565,8 @@ The complete evidence, Android and W3C source links, proposed metrics and execut
 ### WS-07A automated QA result, November 7 (does not supersede physical gate)
 
 The [complete v0.7.7 receipt](WS07A_BUILD_QA_2026-11-07.md) records **78/78 emulator tests passing** following touch geometry/direction correction, same-signer v0.7.6→v0.7.7 preserved save, APK checksum and pinned rollback. The initially failed 15×15/20×20 host/guest swipe tests are green in this distinct run. **No human-operated two-phone Co-op success is claimed.** Continue [WS-07B–G](DEVELOPMENT_ROADMAP.md) only with that distinction and current physical acceptance checklist.
+
+
+### WS-07B compact first-time entry, automated gate (November 7)
+
+[Verified WS-07B QA receipt](WS07B_BUILD_QA_2026-11-07.md): new compact paperback Home keeps saved Solo/Daily/Together actions readily visible; Nearby places Host and Join before optional look/theme/room code, with manual join disclosed on request. The actual API35 suite passed **80/80 tests** including the 360×720dp primary CTA visibility tests and all previous gesture/regression checks. Live active gameplay remains a fixed board scene; advanced sheets and secondary history screens may still scroll. **Do not claim the owner's two-phone P0 is fixed until the real pair succeeds**. No gameplay rules, LAN v7, schema4, package ID or signer changed.

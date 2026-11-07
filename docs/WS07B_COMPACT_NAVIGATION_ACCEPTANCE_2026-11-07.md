@@ -2,7 +2,7 @@
 
 **Date:** November 7, 2026  
 **Candidate:** draft [PR #55](https://github.com/PlayerEden/GridMates-Word-Search/pull/55), QA-only v0.7.8 / Android versionCode32, stacked on [WS-07A PR #54](https://github.com/PlayerEden/GridMates-Word-Search/pull/54).  
-**Status:** Automated checks still require source-matched confirmation. **No user screenshot/physical-device approval claimed.**
+**Status:** **Automated PASS 80/80 API35** plus signed v0.7.7→v0.7.8 saved-update PASS; **owner physical UI and two-phone Co-op acceptance still OPEN**. [Exact-source evidence](WS07B_BUILD_QA_2026-11-07.md).
 
 ## User problem and design hypothesis
 
@@ -14,12 +14,12 @@ Owner's nine real-device screenshots showed oversized Home cards and lengthy Nea
 
 ## Automated gates
 
-- [ ] Standard Android CI builds and lints with **zero Kotlin compilation errors**.
-- [ ] Actual Compose test: on **360×720dp** viewport, Home Word Search, Continue Solo, Open Daily and nearby primary action are **displayed** without scrolling.
-- [ ] Actual Compose test: on **360×720dp** viewport, Host Co-op game and Join nearby game are **displayed** on setup; optional appearance and nearby-room listings are absent until selected.
-- [ ] Existing compact 320dp / 200% font tests for gameplay and Nearby options still pass. No clipping/collision that disables actions; controlled scrolling permitted where increased text genuinely requires it.
-- [ ] Historical WS-07A finger-up, 15×15/20×20 physical touch-injection, all three modes, portrait/landscape and atomic-save regression suite all green in the **full API35 emulator**, not unit-only.
-- [ ] Real same-QA-signer **v0.7.7 code31 → v0.7.8 code32** APK install-over retains schema4 Solo, Daily, identity, Race, Duel and settings. Verify source hash, package, cert, APK sha256, and pin rollback.
+- [x] Standard Android CI builds and lints with **zero Kotlin compilation errors**.
+- [x] Actual Compose test: on **360×720dp** viewport, Home Word Search, Continue Solo, Open Daily and nearby primary action are **displayed** without scrolling.
+- [x] Actual Compose test: on **360×720dp** viewport, Host Co-op game and Join nearby game are **displayed** on setup; optional appearance and nearby-room listings are absent until selected.
+- [x] Existing compact 320dp / 200% font tests for gameplay and Nearby options still pass. No clipping/collision that disables actions; controlled scrolling permitted where increased text genuinely requires it.
+- [x] Historical WS-07A finger-up, 15×15/20×20 physical touch-injection, all three modes, portrait/landscape and atomic-save regression suite all green in the **full API35 emulator**, not unit-only.
+- [x] Real same-QA-signer **v0.7.7 code31 → v0.7.8 code32** APK install-over retains schema4 Solo, Daily, identity, Race, Duel and settings. Verify source hash, package, cert, APK sha256, and pin rollback.
 - [ ] Do not include production signing, change the package ID, or merge the stacked draft PRs.
 
 ## Owner real-device acceptance — not yet performed
@@ -37,3 +37,8 @@ Owner's nine real-device screenshots showed oversized Home cards and lengthy Nea
 [WS-07 research/spec](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) · [Full roadmap](DEVELOPMENT_ROADMAP.md) · [WS-07A verified build receipt](WS07A_BUILD_QA_2026-11-07.md) · [P0 physical word-marking #53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53).
 
 **Acceptance is explicitly separated:** automated source/build correctness, owner visual/usability quality, and real two-phone authoritative gameplay. No single green workflow proves all three.
+
+
+## Automated signoff record — complete
+
+[Full run #42417361001](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42417361001) — **80/80 tests PASS**, signed update PASS; [standard CI #42417348617](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42417348617) PASS. Source `4702543400ef499885dea7a033943974323aacab`, APK SHA-256 `0b0d997e28dbc3ec04eaffe08d59de8c7241c5289caec222c07b8f0f6882126f`. [QA APK artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42417361001/artifacts/13592486307) expires November 14. **Remaining owner tasks above are NOT marked complete.**
