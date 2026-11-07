@@ -96,6 +96,9 @@ internal fun SoloSettingsScreen(store: SoloStore) {
                     Text(preview.active.foundIds.size.toString() +
                         " words saved in the current Solo puzzle.",
                         color = Muted)
+                    Text(preview.raceResults.size.toString() +
+                        " completed Shared Board Race results.",
+                        color = Muted)
                     Text("Restoring replaces your current Word Search profile, " +
                         "puzzle and records on this phone. Export the current " +
                         "progress first if you want a copy.",
@@ -132,7 +135,8 @@ internal fun SoloSettingsScreen(store: SoloStore) {
             "your locally saved progress.",
             color = Muted, style = MaterialTheme.typography.bodyMedium)
         Text(store.profile.completions.toString() + " Solo · " +
-            store.profile.dailyCompletions + " Daily completed",
+            store.profile.dailyCompletions + " Daily · " +
+            store.profile.raceResults.size + " Versus completed",
             color = Forest, style = MaterialTheme.typography.labelLarge)
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val stacked = maxWidth < 350.dp ||
@@ -160,6 +164,10 @@ internal fun SoloSettingsScreen(store: SoloStore) {
                 }
             }
         }
+        Text("Export includes Solo, Daily, completed Versus results, and your " +
+            "profile/collections. Restore asks before replacing existing progress. " +
+            "Older backups without Versus history contain zero Race results.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
         Text("Export saves a file to a location you choose. Restore asks before " +
             "replacing your current Word Search progress.",
             color = Muted, style = MaterialTheme.typography.bodySmall)

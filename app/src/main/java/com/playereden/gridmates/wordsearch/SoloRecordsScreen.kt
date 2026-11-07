@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.SoloProfile
+import com.playereden.gridmates.wordsearch.core.RaceOutcome
 import java.text.DateFormat
 import java.util.Date
 
@@ -37,6 +38,58 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
                 color = Muted, style = MaterialTheme.typography.bodyMedium)
             Text("Daily progress is saved separately from Solo records.",
                 color = Muted, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+
+    Text("Nearby Versus", color = Forest,
+        style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+    Text("Shared Board Race results saved locally. Co-op isn't counted as a win or loss.",
+        color = Muted, style = MaterialTheme.typography.bodySmall)
+    val racing = profile.raceSummary
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MetricCard("Played", racing.played.toString(), Modifier.weight(1f))
+            MetricCard("Wins", racing.wins.toString(), Modifier.weight(1f))
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MetricCard("Losses", racing.losses.toString(), Modifier.weight(1f))
+            MetricCard("Ties", racing.ties.toString(), Modifier.weight(1f))
+        }
+    }
+    if (profile.raceResults.isEmpty()) {
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(14.dp)) {
+                Text("No Versus matches recorded yet.",
+                    fontWeight = FontWeight.SemiBold, color = Forest)
+                Text("Finish a Shared Board Race with a nearby partner to start your journal.",
+                    color = Muted, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    } else {
+        Text("Your most recent races", color = Forest,
+            fontWeight = FontWeight.SemiBold)
+        profile.raceResults.take(15).forEach { race ->
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(when (race.outcome) {
+                            RaceOutcome.WIN -> "Victory"
+                            RaceOutcome.LOSS -> "Defeat"
+                            RaceOutcome.TIE -> "Tie"
+                        }, color = Forest, fontWeight = FontWeight.Bold)
+                        Text("You ${race.ownWords} · Partner ${race.partnerWords}",
+                            color = Forest, fontWeight = FontWeight.SemiBold)
+                    }
+                    Text(race.theme.label + " · " + race.board.cells +
+                        "×" + race.board.cells + " · " + race.challenge.label,
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Text(DateFormat.getDateTimeInstance(
+                        DateFormat.MEDIUM, DateFormat.SHORT).format(Date(race.completedAtMs)),
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
+            }
         }
     }
 

@@ -38,8 +38,11 @@ data class SoloProfile(
     val active: SoloRun,
     val results: List<SoloResult> = emptyList(),
     val dailyEntries: List<DailyProgress> = emptyList(),
-    val identity: PlayerIdentity = PlayerIdentity()
+    val identity: PlayerIdentity = PlayerIdentity(),
+    /** Additive schema-4 race journal in the same atomic save and manual backup. */
+    val raceResults: List<RaceResult> = emptyList()
 ) {
+    val raceSummary: RaceSummary get() = RaceSummary.of(raceResults)
     val completions: Int get() = results.size
     val assistedCompletions: Int get() = results.count { it.assisted }
     val totalWords: Int get() = results.sumOf { it.wordCount }
