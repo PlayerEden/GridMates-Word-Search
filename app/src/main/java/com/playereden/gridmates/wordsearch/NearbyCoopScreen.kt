@@ -49,6 +49,18 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
     val ownName = store.profile.identity.displayName.trim().ifBlank { "Player" }
     val snapshot = state.snapshot
 
+    // The host is authoritative; only finished verified Race snapshots enter
+    // the existing atomic profile journal. The store rejects duplicate room
+    // IDs across recomposition, screen rotation, rejoin and application restart.
+    LaunchedEffect(snapshot?.roomId, snapshot?.revision, snapshot?.finished, state.role) {
+        val final = snapshot ?: return@LaunchedEffect
+        if (final.match == NearbyMatch.SHARED_BOARD_RACE && final.finished &&
+            state.role != NearbyRole.NONE) {
+            val seat = if (state.role == NearbyRole.HOST) CoopSeat.HOST else CoopSeat.GUEST
+            runCatching { store.recordRace(final, seat) }
+        }
+    }
+
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())
         .padding(horizontal = 18.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -317,6 +329,14 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         else "First valid selection counts for the shared board.",
                         color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
+            }
+
+            if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE && snapshot.finished) {
+                RacePostMatchCard(snapshot, localSeat, puzzle,
+                    saved = store.profile.raceResults.any { it.roomId == snapshot.roomId })
+            }
+            store.warning?.let {
+                Text(it, color = Gold, style = MaterialTheme.typography.bodySmall)
             }
 
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
