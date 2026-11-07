@@ -48,6 +48,30 @@ class SpeedDuelUiAndroidTest {
         compose.onNodeWithText("0 / 12").assertExists()
         compose.onNodeWithText("12 / 12").assertExists()
         compose.onNodeWithText("I'm ready").assertDoesNotExist()
-        compose.onNodeWithText("Duel outcomes aren't added", substring = true).assertExists()
+        compose.onNodeWithText("Saving your Duel result to this device…").assertExists()
+        compose.onNodeWithText("Shared Board Race records stay separate", substring = true)
+            .assertExists()
     }
+    @Test fun confirmedWinnerShowsOwnScoreAndSavedJournalStatus() {
+        val run = SoloProgressRules.freshV2(WordTheme.WOODLAND,
+            PuzzleBoardSize.BOOK_SHORT, PuzzleChallenge.RELAXED, 301L)
+        val session = SpeedDuelSession(SoloProgressRules.puzzle(run))
+        session.ready(CoopSeat.HOST, true)
+        session.ready(CoopSeat.GUEST, true)
+        session.puzzle.targets.forEachIndexed { index, target ->
+            session.submit(CoopSeat.HOST, "found-" + index,
+                target.positions.first(), target.positions.last(), true)
+        }
+        compose.setContent {
+            GridMatesTheme {
+                SpeedDuelStatusCard(
+                    session.view(CoopSeat.HOST), 12, true, saved = true) {}
+            }
+        }
+        compose.onNodeWithText("You finished first!").assertExists()
+        compose.onNodeWithText("Saved to your local Speed Duel journal.").assertExists()
+        compose.onNodeWithText("12 / 12").assertExists()
+        compose.onNodeWithText("0 / 12").assertExists()
+    }
+
 }
