@@ -31,7 +31,7 @@ import com.playereden.gridmates.wordsearch.core.WordSearchPuzzle
  */
 @Composable
 internal fun RacePostMatchCard(snapshot: CoopSnapshot, seat: CoopSeat,
-                               puzzle: WordSearchPuzzle, saved: Boolean) {
+                               puzzle: WordSearchPuzzle, saved: Boolean, saveFailed: Boolean = false) {
     if (snapshot.match != NearbyMatch.SHARED_BOARD_RACE || !snapshot.finished) return
     val standing = requireNotNull(snapshot.raceStanding)
     val own = if (seat == CoopSeat.HOST) standing.hostPoints else standing.guestPoints
@@ -73,9 +73,11 @@ internal fun RacePostMatchCard(snapshot: CoopSnapshot, seat: CoopSeat,
             }
             Text("$total shared words · First valid claim scores · 1 point per word",
                 color = Muted, style = MaterialTheme.typography.bodySmall)
-            Text(if (saved) "Saved to your local Versus journal."
-                else "Saving your result to this device…",
-                color = if (saved) Forest else Gold,
+            Text(when {
+                saved -> "Saved to your local Versus journal."
+                saveFailed -> "Couldn't save the result; your earlier records are protected."
+                else -> "Saving your result to this device…"
+            }, color = if (saved) Forest else Gold,
                 style = MaterialTheme.typography.bodySmall)
             HorizontalDivider()
             TextButton(onClick = { details = !details }) {
@@ -83,9 +85,10 @@ internal fun RacePostMatchCard(snapshot: CoopSnapshot, seat: CoopSeat,
                     else "Compare the words you each found")
             }
             if (details) {
+                val otherSeat = if (seat == CoopSeat.HOST) CoopSeat.GUEST
+                    else CoopSeat.HOST
                 for ((label, who) in listOf("You found" to seat,
-                    "Partner found" to if (seat == CoopSeat.HOST) CoopSeat.GUEST
-                        else CoopSeat.HOST)) {
+                    "Partner found" to otherSeat)) {
                     val ids = snapshot.claims.filter { it.seat == who }
                         .map { it.wordId }.toSet()
                     Text("$label · ${ids.size}", fontWeight = FontWeight.SemiBold,
