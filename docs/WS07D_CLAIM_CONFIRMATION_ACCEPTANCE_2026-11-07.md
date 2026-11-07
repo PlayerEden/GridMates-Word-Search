@@ -22,14 +22,14 @@ A valid-looking local line is not a confirmed win. Shared Board Race must honor 
 
 ## Automated acceptance gates
 
-- [ ] Standard Kotlin/unit/lint/test compilation and app QA APK compile.
-- [ ] Host-sent status round-trip matches actual FOUND / ALREADY_FOUND / INVALID_PATH authority outcomes without altering snapshots/revisions.
-- [ ] Old v7 state without receipt remains valid; malformed status/ID/object shape is rejected, not silently coerced.
-- [ ] Real TCP loopback frame includes only existing `state` with optional receipt, wire version remains 7; saved-data format unchanged.
-- [ ] Duel guest receipt does not contain private opponent word IDs/paths; the shared snapshot validates.
-- [ ] Existing 83 Android instrumentation tests still pass, including real Compose word swipe and precise row/column selection.
-- [ ] Real QA-signed **v0.7.9 code33 → v0.8.0 code34** install-over retains schema4, Solo/Daily, identity, Race and Duel journal data.
-- [ ] Source-matched CI and APK SHA, cert SHA, rollback branch recorded after the full API35 pass. A compile-only green build is **not** final acceptance.
+- [x] Standard Kotlin/unit/lint/test compilation and app QA APK compile.
+- [x] Host-sent status round-trip matches actual FOUND / ALREADY_FOUND / INVALID_PATH authority outcomes without altering snapshots/revisions.
+- [x] Old v7 state without receipt remains valid; malformed status/ID/object shape is rejected, not silently coerced.
+- [x] Real TCP loopback frame includes only existing `state` with optional receipt, wire version remains 7; saved-data format unchanged.
+- [x] Duel guest receipt does not contain private opponent word IDs/paths; the shared snapshot validates.
+- [x] Existing 83 Android instrumentation tests still pass, including real Compose word swipe and precise row/column selection.
+- [x] Real QA-signed **v0.7.9 code33 → v0.8.0 code34** install-over retains schema4, Solo/Daily, identity, Race and Duel journal data.
+- [x] Source-matched CI and APK SHA, cert SHA, rollback branch recorded after the full API35 pass. A compile-only green build is **not** final acceptance.
 
 ## Physical acceptance — deferred
 
@@ -43,3 +43,8 @@ When the owner chooses to resume phone tests, use *both actual Android phones* o
 Manual network, real Wi-Fi discovery/NSD and two-phone physical tests are distinct from same-device loopback. The original [physical P0 issue #53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53) stays open until user-observed completion.
 
 [WS-07 roadmap](DEVELOPMENT_ROADMAP.md) · [WS-07C automated QA](WS07C_BUILD_QA_2026-11-07.md) · [WS-07 research](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md).
+
+
+## Automated green result — November 7, 2026
+
+[Verified WS-07D receipt](WS07D_BUILD_QA_2026-11-07.md): **87/87 full API35 instrumentation PASS**, 0 failed/skipped, [run #42420714493](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42420714493). Exact tested SHA `7edb6cf01437b86767d3696a2a04b9e9f03d9e27`; APK SHA-256 `c4a0f1106fd5eab2869ebba39451554caef4488926fa70878c642bcfdf0b3ac6`; real same-signed v0.7.9→v0.8.0 data-preserving install-over PASS. **Two physical phones and accessibility acceptance remain DEFERRED/OPEN**, not checklist-complete.

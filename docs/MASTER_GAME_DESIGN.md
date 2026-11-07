@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
 **Version:** Living master design — WS-07 owner-playtest research addendum, November 7, 2026  
-**Status:** Latest [WS-07B v0.7.8 automated QA receipt](WS07B_BUILD_QA_2026-11-07.md): **80/80 API35 tests PASS**, signed install-over v0.7.7→v0.7.8 preserves saved games, and Home/Host/Join compact entry tests pass at 360×720dp. Earlier physical connected two-phone word selection failure **not yet re-tested**; accessibility and large/small device acceptance still OPEN. [WS-07 roadmap](DEVELOPMENT_ROADMAP.md) guides next phases, draft PRs unmerged, no production release.  
+**Status:** Latest [WS-07D v0.8.0 automated QA receipt](WS07D_BUILD_QA_2026-11-07.md): **87/87 API35 tests PASS** and signed update preserves Solo/Daily/identity/Race/Duel. Adds host-confirmed guest claim feedback without changing LAN v7/private Duel paths. **Real two-phone P0 word marking not re-tested** and owner defers phone/TalkBack acceptance. [Roadmap](DEVELOPMENT_ROADMAP.md) governs remaining work, drafts unmerged, no production release.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
