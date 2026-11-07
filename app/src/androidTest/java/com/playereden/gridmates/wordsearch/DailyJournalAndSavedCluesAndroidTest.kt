@@ -95,9 +95,10 @@ class DailyJournalAndSavedCluesAndroidTest {
             compose.onNodeWithText("Back to puzzle").performClick()
             compose.runOnIdle {
                 assertEquals(3, WordHintPolicy.used(store.profile.active))
-                assertEquals(run.hints, store.profile.active.hints)
-                // Opening review doesn't generate progress or change the backup.
-                assertEquals(before, store.exportBackup())
+                assertEquals(savedHints, store.profile.active.hints)
+                assertEquals(savedFound, store.profile.active.foundIds)
+                // Normal elapsed seconds may advance; review never awards a word.
+                assertTrue(store.profile.results.isEmpty())
             }
         } finally { clean(filename) }
     }
