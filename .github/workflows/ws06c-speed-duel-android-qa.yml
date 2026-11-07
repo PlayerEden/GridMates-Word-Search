@@ -2,6 +2,8 @@ name: WS-06C Speed Duel Android Emulator and Migration QA
 
 # Source-matched emulator QA is opt-in/branch-scoped to conserve Actions minutes.
 # It executes full Co-op, Race, Duel, Solo/Daily and save regression tests.
+# This source-matched rerun includes the fixed Ready-state validation,
+# compile-safe nullable reconnect checks and corrected Compose test imports.
 
 on:
   workflow_dispatch:
