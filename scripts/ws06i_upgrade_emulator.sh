@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Exact previous stable-signed v0.7.6 -> WS-06I v0.7.6 on a real API35
+# Exact previous stable-signed v0.7.5 -> WS-06I v0.7.6 on a real API35
 # emulator, preserving schema-4 Solo/Daily/profile plus both Race/Duel journals.
 set -euxo pipefail
 PKG="com.playereden.gridmates.wordsearch.qa"
