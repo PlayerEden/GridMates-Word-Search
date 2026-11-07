@@ -333,7 +333,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
 
             if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE && snapshot.finished) {
                 RacePostMatchCard(snapshot, localSeat, puzzle,
-                    saved = store.profile.raceResults.any { it.roomId == snapshot.roomId })
+                    saved = store.profile.raceResults.any { it.roomId == snapshot.roomId },
+                    saveFailed = store.warning != null)
             }
             store.warning?.let {
                 Text(it, color = Gold, style = MaterialTheme.typography.bodySmall)
