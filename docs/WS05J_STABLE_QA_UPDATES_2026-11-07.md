@@ -27,7 +27,7 @@ Manual backups contain Solo and Daily runs, completed results and profile/portra
 
 This specifically tests Android update continuity with the *new stable signer*. It does **not** prove that v0.5.8 can be updated without the one-time backup/reinstall, and same-source baseline-vs-candidate is not a full migration test between two different feature releases. The atomic backup restore now rolls back its in-memory imported profile on a failed write.
 
-**QA state:** pending live CI results; don't label the milestone PASS until the Actions run is successful.
+**QA state: AUTOMATED PASS.** [Successful API35 install-over-and-save-preservation run](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42341911826) and [exact source/APK receipt](WS05J_BUILD_QA_2026-11-07.md). Real phone migration and two-phone acceptance remain OPEN.
 
 ## Deferred acceptance
 
