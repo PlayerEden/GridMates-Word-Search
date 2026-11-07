@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Living master design — WS-06F implementation checkpoint, November 7, 2026  
-**Status:** Historical design baseline below plus current [WS-06F automated PASS receipt](WS06F_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
+**Version:** Living master design — WS-06G implementation checkpoint, November 7, 2026  
+**Status:** Historical design baseline below plus current [WS-06G automated PASS receipt](WS06G_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -526,3 +526,8 @@ Cumulative [draft PR #46](https://github.com/PlayerEden/GridMates-Word-Search/pu
 ## November 7, 2026 — WS-06F image result postcards
 
 Cumulative [draft PR #47](https://github.com/PlayerEden/GridMates-Word-Search/pull/47) adds an optional, fully offline **1080×1350 (4:5) result postcard** for completed Solo/Daily/Co-op/Shared Board Race/Speed Duel, based only on already validated spoiler-safe share text. A visible preview gives independent **Share text / Share image / Cancel** choices; image sending uses a read-only scoped Android FileProvider content URI, not permission to other app-private data. The paper/forest/gold styling, bundled Atkinson/Plex fonts, and abstract empty grid match the Word Search aesthetic. No usernames, room credentials, private found-word lists, real puzzle answers or fake stats enter a shared card. [Exact-source 67-test Android QA](WS06F_BUILD_QA_2026-11-07.md) passed including actual signed v0.7.2→v0.7.3 update preserving both Race and Duel histories. The owner's physical Android Sharesheet target-app/scale testing remains OPEN. A future shared Co-op board-theme feature needs its own catalog/selection and accessibility policy; Sudoku's technical display-rank proposal does not establish Word Search entitlements.
+
+
+## November 7, 2026 — WS-06G Shared Co-op Board Appearance (free preview)
+
+Cumulative [draft PR #48](https://github.com/PlayerEden/GridMates-Word-Search/pull/48) now offers three baked-in free **Word Search** grid looks: Classic Paper, Linen Sketch and Blueprint Study. These have an explicit technical display priority **but no rarity, achievement requirement, paid item or unlock entitlement**. During Nearby **Co-op only**, host and guest can each choose before joining; a host-authoritative common look is resolved at the first acknowledged guest admission and frozen for the whole room, including reconnect. Per-phone board font and personal **Use Classic on my phone** visual override remain independent, as do public green/blue claim markers. Solo/Daily/Shared Board Race/Speed Duel remain Classic and do not borrow temporary looks. The change introduces allowlisted room `look` with **LAN v7**, preserving schema-4 saves. [Exact-source 71-test Android QA receipt](WS06G_BUILD_QA_2026-11-07.md) includes a real signed v0.7.3→v0.7.4 update retaining both competitive journals. The original inspiration was [Sudoku's Co-op themes design proposal](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_SHARED_COOP_BOARD_THEMES_DESIGN.md), not a copy of Sudoku's cosmetic IDs or ownership. Real two-phone room-theme synchronization, accessibility at 200% font and hardware network testing remain OPEN.

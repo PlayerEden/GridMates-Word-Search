@@ -1,6 +1,6 @@
 # WS-06G — Shared Co-op Board Looks (First Word Search Preview Catalog)
 
-**November 7, 2026 · Cumulative draft on WS-06F v0.7.3, physical two-phone owner acceptance open.**
+**November 7, 2026 · Implemented and automated QA PASS (71/71 API35 Android tests); physical two-phone owner acceptance OPEN.** [Exact source-matched receipt](WS06G_BUILD_QA_2026-11-07.md).
 
 ## Design reference, not copied cosmetic ownership
 
