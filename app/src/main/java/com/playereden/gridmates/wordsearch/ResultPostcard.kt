@@ -165,7 +165,7 @@ internal object ResultPostcard {
         folder.listFiles()?.forEach { candidate ->
             if (candidate.isFile && candidate.name.startsWith("gridmates-result-") &&
                 candidate.name.endsWith(".png") &&
-                candidate.lastModified() in 1 until olderThan
+                candidate.lastModified() > 0L && candidate.lastModified() < olderThan
             ) {
                 candidate.delete()
             }
