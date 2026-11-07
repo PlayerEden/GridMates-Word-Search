@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State:** Active cumulative Android implementation (WS-06E v0.7.2 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06E exact QA receipt](WS06E_BUILD_QA_2026-11-07.md) for current truth.  
+**State:** Active cumulative Android implementation (WS-06F v0.7.3 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06F exact QA receipt](WS06F_BUILD_QA_2026-11-07.md) for current truth.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
@@ -244,3 +244,13 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Sudoku's latest `development` docs informed this work; copied **design principles only**, not unshipped feature code or unauthorized themes. [Detailed source links, transfer boundaries and QA plan](WS06E_NEARBY_PRESENCE_SHARE_QA_PLAN_2026-11-07.md).
 - Version **v0.7.2 versionCode26**, stable **TEST-ONLY** signer, LAN v6 and schema-4 data unchanged. [Exact QA source, checksum, artifact and rollback receipt](WS06E_BUILD_QA_2026-11-07.md).
 - **Next WS-06F:** a scoped result-image card design pilot or shared Co-op cosmetic theme policy. Either needs its own implementation review and Android verification; two physical phones and actual share targets remain an open owner QA gate. All drafts remain unmerged.
+
+
+## WS-06F — 4:5 offline result postcards and safe Android Sharesheet (November 7, 2026)
+
+- **Automated PASS:** [standard Android QA #42358483446](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42358483446) and [real signed historical upgrade + full API35 emulator #42358477314](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42358477314), **67/67 Android tests; no skipped/failed**. Actual real two-phone acceptance remains OPEN.
+- Optional **4:5 1080×1350 PNG postcard** created offline using Android Canvas and bundled licensed fonts. A spoiler-free decorative letterless puzzle grid and truthful mode-specific scores; no sharing of names, rooms, chat, actual puzzle answers or private Duel word IDs.
+- Preview dialog offers **Share text**, **Share image**, or **Cancel**. Image export uses a temporary private-cache PNG with a scoped Android FileProvider `content://` URI and read-only grant; no gallery permission or backend.
+- Stable QA-only signer, versionCode **27 / v0.7.3**, LAN v6 and schema4 unchanged. Real signed v0.7.2 code26 updated in place while preserving Solo, Daily, profile, saved Shared Board Race and Speed Duel results. [Source-matched QA receipt, checksum and rollback](WS06F_BUILD_QA_2026-11-07.md).
+- Initial emulator migration run failed when seeding a private save before creating its folder; [corrected second run](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42358477314) passed. No failed prior run is counted as accepted QA.
+- **Next WS-06G:** design a real Word Search shared Co-op visual theme policy with curated assets, accessibility fallback and round-stable selection; do not import Sudoku's proposed ranks or ownership model without a matching Word Search catalog. Physical two-phone testing remains owner-deferred; all stacked drafts stay unmerged.

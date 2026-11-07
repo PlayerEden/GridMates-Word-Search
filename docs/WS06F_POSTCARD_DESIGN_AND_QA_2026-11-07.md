@@ -1,6 +1,6 @@
 # WS-06F — Native result postcards and privacy QA
 
-**November 7, 2026 · Design informed by Sudoku's November share-card briefs · DRAFT.**
+**November 7, 2026 · Design informed by Sudoku's November share-card briefs · implemented and automated QA PASS (67/67 Android tests).** Real handset QA remains OPEN. See [source-matched receipt](WS06F_BUILD_QA_2026-11-07.md).
 
 ## User experience
 A finished Solo, Daily, Co-op, Shared Board Race or Speed Duel can preview a **1080×1350, 4:5 PNG result postcard** in addition to the exact same spoiler-safe share text. Buttons offer **Share text**, **Share image**, and **Cancel**. Android's standard chooser opens only after deliberate selection; dismissing the preview leaves progress and match records unchanged. Race/Duel sharing still requires the locally saved result. No accounts, uploads, contacts permissions, forced sharing, fake score or store link.
