@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State:** Active cumulative Android implementation (WS-06D v0.7.1 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06D exact QA receipt](WS06D_BUILD_QA_2026-11-07.md) for current truth.  
+**State:** Active cumulative Android implementation (WS-06E v0.7.2 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06E exact QA receipt](WS06E_BUILD_QA_2026-11-07.md) for current truth.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
@@ -234,3 +234,13 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Optional `duels` array in existing schema-4 AtomicFile and JSON backup, compatible with older profiles and safe import rejection of impossible or duplicate records.
 - Stable QA-only signing, **v0.7.1 versionCode25, LAN v6 unchanged**. The **actual signed v0.7.0 code24 APK** was upgraded in place and retained previous Solo/Daily/profile and completed Race entry. [Exact-source build/QA receipt, checksum and rollback checkpoint](WS06D_BUILD_QA_2026-11-07.md).
 - **Next WS-06E:** Nearby player-presence/accessibility polish and optional sharing, preserving all work before physical two-phone testing. All ancestor PRs remain draft/unmerged.
+
+
+## WS-06E — Nearby presence, spoiler-safe sharing and Sudoku design transfer (November 7, 2026)
+
+- **Automated PASS:** [standard CI #42353429194](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42353429194), [API35 full emulator #42353406551](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42353406551), **63/63 Android on-device tests, 0 skips/failures**, actual signed v0.7.1→v0.7.2 install-over retaining both Race and Duel histories.
+- Nearby partner **presence card** shows connection/name, authentic contributions, a mode-relevant message, and a stacked layout at narrow width/large fonts. Speed Duel still reveals **counts only** to the opponent, no private words.
+- A small optional **Share result** action after real completed Co-op/Race/Duel; competitive outcomes must be saved first. Solo/Daily's existing share text now also has an explicit Preview/Cancel before Android's chooser. Anonymous, spoiler-safe, text-only results with no room/identity/secret data, no new network services.
+- Sudoku's latest `development` docs informed this work; copied **design principles only**, not unshipped feature code or unauthorized themes. [Detailed source links, transfer boundaries and QA plan](WS06E_NEARBY_PRESENCE_SHARE_QA_PLAN_2026-11-07.md).
+- Version **v0.7.2 versionCode26**, stable **TEST-ONLY** signer, LAN v6 and schema-4 data unchanged. [Exact QA source, checksum, artifact and rollback receipt](WS06E_BUILD_QA_2026-11-07.md).
+- **Next WS-06F:** a scoped result-image card design pilot or shared Co-op cosmetic theme policy. Either needs its own implementation review and Android verification; two physical phones and actual share targets remain an open owner QA gate. All drafts remain unmerged.
