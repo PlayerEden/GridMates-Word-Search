@@ -1,6 +1,9 @@
 package com.playereden.gridmates.wordsearch
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
@@ -33,29 +36,31 @@ class CompactRecordsAndCollectionAndroidTest {
         val profile = SoloProfile(SoloProgressRules.fresh(seed = 1001L), results = records)
         compose.setContent {
             GridMatesTheme {
-                Box(Modifier.width(360.dp).height(740.dp)) {
+                Column(Modifier.width(360.dp).height(740.dp)
+                    .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     SoloRecordsScreen(profile)
                 }
             }
         }
         compose.onNodeWithText("Your puzzle journal").assertIsDisplayed()
         compose.onNodeWithText("Select Solo, Race, or Duel", substring = true).assertExists()
-        compose.onAllNodesWithText("Solo").onFirst().performClick()
+        compose.onAllNodesWithText("Solo").onFirst().performScrollTo().performClick()
         compose.onNodeWithText("13 saved results").assertExists()
         compose.onNodeWithText("Page 1 of 4").assertIsDisplayed()
         // The first page shows only four records, rather than all 13.
         compose.onNodeWithText("1m 0s", substring = true).assertDoesNotExist()
         repeat(3) {
-            compose.onNodeWithText("Next").performClick()
+            compose.onNodeWithText("Next").performScrollTo().performClick()
         }
         compose.onNodeWithText("Page 4 of 4").assertIsDisplayed()
         compose.onNodeWithText("7s", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Previous").performClick()
+        compose.onNodeWithText("Previous").performScrollTo().performClick()
         compose.onNodeWithText("Page 3 of 4").assertIsDisplayed()
-        compose.onNodeWithText("Race").performClick()
+        compose.onNodeWithText("Race").performScrollTo().performClick()
         compose.onNodeWithText("Shared Board Race").assertIsDisplayed()
         compose.onNodeWithText("No races yet", substring = true).assertExists()
-        compose.onNodeWithText("Duel").performClick()
+        compose.onNodeWithText("Duel").performScrollTo().performClick()
         compose.onNodeWithText("Speed Duel").assertIsDisplayed()
         compose.onNodeWithText("No Speed Duels yet", substring = true).assertExists()
         compose.runOnIdle { assertEquals(13, profile.results.size) }
@@ -68,7 +73,9 @@ class CompactRecordsAndCollectionAndroidTest {
         try {
             compose.setContent {
                 GridMatesTheme {
-                    Box(Modifier.width(360.dp).height(740.dp)) {
+                    Column(Modifier.width(360.dp).height(740.dp)
+                    .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         CollectionScreen(store)
                     }
                 }
@@ -79,13 +86,13 @@ class CompactRecordsAndCollectionAndroidTest {
             compose.onNodeWithText("Next").performClick()
             compose.onNodeWithText("Page 2 of 3").assertExists()
             compose.onNodeWithText("Badger").assertExists()
-            compose.onNodeWithText("Achievements").performClick()
+            compose.onNodeWithText("Achievements").performScrollTo().performClick()
             compose.onNodeWithText("Page 1 of 2").assertExists()
             compose.onNodeWithText("First Page").assertExists()
             compose.onNodeWithText("Next").performClick()
             compose.onNodeWithText("Page 2 of 2").assertExists()
             compose.onNodeWithText("Three Chapters").assertExists()
-            compose.onNodeWithText("Fonts").performClick()
+            compose.onNodeWithText("Fonts").performScrollTo().performClick()
             compose.onNodeWithText("Readable Print").assertExists()
             compose.onNodeWithText("Classic Typewriter").assertExists()
             compose.runOnIdle {
