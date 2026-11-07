@@ -263,6 +263,7 @@ internal fun WordSearchScreen(
     // consumes remaining measured space rather than being pushed offscreen.
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 2.dp)) {
         val landscape = maxWidth > maxHeight * 1.25f
+        val compactHud = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.5f
         val boardViewport = if (landscape) {
             minOf(maxHeight - (if (finished && !reviewingCompletedBoard) 236.dp else 212.dp),
                 maxWidth * 0.51f).coerceAtLeast(106.dp)
@@ -294,7 +295,8 @@ internal fun WordSearchScreen(
         }
 
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            // Row 1: never truncate theme or settings behind a long full title.
+            // Compact/high-font screens must not pack the timer, count and
+            // full hint button into one overflowing horizontal row.
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
@@ -304,10 +306,12 @@ internal fun WordSearchScreen(
                     Text(theme.label, style = MaterialTheme.typography.titleSmall,
                         color = Forest, fontWeight = FontWeight.Bold,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text((if (daily) "Daily · " else "") +
-                        sizeLabel + " · " + challengeLabel,
-                        style = MaterialTheme.typography.labelSmall, color = Muted,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (!compactHud) {
+                        Text((if (daily) "Daily · " else "") +
+                            sizeLabel + " · " + challengeLabel,
+                            style = MaterialTheme.typography.labelSmall, color = Muted,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
                 }
                 Box {
                     TextButton(onClick = { optionsOpen = true }) { Text("Options") }
@@ -342,16 +346,14 @@ internal fun WordSearchScreen(
                     }
                 }
             }
-            // Row 2: progress, gentle elapsed timer and hint.
-            Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                Text(found.size.toString() + " / " + puzzle.targets.size + " found",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = Forest, fontWeight = FontWeight.SemiBold)
-                Text((run.elapsedSeconds / 60L).toString() + ":" +
-                    (run.elapsedSeconds % 60L).toString().padStart(2, '0'),
-                    color = Muted, style = MaterialTheme.typography.bodyMedium)
+            if (compactHud) {
+                Text((if (daily) "Daily · " else "") + sizeLabel + " · " + challengeLabel,
+                    style = MaterialTheme.typography.labelSmall, color = Muted,
+                    maxLines = 2)
+            }
+            val timeLabel = (run.elapsedSeconds / 60L).toString() + ":" +
+                (run.elapsedSeconds % 60L).toString().padStart(2, '0')
+            val hintAction: @Composable () -> Unit = {
                 TextButton(onClick = {
                     val (next, target) = if (daily) store.dailyHint() else {
                         val (updated, word) = store.hint()
@@ -373,6 +375,28 @@ internal fun WordSearchScreen(
                             WordHintPolicy.allowance(run, daily) + " left for this puzzle."
                     }
                 ) { Text("Hint ($hintsRemaining)") }
+            }
+            if (compactHud) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(found.size.toString() + " / " + puzzle.targets.size + " found",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Forest, fontWeight = FontWeight.SemiBold)
+                    hintAction()
+                }
+                Text("Elapsed " + timeLabel, color = Muted,
+                    style = MaterialTheme.typography.labelSmall)
+            } else {
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text(found.size.toString() + " / " + puzzle.targets.size + " found",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Forest, fontWeight = FontWeight.SemiBold)
+                    Text(timeLabel, color = Muted,
+                        style = MaterialTheme.typography.bodyMedium)
+                    hintAction()
+                }
             }
             PaperProgress(found.size, puzzle.targets.size)
 
