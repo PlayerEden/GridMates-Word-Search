@@ -32,6 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -113,6 +116,8 @@ private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
 internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel) {
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
+    val compactNavigation = LocalConfiguration.current.screenWidthDp < 360 ||
+        LocalDensity.current.fontScale >= 1.5f
     // A new page must start from its top, not inherit the previous tab's
     // scroll offset and appear mysteriously halfway down.
     val pageScroll = remember(page) { ScrollState(0) }
@@ -141,7 +146,16 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
                         selected = item == page,
                         onClick = { pageName = item.name },
                         icon = { GridMatesNavGlyph(item, item == page) },
-                        label = { Text(item.label) }
+                        label = {
+                            val shortLabel = when (item) {
+                                Page.RECORDS -> "Stats"
+                                Page.COLLECTION -> "Items"
+                                Page.SETTINGS -> "Setup"
+                                else -> "Play"
+                            }
+                            Text(if (compactNavigation) shortLabel else item.label,
+                                maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
                     )
                 }
             }
