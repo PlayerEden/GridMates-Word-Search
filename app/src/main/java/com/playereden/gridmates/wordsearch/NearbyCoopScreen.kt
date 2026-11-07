@@ -129,7 +129,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                     }
 
                     Text(when (match) {
-                        NearbyMatch.SPEED_DUEL.name -> "Duel · Private puzzles, Ready / GO"
+                        NearbyMatch.SPEED_DUEL.name -> "Duel: Ready / GO reveals private boards; only counts are shared."
                         NearbyMatch.SHARED_BOARD_RACE.name -> "Race · First to claim each word scores"
                         else -> "Co-op · Find words together"
                     }, color = Muted, style = MaterialTheme.typography.bodySmall)
