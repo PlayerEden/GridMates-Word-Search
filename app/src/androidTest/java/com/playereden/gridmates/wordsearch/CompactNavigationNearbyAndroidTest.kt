@@ -67,7 +67,7 @@ class CompactNavigationNearbyAndroidTest {
                 }
             }
             rule.onNodeWithText("Play Together").assertExists()
-            rule.onNodeWithText("Host a game").performScrollTo().assertIsDisplayed()
+            rule.onNodeWithText("Host Co-op game").performScrollTo().assertIsDisplayed()
             rule.onNodeWithText("Join nearby game").performScrollTo().assertIsDisplayed()
         } finally {
             rooms.leaveRoom()
