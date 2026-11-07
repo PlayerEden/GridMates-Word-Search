@@ -132,6 +132,7 @@ internal class SoloStore(
         val run = readRun(active)
         val clean = SoloProgressRules.validate(run)
         val results = root.optJSONArray("results")
+        require(!root.has("results") || results != null) { "Malformed Solo completion records" }
         val loaded = mutableListOf<SoloResult>()
         if (results != null) for (i in 0 until results.length()) {
             val item = results.getJSONObject(i)
@@ -155,6 +156,7 @@ internal class SoloStore(
         }.distinctBy { it.puzzleId }
         val daily = mutableListOf<DailyProgress>()
         val dailyRaw = root.optJSONArray("daily")
+        require(!root.has("daily") || dailyRaw != null) { "Malformed Daily journal" }
         if (dailyRaw != null) for (i in 0 until dailyRaw.length()) {
             val item = dailyRaw.getJSONObject(i)
             val entry = DailyProgress(
@@ -168,6 +170,7 @@ internal class SoloStore(
             "Duplicate daily date in backup"
         }
         val identityData = root.optJSONObject("identity")
+        require(!root.has("identity") || identityData != null) { "Malformed player identity" }
         val rawIdentity = PlayerIdentity(
             displayName = identityData?.optString("name", "Player") ?: "Player",
             portraitId = identityData?.optString("portraitId", "woodland_owl") ?: "woodland_owl"
@@ -225,18 +228,24 @@ internal class SoloStore(
         return loadedProfile.copy(identity = WoodlandCollection.sanitize(rawIdentity, loadedProfile))
     }
 
-    private fun readRun(source: JSONObject): SoloRun = SoloRun(
+    private fun readRun(source: JSONObject): SoloRun {
+        val found = source.optJSONArray("found")
+        require(!source.has("found") || found != null) { "Malformed found-word progress" }
+        val hints = source.optJSONObject("hints")
+        require(!source.has("hints") || hints != null) { "Malformed hint progress" }
+        return SoloRun(
         theme = WordTheme.valueOf(source.getString("theme")),
         difficulty = WordDifficulty.valueOf(source.getString("difficulty")),
         seed = source.getLong("seed"),
-        foundIds = source.optJSONArray("found").strings().toSet(),
-        hints = source.optJSONObject("hints").toIntMap(),
+        foundIds = found.strings().toSet(),
+        hints = hints.toIntMap(),
         elapsedSeconds = source.optLong("seconds", 0L),
         boardSize = source.optString("board", "").takeIf { it.isNotBlank() }
             ?.let { PuzzleBoardSize.valueOf(it) },
         challenge = source.optString("challenge", "").takeIf { it.isNotBlank() }
             ?.let { PuzzleChallenge.valueOf(it) }
     )
+    }
 
     private fun JSONArray?.strings(): List<String> {
         if (this == null) return emptyList()
