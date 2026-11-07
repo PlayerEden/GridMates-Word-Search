@@ -2,6 +2,7 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -111,6 +113,9 @@ private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
 internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel) {
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
+    // A new page must start from its top, not inherit the previous tab's
+    // scroll offset and appear mysteriously halfway down.
+    val pageScroll = remember(page) { ScrollState(0) }
 
     // Every nested page should honor Android's system Back gesture rather
     // than unexpectedly exiting the application. Nearby owns its own
@@ -165,7 +170,7 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(pageScroll)
                 .padding(horizontal = 18.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
