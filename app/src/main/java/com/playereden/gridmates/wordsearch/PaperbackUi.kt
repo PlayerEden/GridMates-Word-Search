@@ -28,6 +28,9 @@ import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
@@ -106,15 +109,24 @@ internal fun PaperbackCover(player: String) {
                     .clearAndSetSemantics { },
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
+                // The standard 16sp label line height overflowed this 98dp
+                // square on a real phone. Use a bounded, decorative micro-grid
+                // with five explicit rows and no font-family dependencies.
                 letters.forEachIndexed { rowIndex, line ->
-                    Row(Modifier.fillMaxWidth(),
+                    Row(Modifier.fillMaxWidth().height(13.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceEvenly) {
                         line.forEach { letter ->
-                            Text(letter.toString(), color = if (rowIndex == 0) Forest else Ink,
-                                fontWeight = if (rowIndex == 0) FontWeight.Bold else FontWeight.Medium,
-                                style = MaterialTheme.typography.labelSmall,
+                            Text(letter.toString(),
+                                color = if (rowIndex == 0) Forest else Ink,
+                                fontWeight = if (rowIndex == 0) FontWeight.Bold
+                                    else FontWeight.Medium,
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 9.sp, lineHeight = 11.sp,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier.weight(1f),
-                                maxLines = 1)
+                                maxLines = 1,
+                                overflow = TextOverflow.Clip)
                         }
                     }
                 }

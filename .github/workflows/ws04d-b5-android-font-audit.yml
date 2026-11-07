@@ -1,4 +1,4 @@
-name: Word Search WS05I Compact and 200 Percent Font Android QA
+name: Word Search WS05J Screenshot-Driven Art and Find Move Emulator QA
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
@@ -16,6 +16,7 @@ on:
       - feature/ws05g-gameplay-results-polish-2026-11-06
       - feature/ws05h-profile-collection-settings-polish-2026-11-06
       - feature/ws05i-compact-landscape-large-text-qa-2026-11-06
+      - feature/ws05j-phone-screenshot-ui-repair-2026-11-06
     paths:
       - '.github/workflows/ws04d-b5-android-font-audit.yml'
 
@@ -98,6 +99,14 @@ jobs:
             sleep 3
             adb shell screencap -p /sdcard/ws05f-home-default.png
             adb pull /sdcard/ws05f-home-default.png qa-screenshots/home-default.png
+            # Owner's screenshot revealed clipped decorative letters; capture
+            # at a font scale where decorative grid remains visible.
+            adb shell settings put system font_scale 1.2
+            adb shell am force-stop com.playereden.gridmates.wordsearch.qa
+            adb shell am start -W -n com.playereden.gridmates.wordsearch.qa/com.playereden.gridmates.wordsearch.MainActivity
+            sleep 3
+            adb shell screencap -p /sdcard/ws05j-home-art-120percent.png
+            adb pull /sdcard/ws05j-home-art-120percent.png qa-screenshots/home-art-font120.png
             adb shell settings put system font_scale 1.6
             adb shell am force-stop com.playereden.gridmates.wordsearch.qa
             adb shell am start -W -n com.playereden.gridmates.wordsearch.qa/com.playereden.gridmates.wordsearch.MainActivity
@@ -130,18 +139,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05I-Android-Tests
+          name: GridMates-WordSearch-WS05J-Android-Tests
           path: |
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Upload WS05I compact and landscape visual references
+      - name: Upload WS05J fixed cover and game visual references
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05I-UI-Screenshots
+          name: GridMates-WordSearch-WS05J-UI-Screenshots
           path: qa-screenshots/
           if-no-files-found: ignore
           retention-days: 7
@@ -150,10 +159,10 @@ jobs:
         run: |
           test -s app/build/outputs/apk/debug/app-debug.apk
           sha256sum app/build/outputs/apk/debug/app-debug.apk
-      - name: Upload source-matched WS05I QA APK
+      - name: Upload source-matched WS05J QA APK
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05I-QA-v058
+          name: GridMates-WordSearch-WS05J-QA-v059
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
