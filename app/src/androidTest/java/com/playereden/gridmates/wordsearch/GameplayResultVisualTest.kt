@@ -19,7 +19,13 @@ class GameplayResultVisualTest {
     @get:Rule val rule = createComposeRule()
 
     private fun screenshot(file: String) {
-        val desc = InstrumentationRegistry.getInstrumentation().uiAutomation
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        // Compose's semantic tree can advance before SurfaceFlinger's actual
+        // composited frame. Capture only after a UI-frame settle, not merely
+        // after onNodeWithText/assertExists.
+        instrumentation.waitForIdleSync()
+        Thread.sleep(1_300L)
+        val desc = instrumentation.uiAutomation
             .executeShellCommand("screencap -p /sdcard/Download/" + file)
         try {
             // Wait for the shell command, rather than racing an adb pull.
@@ -49,6 +55,10 @@ class GameplayResultVisualTest {
                 }
             }
             rule.onNodeWithText("Puzzle complete!", substring = true).assertExists()
+            rule.onNodeWithText(
+                puzzle.targets.size.toString() + " / " +
+                    puzzle.targets.size + " found"
+            ).assertExists()
             rule.onNodeWithText("Share results").assertExists()
             rule.onNodeWithText("Review completed board").assertExists()
             rule.onNodeWithText("Unassisted solve", substring = true).assertExists()
