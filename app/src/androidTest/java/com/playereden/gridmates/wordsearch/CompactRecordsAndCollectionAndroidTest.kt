@@ -47,16 +47,16 @@ class CompactRecordsAndCollectionAndroidTest {
         compose.onNodeWithText("Select Solo, Race, or Duel", substring = true).assertExists()
         compose.onAllNodesWithText("Solo").onFirst().performScrollTo().performClick()
         compose.onNodeWithText("13 saved results").assertExists()
-        compose.onNodeWithText("Page 1 of 4").assertIsDisplayed()
+        compose.onNodeWithText("Page 1 of 4").performScrollTo().assertIsDisplayed()
         // The first page shows only four records, rather than all 13.
-        compose.onNodeWithText("1m 0s", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("0m 13s", substring = true).assertDoesNotExist()
         repeat(3) {
             compose.onNodeWithText("Next").performScrollTo().performClick()
         }
-        compose.onNodeWithText("Page 4 of 4").assertIsDisplayed()
-        compose.onNodeWithText("7s", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Page 4 of 4").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("0m 13s", substring = true).assertExists()
         compose.onNodeWithText("Previous").performScrollTo().performClick()
-        compose.onNodeWithText("Page 3 of 4").assertIsDisplayed()
+        compose.onNodeWithText("Page 3 of 4").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Race").performScrollTo().performClick()
         compose.onNodeWithText("Shared Board Race").assertIsDisplayed()
         compose.onNodeWithText("No races yet", substring = true).assertExists()
