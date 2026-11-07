@@ -30,13 +30,14 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** Only protocol-compatible devices on a trusted local network can join. */
-private const val WS_WIRE_VERSION = 4
+private const val WS_WIRE_VERSION = 5
 private const val WS_NSD_TYPE = "_gridmatesws._tcp."
 private const val WS_PACKET_MAX = 16_384
 
 internal data class NearbyListing(
     val roomId: String, val name: String, val address: String, val port: Int,
-    val requiresCode: Boolean
+    val requiresCode: Boolean,
+    val match: NearbyMatch = NearbyMatch.COOP
 )
 
 internal enum class NearbyRole { NONE, HOST, GUEST }
@@ -104,6 +105,7 @@ internal object NearbyPacket {
             .put("revision", s.revision).put("claims", claims)
             .put("reserved", s.guestReserved).put("guestHere", s.guestConnected)
             .put("hostHere", s.hostConnected).put("finished", s.finished)
+            .put("match", s.match.name)
     }
 
     fun chatLine(line: NearbyChatLine): JSONObject =
@@ -150,7 +152,8 @@ internal object NearbyPacket {
         }
         return CoopSnapshot(json.getString("room"), spec, json.getLong("revision"),
             claims, json.getBoolean("reserved"), json.getBoolean("guestHere"),
-            json.getBoolean("hostHere"), json.getBoolean("finished"))
+            json.getBoolean("hostHere"), json.getBoolean("finished"),
+            NearbyMatch.valueOf(json.getString("match")))
             .also { NearbyCoopSession.validateSnapshot(it) }
     }
 }
@@ -226,7 +229,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     }
 
     fun host(name: String, theme: WordTheme, board: PuzzleBoardSize,
-             challenge: PuzzleChallenge) {
+             challenge: PuzzleChallenge, match: NearbyMatch = NearbyMatch.COOP) {
         if (state.busy || state.role != NearbyRole.NONE) return
         post { it.copy(busy = true, message = "Opening your nearby game…") }
         io.execute {
@@ -235,7 +238,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     "Connect to a local Wi-Fi network to host a game.")
                 val run = SoloProgressRules.freshV2(theme, board, challenge,
                     System.currentTimeMillis())
-                val session = NearbyCoopSession(run)
+                val session = NearbyCoopSession(run, match = match)
                 val socket = ServerSocket(0, 2, wifi)
                 val roomName = name.trim().take(24).ifBlank { "Player" }
                 synchronized(lock) {
@@ -247,14 +250,16 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                         SecureRandom().nextInt(1_000_000).toString().padStart(6, '0') else ""
                 }
                 post { it.copy(role = NearbyRole.HOST, busy = false,
-                    message = "Room open. Ask a friend to join on the same Wi-Fi.",
+                    message = if (match == NearbyMatch.SHARED_BOARD_RACE)
+                        "Race room open. Invite one opponent on the same Wi-Fi."
+                    else "Room open. Ask a friend to join on the same Wi-Fi.",
                     roomId = session.roomId, address = wifi.hostAddress ?: "",
                     port = socket.localPort, code = hostRoomCode,
                     requiresCode = hostRoomCode.isNotBlank(),
                     hostName = roomName, snapshot = session.snapshot()) }
                 main.post {
                     if (!closed) advertise(session.roomId, roomName, socket.localPort,
-                        hostRoomCode.isNotBlank())
+                        hostRoomCode.isNotBlank(), match)
                 }
                 io.execute { acceptLoop(socket) }
                 heartbeat.scheduleAtFixedRate({
@@ -273,7 +278,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         }
     }
 
-    private fun advertise(id: String, name: String, port: Int, needsCode: Boolean) {
+    private fun advertise(id: String, name: String, port: Int, needsCode: Boolean,
+                          match: NearbyMatch) {
         val info = NsdServiceInfo().apply {
             serviceType = WS_NSD_TYPE
             serviceName = "GridMates - " + name
@@ -281,6 +287,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             setAttribute("room", id)
             setAttribute("pin", if (needsCode) "1" else "0")
             setAttribute("proto", WS_WIRE_VERSION.toString())
+            setAttribute("match", match.name)
         }
         val cb = object : NsdManager.RegistrationListener {
             override fun onServiceRegistered(info: NsdServiceInfo) = Unit
@@ -383,7 +390,9 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 finalState
             }
             post { it.copy(guestName = name, snapshot = accepted,
-                message = "Connected with " + name + ". Find words together!") }
+                message = if (session.match == NearbyMatch.SHARED_BOARD_RACE)
+                    "Connected with " + name + ". First claim wins each word!"
+                else "Connected with " + name + ". Find words together!") }
             socket.soTimeout = 11_000
             while (!closed && !socket.isClosed) {
                 val msg = try { NearbyPacket.read(socket) }
@@ -632,8 +641,13 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     if (result.attributes["proto"]?.toString(Charsets.UTF_8) !=
                         WS_WIRE_VERSION.toString()) return
                     if (id.isBlank() || id.length > 120 || result.port !in 1..65535) return
+                    val advertised = result.attributes["match"]?.toString(Charsets.UTF_8)
+                        ?: return
+                    val match = runCatching { NearbyMatch.valueOf(advertised) }
+                        .getOrNull() ?: return
                     val entry = NearbyListing(id, name, ip, result.port,
-                        result.attributes["pin"]?.toString(Charsets.UTF_8) != "0")
+                        result.attributes["pin"]?.toString(Charsets.UTF_8) != "0",
+                        match)
                     post { current ->
                         if (discovery !== owner || current.role != NearbyRole.NONE ||
                             !discoveryQueue.isLive(name) ||
@@ -787,7 +801,9 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     chat = offeredChat, pendingChat = outstanding, recovery = null,
                     hostName = welcome.optString("hostName", "Host"),
                     address = address, port = port,
-                    message = "Connected! You both share this puzzle.") }
+                    message = if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE)
+                        "Connected! Race for words on the shared board."
+                    else "Connected! You both share this puzzle.") }
                 io.execute { readHost(socket) }
             } catch (e: Exception) {
                 runCatching { socket.close() }
@@ -836,6 +852,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                             val old = current.snapshot
                             if (old != null && (old.roomId != incoming.roomId ||
                                 incoming.revision < old.revision ||
+                                 incoming.match != old.match || incoming.spec != old.spec ||
                                 (incoming.revision == old.revision &&
                                     incoming.claims != old.claims))) current
                             else current.copy(snapshot = incoming)
