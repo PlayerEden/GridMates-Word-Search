@@ -925,16 +925,21 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                             throw IOException("Host private state was sent to the guest")
                         post { current ->
                             val old = current.snapshot
+                            // Bind cross-module nullable properties to local vals; Kotlin
+                            // cannot smart-cast an external public data-class property.
+                            val before = old?.duel
+                            val after = incoming.duel
+                            val duelRegressed = before != null && (after == null ||
+                                after.revision < before.revision ||
+                                !after.ownFoundIds.containsAll(before.ownFoundIds) ||
+                                before.started && !after.started ||
+                                before.finished && !after.finished)
                             if (old != null && (old.roomId != incoming.roomId ||
                                 incoming.revision < old.revision ||
                                 incoming.match != old.match || incoming.spec != old.spec ||
                                 (incoming.revision == old.revision &&
                                     incoming.claims != old.claims) ||
-                                (old.duel != null && (incoming.duel == null ||
-                                    incoming.duel.revision < old.duel.revision ||
-                                    !incoming.duel.ownFoundIds.containsAll(old.duel.ownFoundIds) ||
-                                    old.duel.started && !incoming.duel.started ||
-                                    old.duel.finished && !incoming.duel.finished)))) current
+                                duelRegressed)) current
                             else current.copy(snapshot = incoming)
                         }
                     }
