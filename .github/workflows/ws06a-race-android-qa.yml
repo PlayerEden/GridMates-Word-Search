@@ -1,5 +1,8 @@
 name: WS-06A Shared Board Race Android Emulator and Upgrade QA
 
+# One source-matched run after the WS-05J visual branch reconciliation and
+# packet-test correction. Avoid automatic emulator reruns for ordinary edits.
+
 on:
   workflow_dispatch:
   push:
