@@ -6,6 +6,17 @@ import java.util.UUID
 /** Who is allowed to submit moves is determined by the trusted host transport. */
 enum class CoopSeat { HOST, GUEST }
 
+/** Wire-visible room rules; Speed Duel will use a separate private-board authority. */
+enum class NearbyMatch(val label: String) {
+    COOP("Co-op"),
+    SHARED_BOARD_RACE("Shared Board Race")
+}
+
+/** Derived from host-confirmed word ownership; never award the same word twice. */
+data class RaceStanding(val hostPoints: Int, val guestPoints: Int, val winner: CoopSeat?) {
+    val tied: Boolean get() = winner == null
+}
+
 data class CoopPuzzleSpec(
     val theme: WordTheme,
     val board: PuzzleBoardSize,
@@ -61,8 +72,20 @@ data class CoopSnapshot(
     val guestReserved: Boolean,
     val guestConnected: Boolean,
     val hostConnected: Boolean,
-    val finished: Boolean
+    val finished: Boolean,
+    val match: NearbyMatch = NearbyMatch.COOP
 ) {
+    /** Race result exists only when the authoritative shared board is complete. */
+    val raceStanding: RaceStanding? get() {
+        if (match != NearbyMatch.SHARED_BOARD_RACE || !finished) return null
+        val winner = when {
+            hostWords > guestWords -> CoopSeat.HOST
+            guestWords > hostWords -> CoopSeat.GUEST
+            else -> null
+        }
+        return RaceStanding(hostWords, guestWords, winner)
+    }
+
     val hostWords: Int get() = claims.count { it.seat == CoopSeat.HOST }
     val guestWords: Int get() = claims.count { it.seat == CoopSeat.GUEST }
     val foundIds: Set<String> get() = claims.map { it.wordId }.toSet()
@@ -83,14 +106,16 @@ data class CoopClaimDecision(
 /**
  * Deterministic, Android-free host authority. All valid claims are serialized;
  * first valid claim owns a word, so two near-simultaneous phones cannot both
- * award the same target. This is CO-OP, not competitive scoring.
+ * award the same target. Race mode interprets the same authoritative
+ * ownership as one point per word; co-op remains a separate experience.
  *
  * Caller/transport supplies the authenticated seat. Never accept a seat from
  * an untrusted wire message. No timer automatically ends idle games.
  */
 class NearbyCoopSession(
     run: SoloRun,
-    val roomId: String = UUID.randomUUID().toString()
+    val roomId: String = UUID.randomUUID().toString(),
+    val match: NearbyMatch = NearbyMatch.COOP
 ) {
     val spec: CoopPuzzleSpec = CoopPuzzleSpec.from(run)
     val puzzle: WordSearchPuzzle = spec.regenerate()
@@ -128,7 +153,7 @@ class NearbyCoopSession(
     fun snapshot(): CoopSnapshot = CoopSnapshot(
         roomId, spec, revision, owned.values.toList(),
         guestReserved, guestConnected, hostConnected,
-        WordSearchRules.complete(puzzle, owned.keys)
+        WordSearchRules.complete(puzzle, owned.keys), match
     )
 
     @Synchronized
