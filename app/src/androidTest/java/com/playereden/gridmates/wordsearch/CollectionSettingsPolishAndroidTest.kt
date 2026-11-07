@@ -34,7 +34,7 @@ class CollectionSettingsPolishAndroidTest {
         compose.onNodeWithContentDescription("Open Collection").performClick()
         compose.onNodeWithText("Your Collection").assertExists()
         compose.onNodeWithText("Edit display name").assertExists()
-        compose.onNodeWithText("Collection progress").assertExists()
+        compose.onNodeWithText("COLLECTION PROGRESS").assertExists()
         capture("ws05h-profile.png")
 
         compose.onNodeWithText("Fonts").performScrollTo().performClick()
