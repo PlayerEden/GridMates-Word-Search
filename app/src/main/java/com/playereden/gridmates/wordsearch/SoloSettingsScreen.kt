@@ -205,8 +205,8 @@ internal fun SoloSettingsScreen(store: SoloStore) {
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold)
         Text("Good puzzles. Good company.", color = Muted)
-        Text("Play Solo or Daily without a connection. Nearby co-op uses the " +
-            "same Wi-Fi and shares your display name with your partner. " +
+        Text("Play Solo or Daily without a connection. Nearby games use the " +
+            "same Wi-Fi and share your display name with a partner. " +
             "There is no online account or cloud backup.",
             style = MaterialTheme.typography.bodySmall, color = Muted)
         Text("Version " + runCatching {

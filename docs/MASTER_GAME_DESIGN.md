@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Living master design — WS-06B implementation checkpoint, November 7, 2026  
-**Status:** Historical design baseline below plus current [WS-06B automated PASS receipt](WS06B_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
+**Version:** Living master design — WS-06C implementation checkpoint, November 7, 2026  
+**Status:** Historical design baseline below plus current [WS-06C automated PASS receipt](WS06C_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -506,3 +506,8 @@ All PRs #30–#42 are still **DRAFT and UNMERGED** while the owner defers physic
 ## November 7, 2026 — WS-06B local Versus journal update
 
 Shared Board Race completed outcomes are now stored once per room in the existing local atomic profile (schema 4 optional races field) and in exported/restored backup JSON. Nearby Versus Stats show win/loss/tie and recent results without changing Solo/Daily; after each verified finish there is a player-relative comparison of points and word ownership. [Exact source and 52-test Android verification](WS06B_BUILD_QA_2026-11-07.md). A real two-phone Wi-Fi race and actual-device recovery test remain open. Speed Duel still needs a separate private-board authority and coordinated ready/start.
+
+
+## November 7, 2026 — WS-06C independent Speed Duel
+
+Speed Duel is now implemented separately from Shared Board Race in cumulative [draft PR #44](https://github.com/PlayerEden/GridMates-Word-Search/pull/44), with its own host-owned private word ledgers, per-player readiness and simultaneous GO broadcast, personal word highlights only, public opponent progress counts, and first host-accepted complete board deciding the winner. Near-simultaneous finishes have a deterministic order rather than a forced tie. Original Co-op/Race modes and Solo/Daily/Versus journal remain intact. LAN protocol increases from v5 to v6. [Verified 57-test API35 QA receipt](WS06C_BUILD_QA_2026-11-07.md) includes an install-over from real signed v0.6.1 preserving prior local race journal. Both real phones and anti-cheat security remain unverified; the opponent cannot see a list of discovered words through ordinary client state, but deterministic puzzle seed and unencrypted LAN are not adversarially secure. A distinct Speed Duel persistent result journal is deferred to WS-06D.

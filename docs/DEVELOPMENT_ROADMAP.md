@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State:** Active cumulative Android implementation (WS-06B v0.6.1 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06B exact QA receipt](WS06B_BUILD_QA_2026-11-07.md) for current truth.  
+**State:** Active cumulative Android implementation (WS-06C v0.7.0 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06C exact QA receipt](WS06C_BUILD_QA_2026-11-07.md) for current truth.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
@@ -214,3 +214,13 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Optional schema-4 races array in existing atomic profile and JSON backup, with preview/confirmed restore, invalid duplicate rejection, older saves compatible, no silent pruning. 1,000-match bounded journal.
 - Stable test-only signing, versionCode 23 / v0.6.1, unchanged LAN v5. Actual old v0.6.0 code22 APK updated in place, preserving all previous profile fields. [Verified build receipt](WS06B_BUILD_QA_2026-11-07.md).
 - **Next WS-06C:** Speed Duel needs truly separate per-seat private board, ready/start, host-authoritative finish/tie logic. Actual two-phone acceptance deferred and all drafts unmerged.
+
+
+## WS-06C — Independent Speed Duel, private LAN protocol and safe update (November 7, 2026)
+
+- **Automated PASS:** [regular Android CI #42350347969](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42350347969) and [full API35 emulator #42350506917](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42350506917), **57/57 Android tests, no failures/skips**. Real owner two-phone LAN QA still OPEN.
+- Third distinct Nearby mode **Speed Duel**: identical private boards, hide puzzle/words before both press Ready, GO when host accepts both, independent per-seat discoveries, progress-count-only opponent visibility, host-authoritative first complete board wins (host accepted order breaks near-simultaneous finishes; no arbitrary tie).
+- New separate core SpeedDuelSession, recipient-filtered v6 state packets, mode-aware handshake/reconnect. Both old Co-op and Shared Board Race still available, with Race journal unchanged. v5 clients must update to connect to v6 rooms.
+- Stable **test-only** signer, Android versionCode24/v0.7.0; the **actual v0.6.1 code23 QA APK** updated in place on emulator while maintaining Solo/Daily, identity and existing race journal entries.
+- [Exact-SHA APK/QA/checkpoint](WS06C_BUILD_QA_2026-11-07.md); [design and owner two-phone acceptance plan](WS06C_SPEED_DUEL_QA_PLAN_2026-11-07.md).
+- **Next WS-06D:** independent persistent Duel results. Production signing, encryption, anti-cheat and physical two-device testing remain outside this milestone.

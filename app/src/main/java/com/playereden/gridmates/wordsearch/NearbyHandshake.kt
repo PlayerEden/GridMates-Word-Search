@@ -1,6 +1,8 @@
 package com.playereden.gridmates.wordsearch
 
 import com.playereden.gridmates.wordsearch.core.CoopSnapshot
+import com.playereden.gridmates.wordsearch.core.CoopSeat
+import com.playereden.gridmates.wordsearch.core.NearbyMatch
 import org.json.JSONObject
 
 /**
@@ -24,5 +26,15 @@ internal object NearbyHandshake {
             offered.match == joined.match &&
             joined.guestReserved && joined.guestConnected &&
             joined.revision >= offered.revision &&
-            joined.claims.take(offered.claims.size) == offered.claims
+            joined.claims.take(offered.claims.size) == offered.claims &&
+            if (offered.match == NearbyMatch.SPEED_DUEL) {
+                val old = offered.duel
+                val next = joined.duel
+                old != null && next != null &&
+                    old.recipient == CoopSeat.GUEST && next.recipient == CoopSeat.GUEST &&
+                    next.revision >= old.revision &&
+                    next.ownFoundIds.containsAll(old.ownFoundIds) &&
+                    (!old.started || next.started) &&
+                    (!old.finished || next.finished)
+            } else offered.duel == null && joined.duel == null
 }

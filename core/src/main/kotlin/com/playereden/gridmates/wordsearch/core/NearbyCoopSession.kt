@@ -9,7 +9,8 @@ enum class CoopSeat { HOST, GUEST }
 /** Wire-visible room rules; Speed Duel will use a separate private-board authority. */
 enum class NearbyMatch(val label: String) {
     COOP("Co-op"),
-    SHARED_BOARD_RACE("Shared Board Race")
+    SHARED_BOARD_RACE("Shared Board Race"),
+    SPEED_DUEL("Speed Duel")
 }
 
 /** Derived from host-confirmed word ownership; never award the same word twice. */
@@ -73,7 +74,9 @@ data class CoopSnapshot(
     val guestConnected: Boolean,
     val hostConnected: Boolean,
     val finished: Boolean,
-    val match: NearbyMatch = NearbyMatch.COOP
+    val match: NearbyMatch = NearbyMatch.COOP,
+    /** Recipient-scoped private progression; present ONLY in Speed Duel. */
+    val duel: DuelView? = null
 ) {
     /** Race result exists only when the authoritative shared board is complete. */
     val raceStanding: RaceStanding? get() {
@@ -86,9 +89,10 @@ data class CoopSnapshot(
         return RaceStanding(hostWords, guestWords, winner)
     }
 
-    val hostWords: Int get() = claims.count { it.seat == CoopSeat.HOST }
-    val guestWords: Int get() = claims.count { it.seat == CoopSeat.GUEST }
-    val foundIds: Set<String> get() = claims.map { it.wordId }.toSet()
+    val hostWords: Int get() = duel?.hostCount ?: claims.count { it.seat == CoopSeat.HOST }
+    val guestWords: Int get() = duel?.guestCount ?: claims.count { it.seat == CoopSeat.GUEST }
+    /** Duel returns only THIS recipient\'s private finds, never the opponent\'s IDs. */
+    val foundIds: Set<String> get() = duel?.ownFoundIds ?: claims.map { it.wordId }.toSet()
 }
 
 enum class CoopClaimStatus {
@@ -159,6 +163,8 @@ class NearbyCoopSession(
     @Synchronized
     fun submit(seat: CoopSeat, requestRoom: String, requestId: String,
                start: GridPoint, end: GridPoint): CoopClaimDecision {
+        if (match == NearbyMatch.SPEED_DUEL)
+            return CoopClaimDecision(CoopClaimStatus.INVALID_REQUEST, snapshot())
         if (requestRoom != roomId)
             return CoopClaimDecision(CoopClaimStatus.WRONG_ROOM, snapshot())
         if (requestId.length !in 1..64 ||
@@ -199,6 +205,15 @@ class NearbyCoopSession(
             require(received.roomId.length in 8..100)
             val puzzle = received.spec.regenerate()
             require(received.revision >= 0L)
+            if (received.match == NearbyMatch.SPEED_DUEL) {
+                // No shared claims or opponent found IDs may leak through Duel.
+                require(received.revision == 0L && received.claims.isEmpty())
+                val duel = requireNotNull(received.duel)
+                duel.validate(puzzle, received.guestReserved)
+                require(received.finished == duel.finished)
+                return puzzle
+            }
+            require(received.duel == null) { "Co-op/Race must not carry private Duel data" }
             require(received.claims.size <= puzzle.targets.size)
             val legalIds = puzzle.targets.map { it.id }.toSet()
             require(received.claims.map { it.wordId }.distinct().size == received.claims.size)

@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** Only protocol-compatible devices on a trusted local network can join. */
-private const val WS_WIRE_VERSION = 5
+private const val WS_WIRE_VERSION = 6
 private const val WS_NSD_TYPE = "_gridmatesws._tcp."
 private const val WS_PACKET_MAX = 16_384
 
@@ -98,7 +98,7 @@ internal object NearbyPacket {
             claims.put(JSONObject().put("id", claim.wordId)
                 .put("seat", claim.seat.name).put("rev", claim.revision))
         }
-        return JSONObject().put("type", "state").put("room", s.roomId)
+        val wire = JSONObject().put("type", "state").put("room", s.roomId)
             .put("theme", spec.theme.name).put("board", spec.board.name)
             .put("challenge", spec.challenge.name).put("seed", spec.seed)
             .put("puzzleId", spec.puzzleId).put("digest", spec.boardFingerprint)
@@ -106,6 +106,17 @@ internal object NearbyPacket {
             .put("reserved", s.guestReserved).put("guestHere", s.guestConnected)
             .put("hostHere", s.hostConnected).put("finished", s.finished)
             .put("match", s.match.name)
+        s.duel?.let { d ->
+            // Recipient-specific only! No path or ID of the opponent is sent.
+            wire.put("duel", JSONObject()
+                .put("rev", d.revision).put("recipient", d.recipient.name)
+                .put("hostReady", d.hostReady).put("guestReady", d.guestReady)
+                .put("started", d.started).put("finished", d.finished)
+                .put("winner", d.winner?.name ?: "")
+                .put("hostCount", d.hostCount).put("guestCount", d.guestCount)
+                .put("own", JSONArray(d.ownFoundIds.sorted())))
+        }
+        return wire
     }
 
     fun chatLine(line: NearbyChatLine): JSONObject =
@@ -150,10 +161,23 @@ internal object NearbyPacket {
             CoopWordClaim(obj.getString("id"),
                 CoopSeat.valueOf(obj.getString("seat")), obj.getLong("rev"))
         }
+        val duel = json.optJSONObject("duel")?.let { data ->
+            val own = data.getJSONArray("own")
+            require(own.length() <= 30)
+            val ids = (0 until own.length()).map { own.getString(it) }
+            require(ids.distinct().size == ids.size) { "Duplicate private discovery" }
+            DuelView(data.getLong("rev"),
+                CoopSeat.valueOf(data.getString("recipient")),
+                data.getBoolean("hostReady"), data.getBoolean("guestReady"),
+                data.getBoolean("started"), data.getBoolean("finished"),
+                data.getString("winner").takeIf { it.isNotEmpty() }
+                    ?.let { CoopSeat.valueOf(it) },
+                data.getInt("hostCount"), data.getInt("guestCount"), ids.toSet())
+        }
         return CoopSnapshot(json.getString("room"), spec, json.getLong("revision"),
             claims, json.getBoolean("reserved"), json.getBoolean("guestHere"),
             json.getBoolean("hostHere"), json.getBoolean("finished"),
-            NearbyMatch.valueOf(json.getString("match")))
+            NearbyMatch.valueOf(json.getString("match")), duel)
             .also { NearbyCoopSession.validateSnapshot(it) }
     }
 }
@@ -183,6 +207,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     private var peer: Socket? = null
     private var client: Socket? = null
     private var authority: NearbyCoopSession? = null
+    /** Only host owns both private ledgers. Never serialize this full object. */
+    private var duelAuthority: SpeedDuelSession? = null
     private var reservedToken: String? = null
     private var admissionPending = false
     private var pendingGuestChat: PendingNearbyChat? = null
@@ -228,6 +254,14 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             .firstOrNull { it is Inet4Address && it.isSiteLocalAddress && !it.isLoopbackAddress }
     }
 
+    /** Add private Duel data only for the intended viewer. */
+    private fun forSeat(shared: CoopSnapshot, seat: CoopSeat): CoopSnapshot {
+        if (shared.match != NearbyMatch.SPEED_DUEL) return shared
+        val duel = synchronized(lock) { requireNotNull(duelAuthority) }
+        val view = duel.view(seat)
+        return shared.copy(duel = view, finished = view.finished)
+    }
+
     fun host(name: String, theme: WordTheme, board: PuzzleBoardSize,
              challenge: PuzzleChallenge, match: NearbyMatch = NearbyMatch.COOP) {
         if (state.busy || state.role != NearbyRole.NONE) return
@@ -244,19 +278,24 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 synchronized(lock) {
                     if (closed) { socket.close(); return@execute }
                     authority = session
+                    duelAuthority = if (match == NearbyMatch.SPEED_DUEL)
+                        SpeedDuelSession(session.puzzle) else null
                     liveHostName = roomName
                     listener = socket
                     hostRoomCode = if (requireCodePreference)
                         SecureRandom().nextInt(1_000_000).toString().padStart(6, '0') else ""
                 }
                 post { it.copy(role = NearbyRole.HOST, busy = false,
-                    message = if (match == NearbyMatch.SHARED_BOARD_RACE)
-                        "Race room open. Invite one opponent on the same Wi-Fi."
-                    else "Room open. Ask a friend to join on the same Wi-Fi.",
+                    message = when (match) {
+                        NearbyMatch.SPEED_DUEL -> "Duel room open. Your partner joins, then both tap Ready."
+                        NearbyMatch.SHARED_BOARD_RACE -> "Race room open. Invite one opponent on the same Wi-Fi."
+                        NearbyMatch.COOP -> "Room open. Ask a friend to join on the same Wi-Fi."
+                    },
                     roomId = session.roomId, address = wifi.hostAddress ?: "",
                     port = socket.localPort, code = hostRoomCode,
                     requiresCode = hostRoomCode.isNotBlank(),
-                    hostName = roomName, snapshot = session.snapshot()) }
+                    hostName = roomName,
+                    snapshot = forSeat(session.snapshot(), CoopSeat.HOST)) }
                 main.post {
                     if (!closed) advertise(session.roomId, roomName, socket.localPort,
                         hostRoomCode.isNotBlank(), match)
@@ -364,7 +403,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 current ?: secret()
             }
             // The guest can validate the proposed board before committing its token.
-            val preview = session.snapshot().copy(guestReserved = true, guestConnected = true)
+            val preview = forSeat(session.snapshot().copy(
+                guestReserved = true, guestConnected = true), CoopSeat.GUEST)
             NearbyPacket.write(socket, JSONObject().put("type", "welcome")
                 .put("token", credential).put("hostName", liveHostName)
                 .put("roomState", NearbyPacket.state(preview))
@@ -384,15 +424,18 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 // Send Joined before exposing this socket to heartbeat/host
                 // updates. The lock is reentrant and bounds this short frame.
                 NearbyPacket.write(socket, JSONObject().put("type", "joined")
-                    .put("roomState", NearbyPacket.state(finalState)))
+                    .put("roomState", NearbyPacket.state(forSeat(finalState, CoopSeat.GUEST))))
                 admissionPending = false
                 offered = false
                 finalState
             }
-            post { it.copy(guestName = name, snapshot = accepted,
-                message = if (session.match == NearbyMatch.SHARED_BOARD_RACE)
-                    "Connected with " + name + ". First claim wins each word!"
-                else "Connected with " + name + ". Find words together!") }
+            post { it.copy(guestName = name,
+                snapshot = forSeat(accepted, CoopSeat.HOST),
+                message = when (session.match) {
+                    NearbyMatch.SPEED_DUEL -> "Connected with " + name + ". Both players must tap Ready."
+                    NearbyMatch.SHARED_BOARD_RACE -> "Connected with " + name + ". First claim wins each word!"
+                    NearbyMatch.COOP -> "Connected with " + name + ". Find words together!"
+                }) }
             socket.soTimeout = 11_000
             while (!closed && !socket.isClosed) {
                 val msg = try { NearbyPacket.read(socket) }
@@ -419,14 +462,33 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                             }
                         }
                     }
+                    "duel_ready" -> {
+                        if (session.match != NearbyMatch.SPEED_DUEL)
+                            throw IOException("Not a Duel room")
+                        val duel = synchronized(lock) { duelAuthority }
+                            ?: throw IOException("Duel room is unavailable")
+                        duel.ready(CoopSeat.GUEST,
+                            session.snapshot().guestConnected && session.snapshot().hostConnected)
+                        publishHost(session.snapshot())
+                    }
                     "claim" -> {
                         val points = try {
                             GridPoint(msg.getInt("r1"), msg.getInt("c1")) to
                                 GridPoint(msg.getInt("r2"), msg.getInt("c2"))
                         } catch (_: Exception) { continue }
-                        val outcome = session.submit(CoopSeat.GUEST, session.roomId,
-                            msg.optString("id"), points.first, points.second)
-                        publishHost(outcome.snapshot)
+                        if (session.match == NearbyMatch.SPEED_DUEL) {
+                            val duel = synchronized(lock) { duelAuthority }
+                                ?: throw IOException("Duel room is unavailable")
+                            val current = session.snapshot()
+                            duel.submit(CoopSeat.GUEST, msg.optString("id"),
+                                points.first, points.second,
+                                current.guestConnected && current.hostConnected)
+                            publishHost(session.snapshot())
+                        } else {
+                            val outcome = session.submit(CoopSeat.GUEST, session.roomId,
+                                msg.optString("id"), points.first, points.second)
+                            publishHost(outcome.snapshot)
+                        }
                     }
                     else -> throw IOException("Unsupported game operation")
                 }
@@ -554,10 +616,12 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     }
 
     private fun publishHost(snapshot: CoopSnapshot) {
-        post { it.copy(snapshot = snapshot) }
+        // NEVER send the host's private found IDs to the guest.
+        post { it.copy(snapshot = forSeat(snapshot, CoopSeat.HOST)) }
         val socket = synchronized(lock) { peer } ?: return
-        runCatching { NearbyPacket.write(socket, NearbyPacket.state(snapshot)) }
-            .onFailure { dropGuest(socket) }
+        runCatching {
+            NearbyPacket.write(socket, NearbyPacket.state(forSeat(snapshot, CoopSeat.GUEST)))
+        }.onFailure { dropGuest(socket) }
     }
 
     private fun dropGuest(socket: Socket) {
@@ -565,9 +629,10 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             runCatching { socket.close() }
             if (peer !== socket) return
             peer = null
+            duelAuthority?.onGuestDisconnected()
             val snapshot = authority?.guestDisconnected()
             if (snapshot != null) {
-                post { it.copy(snapshot = snapshot,
+                post { it.copy(snapshot = forSeat(snapshot, CoopSeat.HOST),
                     message = "Partner disconnected. Their progress is saved in this room.") }
             }
         }
@@ -758,6 +823,9 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     throw IOException(welcome.optString("message", "Join declined."))
                 require(welcome.optString("type") == "welcome")
                 val offered = NearbyPacket.parseState(welcome.getJSONObject("roomState"))
+                require(offered.duel?.recipient != CoopSeat.HOST) {
+                    "Host private discoveries cannot be sent to the guest"
+                }
                 val offeredChat = NearbyPacket.readChatHistory(welcome.getJSONArray("chatHistory"))
                 if (roomId.isNotBlank() && offered.roomId != roomId)
                     throw IOException("The room changed. Find it again.")
@@ -779,6 +847,9 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     throw IOException(joined.optString("message", "Join declined."))
                 require(joined.optString("type") == "joined") { "Join was not confirmed." }
                 val snapshot = NearbyPacket.parseState(joined.getJSONObject("roomState"))
+                require(snapshot.duel?.recipient != CoopSeat.HOST) {
+                    "Host private discoveries cannot be sent to the guest"
+                }
                 require(NearbyHandshake.matchesFinal(offered, snapshot)) {
                     "The room changed during joining."
                 }
@@ -801,9 +872,11 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     chat = offeredChat, pendingChat = outstanding, recovery = null,
                     hostName = welcome.optString("hostName", "Host"),
                     address = address, port = port,
-                    message = if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE)
-                        "Connected! Race for words on the shared board."
-                    else "Connected! You both share this puzzle.") }
+                    message = when (snapshot.match) {
+                        NearbyMatch.SPEED_DUEL -> "Connected! Both tap Ready to start your private boards."
+                        NearbyMatch.SHARED_BOARD_RACE -> "Connected! Race for words on the shared board."
+                        NearbyMatch.COOP -> "Connected! You both share this puzzle."
+                    }) }
                 io.execute { readHost(socket) }
             } catch (e: Exception) {
                 runCatching { socket.close() }
@@ -848,13 +921,25 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     }
                     "state" -> {
                         val incoming = NearbyPacket.parseState(msg)
+                        if (incoming.duel?.recipient == CoopSeat.HOST)
+                            throw IOException("Host private state was sent to the guest")
                         post { current ->
                             val old = current.snapshot
+                            // Bind cross-module nullable properties to local vals; Kotlin
+                            // cannot smart-cast an external public data-class property.
+                            val before = old?.duel
+                            val after = incoming.duel
+                            val duelRegressed = before != null && (after == null ||
+                                after.revision < before.revision ||
+                                !after.ownFoundIds.containsAll(before.ownFoundIds) ||
+                                before.started && !after.started ||
+                                before.finished && !after.finished)
                             if (old != null && (old.roomId != incoming.roomId ||
                                 incoming.revision < old.revision ||
-                                 incoming.match != old.match || incoming.spec != old.spec ||
+                                incoming.match != old.match || incoming.spec != old.spec ||
                                 (incoming.revision == old.revision &&
-                                    incoming.claims != old.claims))) current
+                                    incoming.claims != old.claims) ||
+                                duelRegressed)) current
                             else current.copy(snapshot = incoming)
                         }
                     }
@@ -882,13 +967,47 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         }
     }
 
+    fun readySpeedDuel() {
+        val s = state.snapshot ?: return
+        if (s.match != NearbyMatch.SPEED_DUEL || s.duel?.started == true) return
+        when (state.role) {
+            NearbyRole.HOST -> {
+                val session = synchronized(lock) { authority } ?: return
+                val duel = synchronized(lock) { duelAuthority } ?: return
+                val current = session.snapshot()
+                duel.ready(CoopSeat.HOST, current.guestConnected && current.hostConnected)
+                publishHost(session.snapshot())
+            }
+            NearbyRole.GUEST -> {
+                if (state.disconnected) return
+                val socket = synchronized(lock) { client } ?: return
+                io.execute {
+                    runCatching {
+                        NearbyPacket.write(socket, JSONObject().put("type", "duel_ready"))
+                    }.onFailure {
+                        post { it.copy(message = "Ready signal not delivered. Reconnect and try again.") }
+                    }
+                }
+            }
+            NearbyRole.NONE -> Unit
+        }
+    }
+
     fun claim(start: GridPoint, end: GridPoint) {
         val s = state.snapshot ?: return
         when (state.role) {
             NearbyRole.HOST -> {
-                val authority = synchronized(lock) { authority } ?: return
-                publishHost(authority.submit(CoopSeat.HOST, s.roomId,
-                    UUID.randomUUID().toString(), start, end).snapshot)
+                val session = synchronized(lock) { authority } ?: return
+                if (s.match == NearbyMatch.SPEED_DUEL) {
+                    val duel = synchronized(lock) { duelAuthority } ?: return
+                    val current = session.snapshot()
+                    duel.submit(CoopSeat.HOST, UUID.randomUUID().toString(), start, end,
+                        current.guestConnected && current.hostConnected)
+                    publishHost(session.snapshot())
+                } else {
+                    publishHost(session.submit(CoopSeat.HOST, s.roomId,
+                        UUID.randomUUID().toString(), start, end).snapshot)
+                }
             }
             NearbyRole.GUEST -> {
                 if (state.disconnected) return
