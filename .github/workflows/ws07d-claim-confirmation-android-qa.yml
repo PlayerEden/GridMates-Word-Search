@@ -31,7 +31,7 @@ jobs:
       - name: Download exact previously tested v0.7.9 QA APK
         uses: actions/download-artifact@v4
         with:
-          name: GridMates-WordSearch-WS07B-Compact-Navigation-v078
+          name: GridMates-WordSearch-WS07C-Accessible-Precision-v079
           run-id: 42419162816
           github-token: ${{ github.token }}
           repository: PlayerEden/GridMates-Word-Search
@@ -117,7 +117,7 @@ jobs:
       - name: Publish cumulative stable-signed v0.8.0 QA APK
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS07C-Accessible-Precision-v079
+          name: GridMates-WordSearch-WS07D-Claim-Confirmation-v080
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
           if-no-files-found: error
