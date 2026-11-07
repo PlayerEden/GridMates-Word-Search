@@ -1,6 +1,6 @@
 # START HERE — GridMates: Word Search
 
-**Latest automated checkpoint (November 7, 2026): WS-07D v0.8.0/code34 PASS, 87/87 API35 tests.** Host claim acknowledgements/invalid selections/timeout now visible for guests, with unchanged LAN wire v7 and no scoring/privacy change. Signed v0.7.9→v0.8.0 install-over preserves Solo/Daily/identity/Race/Duel. [Verified exact-source receipt](WS07D_BUILD_QA_2026-11-07.md) and [draft PR #57](https://github.com/PlayerEden/GridMates-Word-Search/pull/57); tested commit `7edb6cf01437b86767d3696a2a04b9e9f03d9e27`. **Physical two-phone Co-op word-marking P0 remains OPEN, testing deferred by owner**, no production release or `main` merge.
+**Latest cumulative automated QA (November 7, 2026): WS-07E v0.8.1/code35 PASS, 90/90 API35 emulator tests.** The Daily Journal is compact/paged and saved Solo/Daily hints can be reread without extra charges. QA-signed v0.8.0→v0.8.1 update preserves Solo/Daily/identity/Race/Duel. [Exact tested source, APK SHA and rollback](WS07E_BUILD_QA_2026-11-07.md), [draft PR #58](https://github.com/PlayerEden/GridMates-Word-Search/pull/58), source `edcdc08c53d82dccca83ee1b3cf4255c662d08aa`. **Physical two-phone Co-op P0 and accessibility checks remain OPEN; owner testing deferred**. Nothing merged to `main`, no production release.
 
 ## Current state and documents
 
@@ -69,3 +69,8 @@ WS-06G added a **small, entirely free Co-op board appearance preview catalog** a
 ### WS-07D next handoff (supersedes earlier v0.7.9-only summary)
 
 **87/87 Android tests PASS**, real same-signer v0.7.9→v0.8.0 update PASS. [Full exact-source receipt](WS07D_BUILD_QA_2026-11-07.md). Future WS-07E design/polish work can proceed in a new stacked draft after examining this checkpoint; do not claim two-phone acceptance, and do not ask for physical playtests until user says ready.
+
+
+### Latest WS-07E evidence (supersedes prior v0.8.0-only status)
+
+[Complete green 90/90 API35 suite #42424216761](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42424216761), [source and APK receipt](WS07E_BUILD_QA_2026-11-07.md), [compact Daily and saved-clue acceptance checklist](WS07E_DAILY_CLUES_UX_ACCEPTANCE_2026-11-07.md). A future follow-on can audit Records/Collection/profile/share UX without requesting physical testing prematurely. The original two-physical-phone word marking remains the top untested P0, not an automated pass.
