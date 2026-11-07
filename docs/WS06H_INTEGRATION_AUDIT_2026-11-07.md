@@ -1,6 +1,6 @@
 # WS-06H — Cumulative Integration and Release-Readiness Audit
 
-**November 7, 2026 · Base: exact-green WS-06G v0.7.4 / [draft PR #48](https://github.com/PlayerEden/GridMates-Word-Search/pull/48), [71-test receipt](WS06G_BUILD_QA_2026-11-07.md) · Candidate v0.7.5 / versionCode29 · audit acceptance PENDING until source-matched QA.**
+**November 7, 2026 · Base: exact-green WS-06G v0.7.4 / [draft PR #48](https://github.com/PlayerEden/GridMates-Word-Search/pull/48), [71-test receipt](WS06G_BUILD_QA_2026-11-07.md) · Candidate v0.7.5 / versionCode29 · automated acceptance PASS on exact executable SHA `0c958508468e987d1668da7feeaca104d7087c1d` (74/74 emulator tests and signed update); physical acceptance OPEN.**
 
 ## Scope and method
 
@@ -68,3 +68,12 @@ Added an Android UI smoke test traversing Home → Daily → Home → Records �
 ## Automated acceptance gate
 
 Run standard CI, core/app unit/lint + Android instrumentation compile, and the **full API35 emulator**, including original **signed v0.7.4 versionCode28** → v0.7.5 versionCode29 in-place update, same public QA cert and preservation of `schema`, `active`, `results`, `daily`, `identity`, `races`, `duels`. Record exact tested SHA, final count, APK SHA-256 and exact-source rollback when green. Before those pass, this is a **candidate**, not a verified build.
+
+
+## Final WS-06H automated acceptance — PASS (November 7, 2026)
+
+The dedicated [API35 emulator run #42362755990](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42362755990) passed **74/74 Android tests, zero failed/skipped**, and installed signed **v0.7.4 code28 → v0.7.5 code29** in place, preserving schema, active Solo, results, Daily, identity, Race and Duel records. [Standard Android CI #42362760272](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42362760272) also passed. Exact executable source `0c958508468e987d1668da7feeaca104d7087c1d`; APK SHA-256 `863ca03c8c6a9078392158accb3a19424f064421eb58b671308c884a0a5c46bd`.
+
+[Build QA receipt and artifact links](WS06H_BUILD_QA_2026-11-07.md) · [Pinned rollback checkpoint](https://github.com/PlayerEden/GridMates-Word-Search/tree/checkpoint/ws06h-v075-integration-audit-74-android-tests-upgrade-green-2026-11-07).
+
+**No claim of actual two-phone testing or Play-readiness**. All hardware/signing/merge blockers above remain open. A separate post-audit risk concerning present-but-malformed Solo/Daily fields is tracked as [WS-06I issue #50](https://github.com/PlayerEden/GridMates-Word-Search/issues/50).
