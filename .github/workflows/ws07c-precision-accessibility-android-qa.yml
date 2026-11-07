@@ -31,7 +31,7 @@ jobs:
       - name: Download exact previously tested v0.7.8 QA APK
         uses: actions/download-artifact@v4
         with:
-          name: GridMates-WordSearch-WS07A-Touch-And-Gameplay-v077
+          name: GridMates-WordSearch-WS07B-Compact-Navigation-v078
           run-id: 42417361001
           github-token: ${{ github.token }}
           repository: PlayerEden/GridMates-Word-Search
