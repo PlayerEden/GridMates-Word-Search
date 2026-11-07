@@ -34,6 +34,10 @@ class WordSearchUiSmokeTest {
                 }
             }
             rule.onNodeWithText("Puzzle complete!", substring = true).assertExists()
+            rule.onNodeWithText("Share results").assertExists()
+            // Results have their own page; players shouldn't have to scroll
+            // past a giant letter grid to find their next action.
+            rule.onNodeWithText("Words to find", substring = true).assertDoesNotExist()
             rule.onNodeWithText("Unassisted solve", substring = true).assertExists()
             rule.onNodeWithText("Review completed board").performScrollTo().performClick()
             rule.onNodeWithText("Results").assertExists()
