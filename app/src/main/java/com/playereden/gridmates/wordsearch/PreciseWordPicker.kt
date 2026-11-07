@@ -2,7 +2,6 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.IconButton
@@ -17,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -90,7 +88,7 @@ internal fun PreciseWordPicker(
                 // Spoken row letters help users locate a real word rather
                 // than merely entering blind numerical coordinates.
                 Text(
-                    "Row ${row + 1} reads: " + puzzle.rows[row].joinToString(" "),
+                    "Row ${row + 1} reads: " + puzzle.rows[row].map { it.toString() }.joinToString(" "),
                     color = Ink, style = MaterialTheme.typography.bodySmall
                 )
                 if (start != null && !straightLine) {
