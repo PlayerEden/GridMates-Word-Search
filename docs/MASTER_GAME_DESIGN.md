@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Living master design — WS-06E implementation checkpoint, November 7, 2026  
-**Status:** Historical design baseline below plus current [WS-06E automated PASS receipt](WS06E_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
+**Version:** Living master design — WS-06F implementation checkpoint, November 7, 2026  
+**Status:** Historical design baseline below plus current [WS-06F automated PASS receipt](WS06F_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -521,3 +521,8 @@ Speed Duel now has a **distinct persistent winner/loser journal**, not a subset 
 ## November 7, 2026 — WS-06E friendly presence and optional sharing
 
 Cumulative [draft PR #46](https://github.com/PlayerEden/GridMates-Word-Search/pull/46) adds a compact, accessible "Playing with someone nearby" panel using real friend connection, local display name, personal contributions and mode-specific stage, with **Speed Duel showing only the opponent count**. Completed, host-verified Co-op, Race and Duel have a player-relative, spoiler-safe optional Share result text preview; competitive result must be persisted before sharing. Solo/Daily's pre-existing share action now also previews exact text before Android Sharesheet. There are no room codes, IP addresses, chat logs, private word IDs, online services or invented Play URL in the exported text. This is **text sharing, not PNG card export**. [63-test exact-source Android QA](WS06E_BUILD_QA_2026-11-07.md) verified a v0.7.1→v0.7.2 install-over retaining Race and Duel journals. The latest Nov 6–7 [Sudoku design briefs](WS06E_NEARBY_PRESENCE_SHARE_QA_PLAN_2026-11-07.md) helped set privacy, preview and co-op cosmetic future design boundaries. Shared cosmetic tiers and no-router/Bluetooth transport remain future proposals. Real two-phone LAN fairness, large text and actual share targets still require owner acceptance.
+
+
+## November 7, 2026 — WS-06F image result postcards
+
+Cumulative [draft PR #47](https://github.com/PlayerEden/GridMates-Word-Search/pull/47) adds an optional, fully offline **1080×1350 (4:5) result postcard** for completed Solo/Daily/Co-op/Shared Board Race/Speed Duel, based only on already validated spoiler-safe share text. A visible preview gives independent **Share text / Share image / Cancel** choices; image sending uses a read-only scoped Android FileProvider content URI, not permission to other app-private data. The paper/forest/gold styling, bundled Atkinson/Plex fonts, and abstract empty grid match the Word Search aesthetic. No usernames, room credentials, private found-word lists, real puzzle answers or fake stats enter a shared card. [Exact-source 67-test Android QA](WS06F_BUILD_QA_2026-11-07.md) passed including actual signed v0.7.2→v0.7.3 update preserving both Race and Duel histories. The owner's physical Android Sharesheet target-app/scale testing remains OPEN. A future shared Co-op board-theme feature needs its own catalog/selection and accessibility policy; Sudoku's technical display-rank proposal does not establish Word Search entitlements.
