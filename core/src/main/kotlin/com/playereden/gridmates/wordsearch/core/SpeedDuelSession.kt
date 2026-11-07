@@ -27,6 +27,9 @@ data class DuelView(
         require(ownFoundIds.size == ownCount && ownFoundIds.all { it in ids })
         require(guestReserved || (!guestReady && guestCount == 0))
         require(!started || hostReady && guestReady)
+        // The host sends GO atomically with the second Ready; both-Ready
+        // without GO is not a legal snapshot and must not pass validation.
+        require(started || !(hostReady && guestReady))
         require(started || (hostCount == 0 && guestCount == 0))
         require(finished == (winner != null))
         if (finished) {
