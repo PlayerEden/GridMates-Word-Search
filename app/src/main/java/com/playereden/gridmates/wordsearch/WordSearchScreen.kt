@@ -467,39 +467,83 @@ private fun CompletionPanel(
     onAnother: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    var shareUnavailable by remember(puzzle.id) { mutableStateOf(false) }
     val usedHints = run.hints.values.sum()
+    val time = (completedSeconds.coerceAtLeast(0L) / 60L).toString() + ":" +
+        (completedSeconds.coerceAtLeast(0L) % 60L).toString().padStart(2, '0')
+
     Column(modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("✓ " + (if (daily) "Daily complete!" else "Puzzle complete!"),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Forest, fontWeight = FontWeight.Bold)
-                Text("Every word is found. Nicely done.",
-                    color = Muted, style = MaterialTheme.typography.bodyMedium)
-                Text("${puzzle.targets.size} words · " +
-                    (completedSeconds / 60L) + ":" +
-                    (completedSeconds % 60L).toString().padStart(2, '0'),
-                    style = MaterialTheme.typography.titleMedium, color = Forest)
-                Text(
-                    if (usedHints == 0) "Unassisted solve · No hints used"
-                    else "Assisted solve · $usedHints hint " +
-                        (if (usedHints == 1) "step" else "steps"),
-                    color = Muted, style = MaterialTheme.typography.bodyMedium
-                )
-                Text(if (daily) "Saved in your Daily Journal."
-                    else "Saved in your puzzle journal.",
-                    color = Muted, style = MaterialTheme.typography.bodySmall)
+        verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow(if (daily) "Daily journal · Completed"
+                else "Puzzle journal · Completed")
+            Text(if (daily) "Daily complete!" else "Puzzle complete!",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Forest, fontWeight = FontWeight.Bold)
+            Text("Every word is found. Nicely done.",
+                color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Text(puzzle.theme.label + " · " + puzzle.size + "×" + puzzle.size +
+                " · " + (run.challenge?.label ?: run.difficulty.label),
+                color = Gold, style = MaterialTheme.typography.labelLarge)
+            PaperProgress(puzzle.targets.size, puzzle.targets.size)
+            HorizontalDivider(color = GridRule)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                listOf(
+                    "Words" to (puzzle.targets.size.toString() + "/" + puzzle.targets.size),
+                    "Time" to time,
+                    "Hints" to usedHints.toString()
+                ).forEach { (label, amount) ->
+                    Column(Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(amount, color = Forest,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(label, color = Muted,
+                            style = MaterialTheme.typography.labelMedium,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
             }
+            Text(
+                if (usedHints == 0) "Unassisted solve · No hints used"
+                else "Assisted solve · $usedHints hint " +
+                    (if (usedHints == 1) "step" else "steps"),
+                color = Muted, style = MaterialTheme.typography.bodyMedium
+            )
+            Text(if (daily) "Saved in your Daily Journal."
+                else "Saved in your puzzle journal.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
         }
-        OutlinedButton(onClick = onReview, modifier = Modifier.fillMaxWidth()) {
-            Text("Review completed board")
-        }
+
         if (onAnother != null) {
-            Button(onClick = onAnother, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = onAnother,
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 Text("Play another puzzle")
             }
+        }
+
+        OutlinedButton(onClick = {
+            val summary = PuzzleResultShare.text(puzzle, run, completedSeconds, daily)
+            shareUnavailable = runCatching {
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, summary)
+                }
+                context.startActivity(Intent.createChooser(send, "Share puzzle results"))
+            }.isFailure
+        }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text("Share results")
+        }
+        if (shareUnavailable) {
+            Text("Sharing isn't available on this device.",
+                color = Gold, style = MaterialTheme.typography.bodySmall)
+        }
+
+        OutlinedButton(onClick = onReview,
+            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text("Review completed board")
         }
         Row(Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
