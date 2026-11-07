@@ -172,7 +172,7 @@ internal class SoloStore(
         val races = mutableListOf<RaceResult>()
         val raceRaw = root.optJSONArray("races")
         if (raceRaw != null) {
-            require(raceRaw.length() <= 10_000) { "Too many race records" }
+            require(raceRaw.length() <= 1_000) { "Too many race records" }
             for (i in 0 until raceRaw.length()) {
                 val item = raceRaw.getJSONObject(i)
                 races += RaceResult(
@@ -327,13 +327,21 @@ internal class SoloStore(
     fun recordRace(snapshot: CoopSnapshot, localSeat: CoopSeat,
                    nowMs: Long = System.currentTimeMillis()): Boolean {
         if (blocked) return false
-        val result = RaceResult.fromVerifiedSnapshot(snapshot, localSeat, nowMs)
+        val result = runCatching {
+            RaceResult.fromVerifiedSnapshot(snapshot, localSeat, nowMs)
+        }.getOrElse { return false } // never reward an unverified snapshot
         if (profile.raceResults.any { it.roomId == result.roomId }) return true
         val previous = profile
-        profile = previous.copy(raceResults =
-            RaceJournalRules.addOnce(previous.raceResults, result))
+        val updated = runCatching {
+            RaceJournalRules.addOnce(previous.raceResults, result)
+        }.getOrElse {
+            warning = "Versus journal is full. Back up your records before playing more."
+            return false
+        }
+        profile = previous.copy(raceResults = updated)
         flush()
         if (warning != null) {
+            // AtomicFile failWrite retains the prior on-disk profile.
             profile = previous
             return false
         }
