@@ -1,4 +1,4 @@
-name: Word Search WS05H Tab-First Visual & Android Final QA
+name: Word Search WS05I Compact and 200 Percent Font Android QA
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
@@ -15,6 +15,7 @@ on:
       - feature/ws05f-paperback-app-polish-2026-11-06
       - feature/ws05g-gameplay-results-polish-2026-11-06
       - feature/ws05h-profile-collection-settings-polish-2026-11-06
+      - feature/ws05i-compact-landscape-large-text-qa-2026-11-06
     paths:
       - '.github/workflows/ws04d-b5-android-font-audit.yml'
 
@@ -103,23 +104,44 @@ jobs:
             sleep 3
             adb shell screencap -p /sdcard/ws05f-home-large-text.png
             adb pull /sdcard/ws05f-home-large-text.png qa-screenshots/home-large-text.png
+            # Re-size the actual running emulator to a logical 320dp phone.
+            # This is a rendering reference, not proof on physical devices.
+            adb shell wm size 720x1440
+            adb shell wm density 360
+            adb shell settings put system font_scale 2.0
+            adb shell am force-stop com.playereden.gridmates.wordsearch.qa
+            adb shell am start -W -n com.playereden.gridmates.wordsearch.qa/com.playereden.gridmates.wordsearch.MainActivity
+            sleep 3
+            adb shell screencap -p /sdcard/ws05i-compact-200percent.png
+            adb pull /sdcard/ws05i-compact-200percent.png qa-screenshots/compact-320dp-font200.png
+            # Independent wide/short-screen reference with normal text.
+            adb shell wm size 1280x720
+            adb shell wm density 360
+            adb shell settings put system font_scale 1.0
+            adb shell am force-stop com.playereden.gridmates.wordsearch.qa
+            adb shell am start -W -n com.playereden.gridmates.wordsearch.qa/com.playereden.gridmates.wordsearch.MainActivity
+            sleep 3
+            adb shell screencap -p /sdcard/ws05i-landscape.png
+            adb pull /sdcard/ws05i-landscape.png qa-screenshots/landscape-home.png
+            adb shell wm size reset
+            adb shell wm density reset
             adb shell settings put system font_scale 1.0
       - name: Upload instrumented test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05H-Android-Tests
+          name: GridMates-WordSearch-WS05I-Android-Tests
           path: |
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Upload WS05H profile/achievements/settings visual references
+      - name: Upload WS05I compact and landscape visual references
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05H-UI-Screenshots
+          name: GridMates-WordSearch-WS05I-UI-Screenshots
           path: qa-screenshots/
           if-no-files-found: ignore
           retention-days: 7
@@ -128,10 +150,10 @@ jobs:
         run: |
           test -s app/build/outputs/apk/debug/app-debug.apk
           sha256sum app/build/outputs/apk/debug/app-debug.apk
-      - name: Upload source-matched WS05H QA APK
+      - name: Upload source-matched WS05I QA APK
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05H-QA-v057
+          name: GridMates-WordSearch-WS05I-QA-v058
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7

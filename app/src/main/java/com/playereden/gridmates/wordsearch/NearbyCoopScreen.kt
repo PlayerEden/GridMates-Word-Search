@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.*
@@ -42,6 +43,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
     var pin by rememberSaveable { mutableStateOf("") }
     var selectedRoom by remember { mutableStateOf<NearbyListing?>(null) }
     var chatOpen by rememberSaveable { mutableStateOf(false) }
+    var roomDetailsExpanded by rememberSaveable { mutableStateOf(false) }
     var chatDraft by rememberSaveable { mutableStateOf("") }
     val ownName = store.profile.identity.displayName.trim().ifBlank { "Player" }
     val snapshot = state.snapshot
@@ -212,8 +214,12 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
             val connected = snapshot.guestConnected && snapshot.hostConnected && !state.disconnected
             val lastPartnerWord = snapshot.claims.lastOrNull { it.seat != localSeat }
                 ?.wordId?.let { id -> puzzle.targets.firstOrNull { it.id == id }?.word }
-            val boardDp = (LocalConfiguration.current.screenWidthDp - 36)
-                .coerceIn(180, 440).dp
+            val config = LocalConfiguration.current
+            val availableWidth = (config.screenWidthDp - 36).coerceAtLeast(160)
+            val boardDp = if (config.screenWidthDp > config.screenHeightDp) {
+                minOf(availableWidth, (config.screenHeightDp * 0.72f).toInt(), 440)
+                    .coerceAtLeast(160).dp
+            } else minOf(availableWidth, 440).dp
 
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -234,7 +240,16 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         Text("Partner most recently found: " + lastPartnerWord,
                             color = Forest, style = MaterialTheme.typography.bodyMedium)
                     }
-                    if (state.role == NearbyRole.HOST) {
+                    if (state.role == NearbyRole.HOST && connected) {
+                        TextButton(onClick = {
+                            roomDetailsExpanded = !roomDetailsExpanded
+                        }) {
+                            Text(if (roomDetailsExpanded) "Hide room details"
+                                else "Room details")
+                        }
+                    }
+                    if (state.role == NearbyRole.HOST &&
+                        (!connected || roomDetailsExpanded)) {
                         Text("Your room is ready for one partner",
                             color = Forest, fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.bodyMedium)
@@ -257,6 +272,13 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                 }
             }
 
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                ZoomableWordGrid(puzzle, snapshot.foundIds, emptyList(), boardDp,
+                    onSelect = { from, to ->
+                        if (connected && !snapshot.finished) runtime.claim(from, to)
+                    }, onStep = {}, boardFontId = store.effectiveBoardFontId,
+                    partnerFoundIds = partnerFound)
+            }
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -335,28 +357,31 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                 }
             }
 
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                ZoomableWordGrid(puzzle, snapshot.foundIds, emptyList(), boardDp,
-                    onSelect = { from, to ->
-                        if (connected && !snapshot.finished) runtime.claim(from, to)
-                    }, onStep = {}, boardFontId = store.effectiveBoardFontId,
-                    partnerFoundIds = partnerFound)
-            }
             Text("Words to find", color = Forest,
                 fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-            puzzle.targets.chunked(3).forEach { items ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items.forEach { target ->
-                        val label = when {
-                            target.id in ownFound -> "✓ " + target.word + " (you)"
-                            target.id in partnerFound -> "✓ " + target.word + " (partner)"
-                            else -> target.word
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val columns = if (maxWidth < 360.dp ||
+                    LocalDensity.current.fontScale >= 1.3f) 1 else 2
+                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    puzzle.targets.chunked(columns).forEach { items ->
+                        Row(Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            items.forEach { target ->
+                                val label = when {
+                                    target.id in ownFound -> "✓ " + target.word + " (you)"
+                                    target.id in partnerFound -> "✓ " + target.word + " (partner)"
+                                    else -> target.word
+                                }
+                                Text(label, Modifier.weight(1f),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = if (columns == 1) 2 else 1,
+                                    color = if (target.id in snapshot.foundIds) Forest else Ink)
+                            }
+                            repeat(columns - items.size) {
+                                Spacer(Modifier.weight(1f))
+                            }
                         }
-                        Text(label, Modifier.weight(1f),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (target.id in snapshot.foundIds) Forest else Muted)
                     }
-                    repeat(3 - items.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
             Text(if (snapshot.finished)
