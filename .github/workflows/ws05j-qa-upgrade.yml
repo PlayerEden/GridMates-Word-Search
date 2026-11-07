@@ -9,6 +9,7 @@ on:
       - 'app/**'
       - 'core/**'
       - 'qa-signing/**'
+      - 'scripts/ws05j_upgrade_emulator.sh'
       - '.github/workflows/ws05j-qa-upgrade.yml'
 
 permissions:
@@ -87,25 +88,7 @@ jobs:
           profile: pixel_4
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            set -eu
-            PKG=com.playereden.gridmates.wordsearch.qa
-            SAVEPATH=files/gridmates_wordsearch_solo_v1.json
-            adb install /tmp/ws05j-v20.apk
-            adb shell am start -W -n "$PKG/com.playereden.gridmates.wordsearch.MainActivity"
-            adb shell am force-stop "$PKG"
-            fixture='{"schema":4,"active":{"theme":"WOODLAND","difficulty":"EASY","seed":42,"found":[],"hints":{},"seconds":42},"results":[],"daily":[],"identity":{"name":"Upgrade QA","portraitId":"woodland_owl"}}'
-            printf '%s' "$fixture" | adb shell "run-as $PKG sh -c 'cat > $SAVEPATH'"
-            adb shell "run-as $PKG cat $SAVEPATH" | tr -d '\r' > /tmp/ws05j-before.json
-            grep -F '"name":"Upgrade QA"' /tmp/ws05j-before.json
-            adb install -r /tmp/ws05j-v21.apk | tee /tmp/ws05j-install.txt
-            grep -F 'Success' /tmp/ws05j-install.txt
-            adb shell am start -W -n "$PKG/com.playereden.gridmates.wordsearch.MainActivity"
-            adb shell am force-stop "$PKG"
-            adb shell "run-as $PKG cat $SAVEPATH" | tr -d '\r' > /tmp/ws05j-after.json
-            cmp -s /tmp/ws05j-before.json /tmp/ws05j-after.json
-            adb shell dumpsys package "$PKG" | grep -F 'versionCode=21'
-            echo 'PASS: same-signature in-place upgrade retained private v4 save bytes.'
+          script: bash ./scripts/ws05j_upgrade_emulator.sh
       - name: Archive QA APK checksum
         run: sha256sum app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
