@@ -77,6 +77,33 @@ class RaceJournalPersistenceAndroidTest {
         } finally { clean(ctx.filesDir, name) }
     }
 
+    @Test fun malformedPresentRaceArrayCannotEraseOldHistoryOrOverwriteDisk() {
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+        val name = "ws06h_race_safety_" + System.nanoTime() + ".json"
+        try {
+            val saved = SoloStore(ctx, name)
+            assertTrue(saved.recordRace(finish(777L), CoopSeat.HOST))
+            val initial = saved.exportBackup()
+            val before = saved.profile
+            val corrupt = JSONObject(initial).put("races", "not-an-array").toString()
+
+            // The import preview must reject even though "races" is optional
+            // in legitimate old backups. All existing in-memory data stays.
+            assertTrue(runCatching { saved.previewBackup(corrupt) }.isFailure)
+            assertEquals(before, saved.profile)
+            assertEquals(1, saved.profile.raceResults.size)
+
+            // Likewise, an unreadable on-device save is protected from
+            // being replaced with an empty "new user" profile.
+            File(ctx.filesDir, name).writeText(corrupt, Charsets.UTF_8)
+            val reopened = SoloStore(ctx, name)
+            assertTrue(reopened.warning?.contains("couldn't be read") == true)
+            assertTrue(runCatching { reopened.exportBackup() }.isFailure)
+            reopened.flush()
+            assertEquals(corrupt, File(ctx.filesDir, name).readText(Charsets.UTF_8))
+        } finally { clean(ctx.filesDir, name) }
+    }
+
     private fun clean(directory: File, name: String) {
         for (suffix in listOf("", ".bak", ".new")) File(directory, name + suffix).delete()
     }

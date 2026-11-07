@@ -155,11 +155,29 @@ internal object ResultPostcard {
         }
     }
 
+    // Old images are temporary sharing artifacts, not permanent game records.
+    // Only the app-owned postcard filename pattern in the dedicated cache
+    // subtree is eligible; never prune backups or a freshly shared image.
+    private const val POSTCARD_CACHE_TTL_MS = 7L * 24L * 60L * 60L * 1000L
+
+    private fun pruneExpiredPostcards(folder: File, nowMs: Long) {
+        val olderThan = nowMs - POSTCARD_CACHE_TTL_MS
+        folder.listFiles()?.forEach { candidate ->
+            if (candidate.isFile && candidate.name.startsWith("gridmates-result-") &&
+                candidate.name.endsWith(".png") &&
+                candidate.lastModified() > 0L && candidate.lastModified() < olderThan
+            ) {
+                candidate.delete()
+            }
+        }
+    }
+
     /** Only the isolated images cache subtree can be exposed through FileProvider. */
     fun writeToPrivateCache(context: Context, bitmap: Bitmap): Uri {
         require(bitmap.width == WIDTH && bitmap.height == HEIGHT)
         val folder = File(context.cacheDir, "result-postcards")
         require(folder.isDirectory || folder.mkdirs()) { "Cannot create postcard cache" }
+        pruneExpiredPostcards(folder, System.currentTimeMillis())
         val file = File.createTempFile("gridmates-result-", ".png", folder)
         try {
             FileOutputStream(file).use { output ->

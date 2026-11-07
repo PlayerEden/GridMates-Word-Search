@@ -174,6 +174,9 @@ internal class SoloStore(
         )
         val races = mutableListOf<RaceResult>()
         val raceRaw = root.optJSONArray("races")
+        // Missing means a legitimate pre-race backup; present-but-not-array
+        // must fail CLOSED rather than silently erase saved Versus results.
+        require(!root.has("races") || raceRaw != null) { "Malformed Race journal" }
         if (raceRaw != null) {
             require(raceRaw.length() <= 1_000) { "Too many race records" }
             for (i in 0 until raceRaw.length()) {
