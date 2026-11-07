@@ -430,6 +430,31 @@ internal fun WordSearchScreen(
     }
 }
 
+/** A small, calm result/hint announcement that does not obstruct the board. */
+@Composable
+private fun PuzzleStatus(message: String, compact: Boolean) {
+    val positive = message.startsWith("✓")
+    val hint = message.startsWith("Try ") || message.contains("starts at row") ||
+        message.startsWith("Follow the faint")
+    Box(
+        Modifier.fillMaxWidth()
+            .background(
+                if (positive) Color(0xFFE5EFE6)
+                else if (hint) Color(0xFFF5EDD8)
+                else Paper,
+                RoundedCornerShape(9.dp)
+            )
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .padding(horizontal = 9.dp, vertical = 5.dp)
+    ) {
+        Text(message, color = if (positive) Forest else Ink,
+            fontWeight = if (positive) FontWeight.SemiBold else FontWeight.Normal,
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = if (compact) 1 else 2,
+            overflow = TextOverflow.Ellipsis)
+    }
+}
+
 @Composable
 private fun CompletionPanel(
     puzzle: WordSearchPuzzle,
