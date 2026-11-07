@@ -5,6 +5,7 @@ name: WS-07A Touch and Fixed Gameplay Android Emulator QA
 # Source-matched real v0.7.6-to-v0.7.7 install-over, both result journals preserved.
 # Executes real pointer-injected touch tests for 15x15 and 20x20 board;
 # Rerun all gates after final compact Solo word pages and win/save HUD adjustments.
+# Touch follow-up: include finger-UP final coordinates and report selected endpoints.
 # includes the exact same-signer v0.7.6 -> v0.7.7 update and save checks.
 
 on:
