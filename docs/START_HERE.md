@@ -1,6 +1,6 @@
 # START HERE — GridMates: Word Search
 
-**Current implementation stack:** WS-05J automated QA passed (real-device QA open), draft after [WS-05I #39](https://github.com/PlayerEden/GridMates-Word-Search/pull/39). The Android app is developed in cumulative, unmerged feature PRs, **not** on the repository's minimal main branch.
+**Current implementation stack:** WS-06A Shared Board Race development (real-device QA open), drafted after [WS-05I #39](https://github.com/PlayerEden/GridMates-Word-Search/pull/39). The Android app is developed in cumulative, unmerged feature PRs, **not** on the repository's minimal main branch.
 
 ## Current state and documents
 
@@ -9,11 +9,12 @@
 - [WS-05I Android QA](WS05I_BUILD_QA_2026-11-06.md): v0.5.8, 47 API35 tests, compact-screen and 200% Android text captures; real devices still outstanding.
 - [WS-05J QA APK updates](WS05J_STABLE_QA_UPDATES_2026-11-07.md): stable test-only signer, v0.5.9, **verified emulator update preservation**, and **required one-time backup / reinstall / restore** from earlier APKs.
 - [WS-05J build and QA receipt](WS05J_BUILD_QA_2026-11-07.md): exact source SHA, successful standard/emulator CI, downloadable cumulative APK and rollback checkpoint.
+- [WS-06A first Versus mode and QA plan](WS06A_SHARED_BOARD_RACE_QA_PLAN_2026-11-07.md): Shared Board Race host/guest scoring, winner/tie, protocol v5 and testing. Speed Duel is later.
 - [Word Search GitHub](https://github.com/PlayerEden/GridMates-Word-Search): the only source of truth for this game. Work stays separate from the SudokuTogether repository.
 
 ## Implemented across the cumulative stack
 
-Real Solo and offline Daily, word-search touch selection and multiple book sizes, hints and results, local profiles/achievements, free Woodland portrait collections and board fonts, manual JSON backup/restore, same-Wi-Fi co-op with chat/presence and reconnection scaffolding, polished paperback UI and compact/large-text improvements. The co-op LAN protocol is v4. Do not claim physical multiplayer QA passes until two phones are tested.
+Real Solo and offline Daily, word-search touch selection and multiple book sizes, hints and results, local profiles/achievements, free Woodland portrait collections and board fonts, manual JSON backup/restore, same-Wi-Fi co-op with chat/presence and reconnection scaffolding, polished paperback UI and compact/large-text improvements. Shared Board Race builds on co-op ownership but has separate win/tie rules. WS-06A LAN protocol is v5; older v4 clients cannot join v5 rooms. Do not claim physical multiplayer QA passes until two phones are tested.
 
 ## Locked choices and guardrails
 
@@ -27,4 +28,4 @@ Real Solo and offline Daily, word-search touch selection and multiple book sizes
 
 ## Next
 
-WS-05J emulator upgrade/QA receipt/checkpoint are complete. Next develop the two distinct WS-06 Versus game modes (Shared Board Race and Speed Duel) without replacing or losing the already working Solo/Daily and nearby co-op systems.
+WS-06A adds Shared Board Race and keeps Co-op as the default. Complete automated tests and the stable-signed 0.5.9→0.6.0 APK upgrade check. Follow with WS-06B race result persistence and WS-06C separate Speed Duel private-board gameplay. Keep drafts unmerged.
