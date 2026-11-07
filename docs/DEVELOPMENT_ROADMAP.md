@@ -195,3 +195,12 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Preserve all existing Solo, Daily, profile and nearby LAN behavior. Physical old-build export/import, two-phone LAN and actual handset in-place update remain deferred.
 - Documentation: [WS-05J stable QA upgrade and migration](WS05J_STABLE_QA_UPDATES_2026-11-07.md).
 
+
+
+## WS-06A — Shared Board Race (November 7, 2026)
+
+- **Implemented in source, QA under verification:** One shared board, first host-accepted claim owns each word and earns one point. All words found ends match; higher score wins, equal score ties; no idle timer.
+- Nearby host UI selects Co-op or Shared Board Race with existing optional room-code behavior; guest discovery shows mode, both phones show real-time points, connection state and final personalized outcome. Co-op remains a separate default and has no winner.
+- Host authoritative mode in snapshots; client mode handshake guarded; LAN protocol upgraded from v4 to v5. Older APKs must update to join v5 rooms; stable QA signer stays unchanged and versionCode rises 21→22 (v0.6.0).
+- [WS-06A QA plan](WS06A_SHARED_BOARD_RACE_QA_PLAN_2026-11-07.md): JVM race decision tests, Android codec and mode UI tests, emulator and real two-phone gates.
+- **Later:** WS-06B persistent Race records with idempotent result claims; WS-06C Speed Duel private boards/ready/start. No fabricated win statistics or claims of two-phone hardware acceptance.
