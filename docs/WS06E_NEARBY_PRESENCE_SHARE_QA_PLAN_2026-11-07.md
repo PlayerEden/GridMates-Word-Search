@@ -1,29 +1,26 @@
-# WS-06E — Friendly Nearby presence and optional share preview
+# WS-06E — GridMates cross-game design transfer and QA plan
 
-**November 7, 2026 · Stacked development draft; automation and two-phone acceptance tracked separately.**
+**November 7, 2026 — development branch PR #46 (pending QA).**
 
-## Referenced Sudoku docs (read from PlayerEden/SudokuTogether at development 1818cd54e2f, not main)
-- `docs/GRIDMATES_SHARE_RESULTS_UX_DESIGN.md`: Share result is a small optional secondary action after valid completion, ideally previewed before Android Sharesheet; no auto-nags, leaderboard or unverified Play URL.
-- `docs/GRIDMATES_VERSUS_POST_MATCH_COMPARISON_DESIGN.md`: exact validated results, privacy boundary before finish, honest opponent progress; no fabricated “full board” or timeline. Real per-player move timing not recorded; Word Search should likewise avoid fake timestamps or time comparison.
-- `docs/GRIDMATES_SHARED_COOP_BOARD_THEMES_DESIGN.md`: a potential shared appearance from the highest ranked equipped co-op board, keeping personal number/ink styles. **Word Search currently has bundled board fonts and Woodland portrait cosmetics, but not matching Sudoku board-theme tiers**; defer cosmetics transport, ranking or entitlement changes until assets, accessibility override and tier order are approved.
-- `docs/GRIDMATES_SHAREABLE_CARDS_CONCEPT.md`: optional later downloadable PNG, preview and native Android Sharesheet without accounts, permission to contacts or partner identity by default.
-- `docs/GRIDMATES_OFFLINE_NEARBY_BLUETOOTH_DESIGN.md`: no-router Nearby Connections feasibility, not a shipped feature. Do not alter stable LAN v6 before physical network tests.
-- `docs/GRIDMATES_BRAND_AND_SERIES.md`: friendly, intentional real-life nearby play, not anti-internet, no aggressive social prompts.
+Sudoku reference source: `PlayerEden/SudokuTogether` branch `development` SHA `1818cd54e2fc5c5eaecf37389295ae3d55b898c9`. The new documents are **proposals and design direction**, not proof that the features are implemented in Sudoku.
 
-## Implemented WS-06E slice
-- A visible **Playing with someone nearby** companion card makes friend connection, their chosen display name (bounded to 24 chars), per-person contributions, and game stage visible. A shorter friend name is a display-only treatment; it isn't stored or shared externally. The card stacks its two progress entries at narrow widths or enlarged font scales.
-- Shared Board Co-op and Race use publicly owned shared claims; Co-op shows total shared progress and, when known, the last public partner find. Speed Duel displays only own progress and opponent count, never the opponent's private found IDs, word list or paths.
-- A separate, pure formatter makes truthful **finished and admitted** Co-op, Shared Board Race and Speed Duel summary text from a validated final snapshot; Score is relative to the local player, not assumed host win. No room ID/address/code, IP, chat, player identity, word answers, puzzle seed, store link or claims are exported.
-- Optional **Share result** button on Nearby completed matches. Competitive modes enable only once the result was actually saved locally; incomplete rounds cannot be shared as victories. Co-op share never claims a private journal that doesn't exist.
-- The native Android text Sharesheet now has an **explicit preview and Cancel** step, also for existing Solo and Daily share action. No auto-share and no backend. This phase exports **text**, not the future PNG card; copy/share image formats remain future design options.
-- v0.7.2 / versionCode 26, same public **test-only** signer, Android package and LAN protocol v6. No new network permissions or wire fields.
+- [Share Results UX](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_SHARE_RESULTS_UX_DESIGN.md): A low-pressure, visible, optional Share result action with preview and native share sheet. Word Search already supported Solo/Daily text sharing; WS-06E adds preview/Cancel and extends privacy-safe sharing to validated nearby completions. **This slice shares text only, not PNG images.**
+- [Versus Post-Match Comparison](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_VERSUS_POST_MATCH_COMPARISON_DESIGN.md): Show real recipient-relative outcomes and counts. No false opponent completion times, full replay, or leak of private Speed Duel word IDs. Shared Board Race can already compare public claimed words; Speed Duel only shares totals.
+- [Shareable Cards Concept](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_SHAREABLE_CARDS_CONCEPT.md): Design a future 4:5 PNG postcard rendered offline, with opt-in preview, anonymous partner by default and no fake Play link. **Not implemented in WS-06E.**
+- [Shared Co-op Board Themes](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_SHARED_COOP_BOARD_THEMES_DESIGN.md): Borrowing a partner's owned board skin during Co-op may be fun, but Word Search has a different set of cosmetic assets and **no defined ranked board tiers**. Do not copy Sudoku's board IDs/tiers or unlock ownership to Word Search until reviewed. Respect independent fonts and contrast/local override.
+- [Offline Nearby/Bluetooth](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_OFFLINE_NEARBY_BLUETOOTH_DESIGN.md): Valuable no-router future prototype, but LAN v6 remains unchanged in this milestone until real two-phone Wi-Fi acceptance.
+- [Brand and Series](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_BRAND_AND_SERIES.md): Intentional friendly in-person puzzling, not compulsory online social play or rank pressure.
 
-## QA gates
-- Pure unit: valid/invalid snapshot, proper local player outcomes and totals, no secrets in share text, no private Duel IDs.
-- Android Compose: preview visible/cancel works, presence names and contributions accessible, private Duel only shows count.
-- Standard Kotlin/core/app unit/lint/instrumentation compilation/approved asset and font checks.
-- API35 emulator: install verified historical v0.7.1 stable-signed APK, preserve prior Solo/Daily/profile/Race/Duel records when updating in place to v0.7.2, run full instrumented regression, record artifact SHA and rollback checkpoint.
-- Owner physical acceptance deferred: 2 phones on same Wi-Fi, 320dp/200% fonts, TalkBack, join/reconnect, guest ready/go, actual sharing app targets, correct results and safe install-over. All cumulative PRs stay draft/unmerged.
+## WS-06E implementation
+- Visible **Playing with someone nearby** presence panel shows live connection, sanitized bounded friend display name, each person's already-validated contribution count and stage. Compact or 200% font stacks the entries. Co-op/Race can show latest public shared word; Speed Duel reveals **only per-person counts**.
+- Completed, admitted nearby Co-op/Race/Duel can produce a true local perspective text recap. Competitive Share is enabled only once the completed result has been saved locally. Names, chat, room ID/code/address, IP, raw puzzle seed, word IDs and answers never appear in shared summary.
+- **Share result** is optional and never opens automatically. A preview shows exactly the text being offered and a Cancel choice; only tapping **Share now** opens Android's native text Sharesheet. The same preview now wraps existing Solo/Daily share.
+- v0.7.2 / versionCode26, same public QA-only signer, same `com.playereden.gridmates.wordsearch.qa` app ID and nearby protocol v6. No schema, wire, backend or contacts permissions added.
 
-## Deliberately deferred
-- PNG/shareable image cards, shared cosmetic board-theme tiers/borrowing, Bluetooth/Nearby Connections, opponent private word map comparison, online accounts or leaderboards. These require dedicated design and/or two-device tests, not silent integration from Sudoku.
+## QA
+- Pure formatter tests: truthful friend-relative outcomes, no sharing incomplete/forged results, no private word ID or network secret content.
+- Android Compose tests: preview and Cancel, friend presence and progress, Speed Duel private IDs not presented.
+- Standard core/app tests, Android lint/compile/assets, plus actual API35 emulator install-over from stable-signed **v0.7.1 code25** to v0.7.2 code26 preserving Solo/Daily, profile, completed Shared Board Race **and** Speed Duel history; run full Android test suite.
+- Test real two phones later for room discovery, Ready/GO fairness, final packet delivery, 320dp/200% font, device-native share targets and actual update. All cumulative PRs remain draft/unmerged.
+
+**Future owner-reviewable proposals:** Offline PNG result cards, shared theme borrowing/priority and accessibility override, Nearby Connections/Bluetooth transport. None are released or implied by these documents.
