@@ -29,11 +29,11 @@ class SoloSchemaGuardsAndroidTest {
                     root.getJSONObject("active").put("found", "not-an-array")
                 },
                 "active.hints" to { root: JSONObject ->
-                    root.getJSONObject("active").put("hints", listOf(1, 2))
+                    root.getJSONObject("active").put("hints", org.json.JSONArray().put(1).put(2))
                 }
             )
             for ((label, poison) in cases) {
-                val invalid = JSONObject(baseline).also(poison).toString()
+                val invalid = JSONObject(baseline).also { poison(it) }.toString()
                 assertTrue("$label import should be rejected",
                     runCatching { store.previewBackup(invalid) }.isFailure)
                 assertEquals("$label import must not change in-memory data", before, store.profile)
