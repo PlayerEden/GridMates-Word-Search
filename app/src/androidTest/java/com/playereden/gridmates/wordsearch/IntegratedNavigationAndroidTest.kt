@@ -18,7 +18,7 @@ class IntegratedNavigationAndroidTest {
 
     @Test fun homeDailyRecordsCollectionsSettingsAndNearbyReturnToPlay() {
         rule.onNodeWithText("Open Daily").performScrollTo().performClick()
-        rule.onNodeWithText("The Daily Puzzle").assertExists()
+        rule.onNodeWithText("Daily Word Search").assertExists()
         rule.onNodeWithText("Back to Play").performScrollTo().performClick()
 
         rule.onNodeWithContentDescription("Open Records").performClick()
