@@ -32,6 +32,6 @@ GridMates: Word Search is a standalone, offline-first native Android word-search
 - [Master Game Design](docs/MASTER_GAME_DESIGN.md)
 - [WS-06C Speed Duel rules and acceptance plan](docs/WS06C_SPEED_DUEL_QA_PLAN_2026-11-07.md)
 
-**Installing safely:** Stable-signed WS-05J v0.5.9 from PR #41 or WS-06A v0.6.0 can update over the top to v0.7.0. Old ephemeral-signed v0.5.8 and the separate PR #40 screenshot v0.5.9 APK may require **Export backup → verify JSON → uninstall Word Search QA only → install v0.7.0 → Restore backup**. Never uninstall or clear app storage without verifying a backup. Read the [full QA receipt](docs/WS06C_BUILD_QA_2026-11-07.md).
+**Installing safely:** Stable-signed WS-05J v0.5.9 from PR #41, WS-06A v0.6.0, or WS-06B v0.6.1 can update over the top to v0.7.0 (exact v0.6.1→v0.7.0 path emulator-verified). Old ephemeral-signed v0.5.8 and the separate PR #40 screenshot v0.5.9 APK may require **Export backup → verify JSON → uninstall Word Search QA only → install v0.7.0 → Restore backup**. Never uninstall or clear app storage without verifying a backup. Read the [full QA receipt](docs/WS06C_BUILD_QA_2026-11-07.md).
 
 **Sister project:** [GridMates: Sudoku](https://github.com/PlayerEden/SudokuTogether). Word Search has its own package, saves, engine, LAN mode namespace, signing and repository.
