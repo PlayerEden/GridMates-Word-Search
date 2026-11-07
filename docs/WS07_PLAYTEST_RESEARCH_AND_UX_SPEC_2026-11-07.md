@@ -32,6 +32,18 @@
 - [Android — Adapt layouts](https://developer.android.com/design/ui/mobile/guides/layout-and-content/adapt-layout), [window size classes](https://developer.android.com/develop/adaptive-apps/guides/use-window-size-classes): respond to available width **and height**, rotation, font scaling, split-screen and device sizes. Avoid forcing portrait.
 - **Implication:** no whole-page scroll in the *active play scene*, but genuine settings/history/word-list content may scroll inside clearly invoked sheets or separate screens. The board must not disappear offscreen or compete with scrolling for word gestures. Compact-height landscape uses a side panel or segmented page rather than squeezing every control under the board.
 
+
+### B4. Nearby discovery / LAN delivery
+- [Android — Network service discovery](https://developer.android.com/develop/connectivity/wifi/use-nsd): NSD advertises, discovers and resolves local device services, but it is **discovery**, not a guarantee that application-level word claims are accepted. Service registration/response is asynchronous; service instance names can change due to collisions. Use the announced port, not an assumed constant. Physical testing must separate discovery/connect, handshake, pointer-to-claim, host acceptance, snapshot delivery and visual update.
+- **Implication:** when owner reports "connected but no word marks", require evidence at 5 boundaries (touch DOWN/UP → local path → serialized claim → host authority decision → both UI snapshots). Keep guest-private Duel paths private in logs; use redacted debug evidence in test builds. Two phones on same Wi-Fi are necessary but not by themselves proof of the whole workflow.
+
+### B5. Secondary sheets and active-play ergonomics
+- [Android — Compose bottom sheets](https://developer.android.com/develop/ui/compose/components/bottom-sheets): `ModalBottomSheet` is an appropriate **on-demand** surface for secondary content and state management, so the board can remain anchored while a user deliberately opens Word List, Chat or Room Details. The sheet should dismiss cleanly, preserve puzzle state/zoom and return focus appropriately; never render a sheet that permanently covers the play controls.
+
+### B6. Long-term storage and performance
+- [Android — DataStore](https://developer.android.com/topic/libraries/architecture/datastore): transactional small-object storage, but Room is more appropriate for large/complex collections, partial updates and referential integrity. This **does not authorize migrating existing schema4 saves** as part of a UX fix; first measure historical journal growth, export size and schema-preserving upgrade behavior.
+- [Android — Compose performance](https://developer.android.com/develop/ui/compose/performance): evaluate realistic cold-start, interaction and list/grid rendering; protect touch responsiveness from unnecessary recomposition and workload. Baseline Profiles are a **possible later optimization after measurement**, not a required prerequisite or a claim of improvement.
+
 ## C. UX rules locked for the refinement arc
 
 1. **Play first** — Home: obvious Continue Solo, Daily, Play Together; mode choices and customization secondary, never hiding primary actions. A novice should understand the next step without reading instructions.
