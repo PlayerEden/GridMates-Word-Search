@@ -31,6 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -39,6 +40,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -74,6 +76,12 @@ internal fun CollectionScreen(store: SoloStore) {
         mutableStateOf(profile.identity.displayName)
     }
     var collectionTab by rememberSaveable { mutableStateOf("Portraits") }
+    var portraitPage by rememberSaveable { mutableIntStateOf(0) }
+    var achievementPage by rememberSaveable { mutableIntStateOf(0) }
+    val compactGallery = LocalConfiguration.current.screenWidthDp < 350 ||
+        LocalDensity.current.fontScale >= 1.3f
+    val portraitPageSize = if (compactGallery) 2 else 4
+    val achievementPageSize = if (compactGallery) 2 else 4
     var licenseFontId by rememberSaveable { mutableStateOf<String?>(null) }
     val completed = WoodlandCollection.completedCount(profile)
     val nextPortrait = portraits.firstOrNull { !it.unlocked }?.portrait
@@ -240,10 +248,14 @@ internal fun CollectionScreen(store: SoloStore) {
             color = Forest, style = MaterialTheme.typography.titleMedium)
         Text("Achievements reflect your saved Solo and Daily progress.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
-        achievements.sortedWith(compareBy<AchievementProgress> { it.unlocked }
-            .thenBy { it.target - it.current }).forEach { item ->
-            AchievementCard(item)
-        }
+        val orderedAchievements = achievements.sortedWith(
+            compareBy<AchievementProgress> { it.unlocked }.thenBy { it.target - it.current })
+        val pages = ((orderedAchievements.size + achievementPageSize - 1) /
+            achievementPageSize).coerceAtLeast(1)
+        val current = achievementPage.coerceIn(0, pages - 1)
+        orderedAchievements.drop(current * achievementPageSize).take(achievementPageSize)
+            .forEach { item -> AchievementCard(item) }
+        CollectionPager(current, pages, onChange = { achievementPage = it })
     } else {
         Text(portraits.count { it.unlocked }.toString() +
             " / " + portraits.size + " Woodland portraits available",
@@ -261,7 +273,9 @@ internal fun CollectionScreen(store: SoloStore) {
             val columns = if (maxWidth < 350.dp ||
                 LocalDensity.current.fontScale >= 1.3f) 1 else 2
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                portraits.chunked(columns).forEach { pair ->
+                val current = portraitPage.coerceIn(0, ((portraits.size + portraitPageSize - 1) / portraitPageSize - 1).coerceAtLeast(0))
+                portraits.drop(current * portraitPageSize).take(portraitPageSize)
+                    .chunked(columns).forEach { pair ->
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         pair.forEach { item ->
@@ -277,6 +291,10 @@ internal fun CollectionScreen(store: SoloStore) {
                 }
             }
         }
+        val pages = ((portraits.size + portraitPageSize - 1) /
+            portraitPageSize).coerceAtLeast(1)
+        CollectionPager(portraitPage.coerceIn(0, pages - 1), pages,
+            onChange = { portraitPage = it })
         Text("Unlocks depend on completed Solo and Daily puzzles. " +
             "No random purchases, streak deadlines or paid portraits.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
@@ -423,6 +441,23 @@ private fun AchievementCard(item: AchievementProgress) {
             Text((item.target - item.current).coerceAtLeast(0).toString() +
                 " more to earn this achievement",
                 color = Muted, style = MaterialTheme.typography.labelSmall)
+        }
+    }
+}
+
+/** Compact but complete gallery navigation: no rewards are hidden or discarded. */
+@Composable
+private fun CollectionPager(page: Int, pageCount: Int, onChange: (Int) -> Unit) {
+    if (pageCount <= 1) return
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween) {
+        TextButton(onClick = { onChange(page - 1) }, enabled = page > 0) {
+            Text("Previous")
+        }
+        Text("Page ${page + 1} of $pageCount",
+            color = Muted, style = MaterialTheme.typography.labelMedium)
+        TextButton(onClick = { onChange(page + 1) }, enabled = page < pageCount - 1) {
+            Text("Next")
         }
     }
 }
