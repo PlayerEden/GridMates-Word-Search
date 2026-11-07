@@ -1,6 +1,6 @@
 # WS-06B — Versus journal and post-match comparison
 
-**November 7, 2026 · Status: implemented in cumulative draft; CI/emulator verification pending.**
+**November 7, 2026 · Status: implemented and **automated QA PASS (52 API35 tests)**; physical two-phone verification remains open. See [exact QA receipt](WS06B_BUILD_QA_2026-11-07.md).**
 
 ## Experience
 - After Shared Board Race ends, both phones display a comparison panel showing the local player's result, two readable scores/progress bars, the score difference, and a fold-out list of which words each person found.

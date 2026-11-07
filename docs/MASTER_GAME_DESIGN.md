@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Living master design — WS-06A implementation checkpoint, November 7, 2026  
-**Status:** Historical design baseline below plus current [WS-06A automated PASS receipt](WS06A_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
+**Version:** Living master design — WS-06B implementation checkpoint, November 7, 2026  
+**Status:** Historical design baseline below plus current [WS-06B automated PASS receipt](WS06B_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -501,3 +501,8 @@ The original master design is preserved as a decision/reference document; it is 
 **Still future:** separately playable Speed Duel with coordinated ready/start and private boards; idempotently persisted Versus records and post-match comparison; production Play release/signing; online accounts/servers. Do not imply these are already implemented merely because they are in this master design.
 
 All PRs #30–#42 are still **DRAFT and UNMERGED** while the owner defers physical testing. The live feature stack is PR #42 on #41 on #40 on #39 and older; never develop from the tiny default main tree without reading the current handoff.
+
+
+## November 7, 2026 — WS-06B local Versus journal update
+
+Shared Board Race completed outcomes are now stored once per room in the existing local atomic profile (schema 4 optional races field) and in exported/restored backup JSON. Nearby Versus Stats show win/loss/tie and recent results without changing Solo/Daily; after each verified finish there is a player-relative comparison of points and word ownership. [Exact source and 52-test Android verification](WS06B_BUILD_QA_2026-11-07.md). A real two-phone Wi-Fi race and actual-device recovery test remain open. Speed Duel still needs a separate private-board authority and coordinated ready/start.

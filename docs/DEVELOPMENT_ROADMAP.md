@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State:** Active cumulative Android implementation (WS-06A v0.6.0 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06A exact QA receipt](WS06A_BUILD_QA_2026-11-07.md) for current truth.  
+**State:** Active cumulative Android implementation (WS-06B v0.6.1 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06B exact QA receipt](WS06B_BUILD_QA_2026-11-07.md) for current truth.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
@@ -204,3 +204,13 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Host authoritative mode in snapshots; client mode handshake guarded; LAN protocol upgraded from v4 to v5. Older APKs must update to join v5 rooms; stable QA signer stays unchanged and versionCode rises 21→22 (v0.6.0).
 - [WS-06A QA plan](WS06A_SHARED_BOARD_RACE_QA_PLAN_2026-11-07.md) and [verified build receipt](WS06A_BUILD_QA_2026-11-07.md): JVM race decision tests, Android codec and mode UI tests, 49 green emulator tests, exact v0.5.9→v0.6.0 signed update preserving private save. Real two-phone gates still open.
 - **Later:** WS-06B persistent Race records with idempotent result claims; WS-06C Speed Duel private boards/ready/start. No fabricated win statistics or claims of two-phone hardware acceptance.
+
+
+## WS-06B — Local Versus journal, comparisons and protected updates (November 7, 2026)
+
+- **Automated PASS:** [standard Android CI](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42348095399), [full API35 emulator 52/52 tests and original APK migration](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42348032724). Real two-phone acceptance still OPEN.
+- Completed, verified Shared Board Race result recorded at most once per room, with player-relative win/loss/tie and local historical scores. Co-op and unfinished Race never count.
+- User-facing result comparison shows points, winner/tie, difference and expandable word ownership. Stats adds a distinct Nearby Versus section; Solo and Daily totals stay separate.
+- Optional schema-4 races array in existing atomic profile and JSON backup, with preview/confirmed restore, invalid duplicate rejection, older saves compatible, no silent pruning. 1,000-match bounded journal.
+- Stable test-only signing, versionCode 23 / v0.6.1, unchanged LAN v5. Actual old v0.6.0 code22 APK updated in place, preserving all previous profile fields. [Verified build receipt](WS06B_BUILD_QA_2026-11-07.md).
+- **Next WS-06C:** Speed Duel needs truly separate per-seat private board, ready/start, host-authoritative finish/tie logic. Actual two-phone acceptance deferred and all drafts unmerged.
