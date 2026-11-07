@@ -3,6 +3,7 @@ name: WS-06F Result Postcard Android Emulator QA
 # Source-matched emulator QA is opt-in/branch-scoped to conserve Actions minutes.
 # It executes full Co-op, Race, Duel, Solo/Daily and save regression tests.
 # Source-matched real v0.7.2-to-v0.7.3 install-over, both result journals preserved.
+# Recheck with initialized app-private fixture directory after the initial emulator setup abort.
 
 on:
   workflow_dispatch:
