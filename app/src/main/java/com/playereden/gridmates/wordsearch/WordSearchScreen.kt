@@ -132,6 +132,7 @@ internal fun WordSearchScreen(
     }
     var changeOpen by rememberSaveable { mutableStateOf(false) }
     var feelOpen by rememberSaveable { mutableStateOf(false) }
+    var cluesOpen by rememberSaveable { mutableStateOf(false) }
     var newPuzzleOpen by rememberSaveable { mutableStateOf(false) }
     var optionsOpen by rememberSaveable { mutableStateOf(false) }
     var reviewingCompletedBoard by remember(puzzle.id) { mutableStateOf(false) }
@@ -156,6 +157,7 @@ internal fun WordSearchScreen(
     val haptics = LocalHapticFeedback.current
     val view = LocalView.current
     val hintsRemaining = WordHintPolicy.remaining(run, daily)
+    val usedHintSteps = WordHintPolicy.used(run)
     val finished = WordSearchRules.complete(puzzle, found)
     val hintPaths = puzzle.targets.filter { target ->
         target.id !in found && (run.hints[target.id] ?: 0) >= 3
@@ -266,6 +268,11 @@ internal fun WordSearchScreen(
         )
     }
 
+    if (cluesOpen) {
+        SavedCluesDialog(puzzle = puzzle, run = run,
+            onDismiss = { cluesOpen = false })
+    }
+
     // All screen sizes share the same two-row HUD. The separate word panel
     // consumes remaining measured space rather than being pushed offscreen.
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 2.dp)) {
@@ -351,6 +358,14 @@ internal fun WordSearchScreen(
                                     newPuzzleOpen = true
                                 })
                         }
+                        if (usedHintSteps > 0) {
+                            DropdownMenuItem(
+                                text = { Text("Review saved clues ($usedHintSteps)") },
+                                onClick = {
+                                    optionsOpen = false
+                                    cluesOpen = true
+                                })
+                        }
                         DropdownMenuItem(text = { Text("Feedback settings") },
                             onClick = {
                                 optionsOpen = false
@@ -368,6 +383,9 @@ internal fun WordSearchScreen(
                 (run.elapsedSeconds % 60L).toString().padStart(2, '0')
             val hintAction: @Composable () -> Unit = {
                 TextButton(onClick = {
+                    if (hintsRemaining == 0 && usedHintSteps > 0) {
+                        cluesOpen = true
+                    } else {
                     val (next, target) = if (daily) store.dailyHint() else {
                         val (updated, word) = store.hint()
                         updated to word
@@ -382,12 +400,18 @@ internal fun WordSearchScreen(
                             else -> "Follow the faint gold guide for " + target.word + "."
                         }
                     }
-                }, enabled = hintsRemaining > 0 && !finished,
+                    }
+                }, enabled = !finished && (hintsRemaining > 0 || usedHintSteps > 0),
                     modifier = Modifier.semantics {
-                        contentDescription = "Hint. $hintsRemaining of " +
+                        contentDescription = if (hintsRemaining == 0 && usedHintSteps > 0)
+                            "Review your saved clues. No hints spent."
+                        else "Hint. $hintsRemaining of " +
                             WordHintPolicy.allowance(run, daily) + " left for this puzzle."
                     }
-                ) { Text("Hint ($hintsRemaining)") }
+                ) {
+                    Text(if (hintsRemaining == 0 && usedHintSteps > 0)
+                        "Review clues" else "Hint ($hintsRemaining)")
+                }
             }
             if (compactHud) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
