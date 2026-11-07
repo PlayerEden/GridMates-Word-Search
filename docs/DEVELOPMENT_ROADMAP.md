@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State:** Active cumulative Android implementation (WS-06C v0.7.0 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06C exact QA receipt](WS06C_BUILD_QA_2026-11-07.md) for current truth.  
+**State:** Active cumulative Android implementation (WS-06D v0.7.1 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06D exact QA receipt](WS06D_BUILD_QA_2026-11-07.md) for current truth.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
@@ -224,3 +224,13 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Stable **test-only** signer, Android versionCode24/v0.7.0; the **actual v0.6.1 code23 QA APK** updated in place on emulator while maintaining Solo/Daily, identity and existing race journal entries.
 - [Exact-SHA APK/QA/checkpoint](WS06C_BUILD_QA_2026-11-07.md); [design and owner two-phone acceptance plan](WS06C_SPEED_DUEL_QA_PLAN_2026-11-07.md).
 - **Next WS-06D:** independent persistent Duel results. Production signing, encryption, anti-cheat and physical two-device testing remain outside this milestone.
+
+
+## WS-06D — Persistent Speed Duel results and protected app updates (November 7, 2026)
+
+- **Automated PASS:** [standard Android CI](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42351978673) and [API35 actual-update emulator](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42351958926), **60/60 on-device tests**, no failures or skips. Real two-handset acceptance is still OPEN.
+- Finished host-confirmed Duel views create one local win/loss per room, independent of Shared Board Race ties and Solo/Daily progress. Room replay or rejoin cannot re-award the result; no opponent private word IDs are stored.
+- Distinct Speed Duel Stats with Played/Wins/Losses/Words found and recent scores, plus a player-relative final screen with local save confirmation.
+- Optional `duels` array in existing schema-4 AtomicFile and JSON backup, compatible with older profiles and safe import rejection of impossible or duplicate records.
+- Stable QA-only signing, **v0.7.1 versionCode25, LAN v6 unchanged**. The **actual signed v0.7.0 code24 APK** was upgraded in place and retained previous Solo/Daily/profile and completed Race entry. [Exact-source build/QA receipt, checksum and rollback checkpoint](WS06D_BUILD_QA_2026-11-07.md).
+- **Next WS-06E:** Nearby player-presence/accessibility polish and optional sharing, preserving all work before physical two-phone testing. All ancestor PRs remain draft/unmerged.

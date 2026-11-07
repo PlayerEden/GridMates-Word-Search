@@ -49,15 +49,18 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
     val ownName = store.profile.identity.displayName.trim().ifBlank { "Player" }
     val snapshot = state.snapshot
 
-    // The host is authoritative; only finished verified Race snapshots enter
-    // the existing atomic profile journal. The store rejects duplicate room
-    // IDs across recomposition, screen rotation, rejoin and application restart.
-    LaunchedEffect(snapshot?.roomId, snapshot?.revision, snapshot?.finished, state.role) {
+    // Final, host-authoritative snapshots enter their own atomic journal.
+    // A Duel's revision lives in the recipient-specific DuelView rather than
+    // the co-op revision. Replays/rotation/rejoin never increment totals twice.
+    LaunchedEffect(snapshot?.roomId, snapshot?.revision, snapshot?.duel?.revision,
+        snapshot?.finished, state.role) {
         val final = snapshot ?: return@LaunchedEffect
-        if (final.match == NearbyMatch.SHARED_BOARD_RACE && final.finished &&
-            state.role != NearbyRole.NONE) {
-            val seat = if (state.role == NearbyRole.HOST) CoopSeat.HOST else CoopSeat.GUEST
-            runCatching { store.recordRace(final, seat) }
+        if (!final.finished || state.role == NearbyRole.NONE) return@LaunchedEffect
+        val seat = if (state.role == NearbyRole.HOST) CoopSeat.HOST else CoopSeat.GUEST
+        when (final.match) {
+            NearbyMatch.SHARED_BOARD_RACE -> store.recordRace(final, seat)
+            NearbyMatch.SPEED_DUEL -> store.recordDuel(final, seat)
+            NearbyMatch.COOP -> Unit
         }
     }
 
@@ -357,6 +360,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
 
             if (duel != null) {
                 SpeedDuelStatusCard(duel, puzzle.targets.size, connected,
+                    saved = store.profile.duelResults.any { it.roomId == snapshot.roomId },
+                    saveFailed = store.warning != null,
                     onReady = runtime::readySpeedDuel)
             }
             if (snapshot.match == NearbyMatch.SHARED_BOARD_RACE && snapshot.finished) {

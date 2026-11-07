@@ -99,6 +99,9 @@ internal fun SoloSettingsScreen(store: SoloStore) {
                     Text(preview.raceResults.size.toString() +
                         " completed Shared Board Race results.",
                         color = Muted)
+                    Text(preview.duelResults.size.toString() +
+                        " completed Speed Duel results.",
+                        color = Muted)
                     Text("Restoring replaces your current Word Search profile, " +
                         "puzzle and records on this phone. Export the current " +
                         "progress first if you want a copy.",
@@ -122,7 +125,7 @@ internal fun SoloSettingsScreen(store: SoloStore) {
     PaperEyebrow("Your app & saved progress")
     Text("Settings & backup", color = Forest, fontWeight = FontWeight.Bold,
         style = MaterialTheme.typography.headlineMedium)
-    Text("Your Solo, Daily and collection progress are stored on this device.",
+    Text("Your Solo, Daily, nearby results and collections are stored on this device.",
         color = Muted, style = MaterialTheme.typography.bodyMedium)
 
     PaperPanel(Modifier.fillMaxWidth()) {
@@ -136,7 +139,8 @@ internal fun SoloSettingsScreen(store: SoloStore) {
             color = Muted, style = MaterialTheme.typography.bodyMedium)
         Text(store.profile.completions.toString() + " Solo · " +
             store.profile.dailyCompletions + " Daily · " +
-            store.profile.raceResults.size + " Versus completed",
+            store.profile.raceResults.size + " Races · " +
+            store.profile.duelResults.size + " Duels",
             color = Forest, style = MaterialTheme.typography.labelLarge)
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val stacked = maxWidth < 350.dp ||
@@ -164,9 +168,9 @@ internal fun SoloSettingsScreen(store: SoloStore) {
                 }
             }
         }
-        Text("Export includes Solo, Daily, completed Versus results, and your " +
-            "profile/collections. Restore asks before replacing existing progress. " +
-            "Older backups without Versus history contain zero Race results.",
+        Text("Export includes Solo, Daily, completed Race and Speed Duel results, " +
+            "and profile/collections. Restore asks before replacing progress. " +
+            "Older backups without a Duel journal restore with zero Duel results.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
         Text("Export saves a file to a location you choose. Restore asks before " +
             "replacing your current Word Search progress.",
