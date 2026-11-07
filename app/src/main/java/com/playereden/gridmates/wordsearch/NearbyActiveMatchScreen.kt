@@ -135,8 +135,11 @@ internal fun NearbyActiveMatchScreen(
             Text("Save warning: " + warning, color = Gold,
                 style = MaterialTheme.typography.bodySmall, maxLines = 2)
         }
-        if (touchFeedback.isNotBlank() && started) {
-            Text(touchFeedback, color = Forest,
+        val claimMessage = if (state.role == NearbyRole.GUEST)
+            state.claimReceipt?.description() else null
+        val visibleFeedback = claimMessage ?: touchFeedback
+        if (visibleFeedback.isNotBlank() && started) {
+            Text(visibleFeedback, color = Forest,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 2)
         }

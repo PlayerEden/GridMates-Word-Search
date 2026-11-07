@@ -42,6 +42,33 @@ internal data class NearbyListing(
 
 internal enum class NearbyRole { NONE, HOST, GUEST }
 
+/** Additive metadata inside existing v7 state frames (old peers ignore it).
+ * Always scoped to the guest's submitted request; does not expose Duel paths.
+ */
+internal data class NearbyClaimReceipt(val requestId: String, val status: String) {
+    fun description(): String = when (status) {
+        "FOUND" -> "Word confirmed by host."
+        "ALREADY_FOUND" -> "Someone already found that word."
+        "INVALID_PATH" -> "Host did not accept that selection."
+        "NOT_READY", "NOT_CONNECTED", "NOT_STARTED" -> "Partner not ready. Try again when connected."
+        "FINISHED" -> "That round is already complete."
+        "INVALID_REQUEST", "WRONG_ROOM" -> "Claim rejected. Reconnect before trying again."
+        "UNCONFIRMED" -> "No host confirmation yet. Check connection before retrying."
+        else -> "Word selection was not accepted."
+    }
+
+    companion object {
+        fun validId(value: String): Boolean =
+            value.length in 1..64 && value.all { ch ->
+                ch.code in 0..127 && (ch.isLetterOrDigit() || ch == '-' || ch == '_')
+            }
+
+        fun validStatus(value: String): Boolean =
+            value in CoopClaimStatus.entries.map { it.name } ||
+                value in DuelCommandStatus.entries.map { it.name }
+    }
+}
+
 internal data class NearbyJoinRecovery(
     val roomId: String, val address: String, val port: Int, val code: String
 )
@@ -63,7 +90,9 @@ internal data class NearbyUiState(
     val chat: List<NearbyChatLine> = emptyList(),
     val pendingChat: PendingNearbyChat? = null,
     val recovery: NearbyJoinRecovery? = null,
-    val disconnected: Boolean = false
+    val disconnected: Boolean = false,
+    val pendingClaimId: String? = null,
+    val claimReceipt: NearbyClaimReceipt? = null
 )
 
 /** Small, bounded length-prefixed JSON wire; never deserialize arbitrary objects. */
@@ -91,7 +120,7 @@ internal object NearbyPacket {
         }
     }
 
-    fun state(s: CoopSnapshot): JSONObject {
+    fun state(s: CoopSnapshot, claimReceipt: NearbyClaimReceipt? = null): JSONObject {
         val spec = s.spec
         val claims = JSONArray()
         s.claims.forEach { claim ->
@@ -117,7 +146,27 @@ internal object NearbyPacket {
                 .put("hostCount", d.hostCount).put("guestCount", d.guestCount)
                 .put("own", JSONArray(d.ownFoundIds.sorted())))
         }
+        claimReceipt?.let { acknowledgement ->
+            require(NearbyClaimReceipt.validId(acknowledgement.requestId))
+            require(NearbyClaimReceipt.validStatus(acknowledgement.status))
+            wire.put("claimReceipt", JSONObject()
+                .put("id", acknowledgement.requestId)
+                .put("status", acknowledgement.status))
+        }
         return wire
+    }
+
+    /** State can carry an optional guest-only claim receipt. Invalid metadata
+     * is rejected; neither the saved snapshot nor the LAN version changes.
+     */
+    fun readClaimReceipt(json: JSONObject): NearbyClaimReceipt? {
+        if (!json.has("claimReceipt")) return null
+        val detail = json.getJSONObject("claimReceipt")
+        val acknowledgement = NearbyClaimReceipt(
+            detail.getString("id"), detail.getString("status"))
+        require(NearbyClaimReceipt.validId(acknowledgement.requestId))
+        require(NearbyClaimReceipt.validStatus(acknowledgement.status))
+        return acknowledgement
     }
 
     fun chatLine(line: NearbyChatLine): JSONObject =
@@ -492,14 +541,18 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                             val duel = synchronized(lock) { duelAuthority }
                                 ?: throw IOException("Duel room is unavailable")
                             val current = session.snapshot()
-                            duel.submit(CoopSeat.GUEST, msg.optString("id"),
+                            val requestId = msg.optString("id")
+                            val outcome = duel.submit(CoopSeat.GUEST, requestId,
                                 points.first, points.second,
                                 current.guestConnected && current.hostConnected)
-                            publishHost(session.snapshot())
+                            publishHost(session.snapshot(), if (NearbyClaimReceipt.validId(requestId))
+                                NearbyClaimReceipt(requestId, outcome.status.name) else null)
                         } else {
+                            val requestId = msg.optString("id")
                             val outcome = session.submit(CoopSeat.GUEST, session.roomId,
-                                msg.optString("id"), points.first, points.second)
-                            publishHost(outcome.snapshot)
+                                requestId, points.first, points.second)
+                            publishHost(outcome.snapshot, if (NearbyClaimReceipt.validId(requestId))
+                                NearbyClaimReceipt(requestId, outcome.status.name) else null)
                         }
                     }
                     else -> throw IOException("Unsupported game operation")
@@ -627,12 +680,15 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
         }
     }
 
-    private fun publishHost(snapshot: CoopSnapshot) {
-        // NEVER send the host's private found IDs to the guest.
+    private fun publishHost(snapshot: CoopSnapshot,
+                            receipt: NearbyClaimReceipt? = null) {
+        // NEVER send the host's private found IDs or claim receipts to a
+        // different room. Receipt is an optional field on guest state only.
         post { it.copy(snapshot = forSeat(snapshot, CoopSeat.HOST)) }
         val socket = synchronized(lock) { peer } ?: return
         runCatching {
-            NearbyPacket.write(socket, NearbyPacket.state(forSeat(snapshot, CoopSeat.GUEST)))
+            NearbyPacket.write(socket, NearbyPacket.state(
+                forSeat(snapshot, CoopSeat.GUEST), receipt))
         }.onFailure { dropGuest(socket) }
     }
 
@@ -882,6 +938,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     pendingGuestChat
                 }
                 post { it.copy(role = NearbyRole.GUEST, busy = false, disconnected = false,
+                    pendingClaimId = null, claimReceipt = null,
                     snapshot = snapshot, roomId = snapshot.roomId,
                     chat = offeredChat, pendingChat = outstanding, recovery = null,
                     hostName = welcome.optString("hostName", "Host"),
@@ -935,6 +992,7 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     }
                     "state" -> {
                         val incoming = NearbyPacket.parseState(msg)
+                        val receipt = NearbyPacket.readClaimReceipt(msg)
                         if (incoming.duel?.recipient == CoopSeat.HOST)
                             throw IOException("Host private state was sent to the guest")
                         post { current ->
@@ -956,7 +1014,16 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                                 (incoming.revision == old.revision &&
                                     incoming.claims != old.claims) ||
                                 duelRegressed)) current
-                            else current.copy(snapshot = incoming)
+                            else {
+                                // A stale or unrelated confirmation must not
+                                // replace the latest pending guest selection.
+                                val matched = receipt?.takeIf {
+                                    it.requestId == current.pendingClaimId
+                                }
+                                current.copy(snapshot = incoming,
+                                    pendingClaimId = if (matched == null) current.pendingClaimId else null,
+                                    claimReceipt = matched ?: current.claimReceipt)
+                            }
                         }
                     }
                     "error" -> throw IOException(msg.optString("message"))
@@ -1028,16 +1095,39 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             NearbyRole.GUEST -> {
                 if (state.disconnected) return
                 val socket = synchronized(lock) { client } ?: return
+                val requestId = UUID.randomUUID().toString()
+                post { current ->
+                    if (current.role == NearbyRole.GUEST && current.roomId == s.roomId)
+                        current.copy(pendingClaimId = requestId, claimReceipt = null)
+                    else current
+                }
                 io.execute {
                     runCatching {
                         NearbyPacket.write(socket, JSONObject().put("type", "claim")
-                            .put("id", UUID.randomUUID().toString())
+                            .put("id", requestId)
                             .put("r1", start.row).put("c1", start.col)
                             .put("r2", end.row).put("c2", end.col))
                     }.onFailure {
-                        post { it.copy(message = "Could not send selection; reconnect to continue.") }
+                        post { current ->
+                            if (current.pendingClaimId == requestId)
+                                current.copy(pendingClaimId = null,
+                                    claimReceipt = NearbyClaimReceipt(requestId, "UNCONFIRMED"),
+                                    message = "Could not send selection; reconnect to continue.")
+                            else current
+                        }
                     }
                 }
+                // Never repeat a claim automatically: a lost acknowledgement
+                // may follow successful host-side acceptance.
+                heartbeat.schedule({
+                    post { current ->
+                        if (current.pendingClaimId == requestId &&
+                            current.role == NearbyRole.GUEST && current.roomId == s.roomId)
+                            current.copy(pendingClaimId = null,
+                                claimReceipt = NearbyClaimReceipt(requestId, "UNCONFIRMED"))
+                        else current
+                    }
+                }, 9, TimeUnit.SECONDS)
             }
             else -> Unit
         }

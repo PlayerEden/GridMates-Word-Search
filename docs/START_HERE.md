@@ -1,6 +1,6 @@
 # START HERE — GridMates: Word Search
 
-**Latest cumulative QA (November 7, 2026): WS-07C v0.7.9/code33 automated PASS, 83/83 API35 tests.** Same-signer v0.7.8→v0.7.9 install-over preserves Solo/Daily/identity/Race/Duel. [Verified exact-source receipt](WS07C_BUILD_QA_2026-11-07.md) and [draft PR #56](https://github.com/PlayerEden/GridMates-Word-Search/pull/56); tested executable `113e5e51d44f77c2a4e1bd2dffe3cc0c9b0a8eb6`. Physical two-phone Co-op selection P0 is **OPEN and deferred** by owner; no real-device TalkBack signoff or `main` merge.
+**Latest automated checkpoint (November 7, 2026): WS-07D v0.8.0/code34 PASS, 87/87 API35 tests.** Host claim acknowledgements/invalid selections/timeout now visible for guests, with unchanged LAN wire v7 and no scoring/privacy change. Signed v0.7.9→v0.8.0 install-over preserves Solo/Daily/identity/Race/Duel. [Verified exact-source receipt](WS07D_BUILD_QA_2026-11-07.md) and [draft PR #57](https://github.com/PlayerEden/GridMates-Word-Search/pull/57); tested commit `7edb6cf01437b86767d3696a2a04b9e9f03d9e27`. **Physical two-phone Co-op word-marking P0 remains OPEN, testing deferred by owner**, no production release or `main` merge.
 
 ## Current state and documents
 
@@ -64,3 +64,8 @@ WS-06G added a **small, entirely free Co-op board appearance preview catalog** a
 ### Latest WS-07C source-backed evidence (supersedes earlier v0.7.8-only summary)
 
 [Full green 83/83 Android run #42419162816](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42419162816), [exact tested APK SHA and rollback](WS07C_BUILD_QA_2026-11-07.md). Follow-up WS-07D should prioritize automated LAN/claim reliability without asking owner for phone testing. Keep v0.7.9 verified fallback, ensure no untested code is called stable.
+
+
+### WS-07D next handoff (supersedes earlier v0.7.9-only summary)
+
+**87/87 Android tests PASS**, real same-signer v0.7.9→v0.8.0 update PASS. [Full exact-source receipt](WS07D_BUILD_QA_2026-11-07.md). Future WS-07E design/polish work can proceed in a new stacked draft after examining this checkpoint; do not claim two-phone acceptance, and do not ask for physical playtests until user says ready.
