@@ -46,11 +46,15 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
     Text("Shared Board Race results saved locally. Co-op isn't counted as a win or loss.",
         color = Muted, style = MaterialTheme.typography.bodySmall)
     val racing = profile.raceSummary
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        MetricCard("Played", racing.played.toString(), Modifier.weight(1f))
-        MetricCard("Wins", racing.wins.toString(), Modifier.weight(1f))
-        MetricCard("Losses", racing.losses.toString(), Modifier.weight(1f))
-        MetricCard("Ties", racing.ties.toString(), Modifier.weight(1f))
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MetricCard("Played", racing.played.toString(), Modifier.weight(1f))
+            MetricCard("Wins", racing.wins.toString(), Modifier.weight(1f))
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MetricCard("Losses", racing.losses.toString(), Modifier.weight(1f))
+            MetricCard("Ties", racing.ties.toString(), Modifier.weight(1f))
+        }
     }
     if (profile.raceResults.isEmpty()) {
         Card(Modifier.fillMaxWidth()) {
