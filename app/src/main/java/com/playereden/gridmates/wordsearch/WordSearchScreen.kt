@@ -265,11 +265,17 @@ internal fun WordSearchScreen(
         val landscape = maxWidth > maxHeight * 1.25f
         val compactHud = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.5f
         val boardViewport = if (landscape) {
-            minOf(maxHeight - (if (finished && !reviewingCompletedBoard) 236.dp else 212.dp),
-                maxWidth * 0.51f).coerceAtLeast(106.dp)
+            minOf(maxHeight - when {
+                    compactHud -> 248.dp
+                    finished && !reviewingCompletedBoard -> 236.dp
+                    else -> 212.dp
+                }, maxWidth * 0.51f).coerceAtLeast(106.dp)
         } else {
-            minOf(maxWidth, maxHeight * (if (finished && !reviewingCompletedBoard)
-                    0.43f else 0.54f))
+            minOf(maxWidth, maxHeight * when {
+                    compactHud -> 0.40f
+                    finished && !reviewingCompletedBoard -> 0.43f
+                    else -> 0.54f
+                })
                 .coerceAtLeast(145.dp)
         }
 
