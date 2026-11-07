@@ -46,6 +46,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
     var chatOpen by rememberSaveable { mutableStateOf(false) }
     var roomDetailsExpanded by rememberSaveable { mutableStateOf(false) }
     var chatDraft by rememberSaveable { mutableStateOf("") }
+    var shareText by rememberSaveable { mutableStateOf<String?>(null) }
     val ownName = store.profile.identity.displayName.trim().ifBlank { "Player" }
     val snapshot = state.snapshot
 
@@ -314,12 +315,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                                 color = Muted, style = MaterialTheme.typography.bodySmall)
                         }
                     }
-                    Text(if (connected) "● Partner connected" else "○ Partner offline / not joined",
-                        color = if (connected) Forest else Muted)
-                    if (lastPartnerWord != null) {
-                        Text("Partner most recently found: " + lastPartnerWord,
-                            color = Forest, style = MaterialTheme.typography.bodyMedium)
-                    }
+                    // Connection, identity and contributions are shown in a
+                    // dedicated companion panel immediately below this header.
                     if (state.role == NearbyRole.HOST && connected) {
                         TextButton(onClick = {
                             roomDetailsExpanded = !roomDetailsExpanded
@@ -358,6 +355,9 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                 }
             }
 
+            NearbyPlayerPresenceCard(state, snapshot, localSeat, puzzle.targets.size,
+                recentWord = lastPartnerWord)
+
             if (duel != null) {
                 SpeedDuelStatusCard(duel, puzzle.targets.size, connected,
                     saved = store.profile.duelResults.any { it.roomId == snapshot.roomId },
@@ -371,6 +371,29 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
             }
             store.warning?.let {
                 Text(it, color = Gold, style = MaterialTheme.typography.bodySmall)
+            }
+
+            if (snapshot.finished && snapshot.guestReserved) {
+                val safelySaved = when (snapshot.match) {
+                    NearbyMatch.COOP -> true
+                    NearbyMatch.SHARED_BOARD_RACE ->
+                        store.profile.raceResults.any { it.roomId == snapshot.roomId }
+                    NearbyMatch.SPEED_DUEL ->
+                        store.profile.duelResults.any { it.roomId == snapshot.roomId }
+                }
+                OutlinedButton(
+                    onClick = {
+                        shareText = runCatching {
+                            NearbyMatchShare.text(snapshot, localSeat)
+                        }.getOrNull()
+                    },
+                    enabled = safelySaved,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                ) { Text("Share result") }
+                if (!safelySaved) {
+                    Text("You can share once the completed match is saved on this phone.",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
             }
 
             if (duel == null || duel.started) {
@@ -538,6 +561,10 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                 TextButton(onClick = { exitPrompt = false }) { Text("Keep playing") }
             }
         )
+    }
+
+    shareText?.let { summary ->
+        ShareResultPreview(summary = summary, onDismiss = { shareText = null })
     }
 
     val protected = selectedRoom

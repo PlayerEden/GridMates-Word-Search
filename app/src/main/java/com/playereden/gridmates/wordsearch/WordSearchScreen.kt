@@ -1,6 +1,5 @@
 package com.playereden.gridmates.wordsearch
 
-import android.content.Intent
 import android.view.SoundEffectConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -491,8 +490,7 @@ private fun CompletionPanel(
     onAnother: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    var shareUnavailable by remember(puzzle.id) { mutableStateOf(false) }
+    var shareText by remember(puzzle.id) { mutableStateOf<String?>(null) }
     val usedHints = run.hints.values.sum()
     val time = (completedSeconds.coerceAtLeast(0L) / 60L).toString() + ":" +
         (completedSeconds.coerceAtLeast(0L) % 60L).toString().padStart(2, '0')
@@ -549,20 +547,9 @@ private fun CompletionPanel(
         }
 
         OutlinedButton(onClick = {
-            val summary = PuzzleResultShare.text(puzzle, run, completedSeconds, daily)
-            shareUnavailable = runCatching {
-                val send = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, summary)
-                }
-                context.startActivity(Intent.createChooser(send, "Share puzzle results"))
-            }.isFailure
+            shareText = PuzzleResultShare.text(puzzle, run, completedSeconds, daily)
         }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
             Text("Share results")
-        }
-        if (shareUnavailable) {
-            Text("Sharing isn't available on this device.",
-                color = Gold, style = MaterialTheme.typography.bodySmall)
         }
 
         OutlinedButton(onClick = onReview,
@@ -578,6 +565,9 @@ private fun CompletionPanel(
                 Text("Home")
             }
         }
+    }
+    shareText?.let { summary ->
+        ShareResultPreview(summary, onDismiss = { shareText = null })
     }
 }
 

@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Living master design — WS-06D implementation checkpoint, November 7, 2026  
-**Status:** Historical design baseline below plus current [WS-06D automated PASS receipt](WS06D_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
+**Version:** Living master design — WS-06E implementation checkpoint, November 7, 2026  
+**Status:** Historical design baseline below plus current [WS-06E automated PASS receipt](WS06E_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -516,3 +516,8 @@ Speed Duel is now implemented separately from Shared Board Race in cumulative [d
 ## November 7, 2026 — WS-06D Speed Duel records
 
 Speed Duel now has a **distinct persistent winner/loser journal**, not a subset of Shared Board Race history. Only completed, recipient-scoped, host-verified outcomes are recorded. The first record for each hosted room remains immutable across retries and reconnections. Player Stats show separate Duel Played/Wins/Losses and recent matches; backup Export/preview/Restore include Duel history as an optional schema-4 array, with older backups supported and invalid/duplicate awards rejected. No opponent word IDs are exposed or stored as history. The final Duel card shows both counts and save status. [Source-matched 60-test QA receipt](WS06D_BUILD_QA_2026-11-07.md) proves an install-over from original v0.7.0 preserving Solo/Daily/profile and prior Race history. Owner two-device fairness, Wi-Fi loss and actual handset acceptance remain open; LAN traffic is not cryptographically secure. Next is UX/presence polish and potential sharing in WS-06E.
+
+
+## November 7, 2026 — WS-06E friendly presence and optional sharing
+
+Cumulative [draft PR #46](https://github.com/PlayerEden/GridMates-Word-Search/pull/46) adds a compact, accessible "Playing with someone nearby" panel using real friend connection, local display name, personal contributions and mode-specific stage, with **Speed Duel showing only the opponent count**. Completed, host-verified Co-op, Race and Duel have a player-relative, spoiler-safe optional Share result text preview; competitive result must be persisted before sharing. Solo/Daily's pre-existing share action now also previews exact text before Android Sharesheet. There are no room codes, IP addresses, chat logs, private word IDs, online services or invented Play URL in the exported text. This is **text sharing, not PNG card export**. [63-test exact-source Android QA](WS06E_BUILD_QA_2026-11-07.md) verified a v0.7.1→v0.7.2 install-over retaining Race and Duel journals. The latest Nov 6–7 [Sudoku design briefs](WS06E_NEARBY_PRESENCE_SHARE_QA_PLAN_2026-11-07.md) helped set privacy, preview and co-op cosmetic future design boundaries. Shared cosmetic tiers and no-router/Bluetooth transport remain future proposals. Real two-phone LAN fairness, large text and actual share targets still require owner acceptance.
