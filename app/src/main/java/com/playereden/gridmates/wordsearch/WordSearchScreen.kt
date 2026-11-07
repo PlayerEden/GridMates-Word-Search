@@ -264,10 +264,11 @@ internal fun WordSearchScreen(
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 2.dp)) {
         val landscape = maxWidth > maxHeight * 1.25f
         val boardViewport = if (landscape) {
-            minOf(maxHeight - (if (finished) 236.dp else 212.dp),
+            minOf(maxHeight - (if (finished && !reviewingCompletedBoard) 236.dp else 212.dp),
                 maxWidth * 0.51f).coerceAtLeast(106.dp)
         } else {
-            minOf(maxWidth, maxHeight * (if (finished) 0.43f else 0.54f))
+            minOf(maxWidth, maxHeight * (if (finished && !reviewingCompletedBoard)
+                    0.43f else 0.54f))
                 .coerceAtLeast(145.dp)
         }
 
@@ -375,56 +376,43 @@ internal fun WordSearchScreen(
             }
             PaperProgress(found.size, puzzle.targets.size)
 
-            if (landscape) {
+            // A finished puzzle should open its journal first, not bury
+            // Play another / Share below a large (zoomed) board.
+            // The board remains available with Review completed board.
+            if (finished && !reviewingCompletedBoard) {
+                CompletionPanel(
+                    puzzle = puzzle, run = run, daily = daily,
+                    completedSeconds = currentResult?.elapsedSeconds ?: run.elapsedSeconds,
+                    onReview = { reviewingCompletedBoard = true },
+                    onRecords = { store.flush(); onRecords() },
+                    onHome = { store.flush(); onBack() },
+                    onAnother = if (daily) null else { { startNew() } },
+                    modifier = Modifier.weight(1f).fillMaxWidth()
+                )
+            } else if (landscape) {
                 Row(Modifier.weight(1f).fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(Modifier.width(boardViewport),
                         verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         ZoomableWordGrid(puzzle, found, hintPaths,
                             boardViewport, select, onStep, boardFontId)
-                        if (!finished || reviewingCompletedBoard) {
-                            PuzzleStatus(status, compact = true)
-                        }
+                        PuzzleStatus(status, compact = true)
                     }
-                    if (!finished || reviewingCompletedBoard) {
-                        WordList(puzzle, found, daily,
-                            Modifier.weight(1f).fillMaxSize(),
-                            onShowResults = if (finished) { { reviewingCompletedBoard = false } }
-                                else null)
-                    } else {
-                        CompletionPanel(
-                            puzzle = puzzle, run = run, daily = daily,
-                            completedSeconds = currentResult?.elapsedSeconds ?: run.elapsedSeconds,
-                            onReview = { reviewingCompletedBoard = true },
-                            onRecords = { store.flush(); onRecords() },
-                            onHome = { store.flush(); onBack() },
-                            onAnother = if (daily) null else { { startNew() } },
-                            modifier = Modifier.weight(1f).fillMaxSize()
-                        )
-                    }
+                    WordList(puzzle, found, daily,
+                        Modifier.weight(1f).fillMaxSize(),
+                        onShowResults = if (finished) { { reviewingCompletedBoard = false } }
+                            else null)
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     ZoomableWordGrid(puzzle, found, hintPaths,
                         boardViewport, select, onStep, boardFontId)
                 }
-                if (!finished || reviewingCompletedBoard) {
-                    PuzzleStatus(status, compact = false)
-                    WordList(puzzle, found, daily,
-                        Modifier.weight(1f).fillMaxWidth(),
-                        onShowResults = if (finished) { { reviewingCompletedBoard = false } }
-                            else null)
-                } else {
-                    CompletionPanel(
-                        puzzle = puzzle, run = run, daily = daily,
-                        completedSeconds = currentResult?.elapsedSeconds ?: run.elapsedSeconds,
-                        onReview = { reviewingCompletedBoard = true },
-                        onRecords = { store.flush(); onRecords() },
-                        onHome = { store.flush(); onBack() },
-                        onAnother = if (daily) null else { { startNew() } },
-                        modifier = Modifier.weight(1f).fillMaxWidth()
-                    )
-                }
+                PuzzleStatus(status, compact = false)
+                WordList(puzzle, found, daily,
+                    Modifier.weight(1f).fillMaxWidth(),
+                    onShowResults = if (finished) { { reviewingCompletedBoard = false } }
+                        else null)
             }
         }
     }
