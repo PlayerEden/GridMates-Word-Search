@@ -5,10 +5,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,10 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.SoloProfile
+import com.playereden.gridmates.wordsearch.core.WoodlandCollection
 
 /**
  * Small QA-friendly backup screen. Uses Android's document picker rather than
@@ -65,85 +73,115 @@ internal fun SoloSettingsScreen(store: SoloStore) {
 
     if (pendingImport != null) {
         val preview = requireNotNull(pendingImport)
+        val portrait = WoodlandCollection.portraits.firstOrNull {
+            it.id == preview.identity.portraitId
+        }?.label ?: "Woodland portrait"
         AlertDialog(
             onDismissRequest = { pendingImport = null },
-            title = { Text("Restore this backup?") },
+            title = { Text("Replace saved progress?") },
             text = {
-                Text(
-                    "This backup includes the profile '" + preview.identity.displayName + "', " +
-                        "portrait " + preview.identity.portraitId + ", " +
-                        preview.completions + " completed Solo puzzles, " +
-                        preview.dailyCompletions + " completed Daily puzzles, " +
-                        preview.dailyEntries.size + " dated entries, and " +
-                        preview.active.foundIds.size + " words in the current Solo puzzle. " +
-                        "Restoring will replace the Word Search progress currently on this device. " +
-                        "Export the current progress first if you want to keep both."
-                )
+                Column(
+                    Modifier.heightIn(max = 420.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(9.dp)
+                ) {
+                    Text("This backup contains:",
+                        fontWeight = FontWeight.SemiBold, color = Forest)
+                    Text("Profile: " + preview.identity.displayName + " · " + portrait)
+                    Text(preview.completions.toString() + " Solo puzzles · " +
+                        preview.dailyCompletions + " Daily puzzles",
+                        color = Muted)
+                    Text(preview.active.foundIds.size.toString() +
+                        " words saved in the current Solo puzzle.",
+                        color = Muted)
+                    Text("Restoring replaces your current Word Search profile, " +
+                        "puzzle and records on this phone. Export the current " +
+                        "progress first if you want a copy.",
+                        color = Gold, style = MaterialTheme.typography.bodyMedium)
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
                     message = if (store.restoreBackup(preview))
-                        "Backup restored. Continue Solo to review your puzzle."
-                    else "Could not restore. Your prior data is protected."
+                        "Backup restored. Your profile, puzzle and records were updated."
+                    else "Could not restore. Your previous data is protected."
                     pendingImport = null
-                }) { Text("Restore") }
+                }) { Text("Restore backup") }
             },
             dismissButton = {
-                TextButton(onClick = { pendingImport = null }) { Text("Cancel") }
+                TextButton(onClick = { pendingImport = null }) { Text("Keep current") }
             }
         )
     }
 
+    PaperEyebrow("Your app & saved progress")
     Text("Settings & backup", color = Forest, fontWeight = FontWeight.Bold,
         style = MaterialTheme.typography.headlineMedium)
-    Text("Local, offline puzzle progress. No account required.",
+    Text("Your Solo, Daily and collection progress are stored on this device.",
         color = Muted, style = MaterialTheme.typography.bodyMedium)
 
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Protect your puzzles", color = Forest,
-                fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
-            Text("Progress is automatically saved inside this app. Export a backup before " +
-                "uninstalling or replacing a test build. Android uninstallation removes " +
-                "local app storage.",
-                color = Muted)
-            Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = {
-                    export.launch("GridMates-WordSearch-Backup.json")
-                }) { Text("Export") }
-                Button(onClick = {
-                    import.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
-                }) { Text("Import") }
-            }
-            Text("Completed: " + store.profile.completions + " Solo · " +
-                    store.profile.dailyCompletions + " Daily",
-                color = Forest, fontWeight = FontWeight.SemiBold)
-        }
-    }
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Gameplay preferences", color = Forest,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold)
-            Text("Choose gentle vibrations and word-found sound in a puzzle's " +
-                "Options → Feedback settings. Your choices are remembered on this device.",
-                color = Muted)
-        }
-    }
-    if (message.isNotBlank()) {
-        Text(message, color = Forest, style = MaterialTheme.typography.bodyMedium)
-    }
     PaperPanel(Modifier.fillMaxWidth()) {
-        Text("About Word Search", color = Forest,
+        PaperEyebrow("Keep your progress")
+        Text("Backup & restore", color = Forest,
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleLarge)
+        Text("Puzzles save automatically. Export a backup before uninstalling, " +
+            "clearing app storage, or switching phones. Uninstalling removes " +
+            "your locally saved progress.",
+            color = Muted, style = MaterialTheme.typography.bodyMedium)
+        Text(store.profile.completions.toString() + " Solo · " +
+            store.profile.dailyCompletions + " Daily completed",
+            color = Forest, style = MaterialTheme.typography.labelLarge)
+        Row(Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = {
+                export.launch("GridMates-WordSearch-Backup.json")
+            }, modifier = Modifier.weight(1f)) { Text("Export backup") }
+            OutlinedButton(onClick = {
+                import.launch(arrayOf("application/json", "text/plain",
+                    "application/octet-stream"))
+            }, modifier = Modifier.weight(1f)) { Text("Restore backup") }
+        }
+        Text("Export saves a file to a location you choose. Restore asks before " +
+            "replacing your current Word Search progress.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+    }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("Puzzle feel")
+        Text("Gameplay preferences", color = Forest,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold)
+        Text("Adjust sound and gentle vibrations while playing: " +
+            "open a puzzle, choose Options, then Feedback settings. " +
+            "Your preferences remain on this device.",
+            color = Muted, style = MaterialTheme.typography.bodyMedium)
+    }
+
+    if (message.isNotBlank()) {
+        PaperPanel(Modifier.fillMaxWidth().semantics {
+            liveRegion = LiveRegionMode.Polite
+        }) {
+            Text(message, color = Forest, style = MaterialTheme.typography.bodyMedium)
+            TextButton(onClick = { message = "" }) { Text("Dismiss") }
+        }
+    }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("About")
+        Text("GridMates: Word Search", color = Forest,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold)
         Text("Good puzzles. Good company.", color = Muted)
-        Text("Offline Solo and Daily puzzles, with optional nearby Wi-Fi co-op. " +
-            "Your Solo and Daily records stay on this device.",
+        Text("Play Solo or Daily without a connection. Nearby co-op uses the " +
+            "same Wi-Fi and shares your display name with your partner. " +
+            "There is no online account or cloud backup.",
             style = MaterialTheme.typography.bodySmall, color = Muted)
+        Text("Version " + runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0)
+                .versionName
+        }.getOrNull().orEmpty().ifEmpty { "Unknown" },
+            color = Muted, style = MaterialTheme.typography.labelMedium)
     }
     store.warning?.let {
         Text(it, color = Gold, style = MaterialTheme.typography.bodyMedium)
