@@ -114,7 +114,7 @@ class ResultPostcardAndroidTest {
             "GridMates: Word Search", "Solo Puzzle complete!",
             "Woodland · 10×10 · Classic",
             "12 words found · 1:33", "No hints used",
-            "Good puzzles. Good company.").joinToString("\\n")
+            "Good puzzles. Good company.").joinToString("\n")
         try {
             val bitmap = ResultPostcard.render(ctx, summary)
             try { ResultPostcard.writeToPrivateCache(ctx, bitmap) }
