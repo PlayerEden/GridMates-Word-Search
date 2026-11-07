@@ -24,13 +24,13 @@ A dense 20×20 board can be readable as an overview but extremely difficult to t
 
 ## Automated gates
 
-- [ ] Standard core/app/unit/lint/Android test Kotlin compilation passed on exact code commit.
-- [ ] Actual Compose: select a placed target start and end with only row/col stepper buttons; resulting callback receives exactly the target endpoints.
-- [ ] Compose: non-straight and zero-length endpoints do not enable Mark word.
+- [x] Standard core/app/unit/lint/Android test Kotlin compilation passed on exact code commit.
+- [x] Actual Compose: select a placed target start and end with only row/col stepper buttons; resulting callback receives exactly the target endpoints.
+- [x] Compose: non-straight and zero-length endpoints do not enable Mark word.
 - [ ] Compose: 20×20 board has a single descriptive accessible action; no 400 individual Row/Column focus targets; tapping Select opens the picker.
-- [ ] Existing 15×15 and 20×20 single-finger injected gestures, two-tap, zoom/pan, Solo/Daily and three Nearby modes remain unaffected.
-- [ ] Full API35 instrumentation + actual same-QA-signed v0.7.8→v0.7.9 install-over preserving schema4 Solo/Daily/profile/Race/Duel history.
-- [ ] Source-matched APK SHA-256, signer, run, reports and rollback pinned. No app ID/signing/schema4/LAN v7 changes, no merge or Play production release.
+- [x] Existing 15×15 and 20×20 single-finger injected gestures, two-tap, zoom/pan, Solo/Daily and three Nearby modes remain unaffected.
+- [x] Full API35 instrumentation + actual same-QA-signed v0.7.8→v0.7.9 install-over preserving schema4 Solo/Daily/profile/Race/Duel history.
+- [x] Source-matched APK SHA-256, signer, run, reports and rollback pinned. No app ID/signing/schema4/LAN v7 changes, no merge or Play production release.
 
 ## Owner physical acceptance — not requested yet
 
@@ -44,3 +44,8 @@ A dense 20×20 board can be readable as an overview but extremely difficult to t
 **Future improvements remain open:** a touch loupe/crosshair prototype, keyboard/d-pad navigation, zoomed-pan gesture stress, TalkBack focus restoration, large-text adjustments and human usability trials. Do not claim full WS-07C release acceptance before those are measured.
 
 [Project roadmap](DEVELOPMENT_ROADMAP.md) · [Earlier WS-07 research](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) · [physical Co-op blocker #53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53).
+
+
+## Green automated receipt
+
+Source-matched [WS-07C report](WS07C_BUILD_QA_2026-11-07.md): **83/83 tests PASS**, exact commit `113e5e51d44f77c2a4e1bd2dffe3cc0c9b0a8eb6`, QA APK SHA-256 `95be321feee5ef55abd40c0ac2af51670215e50f993a393fdd6006b362804d43`, same-signed saved-data-preserving v0.7.8→v0.7.9 upgrade PASS. Human/phone checks remain unperformed as instructed.

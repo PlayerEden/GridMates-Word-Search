@@ -1,6 +1,6 @@
 # START HERE — GridMates: Word Search
 
-**Current cumulative QA candidate (November 7, 2026):** [WS-07B v0.7.8 exact-source receipt](WS07B_BUILD_QA_2026-11-07.md) — **80/80 API35 emulator tests PASS** and real signed v0.7.7→v0.7.8 install-over preserving all saved Solo/Daily/identity/Race/Duel fields; tested SHA `4702543400ef499885dea7a033943974323aacab`, APK SHA-256 `0b0d997e28dbc3ec04eaffe08d59de8c7241c5289caec222c07b8f0f6882126f`. Compact Home and first-access Nearby Host/Join tested at 360×720dp; WS-07A gestures remain green. **Physical two-phone word-marking issue #53 is still OPEN**; actual visual and large-font experience need owner testing. [Draft PR #55](https://github.com/PlayerEden/GridMates-Word-Search/pull/55) remains stacked on #54 and `main` is untouched; previous v0.7.7 automated rollback pinned.
+**Latest cumulative QA (November 7, 2026): WS-07C v0.7.9/code33 automated PASS, 83/83 API35 tests.** Same-signer v0.7.8→v0.7.9 install-over preserves Solo/Daily/identity/Race/Duel. [Verified exact-source receipt](WS07C_BUILD_QA_2026-11-07.md) and [draft PR #56](https://github.com/PlayerEden/GridMates-Word-Search/pull/56); tested executable `113e5e51d44f77c2a4e1bd2dffe3cc0c9b0a8eb6`. Physical two-phone Co-op selection P0 is **OPEN and deferred** by owner; no real-device TalkBack signoff or `main` merge.
 
 ## Current state and documents
 
@@ -59,3 +59,8 @@ WS-06G added a **small, entirely free Co-op board appearance preview catalog** a
 ## Latest WS-07B checkpoint (supersedes older v0.7.7-only status above)
 
 **80/80 full emulator success and same-signed v0.7.7→v0.7.8 upgrade**; [build artifact, exact SHA and checksums](WS07B_BUILD_QA_2026-11-07.md), [real phone UI checklist](WS07B_COMPACT_NAVIGATION_ACCEPTANCE_2026-11-07.md). Start new implementation passes from draft #55; preserve its stacked relationship to #54. The two-phone physical P0 and 200% font/TalkBack remain owner gates. Do not rerun expensive full emulator on documentation-only commits.
+
+
+### Latest WS-07C source-backed evidence (supersedes earlier v0.7.8-only summary)
+
+[Full green 83/83 Android run #42419162816](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42419162816), [exact tested APK SHA and rollback](WS07C_BUILD_QA_2026-11-07.md). Follow-up WS-07D should prioritize automated LAN/claim reliability without asking owner for phone testing. Keep v0.7.9 verified fallback, ensure no untested code is called stable.
