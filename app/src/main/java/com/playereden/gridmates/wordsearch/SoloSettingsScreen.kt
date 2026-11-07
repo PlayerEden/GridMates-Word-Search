@@ -3,6 +3,7 @@ package com.playereden.gridmates.wordsearch
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
@@ -28,6 +29,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.SoloProfile
@@ -132,15 +134,31 @@ internal fun SoloSettingsScreen(store: SoloStore) {
         Text(store.profile.completions.toString() + " Solo · " +
             store.profile.dailyCompletions + " Daily completed",
             color = Forest, style = MaterialTheme.typography.labelLarge)
-        Row(Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = {
-                export.launch("GridMates-WordSearch-Backup.json")
-            }, modifier = Modifier.weight(1f)) { Text("Export backup") }
-            OutlinedButton(onClick = {
-                import.launch(arrayOf("application/json", "text/plain",
-                    "application/octet-stream"))
-            }, modifier = Modifier.weight(1f)) { Text("Restore backup") }
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val stacked = maxWidth < 350.dp ||
+                LocalDensity.current.fontScale >= 1.3f
+            if (stacked) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        export.launch("GridMates-WordSearch-Backup.json")
+                    }, modifier = Modifier.fillMaxWidth()) { Text("Export backup") }
+                    OutlinedButton(onClick = {
+                        import.launch(arrayOf("application/json", "text/plain",
+                            "application/octet-stream"))
+                    }, modifier = Modifier.fillMaxWidth()) { Text("Restore backup") }
+                }
+            } else {
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        export.launch("GridMates-WordSearch-Backup.json")
+                    }, modifier = Modifier.weight(1f)) { Text("Export backup") }
+                    OutlinedButton(onClick = {
+                        import.launch(arrayOf("application/json", "text/plain",
+                            "application/octet-stream"))
+                    }, modifier = Modifier.weight(1f)) { Text("Restore backup") }
+                }
+            }
         }
         Text("Export saves a file to a location you choose. Restore asks before " +
             "replacing your current Word Search progress.",
@@ -169,7 +187,7 @@ internal fun SoloSettingsScreen(store: SoloStore) {
 
     PaperPanel(Modifier.fillMaxWidth()) {
         PaperEyebrow("About")
-        Text("GridMates: Word Search", color = Forest,
+        Text("About Word Search", color = Forest,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold)
         Text("Good puzzles. Good company.", color = Muted)
