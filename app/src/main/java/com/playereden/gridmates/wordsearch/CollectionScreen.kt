@@ -1,5 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -7,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -39,6 +41,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -71,6 +75,8 @@ internal fun CollectionScreen(store: SoloStore) {
     }
     var collectionTab by rememberSaveable { mutableStateOf("Portraits") }
     var licenseFontId by rememberSaveable { mutableStateOf<String?>(null) }
+    val completed = WoodlandCollection.completedCount(profile)
+    val nextPortrait = portraits.firstOrNull { !it.unlocked }?.portrait
     val fonts = remember(profile, store.selectedBoardFontId) {
         BoardFontCollection.progress(profile, store.selectedBoardFontId)
     }
@@ -130,31 +136,59 @@ internal fun CollectionScreen(store: SoloStore) {
         )
     }
 
+    PaperEyebrow("Your profile & rewards")
     Text("Your Collection", color = Forest,
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold)
-    Text("Little treasures from the puzzles you've finished.",
+    Text("Every portrait and font is earned through play. No shop or purchases.",
         color = Muted, style = MaterialTheme.typography.bodyMedium)
 
-    Card(Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(14.dp), horizontalArrangement = Arrangement.spacedBy(12.dp),
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("Player profile")
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            PortraitBadge(equippedId, equippedName, 64)
+            PortraitBadge(equippedId, equippedName, 60)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(profile.identity.displayName, color = Forest,
-                    style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(equippedName + " · Woodland portrait",
-                    color = Muted, style = MaterialTheme.typography.bodyMedium)
-                Text((profile.completions + profile.dailyCompletions).toString() +
-                    " puzzles completed · " + profile.dailyCompletions + " Daily",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(equippedName + " · Current portrait", color = Muted,
+                    style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+        Text(completed.toString() + " completed puzzles · " +
+            profile.completions + " Solo · " + profile.dailyCompletions + " Daily",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+        OutlinedButton(onClick = {
+            draftName = profile.identity.displayName
+            showNameDialog = true
+        }, modifier = Modifier.fillMaxWidth()) { Text("Edit display name") }
+    }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("Collection progress")
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(portraits.count { it.unlocked }.toString() + " of " +
+                    portraits.size + " portraits", color = Forest,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold)
+                Text(achievements.count { it.unlocked }.toString() + " of " +
+                    achievements.size + " achievements earned",
                     color = Muted, style = MaterialTheme.typography.bodySmall)
             }
-            TextButton(onClick = {
-                draftName = profile.identity.displayName
-                showNameDialog = true
-            }) { Text("Edit") }
         }
+        PaperProgress(portraits.count { it.unlocked }, portraits.size)
+        Text(
+            if (nextPortrait == null) "You have earned every Woodland portrait."
+            else "Next portrait: " + nextPortrait.label + " · " +
+                (nextPortrait.requiredCompletions - completed).coerceAtLeast(0) +
+                " more completed " + (if (nextPortrait.requiredCompletions - completed == 1)
+                    "puzzle" else "puzzles") + " to unlock.",
+            color = Muted, style = MaterialTheme.typography.bodySmall
+        )
     }
 
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -175,14 +209,21 @@ internal fun CollectionScreen(store: SoloStore) {
         Text("All styles are free. Earn fonts through achievements, then equip " +
             "one to change your puzzle letters. The readable default is always available.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
-        fonts.chunked(2).forEach { pair ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                pair.forEach { item ->
-                    BoardFontCard(item, Modifier.weight(1f),
-                        onEquip = { store.equipBoardFont(item.font.id) },
-                        onLicense = { licenseFontId = item.font.id })
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val columns = if (maxWidth < 350.dp ||
+                LocalDensity.current.fontScale >= 1.3f) 1 else 2
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                fonts.chunked(columns).forEach { pair ->
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        pair.forEach { item ->
+                            BoardFontCard(item, Modifier.weight(1f),
+                                onEquip = { store.equipBoardFont(item.font.id) },
+                                onLicense = { licenseFontId = item.font.id })
+                        }
+                        if (pair.size < columns) Box(Modifier.weight(1f))
+                    }
                 }
-                if (pair.size == 1) Box(Modifier.weight(1f))
             }
         }
         Text("Every font is bundled for offline use under its own Open Font License. " +
@@ -192,7 +233,12 @@ internal fun CollectionScreen(store: SoloStore) {
         Text(achievements.count { it.unlocked }.toString() +
             " / " + achievements.size + " achievements",
             color = Forest, style = MaterialTheme.typography.titleMedium)
-        achievements.forEach { item -> AchievementCard(item) }
+        Text("Achievements reflect your saved Solo and Daily progress.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+        achievements.sortedWith(compareBy<AchievementProgress> { it.unlocked }
+            .thenBy { it.target - it.current }).forEach { item ->
+            AchievementCard(item)
+        }
     } else {
         Text(portraits.count { it.unlocked }.toString() +
             " / " + portraits.size + " Woodland portraits available",
@@ -206,17 +252,24 @@ internal fun CollectionScreen(store: SoloStore) {
             },
             color = Muted, style = MaterialTheme.typography.bodySmall
         )
-        portraits.chunked(2).forEach { pair ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                pair.forEach { item ->
-                    PortraitCard(
-                        item,
-                        WoodlandCollection.remaining(profile, item.portrait.id) ?: 0,
-                        Modifier.weight(1f),
-                        onEquip = { store.equipPortrait(item.portrait.id) }
-                    )
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val columns = if (maxWidth < 350.dp ||
+                LocalDensity.current.fontScale >= 1.3f) 1 else 2
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                portraits.chunked(columns).forEach { pair ->
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        pair.forEach { item ->
+                            PortraitCard(
+                                item,
+                                WoodlandCollection.remaining(profile, item.portrait.id) ?: 0,
+                                Modifier.weight(1f),
+                                onEquip = { store.equipPortrait(item.portrait.id) }
+                            )
+                        }
+                        if (pair.size < columns) Box(Modifier.weight(1f))
+                    }
                 }
-                if (pair.size == 1) Box(Modifier.weight(1f))
             }
         }
         Text("Unlocks depend on completed Solo and Daily puzzles. " +
