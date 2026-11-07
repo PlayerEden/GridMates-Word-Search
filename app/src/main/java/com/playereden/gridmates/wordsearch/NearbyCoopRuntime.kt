@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** Only protocol-compatible devices on a trusted local network can join. */
-private const val WS_WIRE_VERSION = 6
+private const val WS_WIRE_VERSION = 7
 private const val WS_NSD_TYPE = "_gridmatesws._tcp."
 private const val WS_PACKET_MAX = 16_384
 
@@ -106,6 +106,7 @@ internal object NearbyPacket {
             .put("reserved", s.guestReserved).put("guestHere", s.guestConnected)
             .put("hostHere", s.hostConnected).put("finished", s.finished)
             .put("match", s.match.name)
+            .put("look", s.boardLookId)
         s.duel?.let { d ->
             // Recipient-specific only! No path or ID of the opponent is sent.
             wire.put("duel", JSONObject()
@@ -177,7 +178,8 @@ internal object NearbyPacket {
         return CoopSnapshot(json.getString("room"), spec, json.getLong("revision"),
             claims, json.getBoolean("reserved"), json.getBoolean("guestHere"),
             json.getBoolean("hostHere"), json.getBoolean("finished"),
-            NearbyMatch.valueOf(json.getString("match")), duel)
+            NearbyMatch.valueOf(json.getString("match")), duel,
+            json.getString("look"))
             .also { NearbyCoopSession.validateSnapshot(it) }
     }
 }
@@ -263,7 +265,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
     }
 
     fun host(name: String, theme: WordTheme, board: PuzzleBoardSize,
-             challenge: PuzzleChallenge, match: NearbyMatch = NearbyMatch.COOP) {
+             challenge: PuzzleChallenge, match: NearbyMatch = NearbyMatch.COOP,
+             boardLookId: String = CoopBoardLook.CLASSIC.id) {
         if (state.busy || state.role != NearbyRole.NONE) return
         post { it.copy(busy = true, message = "Opening your nearby game…") }
         io.execute {
@@ -272,7 +275,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     "Connect to a local Wi-Fi network to host a game.")
                 val run = SoloProgressRules.freshV2(theme, board, challenge,
                     System.currentTimeMillis())
-                val session = NearbyCoopSession(run, match = match)
+                val session = NearbyCoopSession(run, match = match,
+                    hostLook = CoopBoardLook.safe(boardLookId))
                 val socket = ServerSocket(0, 2, wifi)
                 val roomName = name.trim().take(24).ifBlank { "Player" }
                 synchronized(lock) {
@@ -375,6 +379,9 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             }
             if (hello.optString("type") != "hello") reject("Invalid join request.")
             val name = hello.optString("name").trim().take(24).ifBlank { "Player" }
+            // The guest only proposes a known, free local preview style. The
+            // host chooses/finalizes once and never trusts remote files/colors.
+            val requestedLook = CoopBoardLook.safe(hello.optString("look", "classic"))
             val session = synchronized(lock) { authority } ?: reject("Room closed.")
             if (hello.optString("room").isNotBlank() &&
                 hello.optString("room") != session.roomId) reject("This room has changed.")
@@ -403,8 +410,11 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 current ?: secret()
             }
             // The guest can validate the proposed board before committing its token.
+            val proposedLook = if (session.match == NearbyMatch.COOP)
+                session.offeredBoardLook(requestedLook.id).id else CoopBoardLook.CLASSIC.id
             val preview = forSeat(session.snapshot().copy(
-                guestReserved = true, guestConnected = true), CoopSeat.GUEST)
+                guestReserved = true, guestConnected = true,
+                boardLookId = proposedLook), CoopSeat.GUEST)
             NearbyPacket.write(socket, JSONObject().put("type", "welcome")
                 .put("token", credential).put("hostName", liveHostName)
                 .put("roomState", NearbyPacket.state(preview))
@@ -420,6 +430,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                 peer = socket
                 peerLastReadNanos = System.nanoTime()
                 admitted = true
+                if (session.match == NearbyMatch.COOP)
+                    session.freezeGuestBoardLook(requestedLook.id)
                 val finalState = session.admitOrRejoinGuest()
                 // Send Joined before exposing this socket to heartbeat/host
                 // updates. The lock is reentrant and bounds this short frame.
@@ -793,7 +805,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
             }
     }
 
-    fun join(address: String, port: Int, roomId: String, code: String, name: String) {
+    fun join(address: String, port: Int, roomId: String, code: String, name: String,
+             boardLookId: String = CoopBoardLook.CLASSIC.id) {
         if (state.busy || state.role != NearbyRole.NONE && !state.disconnected) return
         if (!joinInProgress.compareAndSet(false, true)) return
         if (state.role == NearbyRole.GUEST && roomId != state.roomId) {
@@ -817,7 +830,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                     prefs.getString("token_" + roomId, "") ?: "" else ""
                 NearbyPacket.write(socket, JSONObject().put("type", "hello")
                     .put("room", roomId).put("token", token).put("code", code)
-                    .put("name", name.trim().take(24).ifBlank { "Player" }))
+                    .put("name", name.trim().take(24).ifBlank { "Player" })
+                    .put("look", CoopBoardLook.safe(boardLookId).id))
                 val welcome = NearbyPacket.read(socket)
                 if (welcome.optString("type") == "error")
                     throw IOException(welcome.optString("message", "Join declined."))
@@ -937,6 +951,8 @@ internal class NearbyCoopRuntime(context: Context) : AutoCloseable {
                             if (old != null && (old.roomId != incoming.roomId ||
                                 incoming.revision < old.revision ||
                                 incoming.match != old.match || incoming.spec != old.spec ||
+                                (old.guestReserved &&
+                                    incoming.boardLookId != old.boardLookId) ||
                                 (incoming.revision == old.revision &&
                                     incoming.claims != old.claims) ||
                                 duelRegressed)) current
