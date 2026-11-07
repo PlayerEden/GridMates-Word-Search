@@ -184,3 +184,14 @@ Before WS-08: exact Play listing, privacy, test eligibility, signed artifact, ad
 - [#2 — WS-02 Word-search engine and tactile input prototype](https://github.com/PlayerEden/GridMates-Word-Search/issues/2)
 
 Later milestone issues should be opened as work approaches, rather than creating a large unattended backlog.
+
+
+## WS-05J — Stable QA updates and saved-progress protection (November 7, 2026)
+
+- Pin the **public test-only**, non-production QA signer and retain the existing standalone QA package ID while moving to versionCode 21 / v0.5.9.
+- Add same-signer, versionCode 20→21 **adb install -r** emulator upgrade test and byte-compare the app's private profile file before/after. Keep a source-matched artifact and evidence for this milestone.
+- Improve restore reliability by reverting in-memory import when atomic disk write fails.
+- **Earlier v0.5.8 and older debug APKs need a one-time manual JSON backup → uninstall old QA Word Search → install v0.5.9 → restore** because old runner signing identities differ. No silent uninstall or data clearing.
+- Preserve all existing Solo, Daily, profile and nearby LAN behavior. Physical old-build export/import, two-phone LAN and actual handset in-place update remain deferred.
+- Documentation: [WS-05J stable QA upgrade and migration](WS05J_STABLE_QA_UPDATES_2026-11-07.md).
+
