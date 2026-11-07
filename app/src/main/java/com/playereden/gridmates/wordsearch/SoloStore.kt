@@ -273,9 +273,15 @@ internal class SoloStore(
             return false
         }
         val checked = restored.copy(active = SoloProgressRules.validate(restored.active))
+        val previous = profile
         profile = checked.copy(identity = WoodlandCollection.sanitize(checked.identity, checked))
         flush()
-        return warning == null
+        if (warning != null) {
+            // Never present an uncommitted import as the user's saved data.
+            profile = previous
+            return false
+        }
+        return true
     }
 
     /** Opens today's puzzle or a previously started date, without touching Solo. */
