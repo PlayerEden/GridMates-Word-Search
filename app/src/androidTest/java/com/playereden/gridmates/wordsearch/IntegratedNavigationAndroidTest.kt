@@ -33,7 +33,7 @@ class IntegratedNavigationAndroidTest {
         rule.onNodeWithContentDescription("Open Play").performClick()
         rule.onNodeWithContentDescription("Open Nearby co-op")
             .performScrollTo().performClick()
-        rule.onNodeWithText("Co-op board appearance").assertExists()
+        rule.onNodeWithText("Board appearance", substring = true).assertExists()
         rule.onNodeWithText("Host Co-op game").assertExists()
         rule.onNodeWithText("← Back to Play").performClick()
 

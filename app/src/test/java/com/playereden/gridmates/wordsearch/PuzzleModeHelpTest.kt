@@ -5,23 +5,19 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PuzzleModeHelpTest {
-    @Test fun largeBoardsExplainMoveWithoutConfusingItWithWordSelection() {
+    @Test fun largeBoardsExplainBothGestureTypesWithoutForcedModes() {
         val guide = PuzzleModeHelp.opening(20)
-        assertTrue(guide.contains("Move"))
-        assertTrue(guide.contains("Find"))
-        assertFalse(guide.contains("Drag a word"))
+        assertTrue(guide.contains("one finger"))
+        assertTrue(guide.contains("Pinch"))
+        assertTrue(guide.contains("first and last"))
+        assertFalse(guide.contains("tap Move"))
     }
 
-    @Test fun findAndMoveDirectionsActuallyDescribeTheirCurrentMode() {
-        val move = PuzzleModeHelp.selected(true)
-        val find = PuzzleModeHelp.selected(false)
-        assertTrue(move.startsWith("Move:"))
-        assertTrue(move.contains("pan"))
-        assertTrue(move.contains("zoom"))
-        assertTrue(move.contains("Tap Find"))
-        assertTrue(find.startsWith("Find:"))
-        assertTrue(find.contains("first and last"))
-        assertFalse(find.contains("pinch"))
+    @Test fun guidanceMakesOneAndTwoFingerResponsibilitiesClear() {
+        val guide = PuzzleModeHelp.selected(false)
+        assertTrue(guide.contains("One finger"))
+        assertTrue(guide.contains("Two fingers"))
+        assertFalse(guide.contains("Tap Find"))
     }
 
     @Test fun smallerBoardsKeepSimpleFindGuidance() {

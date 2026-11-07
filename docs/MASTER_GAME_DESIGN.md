@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Living master design — WS-06G implementation checkpoint, November 7, 2026  
-**Status:** Historical design baseline below plus current [WS-06G automated PASS receipt](WS06G_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
+**Version:** Living master design — WS-07 owner-playtest research addendum, November 7, 2026  
+**Status:** Historical design baseline plus [WS-07 research/UX spec](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) and [live development roadmap](DEVELOPMENT_ROADMAP.md). **Real two-phone word marking failed**; v0.7.7 has **78/78 automated API35 tests PASS** plus saved-data-preserving signed upgrade, but the **physical two-phone marking failure still needs re-test**. Both v0.7.7 and v0.7.6 source-matched QA checkpoints are preserved; no production release.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -531,3 +531,37 @@ Cumulative [draft PR #47](https://github.com/PlayerEden/GridMates-Word-Search/pu
 ## November 7, 2026 — WS-06G Shared Co-op Board Appearance (free preview)
 
 Cumulative [draft PR #48](https://github.com/PlayerEden/GridMates-Word-Search/pull/48) now offers three baked-in free **Word Search** grid looks: Classic Paper, Linen Sketch and Blueprint Study. These have an explicit technical display priority **but no rarity, achievement requirement, paid item or unlock entitlement**. During Nearby **Co-op only**, host and guest can each choose before joining; a host-authoritative common look is resolved at the first acknowledged guest admission and frozen for the whole room, including reconnect. Per-phone board font and personal **Use Classic on my phone** visual override remain independent, as do public green/blue claim markers. Solo/Daily/Shared Board Race/Speed Duel remain Classic and do not borrow temporary looks. The change introduces allowlisted room `look` with **LAN v7**, preserving schema-4 saves. [Exact-source 71-test Android QA receipt](WS06G_BUILD_QA_2026-11-07.md) includes a real signed v0.7.3→v0.7.4 update retaining both competitive journals. The original inspiration was [Sudoku's Co-op themes design proposal](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_SHARED_COOP_BOARD_THEMES_DESIGN.md), not a copy of Sudoku's cosmetic IDs or ownership. Real two-phone room-theme synchronization, accessibility at 200% font and hardware network testing remain OPEN.
+
+---
+
+## WS-07 — Owner playtest-driven design correction (November 7, 2026)
+
+**Supersedes earlier provisional touch/layout patterns when they conflict.** Nine real-phone screenshots and a two-phone Nearby session revealed a severe puzzle interaction failure: both phones could connect, yet neither player could mark a word. The pictures additionally showed cropped default zoom, tiny Expert 20×20 touch targets and heavy scrolling through gameplay information. Do not conflate session connectivity with game playability.
+
+### Revised locked UX outcomes
+
+- **Play must feel as natural as drawing a line through a paper book.** Default word drag uses one finger, accurately registers the first pressed cell and the final released cell, previews a straight/diagonal/reversed path and offers understandable invalid/accepted feedback. A second tap to select the last letter is a non-dragging alternative. Never rely on an undiscoverable Find/Move switch.
+- **Make zoom optional rather than compulsory.** On opening any 12×12/15×15/20×20 puzzle, show the entire board. Two-finger pinch and two-finger pan are navigation gestures and never submit a word; +/− and Fit are visible, single-pointer alternatives. At 20×20, the fit view is an overview rather than a claim of comfortable precision: research/try a loupe, center crosshair, or non-drag cell navigator. Selected-cell previews, labels and lines must match validated board coordinates.
+- **No whole-page gameplay scrolling.** Active Solo/Daily/Co-op/Race/Duel screen uses a stable grid, minimal progress/connection/partner HUD, small visible target preview and accessible actions for full word list, chat, room details and results. Word-list/chat/history/collection/settings sheets or separate views can scroll when deliberately opened; active gameplay never disappears above/below a scrolling page. Adaptive landscape and 200%-font screens must not squeeze a board into unreadable cells.
+- **Multiplayer trust remains grounded.** Co-op first valid shared claim, Race one host-confirmed owner and word-by-word final comparison, Duel independent private boards and Ready/GO. Both players must be able to mark a word on real phones before any mode is labeled accepted. Friendly presence uses truthful connection state. Do not reveal partner's private Duel word IDs or paths.
+- **Accessibility is not merely enlarged text.** Standard controls should have Android-recommended 48dp touch areas; the 20×20 grid itself is a special spatial input surface and needs alternatives. Avoid requiring screen reader users to navigate 400 ungrouped cells as the sole selection path. Test TalkBack, Switch Access, 200% text, contrast, keyboard access and motor-accessible non-drag equivalents. Celebrate completed words without requiring color-only identification.
+- **Ease over additional options.** Keep simple Home > Continue Solo, Daily, Host/Join; optional room codes and styles under secondary options. Settings, profiles, collections, achievements, sharing and saved records remain reachable but do not interrupt a puzzle.
+- **Hint and content review remains planned, not an accidental redesign.** The master’s intended hint ladder is generous and should help at the last word; actual shipped Solo/Daily budgets are stricter and must be evaluated. Curated themes, replay variety, and reward/cosmetic presentation should follow usability measurements. Avoid purchasing/ads/online services until independently approved.
+
+### Technical acceptance gates (MUST pass before release candidacy)
+
+1. Finger-down/move/up/cancel, direction lock, coordinate mapping, clipping/scaling, pan/zoom matrix and 2-finger interruption pass deterministic tests on multiple board sizes and orientations; test via actual Compose pointer injection, not only core word validation.
+2. **Owner two-phone P0:** each phone finds at least a horizontal, diagonal/reversed, edge and two-tap target; both receive the correct host-approved updated board; no accidental claims on pinch/pan.
+3. Whole gameplay view fits in the available viewport without scroll and exposes progress, board and words; mode setup, word list, chat and information use clearly summoned subordinate surfaces.
+4. Check width/height adaptation, 320dp and common screen sizes, orientation, 200% system text, TalkBack/Switch Access, feedback, failure/reconnect and back navigation.
+5. Full standard CI + API35 emulator + actual same-signer v0.7.6→candidate signed install-over; preserve Solo/Daily/profile/Race/Duel and recorded finished results; real owner acceptance still required.
+6. Rollback to verified source and signing identities, review stacked drafts before any merge, and do not publish QA app as a store production release.
+
+### Research references / evidence
+
+The complete evidence, Android and W3C source links, proposed metrics and execution order are in [WS-07 Playtest Research & UX Spec](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) and the [WS-07A physical checklist](WS07A_REAL_PHONE_TOUCH_ACCEPTANCE_2026-11-07.md). The original WS-06G and WS-06I source records remain historical facts, not evidence the current P0 is fixed.
+
+
+### WS-07A automated QA result, November 7 (does not supersede physical gate)
+
+The [complete v0.7.7 receipt](WS07A_BUILD_QA_2026-11-07.md) records **78/78 emulator tests passing** following touch geometry/direction correction, same-signer v0.7.6→v0.7.7 preserved save, APK checksum and pinned rollback. The initially failed 15×15/20×20 host/guest swipe tests are green in this distinct run. **No human-operated two-phone Co-op success is claimed.** Continue [WS-07B–G](DEVELOPMENT_ROADMAP.md) only with that distinction and current physical acceptance checklist.
