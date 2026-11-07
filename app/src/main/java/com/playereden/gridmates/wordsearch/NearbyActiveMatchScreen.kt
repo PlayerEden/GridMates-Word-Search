@@ -105,8 +105,17 @@ internal fun NearbyActiveMatchScreen(
                     Text(if (duel.ownReady) "Waiting…" else "Ready")
                 }
             } else if (snapshot.finished) {
-                Text("Complete ✓", color = Forest,
-                    fontWeight = FontWeight.Bold)
+                Text(when (snapshot.match) {
+                    NearbyMatch.COOP -> "Solved together ✓"
+                    NearbyMatch.SHARED_BOARD_RACE -> when (snapshot.raceStanding?.winner) {
+                        seat -> "You win!"
+                        null -> "Tie game"
+                        else -> "$partner wins"
+                    }
+                    NearbyMatch.SPEED_DUEL ->
+                        if (duel?.winner == seat) "You win!" else "$partner wins"
+                }, color = Forest, fontWeight = FontWeight.Bold,
+                    maxLines = 2, style = MaterialTheme.typography.bodyMedium)
             } else {
                 Text(spec.board.cells.toString() + "×" + spec.board.cells,
                     color = Muted, style = MaterialTheme.typography.bodySmall)
@@ -121,6 +130,10 @@ internal fun NearbyActiveMatchScreen(
             }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
                 Text("Reconnect to game")
             }
+        }
+        store.warning?.let { warning ->
+            Text("Save warning: " + warning, color = Gold,
+                style = MaterialTheme.typography.bodySmall, maxLines = 2)
         }
         if (touchFeedback.isNotBlank() && started) {
             Text(touchFeedback, color = Forest,
