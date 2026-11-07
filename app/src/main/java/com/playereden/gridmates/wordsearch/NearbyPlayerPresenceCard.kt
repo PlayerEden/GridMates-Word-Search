@@ -24,7 +24,8 @@ import com.playereden.gridmates.wordsearch.core.NearbyMatch
  */
 @Composable
 internal fun NearbyPlayerPresenceCard(
-    state: NearbyUiState, snapshot: CoopSnapshot, localSeat: CoopSeat, total: Int
+    state: NearbyUiState, snapshot: CoopSnapshot, localSeat: CoopSeat,
+    total: Int, recentWord: String? = null
 ) {
     val connected = snapshot.guestConnected && snapshot.hostConnected && !state.disconnected
     val remote = if (state.role == NearbyRole.HOST) state.guestName else state.hostName
@@ -67,6 +68,10 @@ internal fun NearbyPlayerPresenceCard(
                 }
             }
             Text(activity, color = Muted, style = MaterialTheme.typography.bodySmall)
+            if (duel == null && recentWord != null) {
+                Text("Friend's latest shared find: " + recentWord,
+                    color = Forest, style = MaterialTheme.typography.bodySmall)
+            }
             if (snapshot.match == NearbyMatch.COOP) {
                 Text("${snapshot.foundIds.size} of $total shared words found",
                     color = Forest, style = MaterialTheme.typography.bodySmall)
