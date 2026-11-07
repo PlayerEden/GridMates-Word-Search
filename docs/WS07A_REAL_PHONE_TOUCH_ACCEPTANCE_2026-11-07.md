@@ -1,8 +1,9 @@
 # WS-07A — Real-phone Word Marking & Compact Play Acceptance
 
-**Status:** NOT PERFORMED. The owner's November 7 screenshots established that two phones could connect to a Nearby room but could not successfully mark words. This checklist describes a follow-up **test**, not a completed fix.
+**Status:** OWNER TWO-PHONE RETEST NOT PERFORMED; automation is GREEN (78/78 Android emulator). The owner's November 7 screenshots established that two phones could connect to a Nearby room but could not successfully mark words. This checklist describes a follow-up **test**, not a completed fix.
 
 ## Install safely
+- [Verified v0.7.7 QA APK ZIP](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42413940520/artifacts/13591057182) (expires Nov 14, 2026). The `app-debug.apk` within has SHA-256 `0a807b2de2db335f4b723ae5d9d5882ad2df1768481c78d1c63cd484d9950a8f`; [full receipt](WS07A_BUILD_QA_2026-11-07.md).
 - Record Android model/version for each phone, actual installed QA package, **versionCode**, signing certificate and APK SHA-256. The new candidate is v0.7.7 code31 QA-only. Both phones must use compatible LAN v7 builds.
 - Export valid local Word Search JSON from **each phone**, store it away from the app, verify it contains your expected Solo/Daily/Race/Duel records. **Do not uninstall or clear data just to try this build.**
 - If staying on the same signed QA package, install the new APK **over** the old app. Confirm all profile data remains.

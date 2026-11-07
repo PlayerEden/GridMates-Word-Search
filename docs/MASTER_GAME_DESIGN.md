@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
 **Version:** Living master design — WS-07 owner-playtest research addendum, November 7, 2026  
-**Status:** Historical design baseline plus [WS-07 research/UX spec](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) and [live development roadmap](DEVELOPMENT_ROADMAP.md). **Real two-phone word marking failed**; draft v0.7.7 is not accepted until gesture tests and hardware retest pass. Latest verified automated fallback: v0.7.6 (76/76 emulator), with separate physical acceptance still OPEN.  
+**Status:** Historical design baseline plus [WS-07 research/UX spec](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) and [live development roadmap](DEVELOPMENT_ROADMAP.md). **Real two-phone word marking failed**; v0.7.7 has **78/78 automated API35 tests PASS** plus saved-data-preserving signed upgrade, but the **physical two-phone marking failure still needs re-test**. Both v0.7.7 and v0.7.6 source-matched QA checkpoints are preserved; no production release.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -560,3 +560,8 @@ Cumulative [draft PR #48](https://github.com/PlayerEden/GridMates-Word-Search/pu
 ### Research references / evidence
 
 The complete evidence, Android and W3C source links, proposed metrics and execution order are in [WS-07 Playtest Research & UX Spec](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) and the [WS-07A physical checklist](WS07A_REAL_PHONE_TOUCH_ACCEPTANCE_2026-11-07.md). The original WS-06G and WS-06I source records remain historical facts, not evidence the current P0 is fixed.
+
+
+### WS-07A automated QA result, November 7 (does not supersede physical gate)
+
+The [complete v0.7.7 receipt](WS07A_BUILD_QA_2026-11-07.md) records **78/78 emulator tests passing** following touch geometry/direction correction, same-signer v0.7.6→v0.7.7 preserved save, APK checksum and pinned rollback. The initially failed 15×15/20×20 host/guest swipe tests are green in this distinct run. **No human-operated two-phone Co-op success is claimed.** Continue [WS-07B–G](DEVELOPMENT_ROADMAP.md) only with that distinction and current physical acceptance checklist.
