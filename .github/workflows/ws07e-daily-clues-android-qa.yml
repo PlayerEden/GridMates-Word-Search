@@ -7,6 +7,7 @@ name: WS-07E Daily and Saved Clues Android Emulator QA
 # Rerun all gates after final compact Solo word pages and win/save HUD adjustments.
 # Touch follow-up: include finger-UP final coordinates and report selected endpoints.
 # WS-07E: verify paged Daily journal, no-cost saved clue review, and cumulative regressions.
+# Source-matched rerun: corrected stale saved-clue test assertion and compact Daily grouping.
 # Includes previous 87 tests plus 3 Daily/clue tests and v0.8.0 -> v0.8.1 signed upgrade.
 # includes the exact same-signer v0.8.0 -> v0.8.1 update and save checks.
 
