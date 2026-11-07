@@ -140,56 +140,8 @@ internal fun CollectionScreen(store: SoloStore) {
     Text("Your Collection", color = Forest,
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold)
-    Text("Every portrait and font is earned through play. No shop or purchases.",
+    Text("Collect more portraits and fonts as you finish puzzles. Everything is free.",
         color = Muted, style = MaterialTheme.typography.bodyMedium)
-
-    PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("Player profile")
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            PortraitBadge(equippedId, equippedName, 60)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(profile.identity.displayName, color = Forest,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(equippedName + " · Current portrait", color = Muted,
-                    style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-        Text(completed.toString() + " completed puzzles · " +
-            profile.completions + " Solo · " + profile.dailyCompletions + " Daily",
-            color = Muted, style = MaterialTheme.typography.bodySmall)
-        OutlinedButton(onClick = {
-            draftName = profile.identity.displayName
-            showNameDialog = true
-        }, modifier = Modifier.fillMaxWidth()) { Text("Edit display name") }
-    }
-
-    PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("Collection progress")
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(portraits.count { it.unlocked }.toString() + " of " +
-                    portraits.size + " portraits", color = Forest,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold)
-                Text(achievements.count { it.unlocked }.toString() + " of " +
-                    achievements.size + " achievements earned",
-                    color = Muted, style = MaterialTheme.typography.bodySmall)
-            }
-        }
-        PaperProgress(portraits.count { it.unlocked }, portraits.size)
-        Text(
-            if (nextPortrait == null) "You have earned every Woodland portrait."
-            else "Next portrait: " + nextPortrait.label + " · " +
-                (nextPortrait.requiredCompletions - completed).coerceAtLeast(0) +
-                " more completed " + (if (nextPortrait.requiredCompletions - completed == 1)
-                    "puzzle" else "puzzles") + " to unlock.",
-            color = Muted, style = MaterialTheme.typography.bodySmall
-        )
-    }
 
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -200,6 +152,59 @@ internal fun CollectionScreen(store: SoloStore) {
                 label = { Text(label) }
             )
         }
+    }
+
+    // The selected collection tab must open to its content immediately,
+    // not below a full-page profile header. Keep profile/dossier in Portraits.
+    if (collectionTab == "Portraits") {
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow("Player profile")
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                PortraitBadge(equippedId, equippedName, 60)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(profile.identity.displayName, color = Forest,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(equippedName + " · Current portrait", color = Muted,
+                        style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            Text(completed.toString() + " completed puzzles · " +
+                profile.completions + " Solo · " + profile.dailyCompletions + " Daily",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
+            OutlinedButton(onClick = {
+                draftName = profile.identity.displayName
+                showNameDialog = true
+            }, modifier = Modifier.fillMaxWidth()) { Text("Edit display name") }
+        }
+
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow("Collection progress")
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(portraits.count { it.unlocked }.toString() + " of " +
+                        portraits.size + " portraits", color = Forest,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold)
+                    Text(achievements.count { it.unlocked }.toString() + " of " +
+                        achievements.size + " achievements earned",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+            PaperProgress(portraits.count { it.unlocked }, portraits.size)
+            Text(
+                if (nextPortrait == null) "You have earned every Woodland portrait."
+                else "Next portrait: " + nextPortrait.label + " · " +
+                    (nextPortrait.requiredCompletions - completed).coerceAtLeast(0) +
+                    " more completed " + (if (nextPortrait.requiredCompletions - completed == 1)
+                        "puzzle" else "puzzles") + " to unlock.",
+                color = Muted, style = MaterialTheme.typography.bodySmall
+            )
+        }
+
     }
 
     if (collectionTab == "Fonts") {
