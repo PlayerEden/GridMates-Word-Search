@@ -5,6 +5,10 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 internal val Cream = Color(0xFFF4F3EB)
 internal val Paper = Color(0xFFFFFDF8)
@@ -38,11 +42,26 @@ private val gridMatesScheme = lightColorScheme(
     surfaceContainerLow = Paper
 )
 
+private val paperbackTypography = Typography(
+    headlineLarge = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
+        fontSize = 32.sp, lineHeight = 38.sp),
+    headlineMedium = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
+        fontSize = 28.sp, lineHeight = 34.sp),
+    titleLarge = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp, lineHeight = 28.sp),
+    titleMedium = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp, lineHeight = 24.sp),
+    bodyLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 16.sp,
+        lineHeight = 24.sp),
+    bodyMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 14.sp,
+        lineHeight = 21.sp)
+)
+
 @Composable
 internal fun GridMatesTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = gridMatesScheme,
-        typography = Typography(),
+        typography = paperbackTypography,
         content = content
     )
 }

@@ -1,6 +1,7 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -13,7 +14,7 @@ class NearbyCoopUiEntryTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun nearbyRoomControlsAreReachableWithoutStartingAConnection() {
-        compose.onNodeWithText("Play Together (QA preview)")
+        compose.onNodeWithContentDescription("Open Nearby co-op")
             .performScrollTo().performClick()
         compose.onNodeWithText("Play Together").assertExists()
         compose.onNodeWithText("Host a game").assertExists()

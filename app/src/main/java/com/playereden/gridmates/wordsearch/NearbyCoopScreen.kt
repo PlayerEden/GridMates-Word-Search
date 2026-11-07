@@ -25,8 +25,13 @@ import com.playereden.gridmates.wordsearch.core.*
 internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBack: () -> Unit) {
     val ctx = LocalContext.current.applicationContext
     val runtime = remember(rooms) { rooms.runtime(ctx) }
-    BackHandler { onBack() }
     val state = runtime.state
+    var exitPrompt by rememberSaveable { mutableStateOf(false) }
+    val requestExit = {
+        if (state.role == NearbyRole.NONE && !state.busy && state.recovery == null) onBack()
+        else exitPrompt = true
+    }
+    BackHandler { requestExit() }
     var theme by rememberSaveable { mutableStateOf(WordTheme.WOODLAND.name) }
     var board by rememberSaveable { mutableStateOf(PuzzleBoardSize.BOOK_CLASSIC.name) }
     var challenge by rememberSaveable { mutableStateOf(PuzzleChallenge.CLASSIC.name) }
@@ -44,7 +49,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())
         .padding(horizontal = 18.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        TextButton(onClick = onBack) { Text("← Back to Play") }
+        TextButton(onClick = requestExit) { Text("← Back to Play") }
+        PaperEyebrow("GridMates · Nearby Play")
         Text("Play Together", style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold, color = Forest)
         Text("One word search, two phones. Same Wi-Fi, no sign-in.",
@@ -217,8 +223,9 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         fontWeight = FontWeight.Bold, color = Forest)
                     Text(spec.theme.label + " · " + spec.board.cells + "×" + spec.board.cells +
                         " · " + spec.challenge.label, color = Muted)
+                    PaperProgress(snapshot.foundIds.size, puzzle.targets.size)
                     Text(snapshot.foundIds.size.toString() + " / " + puzzle.targets.size +
-                        " found  ·  You: " + ownFound.size +
+                        " words found  ·  You: " + ownFound.size +
                         "  ·  Partner: " + partnerFound.size, color = Forest,
                         fontWeight = FontWeight.SemiBold)
                     Text(if (connected) "● Partner connected" else "○ Partner offline / not joined",
@@ -228,10 +235,14 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                             color = Forest, style = MaterialTheme.typography.bodyMedium)
                     }
                     if (state.role == NearbyRole.HOST) {
-                        Text("Host: " + state.address + ":" + state.port,
-                            color = Muted, style = MaterialTheme.typography.bodySmall)
-                        Text(if (state.requiresCode) "Join code: " + state.code
+                        Text("Your room is ready for one partner",
+                            color = Forest, fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyMedium)
+                        Text(if (state.requiresCode) "Room code: " + state.code
                             else "Open room · no code needed",
+                            color = Muted, style = MaterialTheme.typography.bodyMedium)
+                        Text("If your partner cannot find the room, share " +
+                            state.address + ":" + state.port,
                             color = Muted, style = MaterialTheme.typography.bodySmall)
                     }
                     if (state.disconnected) {
@@ -354,6 +365,33 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                 "doesn't erase the current host's shared progress.",
                 color = Muted, style = MaterialTheme.typography.bodySmall)
         }
+    }
+
+    if (exitPrompt) {
+        AlertDialog(
+            onDismissRequest = { exitPrompt = false },
+            title = { Text(if (state.role == NearbyRole.HOST) "Close this shared game?"
+                else "Leave Play Together?") },
+            text = { Text(
+                if (state.role == NearbyRole.HOST) {
+                    "Your partner will be disconnected. This shared board and its chat " +
+                        "end when you close the room. Your Solo and Daily puzzles are safe."
+                } else if (state.role == NearbyRole.GUEST) {
+                    "Leaving will disconnect you from your partner. " +
+                        "Your Solo and Daily puzzles are not affected."
+                } else {
+                    "Leave the nearby game setup? Your connection attempt will be closed."
+                }
+            ) },
+            confirmButton = {
+                TextButton(onClick = { exitPrompt = false; onBack() }) {
+                    Text(if (state.role == NearbyRole.HOST) "Close room" else "Leave")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { exitPrompt = false }) { Text("Keep playing") }
+            }
+        )
     }
 
     val protected = selectedRoom

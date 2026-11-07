@@ -106,12 +106,12 @@ internal fun CollectionScreen(store: SoloStore) {
             title = { Text("Your local profile") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("This name stays inside Word Search on this device. " +
-                        "It is not shared with Sudoku or other players.",
+                    Text("Your name is saved on this device and shown to a partner " +
+                        "during Nearby Co-op. No account is needed.",
                         color = Muted, style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = draftName,
-                        onValueChange = { draftName = it.take(48) },
+                        onValueChange = { draftName = it.take(24) },
                         label = { Text("Display name") },
                         singleLine = true,
                         supportingText = { Text("Up to 24 characters") }
@@ -199,10 +199,10 @@ internal fun CollectionScreen(store: SoloStore) {
             color = Forest, style = MaterialTheme.typography.titleMedium)
         Text(
             if (originalImagesAvailable) {
-                "The original Woodland portraits from GridMates: Sudoku."
+                "Choose a Woodland companion. More portraits unlock as you play."
             } else {
-                "The approved portrait PNGs are not present in this local build. " +
-                    "Letter badges are shown until the original art is imported."
+                "Some portrait artwork is unavailable in this build. " +
+                    "Letter badges will appear instead."
             },
             color = Muted, style = MaterialTheme.typography.bodySmall
         )

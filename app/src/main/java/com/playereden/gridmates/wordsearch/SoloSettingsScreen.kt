@@ -128,13 +128,22 @@ internal fun SoloSettingsScreen(store: SoloStore) {
             Text("Gameplay preferences", color = Forest,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold)
-            Text("Open Feel during a puzzle to adjust gentle vibrations and sound. " +
-                "Persistent feedback preferences are planned for a later update.",
+            Text("Choose gentle vibrations and word-found sound in a puzzle's " +
+                "Options → Feedback settings. Your choices are remembered on this device.",
                 color = Muted)
         }
     }
     if (message.isNotBlank()) {
         Text(message, color = Forest, style = MaterialTheme.typography.bodyMedium)
+    }
+    PaperPanel(Modifier.fillMaxWidth()) {
+        Text("About Word Search", color = Forest,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold)
+        Text("Good puzzles. Good company.", color = Muted)
+        Text("Offline Solo and Daily puzzles, with optional nearby Wi-Fi co-op. " +
+            "Your Solo and Daily records stay on this device.",
+            style = MaterialTheme.typography.bodySmall, color = Muted)
     }
     store.warning?.let {
         Text(it, color = Gold, style = MaterialTheme.typography.bodyMedium)
