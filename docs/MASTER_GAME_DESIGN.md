@@ -1,7 +1,7 @@
 # GridMates: Word Search — Master Game Design Document
 
-**Version:** Living master design — WS-06C implementation checkpoint, November 7, 2026  
-**Status:** Historical design baseline below plus current [WS-06C automated PASS receipt](WS06C_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
+**Version:** Living master design — WS-06D implementation checkpoint, November 7, 2026  
+**Status:** Historical design baseline below plus current [WS-06D automated PASS receipt](WS06D_BUILD_QA_2026-11-07.md); Solo, Daily, nearby Co-op and Shared Board Race implemented in cumulative drafts. Physical two-phone acceptance still open.  
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
 **Companion plan:** [Development Roadmap](DEVELOPMENT_ROADMAP.md)  
 **Planning rule:** Preserve accepted decisions, clearly label proposals, and revise this document when playtesting changes our mind.
@@ -511,3 +511,8 @@ Shared Board Race completed outcomes are now stored once per room in the existin
 ## November 7, 2026 — WS-06C independent Speed Duel
 
 Speed Duel is now implemented separately from Shared Board Race in cumulative [draft PR #44](https://github.com/PlayerEden/GridMates-Word-Search/pull/44), with its own host-owned private word ledgers, per-player readiness and simultaneous GO broadcast, personal word highlights only, public opponent progress counts, and first host-accepted complete board deciding the winner. Near-simultaneous finishes have a deterministic order rather than a forced tie. Original Co-op/Race modes and Solo/Daily/Versus journal remain intact. LAN protocol increases from v5 to v6. [Verified 57-test API35 QA receipt](WS06C_BUILD_QA_2026-11-07.md) includes an install-over from real signed v0.6.1 preserving prior local race journal. Both real phones and anti-cheat security remain unverified; the opponent cannot see a list of discovered words through ordinary client state, but deterministic puzzle seed and unencrypted LAN are not adversarially secure. A distinct Speed Duel persistent result journal is deferred to WS-06D.
+
+
+## November 7, 2026 — WS-06D Speed Duel records
+
+Speed Duel now has a **distinct persistent winner/loser journal**, not a subset of Shared Board Race history. Only completed, recipient-scoped, host-verified outcomes are recorded. The first record for each hosted room remains immutable across retries and reconnections. Player Stats show separate Duel Played/Wins/Losses and recent matches; backup Export/preview/Restore include Duel history as an optional schema-4 array, with older backups supported and invalid/duplicate awards rejected. No opponent word IDs are exposed or stored as history. The final Duel card shows both counts and save status. [Source-matched 60-test QA receipt](WS06D_BUILD_QA_2026-11-07.md) proves an install-over from original v0.7.0 preserving Solo/Daily/profile and prior Race history. Owner two-device fairness, Wi-Fi loss and actual handset acceptance remain open; LAN traffic is not cryptographically secure. Next is UX/presence polish and potential sharing in WS-06E.

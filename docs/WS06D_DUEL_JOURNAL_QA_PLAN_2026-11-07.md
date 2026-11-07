@@ -1,6 +1,6 @@
 # WS-06D — Speed Duel records, results and protected update
 
-**November 7, 2026 · Source implemented in cumulative draft; automated QA and hardware verification tracked separately.**
+**November 7, 2026 · Implemented; **60/60 Android API35 emulator tests PASS**, actual signed v0.7.0→v0.7.1 data-preserving update PASS. Real two-phone hardware acceptance remains open. See [verified receipt](WS06D_BUILD_QA_2026-11-07.md).**
 
 Speed Duel final, host-validated recipient-scoped snapshots now create separate local win/loss records. Each result records room, puzzle spec/digest, winner, player-relative word counts and completion timestamp, never opponent private word IDs. Incomplete rounds and other modes cannot generate Duel records; one room can be recorded only once across reconnect, duplicate packets or rotation.
 
