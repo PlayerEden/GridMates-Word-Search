@@ -40,7 +40,7 @@ class CompactRecordsAndCollectionAndroidTest {
         }
         compose.onNodeWithText("Your puzzle journal").assertIsDisplayed()
         compose.onNodeWithText("Select Solo, Race, or Duel", substring = true).assertExists()
-        compose.onNodeWithText("Solo").performClick()
+        compose.onAllNodesWithText("Solo").onFirst().performClick()
         compose.onNodeWithText("13 saved results").assertExists()
         compose.onNodeWithText("Page 1 of 4").assertIsDisplayed()
         // The first page shows only four records, rather than all 13.
