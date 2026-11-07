@@ -285,8 +285,11 @@ private fun BoardFontCard(
     onEquip: () -> Unit,
     onLicense: () -> Unit
 ) {
-    Card(modifier) {
-        Column(Modifier.padding(9.dp),
+    Card(modifier,
+        colors = CardDefaults.cardColors(containerColor = Paper),
+        border = BorderStroke(1.dp, if (item.equipped) Forest else Color(0xFFDFE0D6))
+    ) {
+        Column(Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)) {
             BoardFontPreview(item.font.id)
             Text(item.font.label, color = Forest,
@@ -366,7 +369,10 @@ private fun PortraitCard(
     modifier: Modifier,
     onEquip: () -> Unit
 ) {
-    Card(modifier) {
+    Card(modifier,
+        colors = CardDefaults.cardColors(containerColor = Paper),
+        border = BorderStroke(1.dp, if (item.equipped) Forest else Color(0xFFDFE0D6))
+    ) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(7.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
             PortraitBadge(item.portrait.id, item.portrait.label, 54, item.unlocked)
@@ -376,11 +382,16 @@ private fun PortraitCard(
                 when {
                     item.equipped -> "Equipped"
                     item.unlocked -> "Unlocked"
-                    else -> remaining.toString() + " more to unlock"
+                    else -> remaining.toString() + " more " +
+                        (if (remaining == 1) "puzzle" else "puzzles") + " to unlock"
                 },
                 color = Muted, style = MaterialTheme.typography.labelMedium,
-                maxLines = 1, overflow = TextOverflow.Ellipsis
+                maxLines = 2, overflow = TextOverflow.Ellipsis
             )
+            if (!item.unlocked && item.portrait.requiredCompletions > 0) {
+                val completed = (item.portrait.requiredCompletions - remaining).coerceAtLeast(0)
+                PaperProgress(completed, item.portrait.requiredCompletions)
+            }
             TextButton(onClick = onEquip, enabled = item.unlocked && !item.equipped) {
                 Text(if (item.equipped) "Selected" else if (item.unlocked) "Equip" else "Locked")
             }
@@ -390,22 +401,23 @@ private fun PortraitCard(
 
 @Composable
 private fun AchievementCard(item: AchievementProgress) {
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(item.title, fontWeight = FontWeight.SemiBold, color = Forest)
-                Text(if (item.unlocked) "Earned" else
-                    item.current.toString() + "/" + item.target,
-                    color = if (item.unlocked) Forest else Muted,
-                    style = MaterialTheme.typography.labelMedium)
-            }
-            Text(item.description, style = MaterialTheme.typography.bodySmall, color = Muted)
-            LinearProgressIndicator(
-                progress = { item.current.toFloat() / item.target.toFloat() },
-                modifier = Modifier.fillMaxWidth(),
-                color = Forest,
-                trackColor = ColorForestPale
-            )
+    PaperPanel(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Text(item.title, fontWeight = FontWeight.SemiBold, color = Forest,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f))
+            Text(if (item.unlocked) "Earned" else
+                item.current.toString() + " / " + item.target,
+                color = if (item.unlocked) Forest else Muted,
+                style = MaterialTheme.typography.labelMedium)
+        }
+        Text(item.description, style = MaterialTheme.typography.bodyMedium, color = Muted)
+        PaperProgress(item.current, item.target)
+        if (!item.unlocked) {
+            Text((item.target - item.current).coerceAtLeast(0).toString() +
+                " more to earn this achievement",
+                color = Muted, style = MaterialTheme.typography.labelSmall)
         }
     }
 }
