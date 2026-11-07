@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/ws06i-integration-audit-and-hardening-2026-11-07
+      - feature/ws06i-fail-closed-solo-daily-2026-11-07
     paths:
-      - '.github/workflows/ws06i-integration-audit-android-qa.yml'
+      - '.github/workflows/ws06i-save-integrity-android-qa.yml'
 
 permissions:
   contents: read
@@ -68,7 +68,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Build versionCode 30 with integration audit and backup hardening
+      - name: Build versionCode 30 with fail-closed Solo/Daily data guards
         run: gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:compileDebugAndroidTestKotlin :app:assembleDebug
       - name: Check APK package version and same trusted QA test signer
         run: |
