@@ -46,6 +46,7 @@ internal fun DailyLandingScreen(
     var page by rememberSaveable { mutableIntStateOf(0) }
     val visiblePage = page.coerceIn(0, totalPages - 1)
 
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
     PaperEyebrow("Your daily puzzle")
     Text("Daily Word Search", color = Forest,
         style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
@@ -135,4 +136,5 @@ internal fun DailyLandingScreen(
         }
     }
     TextButton(onClick = onBack) { Text("Back to Play") }
+    }
 }
