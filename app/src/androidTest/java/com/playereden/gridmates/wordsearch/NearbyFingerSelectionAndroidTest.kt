@@ -42,11 +42,13 @@ class NearbyFingerSelectionAndroidTest {
         val puzzle = session.puzzle
         val word = puzzle.targets.first()
         val captured = AtomicReference<CoopClaimDecision?>(null)
+        val endpoints = AtomicReference<Pair<GridPoint, GridPoint>?>(null)
         compose.setContent {
             GridMatesTheme {
                 Box(Modifier.size(350.dp)) {
                     ZoomableWordGrid(puzzle, emptySet(), emptyList(), 320.dp,
                         onSelect = { from, to ->
+                            endpoints.set(from to to)
                             captured.set(session.submit(seat, session.roomId,
                                 UUID.randomUUID().toString(), from, to))
                         },
@@ -70,7 +72,9 @@ class NearbyFingerSelectionAndroidTest {
         compose.runOnIdle {
             val decision = captured.get()
             assertTrue("A real finger trace must call host authority", decision != null)
-            assertEquals(CoopClaimStatus.FOUND, decision!!.status)
+            assertEquals("Expected " + word.positions.first() + " to " +
+                word.positions.last() + " but UI delivered " + endpoints.get(),
+                CoopClaimStatus.FOUND, decision!!.status)
             assertEquals(word.id, decision.wordId)
             assertEquals(1, decision.snapshot.foundIds.size)
         }
