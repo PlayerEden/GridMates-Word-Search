@@ -28,14 +28,14 @@ These changes favor the app's paperback puzzle-book identity: readable date rows
 
 ## Automated acceptance
 
-- [ ] Standard Kotlin build, core/app unit tests, lint, Android test compilation and QA APK succeeded.
-- [ ] Simulated phone viewport (360×720dp) Daily page shows today's action, journal, and next/previous page controls without an endless historical card stack.
-- [ ] Eight saved past dates are reachable across three pages; none are removed or completed by page navigation.
-- [ ] UI can reread an exhausted 3-step hint without changing found IDs, hint counts, or result journal (puzzle time continues normally).
-- [ ] A partial-budget clue is revisitable through Options without spending another step.
-- [ ] Full API35 emulator instrumentation passes **all prior 87 tests plus 3 new WS-07E UI cases**, including prior 15×15/20×20 gestures, LAN host receipts and saved-data regressions.
-- [ ] Real QA-signed v0.8.0 code34→v0.8.1 code35 APK install-over preserves schema4, Solo, Daily, identity, Race, Duel and settings. Record exact executable SHA, APK SHA-256, signer, artifact/expiry, rollback.
-- [ ] The cumulative PR remains **draft/unmerged**; no production Play signing or cloud data changes.
+- [x] Standard Kotlin build, core/app unit tests, lint, Android test compilation and QA APK succeeded.
+- [x] Simulated phone viewport (360×720dp) Daily page shows today's action, journal, and next/previous page controls without an endless historical card stack.
+- [x] Eight saved past dates are reachable across three pages; none are removed or completed by page navigation.
+- [x] UI can reread an exhausted 3-step hint without changing found IDs, hint counts, or result journal (puzzle time continues normally).
+- [x] A partial-budget clue is revisitable through Options without spending another step.
+- [x] Full API35 emulator instrumentation passes **all prior 87 tests plus 3 new WS-07E UI cases**, including prior 15×15/20×20 gestures, LAN host receipts and saved-data regressions.
+- [x] Real QA-signed v0.8.0 code34→v0.8.1 code35 APK install-over preserves schema4, Solo, Daily, identity, Race, Duel and settings. Record exact executable SHA, APK SHA-256, signer, artifact/expiry, rollback.
+- [x] The cumulative PR remains **draft/unmerged**; no production Play signing or cloud data changes.
 
 ## Later owner physical acceptance (not requested yet)
 
@@ -46,3 +46,8 @@ When owner opts in, compare Daily on their actual device(s), including 320dp scr
 This is a **bounded first WS-07E UX pass**, not whole-game user acceptance. Further independent passes can audit profile/records/collection hierarchy, hints on the last unresolved word, results/share, and visual/touch ergonomics, but each must preserve approved save semantics and stay testable.
 
 [Roadmap](DEVELOPMENT_ROADMAP.md) · [UX research](WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md) · [WS-07D verified checkpoint](WS07D_BUILD_QA_2026-11-07.md).
+
+
+## Green automated result — November 7
+
+[Exact-source WS-07E QA receipt](WS07E_BUILD_QA_2026-11-07.md) records **90/90 API35 tests PASS**, same-QA-signer v0.8.0→v0.8.1 update retaining all historical saved data, APK checksum and pinned rollback. **Human/physical device and two-phone items above remain unperformed** and are not checked off by automation.
