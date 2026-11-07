@@ -21,6 +21,7 @@ import com.playereden.gridmates.wordsearch.core.DuelView
  */
 @Composable
 internal fun SpeedDuelStatusCard(view: DuelView, total: Int, connected: Boolean,
+                                 saved: Boolean = false, saveFailed: Boolean = false,
                                  onReady: () -> Unit) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
@@ -79,8 +80,20 @@ internal fun SpeedDuelStatusCard(view: DuelView, total: Int, connected: Boolean,
                 }
             }
             if (view.finished) {
-                Text("Duel outcomes aren't added to Shared Board Race records. " +
-                    "A separate Duel journal is planned.",
+                Text("You: " + view.ownCount + " words · Partner: " +
+                    view.opponentCount + " words. " +
+                    (if (view.winner == view.recipient)
+                        "You completed all " + total + " words first."
+                     else "You had " + (total - view.ownCount) +
+                        " words remaining when your partner finished."),
+                    color = Forest, style = MaterialTheme.typography.bodyMedium)
+                Text(when {
+                    saved -> "Saved to your local Speed Duel journal."
+                    saveFailed -> "Unable to save this Duel result. Earlier records are protected."
+                    else -> "Saving your Duel result to this device…"
+                }, color = if (saved) Forest else Gold,
+                    style = MaterialTheme.typography.bodySmall)
+                Text("Shared Board Race records stay separate from Speed Duel.",
                     color = Muted, style = MaterialTheme.typography.bodySmall)
             }
         }

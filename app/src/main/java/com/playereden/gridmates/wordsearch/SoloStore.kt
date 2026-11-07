@@ -17,6 +17,9 @@ import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.SoloProfile
 import com.playereden.gridmates.wordsearch.core.RaceResult
 import com.playereden.gridmates.wordsearch.core.RaceJournalRules
+import com.playereden.gridmates.wordsearch.core.DuelResult
+import com.playereden.gridmates.wordsearch.core.DuelJournalRules
+import com.playereden.gridmates.wordsearch.core.NearbyMatch
 import com.playereden.gridmates.wordsearch.core.CoopSnapshot
 import com.playereden.gridmates.wordsearch.core.CoopSeat
 import com.playereden.gridmates.wordsearch.core.SoloProgressRules
@@ -189,8 +192,33 @@ internal class SoloStore(
                 ).validate()
             }
         }
+        // Optional additive schema-4 journal. Older backups and on-device
+        // profiles do not contain this key; they safely start at zero Duels.
+        val duelRaw = root.optJSONArray("duels")
+        require(!root.has("duels") || duelRaw != null) { "Malformed Speed Duel journal" }
+        val duels = mutableListOf<DuelResult>()
+        if (duelRaw != null) {
+            require(duelRaw.length() <= 1_000) { "Too many Speed Duel records" }
+            for (i in 0 until duelRaw.length()) {
+                val item = duelRaw.getJSONObject(i)
+                duels += DuelResult(
+                    roomId = item.getString("room"),
+                    puzzleId = item.getString("puzzle"),
+                    boardFingerprint = item.getString("digest"),
+                    theme = WordTheme.valueOf(item.getString("theme")),
+                    board = PuzzleBoardSize.valueOf(item.getString("board")),
+                    challenge = PuzzleChallenge.valueOf(item.getString("challenge")),
+                    localSeat = CoopSeat.valueOf(item.getString("seat")),
+                    winner = CoopSeat.valueOf(item.getString("winner")),
+                    ownWords = item.getInt("own"),
+                    partnerWords = item.getInt("partner"),
+                    completedAtMs = item.getLong("completedAt")
+                ).validate()
+            }
+        }
         val loadedProfile = SoloProfile(clean, valid, daily, rawIdentity,
-            RaceJournalRules.validateImported(races))
+            RaceJournalRules.validateImported(races),
+            DuelJournalRules.validateImported(duels))
         return loadedProfile.copy(identity = WoodlandCollection.sanitize(rawIdentity, loadedProfile))
     }
 
@@ -263,9 +291,19 @@ internal class SoloStore(
                 .put("seat", r.localSeat.name).put("own", r.ownWords)
                 .put("partner", r.partnerWords).put("completedAt", r.completedAtMs))
         }
+        val duels = JSONArray()
+        for (d in value.duelResults) {
+            duels.put(JSONObject()
+                .put("room", d.roomId).put("puzzle", d.puzzleId)
+                .put("digest", d.boardFingerprint).put("theme", d.theme.name)
+                .put("board", d.board.name).put("challenge", d.challenge.name)
+                .put("seat", d.localSeat.name).put("winner", d.winner.name)
+                .put("own", d.ownWords).put("partner", d.partnerWords)
+                .put("completedAt", d.completedAtMs))
+        }
         return JSONObject().put("schema", 4).put("active", active)
             .put("results", results).put("daily", daily).put("identity", identity)
-            .put("races", races)
+            .put("races", races).put("duels", duels)
             .toString().toByteArray(StandardCharsets.UTF_8)
     }
 
@@ -343,6 +381,37 @@ internal class SoloStore(
         if (warning != null) {
             // AtomicFile failWrite retains the prior on-disk profile.
             profile = previous
+            return false
+        }
+        return true
+    }
+
+    /**
+     * Save only a completed recipient-scoped host-confirmed Speed Duel state.
+     * Neither a guest's submitted bare score nor an unfinished room can
+     * become a permanent record. Rejoins and rerenders cannot award twice.
+     */
+    fun recordDuel(snapshot: CoopSnapshot, localSeat: CoopSeat,
+                   nowMs: Long = System.currentTimeMillis()): Boolean {
+        if (blocked) return false
+        val result = runCatching {
+            DuelResult.fromVerifiedSnapshot(snapshot, localSeat, nowMs)
+        }.getOrElse {
+            warning = "Could not verify this Speed Duel result."
+            return false
+        }
+        if (profile.duelResults.any { it.roomId == result.roomId }) return true
+        val previous = profile
+        val updated = runCatching {
+            DuelJournalRules.addOnce(previous.duelResults, result)
+        }.getOrElse {
+            warning = "Speed Duel journal full. Export a backup before playing more."
+            return false
+        }
+        profile = previous.copy(duelResults = updated)
+        flush()
+        if (warning != null) {
+            profile = previous // AtomicFile protects previous on-disk save.
             return false
         }
         return true

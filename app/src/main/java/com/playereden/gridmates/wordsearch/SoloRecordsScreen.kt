@@ -41,7 +41,7 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
         }
     }
 
-    Text("Nearby Versus", color = Forest,
+    Text("Shared Board Race", color = Forest,
         style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     Text("Shared Board Race results saved locally. Co-op isn't counted as a win or loss.",
         color = Muted, style = MaterialTheme.typography.bodySmall)
@@ -87,6 +87,55 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
                         color = Muted, style = MaterialTheme.typography.bodySmall)
                     Text(DateFormat.getDateTimeInstance(
                         DateFormat.MEDIUM, DateFormat.SHORT).format(Date(race.completedAtMs)),
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    }
+
+    Text("Speed Duel", color = Forest,
+        style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+    Text("Separate private-board matches. First host-confirmed completion wins. " +
+        "These results are not mixed with Shared Board Race.",
+        color = Muted, style = MaterialTheme.typography.bodySmall)
+    val dueling = profile.duelSummary
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MetricCard("Played", dueling.played.toString(), Modifier.weight(1f))
+            MetricCard("Wins", dueling.wins.toString(), Modifier.weight(1f))
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MetricCard("Losses", dueling.losses.toString(), Modifier.weight(1f))
+            MetricCard("Words found", dueling.totalWordsFound.toString(), Modifier.weight(1f))
+        }
+    }
+    if (profile.duelResults.isEmpty()) {
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(14.dp)) {
+                Text("No Speed Duels recorded yet.",
+                    fontWeight = FontWeight.SemiBold, color = Forest)
+                Text("Finish a private-board Duel with a nearby friend to save your result.",
+                    color = Muted, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    } else {
+        Text("Recent Speed Duels", color = Forest, fontWeight = FontWeight.SemiBold)
+        profile.duelResults.take(12).forEach { duel ->
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(if (duel.won) "Victory" else "Defeat",
+                            color = Forest, fontWeight = FontWeight.Bold)
+                        Text("You " + duel.ownWords + " · Partner " + duel.partnerWords,
+                            color = Forest, fontWeight = FontWeight.SemiBold)
+                    }
+                    Text(duel.theme.label + " · " + duel.board.cells +
+                        "×" + duel.board.cells + " · " + duel.challenge.label,
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Text(DateFormat.getDateTimeInstance(
+                        DateFormat.MEDIUM, DateFormat.SHORT).format(Date(duel.completedAtMs)),
                         color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
             }
