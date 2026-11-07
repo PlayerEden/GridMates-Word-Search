@@ -56,7 +56,7 @@ class NearbyFingerSelectionAndroidTest {
             }
         }
         compose.onNodeWithTag("word-grid-touch-area").performTouchInput {
-            val side = size.width.toFloat()
+            val side = center.x * 2f
             val from = word.positions.first()
             val to = word.positions.last()
             swipe(
