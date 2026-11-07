@@ -4,12 +4,12 @@ package com.playereden.gridmates.wordsearch
 internal object PuzzleModeHelp {
     fun opening(boardSize: Int): String =
         if (boardSize >= 15)
-            "Large board: choose Move to explore, then Find to select words."
+            "Large board: tap Move to explore, then Find to select words."
         else "Drag a word, or tap its first and last letters."
 
     fun selected(moving: Boolean): String =
         if (moving)
-            "Move mode: drag the board to explore or pinch to zoom. Select Find to trace words."
+            "Move: drag to pan or pinch to zoom. Tap Find to select words."
         else
-            "Find mode: drag across a word, or tap its first and last letters."
+            "Find: drag a word, or tap its first and last letters."
 }
