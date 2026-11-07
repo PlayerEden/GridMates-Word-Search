@@ -37,6 +37,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
     var theme by rememberSaveable { mutableStateOf(WordTheme.WOODLAND.name) }
     var board by rememberSaveable { mutableStateOf(PuzzleBoardSize.BOOK_CLASSIC.name) }
     var challenge by rememberSaveable { mutableStateOf(PuzzleChallenge.CLASSIC.name) }
+    var preferredBoardLook by rememberSaveable { mutableStateOf(CoopBoardLook.CLASSIC.id) }
+    var classicOnThisPhone by rememberSaveable { mutableStateOf(false) }
     var showJoin by rememberSaveable { mutableStateOf(false) }
     var manual by rememberSaveable { mutableStateOf(false) }
     var manualAddress by rememberSaveable { mutableStateOf("") }
@@ -84,6 +86,30 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
         if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
 
         if (snapshot == null && state.role == NearbyRole.NONE) {
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Co-op board appearance",
+                        color = Forest, fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleMedium)
+                    Text("Optional free looks. You and your partner each choose before joining; " +
+                        "the shared preview uses a consistent display priority. No cosmetic " +
+                        "is bought, earned or transferred.",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        CoopBoardLook.entries.forEach { look ->
+                            FilterChip(
+                                selected = preferredBoardLook == look.id,
+                                onClick = { preferredBoardLook = look.id },
+                                label = { Text(look.label) })
+                        }
+                    }
+                    Text("Co-op only. Race and Speed Duel keep their normal board. " +
+                        "The room look stays fixed after the first partner joins.",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
+            }
             state.recovery?.let {
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp),
@@ -164,7 +190,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                     Button(onClick = {
                         runtime.host(ownName, WordTheme.valueOf(theme),
                             PuzzleBoardSize.valueOf(board), PuzzleChallenge.valueOf(challenge),
-                            NearbyMatch.valueOf(match))
+                            NearbyMatch.valueOf(match), preferredBoardLook)
                     }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
                         Text(when (match) {
                             NearbyMatch.SPEED_DUEL.name -> "Host Speed Duel"
@@ -205,7 +231,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                                 pin = ""
                                 if (!entry.requiresCode) {
                                     runtime.join(entry.address, entry.port, entry.roomId, "",
-                                        ownName)
+                                        ownName, preferredBoardLook)
                                 }
                             }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
                                 Column(Modifier.fillMaxWidth()) {
@@ -232,7 +258,8 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                                 singleLine = true, modifier = Modifier.fillMaxWidth())
                             Button(onClick = {
                                 val port = manualPort.toIntOrNull() ?: 0
-                                runtime.join(manualAddress, port, "", pin, ownName)
+                                runtime.join(manualAddress, port, "", pin, ownName,
+                                    preferredBoardLook)
                             }, enabled = !state.busy && (manualPort.toIntOrNull() ?: 0) in 1..65535 &&
                                 manualAddress.isNotBlank(),
                                 modifier = Modifier.fillMaxWidth()) { Text("Join with address") }
@@ -358,6 +385,35 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
             NearbyPlayerPresenceCard(state, snapshot, localSeat, puzzle.targets.size,
                 recentWord = lastPartnerWord)
 
+            if (snapshot.match == NearbyMatch.COOP) {
+                val sharedLook = CoopBoardLook.safe(snapshot.boardLookId)
+                Card(Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Shared board: " + sharedLook.label,
+                            color = Forest, fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.titleMedium)
+                        Text("This temporary room appearance doesn't unlock a board skin " +
+                            "or change either player's personal board font.",
+                            color = Muted, style = MaterialTheme.typography.bodySmall)
+                        if (sharedLook != CoopBoardLook.CLASSIC) {
+                            Row(Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween) {
+                                Column(Modifier.weight(1f)) {
+                                    Text("Use Classic on my phone",
+                                        color = Forest, style = MaterialTheme.typography.bodyMedium)
+                                    Text("Local readability choice. Your friend's board is unchanged.",
+                                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                                }
+                                Switch(checked = classicOnThisPhone,
+                                    onCheckedChange = { classicOnThisPhone = it })
+                            }
+                        }
+                    }
+                }
+            }
+
             if (duel != null) {
                 SpeedDuelStatusCard(duel, puzzle.targets.size, connected,
                     saved = store.profile.duelResults.any { it.roomId == snapshot.roomId },
@@ -402,7 +458,9 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                         onSelect = { from, to ->
                             if (connected && !snapshot.finished) runtime.claim(from, to)
                         }, onStep = {}, boardFontId = store.effectiveBoardFontId,
-                        partnerFoundIds = partnerFound)
+                        partnerFoundIds = partnerFound,
+                        boardLookId = if (snapshot.match == NearbyMatch.COOP &&
+                            !classicOnThisPhone) snapshot.boardLookId else "classic")
                 }
             } else {
                 Card(Modifier.fillMaxWidth()) {
@@ -582,7 +640,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
             confirmButton = {
                 TextButton(onClick = {
                     runtime.join(protected.address, protected.port, protected.roomId,
-                        pin, ownName)
+                        pin, ownName, preferredBoardLook)
                     selectedRoom = null
                 }, enabled = pin.length == 6 && !state.busy) { Text("Join game") }
             },
