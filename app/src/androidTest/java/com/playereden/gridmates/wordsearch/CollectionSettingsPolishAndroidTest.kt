@@ -38,11 +38,15 @@ class CollectionSettingsPolishAndroidTest {
         capture("ws05h-profile.png")
 
         compose.onNodeWithText("Fonts").performScrollTo().performClick()
+        // Font and achievement tabs must not be pushed below the large
+        // portrait/profile panels when players switch collections.
+        compose.onNodeWithText("Edit display name").assertDoesNotExist()
         compose.onNodeWithText("Readable Print").performScrollTo().assertExists()
         compose.onNodeWithText("Classic Typewriter").assertExists()
         capture("ws05h-fonts.png")
 
         compose.onNodeWithText("Achievements").performScrollTo().performClick()
+        compose.onNodeWithText("Edit display name").assertDoesNotExist()
         compose.onNodeWithText("First Page").performScrollTo().assertExists()
         compose.onNodeWithText("Complete your first puzzle.").assertExists()
         capture("ws05h-achievements.png")
