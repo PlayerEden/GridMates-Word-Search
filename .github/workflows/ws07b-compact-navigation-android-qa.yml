@@ -7,6 +7,7 @@ name: WS-07B Compact Home and Nearby Android Emulator QA
 # Rerun all gates after final compact Solo word pages and win/save HUD adjustments.
 # Touch follow-up: include finger-UP final coordinates and report selected endpoints.
 # WS-07B: ensure Home, Host, and Join actions are immediately visible, while the full touch suite stays green.
+# Source-matched repeat after fixing Compose test import in CompactHomeNearbyEntryAndroidTest.
 # includes the exact same-signer v0.7.7 -> v0.7.8 update and save checks.
 
 on:
