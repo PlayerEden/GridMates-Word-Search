@@ -55,6 +55,7 @@ class CollectionSettingsPolishAndroidTest {
     @Test fun switchingFromDeepCollectionScrollStartsSettingsAtTop() {
         compose.onNodeWithContentDescription("Open Collection").performClick()
         compose.onNodeWithText("Achievements").performScrollTo().performClick()
+        compose.onNodeWithText("Next").performScrollTo().performClick()
         compose.onNodeWithText("Three Chapters").performScrollTo().assertExists()
         compose.onNodeWithContentDescription("Open Settings").performClick()
         compose.onNodeWithText("Settings & backup").assertIsDisplayed()
