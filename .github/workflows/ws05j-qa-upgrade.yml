@@ -1,0 +1,116 @@
+name: WS-05J Stable QA Update and Save Preservation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws05j-stable-qa-signing-upgrade-protection-2026-11-07
+    paths:
+      - 'app/**'
+      - 'core/**'
+      - 'qa-signing/**'
+      - '.github/workflows/ws05j-qa-upgrade.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  qa-upgrade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check pinned public QA-only signer
+        run: |
+          echo 'cbe50b2b4a34f3a8433e28ddc0efd5307a1adf9aa91e324ca757f40c6aec91ee  qa-signing/wordsearch-qa.p12' | sha256sum --check
+      - name: Checkout approved original Woodland artwork
+        uses: actions/checkout@v4
+        with:
+          repository: PlayerEden/SudokuTogether
+          ref: 975e31a1e8cbfebad1fbbc7602b3340c357da7ef
+          path: _approved_sudoku
+          persist-credentials: false
+      - run: python3 scripts/import_woodland_portraits.py --source _approved_sudoku
+      - name: Checkout reviewed OFL fonts at pinned revision
+        uses: actions/checkout@v4
+        with:
+          repository: google/fonts
+          ref: 24ddc1f324cac5d9f5aedca126d298f56e3f1640
+          path: _approved_fonts
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            ofl/atkinsonhyperlegible
+            ofl/ibmplexmono
+            ofl/dmmono
+            ofl/patrickhand
+      - name: Verify font imports and licenses
+        run: |
+          python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
+          python3 scripts/import_font_library.py --source _approved_fonts
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build same-source baseline APK with versionCode 20
+        run: |
+          gradle --no-daemon -PqaVersionCode=20 :app:assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk /tmp/ws05j-v20.apk
+      - name: Build versionCode 21 and run JVM lint and test compile checks
+        run: |
+          gradle --no-daemon :app:clean :core:test :app:testDebugUnitTest :app:lintDebug :app:compileDebugAndroidTestKotlin :app:assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk /tmp/ws05j-v21.apk
+          aapt_cmd="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          "$aapt_cmd" dump badging /tmp/ws05j-v20.apk | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='20'"
+          "$aapt_cmd" dump badging /tmp/ws05j-v21.apk | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='21'"
+          apksigner="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$apksigner" verify --print-certs /tmp/ws05j-v20.apk > /tmp/ws05j-cert-old.txt
+          "$apksigner" verify --print-certs /tmp/ws05j-v21.apk > /tmp/ws05j-cert-new.txt
+          grep -F 'Signer #1 certificate SHA-256 digest:' /tmp/ws05j-cert-old.txt > /tmp/ws05j-old-digest.txt
+          grep -F 'Signer #1 certificate SHA-256 digest:' /tmp/ws05j-cert-new.txt > /tmp/ws05j-new-digest.txt
+          diff -u /tmp/ws05j-old-digest.txt /tmp/ws05j-new-digest.txt
+          cat /tmp/ws05j-new-digest.txt
+      - name: Enable KVM on Linux runner
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=static_node"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Actual in-place APK upgrade with persistent private save on API35
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_4
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            set -eu
+            PKG=com.playereden.gridmates.wordsearch.qa
+            SAVEPATH=files/gridmates_wordsearch_solo_v1.json
+            adb install /tmp/ws05j-v20.apk
+            adb shell am start -W -n "$PKG/com.playereden.gridmates.wordsearch.MainActivity"
+            adb shell am force-stop "$PKG"
+            fixture='{"schema":4,"active":{"theme":"WOODLAND","difficulty":"EASY","seed":42,"found":[],"hints":{},"seconds":42},"results":[],"daily":[],"identity":{"name":"Upgrade QA","portraitId":"woodland_owl"}}'
+            printf '%s' "$fixture" | adb shell "run-as $PKG sh -c 'cat > $SAVEPATH'"
+            adb shell "run-as $PKG cat $SAVEPATH" | tr -d '\r' > /tmp/ws05j-before.json
+            grep -F '"name":"Upgrade QA"' /tmp/ws05j-before.json
+            adb install -r /tmp/ws05j-v21.apk | tee /tmp/ws05j-install.txt
+            grep -F 'Success' /tmp/ws05j-install.txt
+            adb shell am start -W -n "$PKG/com.playereden.gridmates.wordsearch.MainActivity"
+            adb shell am force-stop "$PKG"
+            adb shell "run-as $PKG cat $SAVEPATH" | tr -d '\r' > /tmp/ws05j-after.json
+            cmp -s /tmp/ws05j-before.json /tmp/ws05j-after.json
+            adb shell dumpsys package "$PKG" | grep -F 'versionCode=21'
+            echo 'PASS: same-signature in-place upgrade retained private v4 save bytes.'
+      - name: Archive QA APK checksum
+        run: sha256sum app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GridMates-WordSearch-WS05J-Stable-QA-v059
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
