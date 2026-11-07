@@ -60,6 +60,8 @@ class GameplayResultVisualTest {
                     puzzle.targets.size + " found"
             ).assertExists()
             rule.onNodeWithText("Share results").assertExists()
+            rule.onNodeWithText("Play another puzzle").assertExists()
+            rule.onNodeWithText("Words to find", substring = true).assertDoesNotExist()
             rule.onNodeWithText("Review completed board").assertExists()
             rule.onNodeWithText("Unassisted solve", substring = true).assertExists()
             rule.waitForIdle()
