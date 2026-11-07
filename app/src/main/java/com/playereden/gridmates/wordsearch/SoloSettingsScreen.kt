@@ -63,10 +63,10 @@ internal fun SoloSettingsScreen(store: SoloStore) {
     ) { uri ->
         if (uri != null) {
             try {
-                val raw = requireNotNull(context.contentResolver.openInputStream(uri))
-                    .bufferedReader(Charsets.UTF_8).use { it.readText() }
-                require(raw.length <= 2_000_000) { "Backup too large" }
+                val raw = BackupDocumentReader.readUtf8(
+                    requireNotNull(context.contentResolver.openInputStream(uri)))
                 pendingImport = store.previewBackup(raw)
+                message = ""
             } catch (ex: Exception) {
                 message = "This is not a supported GridMates: Word Search backup."
             }
