@@ -586,10 +586,11 @@ private fun WordList(
     onShowResults: (() -> Unit)? = null
 ) {
     var remainingOnly by remember(puzzle.id) { mutableStateOf(false) }
+    var page by remember(puzzle.id, remainingOnly) { mutableStateOf(0) }
     val targets = if (remainingOnly) puzzle.targets.filter { it.id !in found }
         else puzzle.targets
 
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(5.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
@@ -605,45 +606,62 @@ private fun WordList(
             }
         }
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
-            // Wide two-column index for normal text; a legible single column
-            // at 320dp / enlarged system fonts rather than cut-off words.
-            val columns = if (maxWidth < 350.dp ||
-                LocalDensity.current.fontScale >= 1.3f) 1 else 2
-            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            val enlarged = LocalDensity.current.fontScale >= 1.3f
+            val columns = if (maxWidth < 320.dp || enlarged) 1 else 2
+            // The list is paged instead of scrollable. Keep all visible
+            // targets within the space left below the fixed puzzle board.
+            val rowBudget = if (enlarged) 62.dp else 43.dp
+            val rowsPerPage = ((maxHeight - 40.dp) / rowBudget)
+                .toInt().coerceIn(1, 5)
+            val perPage = columns * rowsPerPage
+            val pageCount = ((targets.size + perPage - 1) / perPage).coerceAtLeast(1)
+            val visiblePage = page.coerceIn(0, pageCount - 1)
+            val visibleTargets = targets.drop(visiblePage * perPage).take(perPage)
+            Column(Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (targets.isEmpty()) {
                     Text("All words found!", color = Forest,
                         style = MaterialTheme.typography.bodyMedium)
-                }
-                targets.chunked(columns).forEach { pair ->
-                    Row(Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        pair.forEach { target ->
-                            val solved = target.id in found
-                            val shape = RoundedCornerShape(9.dp)
-                            Box(Modifier.weight(1f)
-                                .background(
-                                    if (solved) FoundMarker.copy(alpha = 0.28f) else Paper,
-                                    shape)
-                                .border(1.dp, if (solved) Color(0xFFC5D9C8) else GridRule, shape)
-                                .padding(horizontal = 9.dp, vertical = 7.dp)
-                            ) {
-                                Text(
-                                    (if (solved) "✓ " else "○ ") + target.word,
-                                    color = if (solved) Forest else Ink,
-                                    fontWeight = if (solved) FontWeight.Normal
-                                        else FontWeight.Medium,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    textDecoration = if (solved) TextDecoration.LineThrough else null,
-                                    maxLines = 1, overflow = TextOverflow.Ellipsis
-                                )
+                } else {
+                    visibleTargets.chunked(columns).forEach { pair ->
+                        Row(Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            pair.forEach { target ->
+                                val solved = target.id in found
+                                val shape = RoundedCornerShape(9.dp)
+                                Box(Modifier.weight(1f)
+                                    .background(if (solved) FoundMarker.copy(alpha = 0.28f)
+                                        else Paper, shape)
+                                    .border(1.dp,
+                                        if (solved) Color(0xFFC5D9C8) else GridRule, shape)
+                                    .padding(horizontal = 8.dp, vertical = 5.dp)
+                                ) {
+                                    Text((if (solved) "✓ " else "○ ") + target.word,
+                                        color = if (solved) Forest else Ink,
+                                        fontWeight = if (solved) FontWeight.Normal
+                                            else FontWeight.Medium,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        textDecoration = if (solved)
+                                            TextDecoration.LineThrough else null,
+                                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                }
                             }
+                            if (pair.size < columns) Box(Modifier.weight(1f))
                         }
-                        if (pair.size < columns) Box(Modifier.weight(1f))
                     }
                 }
-                Text(if (daily) "Daily progress saved." else "Your puzzle saves automatically.",
-                    color = Muted, style = MaterialTheme.typography.labelSmall)
+                if (pageCount > 1) {
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(onClick = { page = visiblePage - 1 },
+                            enabled = visiblePage > 0) { Text("Previous") }
+                        Text("Page " + (visiblePage + 1) + " of " + pageCount,
+                            color = Muted, style = MaterialTheme.typography.labelSmall)
+                        TextButton(onClick = { page = visiblePage + 1 },
+                            enabled = visiblePage < pageCount - 1) { Text("Next") }
+                    }
+                }
             }
         }
     }
