@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** Only protocol-compatible devices on a trusted local network can join. */
-private const val WS_WIRE_VERSION = 5
+private const val WS_WIRE_VERSION = 6
 private const val WS_NSD_TYPE = "_gridmatesws._tcp."
 private const val WS_PACKET_MAX = 16_384
 
@@ -98,7 +98,7 @@ internal object NearbyPacket {
             claims.put(JSONObject().put("id", claim.wordId)
                 .put("seat", claim.seat.name).put("rev", claim.revision))
         }
-        return JSONObject().put("type", "state").put("room", s.roomId)
+        val wire = JSONObject().put("type", "state").put("room", s.roomId)
             .put("theme", spec.theme.name).put("board", spec.board.name)
             .put("challenge", spec.challenge.name).put("seed", spec.seed)
             .put("puzzleId", spec.puzzleId).put("digest", spec.boardFingerprint)
@@ -106,6 +106,17 @@ internal object NearbyPacket {
             .put("reserved", s.guestReserved).put("guestHere", s.guestConnected)
             .put("hostHere", s.hostConnected).put("finished", s.finished)
             .put("match", s.match.name)
+        s.duel?.let { d ->
+            // Recipient-specific only! No path or ID of the opponent is sent.
+            wire.put("duel", JSONObject()
+                .put("rev", d.revision).put("recipient", d.recipient.name)
+                .put("hostReady", d.hostReady).put("guestReady", d.guestReady)
+                .put("started", d.started).put("finished", d.finished)
+                .put("winner", d.winner?.name ?: "")
+                .put("hostCount", d.hostCount).put("guestCount", d.guestCount)
+                .put("own", JSONArray(d.ownFoundIds.sorted())))
+        }
+        return wire
     }
 
     fun chatLine(line: NearbyChatLine): JSONObject =
@@ -150,10 +161,23 @@ internal object NearbyPacket {
             CoopWordClaim(obj.getString("id"),
                 CoopSeat.valueOf(obj.getString("seat")), obj.getLong("rev"))
         }
+        val duel = json.optJSONObject("duel")?.let { data ->
+            val own = data.getJSONArray("own")
+            require(own.length() <= 30)
+            val ids = (0 until own.length()).map { own.getString(it) }
+            require(ids.distinct().size == ids.size) { "Duplicate private discovery" }
+            DuelView(data.getLong("rev"),
+                CoopSeat.valueOf(data.getString("recipient")),
+                data.getBoolean("hostReady"), data.getBoolean("guestReady"),
+                data.getBoolean("started"), data.getBoolean("finished"),
+                data.getString("winner").takeIf { it.isNotEmpty() }
+                    ?.let { CoopSeat.valueOf(it) },
+                data.getInt("hostCount"), data.getInt("guestCount"), ids.toSet())
+        }
         return CoopSnapshot(json.getString("room"), spec, json.getLong("revision"),
             claims, json.getBoolean("reserved"), json.getBoolean("guestHere"),
             json.getBoolean("hostHere"), json.getBoolean("finished"),
-            NearbyMatch.valueOf(json.getString("match")))
+            NearbyMatch.valueOf(json.getString("match")), duel)
             .also { NearbyCoopSession.validateSnapshot(it) }
     }
 }
