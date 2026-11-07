@@ -1,5 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
+import android.content.Intent
 import android.view.SoundEffectConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -56,8 +59,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -258,10 +264,11 @@ internal fun WordSearchScreen(
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 2.dp)) {
         val landscape = maxWidth > maxHeight * 1.25f
         val boardViewport = if (landscape) {
-            minOf(maxHeight - (if (finished) 222.dp else 196.dp),
+            minOf(maxHeight - (if (finished && !reviewingCompletedBoard) 236.dp else 212.dp),
                 maxWidth * 0.51f).coerceAtLeast(106.dp)
         } else {
-            minOf(maxWidth, maxHeight * (if (finished) 0.43f else 0.54f))
+            minOf(maxWidth, maxHeight * (if (finished && !reviewingCompletedBoard)
+                    0.43f else 0.54f))
                 .coerceAtLeast(145.dp)
         }
 
@@ -367,70 +374,72 @@ internal fun WordSearchScreen(
                     }
                 ) { Text("Hint ($hintsRemaining)") }
             }
+            PaperProgress(found.size, puzzle.targets.size)
 
-
-            if (landscape) {
+            // A finished puzzle should open its journal first, not bury
+            // Play another / Share below a large (zoomed) board.
+            // The board remains available with Review completed board.
+            if (finished && !reviewingCompletedBoard) {
+                CompletionPanel(
+                    puzzle = puzzle, run = run, daily = daily,
+                    completedSeconds = currentResult?.elapsedSeconds ?: run.elapsedSeconds,
+                    onReview = { reviewingCompletedBoard = true },
+                    onRecords = { store.flush(); onRecords() },
+                    onHome = { store.flush(); onBack() },
+                    onAnother = if (daily) null else { { startNew() } },
+                    modifier = Modifier.weight(1f).fillMaxWidth()
+                )
+            } else if (landscape) {
                 Row(Modifier.weight(1f).fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(Modifier.width(boardViewport),
                         verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         ZoomableWordGrid(puzzle, found, hintPaths,
                             boardViewport, select, onStep, boardFontId)
-                        if (!finished || reviewingCompletedBoard) {
-                            Text(status,
-                                color = if (status.startsWith("✓")) Forest else Muted,
-                                fontWeight = if (status.startsWith("✓")) FontWeight.SemiBold
-                                    else FontWeight.Normal,
-                                style = MaterialTheme.typography.labelSmall,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
+                        PuzzleStatus(status, compact = true)
                     }
-                    if (!finished || reviewingCompletedBoard) {
-                        WordList(puzzle, found, daily,
-                            Modifier.weight(1f).fillMaxSize(),
-                            onShowResults = if (finished) { { reviewingCompletedBoard = false } }
-                                else null)
-                    } else {
-                        CompletionPanel(
-                            puzzle = puzzle, run = run, daily = daily,
-                            completedSeconds = currentResult?.elapsedSeconds ?: run.elapsedSeconds,
-                            onReview = { reviewingCompletedBoard = true },
-                            onRecords = { store.flush(); onRecords() },
-                            onHome = { store.flush(); onBack() },
-                            onAnother = if (daily) null else { { startNew() } },
-                            modifier = Modifier.weight(1f).fillMaxSize()
-                        )
-                    }
+                    WordList(puzzle, found, daily,
+                        Modifier.weight(1f).fillMaxSize(),
+                        onShowResults = if (finished) { { reviewingCompletedBoard = false } }
+                            else null)
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     ZoomableWordGrid(puzzle, found, hintPaths,
                         boardViewport, select, onStep, boardFontId)
                 }
-                if (!finished || reviewingCompletedBoard) {
-                    Text(status,
-                        color = if (status.startsWith("✓")) Forest else Muted,
-                        fontWeight = if (status.startsWith("✓")) FontWeight.SemiBold
-                            else FontWeight.Normal,
-                        style = MaterialTheme.typography.labelSmall,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    WordList(puzzle, found, daily,
-                        Modifier.weight(1f).fillMaxWidth(),
-                        onShowResults = if (finished) { { reviewingCompletedBoard = false } }
-                            else null)
-                } else {
-                    CompletionPanel(
-                        puzzle = puzzle, run = run, daily = daily,
-                        completedSeconds = currentResult?.elapsedSeconds ?: run.elapsedSeconds,
-                        onReview = { reviewingCompletedBoard = true },
-                        onRecords = { store.flush(); onRecords() },
-                        onHome = { store.flush(); onBack() },
-                        onAnother = if (daily) null else { { startNew() } },
-                        modifier = Modifier.weight(1f).fillMaxWidth()
-                    )
-                }
+                PuzzleStatus(status, compact = false)
+                WordList(puzzle, found, daily,
+                    Modifier.weight(1f).fillMaxWidth(),
+                    onShowResults = if (finished) { { reviewingCompletedBoard = false } }
+                        else null)
             }
         }
+    }
+}
+
+/** A small, calm result/hint announcement that does not obstruct the board. */
+@Composable
+private fun PuzzleStatus(message: String, compact: Boolean) {
+    val positive = message.startsWith("✓")
+    val hint = message.startsWith("Try ") || message.contains("starts at row") ||
+        message.startsWith("Follow the faint")
+    Box(
+        Modifier.fillMaxWidth()
+            .background(
+                if (positive) Color(0xFFE5EFE6)
+                else if (hint) Color(0xFFF5EDD8)
+                else Paper,
+                RoundedCornerShape(9.dp)
+            )
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .padding(horizontal = 9.dp, vertical = 5.dp)
+    ) {
+        Text(message, color = if (positive) Forest else Ink,
+            fontWeight = if (positive) FontWeight.SemiBold else FontWeight.Normal,
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = if (compact) 1 else 2,
+            overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -446,39 +455,83 @@ private fun CompletionPanel(
     onAnother: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    var shareUnavailable by remember(puzzle.id) { mutableStateOf(false) }
     val usedHints = run.hints.values.sum()
+    val time = (completedSeconds.coerceAtLeast(0L) / 60L).toString() + ":" +
+        (completedSeconds.coerceAtLeast(0L) % 60L).toString().padStart(2, '0')
+
     Column(modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("✓ " + (if (daily) "Daily complete!" else "Puzzle complete!"),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Forest, fontWeight = FontWeight.Bold)
-                Text("Every word is found. Nicely done.",
-                    color = Muted, style = MaterialTheme.typography.bodyMedium)
-                Text("${puzzle.targets.size} words · " +
-                    (completedSeconds / 60L) + ":" +
-                    (completedSeconds % 60L).toString().padStart(2, '0'),
-                    style = MaterialTheme.typography.titleMedium, color = Forest)
-                Text(
-                    if (usedHints == 0) "Unassisted solve · No hints used"
-                    else "Assisted solve · $usedHints hint " +
-                        (if (usedHints == 1) "step" else "steps"),
-                    color = Muted, style = MaterialTheme.typography.bodyMedium
-                )
-                Text(if (daily) "Saved in your Daily Journal."
-                    else "Saved in your puzzle journal.",
-                    color = Muted, style = MaterialTheme.typography.bodySmall)
+        verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow(if (daily) "Daily journal · Completed"
+                else "Puzzle journal · Completed")
+            Text(if (daily) "Daily complete!" else "Puzzle complete!",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Forest, fontWeight = FontWeight.Bold)
+            Text("Every word is found. Nicely done.",
+                color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Text(puzzle.theme.label + " · " + puzzle.size + "×" + puzzle.size +
+                " · " + (run.challenge?.label ?: run.difficulty.label),
+                color = Gold, style = MaterialTheme.typography.labelLarge)
+            PaperProgress(puzzle.targets.size, puzzle.targets.size)
+            HorizontalDivider(color = GridRule)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                listOf(
+                    "Words" to (puzzle.targets.size.toString() + "/" + puzzle.targets.size),
+                    "Time" to time,
+                    "Hints" to usedHints.toString()
+                ).forEach { (label, amount) ->
+                    Column(Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(amount, color = Forest,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(label, color = Muted,
+                            style = MaterialTheme.typography.labelMedium,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
             }
+            Text(
+                if (usedHints == 0) "Unassisted solve · No hints used"
+                else "Assisted solve · $usedHints hint " +
+                    (if (usedHints == 1) "step" else "steps"),
+                color = Muted, style = MaterialTheme.typography.bodyMedium
+            )
+            Text(if (daily) "Saved in your Daily Journal."
+                else "Saved in your puzzle journal.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
         }
-        OutlinedButton(onClick = onReview, modifier = Modifier.fillMaxWidth()) {
-            Text("Review completed board")
-        }
+
         if (onAnother != null) {
-            Button(onClick = onAnother, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = onAnother,
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 Text("Play another puzzle")
             }
+        }
+
+        OutlinedButton(onClick = {
+            val summary = PuzzleResultShare.text(puzzle, run, completedSeconds, daily)
+            shareUnavailable = runCatching {
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, summary)
+                }
+                context.startActivity(Intent.createChooser(send, "Share puzzle results"))
+            }.isFailure
+        }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text("Share results")
+        }
+        if (shareUnavailable) {
+            Text("Sharing isn't available on this device.",
+                color = Gold, style = MaterialTheme.typography.bodySmall)
+        }
+
+        OutlinedButton(onClick = onReview,
+            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text("Review completed board")
         }
         Row(Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -503,7 +556,8 @@ private fun WordList(
     var remainingOnly by remember(puzzle.id) { mutableStateOf(false) }
     val targets = if (remainingOnly) puzzle.targets.filter { it.id !in found }
         else puzzle.targets
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Row(Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
@@ -518,37 +572,47 @@ private fun WordList(
                     label = { Text("Remaining") })
             }
         }
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            if (targets.isEmpty()) {
-                Text("All words found!", color = Forest,
-                    style = MaterialTheme.typography.bodyMedium)
-            }
-            targets.chunked(2).forEach { pair ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    pair.forEach { target ->
-                        val solved = target.id in found
-                        Box(
-                            Modifier.weight(1f).background(
-                                if (solved) FoundMarker.copy(alpha = 0.33f) else Paper,
-                                RoundedCornerShape(8.dp)
-                            ).padding(horizontal = 8.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                (if (solved) "✓ " else "○ ") + target.word,
-                                color = if (solved) Forest else Ink,
-                                fontWeight = if (solved) FontWeight.Normal else FontWeight.Medium,
-                                style = MaterialTheme.typography.bodyMedium,
-                                textDecoration = if (solved) TextDecoration.LineThrough else null,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                    if (pair.size == 1) Box(Modifier.weight(1f))
+        BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+            // Wide two-column index for normal text; a legible single column
+            // at 320dp / enlarged system fonts rather than cut-off words.
+            val columns = if (maxWidth < 350.dp ||
+                LocalDensity.current.fontScale >= 1.3f) 1 else 2
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                if (targets.isEmpty()) {
+                    Text("All words found!", color = Forest,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
+                targets.chunked(columns).forEach { pair ->
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        pair.forEach { target ->
+                            val solved = target.id in found
+                            val shape = RoundedCornerShape(9.dp)
+                            Box(Modifier.weight(1f)
+                                .background(
+                                    if (solved) FoundMarker.copy(alpha = 0.28f) else Paper,
+                                    shape)
+                                .border(1.dp, if (solved) Color(0xFFC5D9C8) else GridRule, shape)
+                                .padding(horizontal = 9.dp, vertical = 7.dp)
+                            ) {
+                                Text(
+                                    (if (solved) "✓ " else "○ ") + target.word,
+                                    color = if (solved) Forest else Ink,
+                                    fontWeight = if (solved) FontWeight.Normal
+                                        else FontWeight.Medium,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    textDecoration = if (solved) TextDecoration.LineThrough else null,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                        if (pair.size < columns) Box(Modifier.weight(1f))
+                    }
+                }
+                Text(if (daily) "Daily progress saved." else "Your puzzle saves automatically.",
+                    color = Muted, style = MaterialTheme.typography.labelSmall)
             }
-            Text(if (daily) "Daily progress saved." else "Your puzzle saves automatically.",
-                color = Muted, style = MaterialTheme.typography.labelSmall)
         }
     }
 }
