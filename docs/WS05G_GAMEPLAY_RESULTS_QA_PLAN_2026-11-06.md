@@ -18,6 +18,7 @@ The paperback-style home and launcher are in place. Gameplay and the solved-puzz
 
 ### Finishing a puzzle
 
+- **Results-first completion view:** after the final word, the large zoomed letter board is replaced by the finished journal with its actions visible. `Review completed board` opens the actual highlighted grid and word list; its `Results` action returns to the journal. This was chosen after reviewing real API35 screenshots of the initial split-board completion, where Play another and Share were hidden below the visible area.
 - Paper-style completion journal with **accurate** words found, elapsed time and hint steps taken. Shows `Unassisted solve` only when zero hints were used, and labels other results `Assisted solve`.
 - Primary **Play another puzzle** button for Solo, plus **Review completed board**, Records, Home and a newly added **Share results** button. Daily still follows its one-board-per-day rules and does not offer a new Daily puzzle.
 - Sharing launches **Android's native text share sheet**. Summary includes mode, theme, board size, difficulty/challenge, word count, time and hint use, plus GridMates branding.
