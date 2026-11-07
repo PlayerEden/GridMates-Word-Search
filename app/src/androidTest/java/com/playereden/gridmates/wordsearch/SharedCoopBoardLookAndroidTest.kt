@@ -40,8 +40,11 @@ class SharedCoopBoardLookAndroidTest {
         val wire = NearbyPacket.state(joined)
         assertTrue(runCatching { NearbyPacket.parseState(
             JSONObject(wire.toString()).put("look", "../untrusted.png")) }.isFailure)
-        assertTrue(runCatching { NearbyPacket.parseState(
-            JSONObject(wire.toString()).remove("look")) }.isFailure)
+        assertTrue(runCatching {
+            val missing = JSONObject(wire.toString())
+            missing.remove("look")
+            NearbyPacket.parseState(missing)
+        }.isFailure)
         assertTrue(runCatching { NearbyPacket.parseState(
             JSONObject(wire.toString()).put("match", "SHARED_BOARD_RACE")) }.isFailure)
     }
