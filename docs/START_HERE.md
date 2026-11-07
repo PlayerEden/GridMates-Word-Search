@@ -1,13 +1,14 @@
 # START HERE — GridMates: Word Search
 
-**Current implementation stack:** WS-05J draft after [WS-05I #39](https://github.com/PlayerEden/GridMates-Word-Search/pull/39). The Android app is developed in cumulative, unmerged feature PRs, **not** on the repository's minimal main branch.
+**Current implementation stack:** WS-05J automated QA passed (real-device QA open), draft after [WS-05I #39](https://github.com/PlayerEden/GridMates-Word-Search/pull/39). The Android app is developed in cumulative, unmerged feature PRs, **not** on the repository's minimal main branch.
 
 ## Current state and documents
 
 - [Master game design](MASTER_GAME_DESIGN.md): the full accessible paperback-inspired Android puzzle game vision.
 - [Development roadmap](DEVELOPMENT_ROADMAP.md): phased implementation and acceptance requirements.
 - [WS-05I Android QA](WS05I_BUILD_QA_2026-11-06.md): v0.5.8, 47 API35 tests, compact-screen and 200% Android text captures; real devices still outstanding.
-- [WS-05J QA APK updates](WS05J_STABLE_QA_UPDATES_2026-11-07.md): stable test-only signer, v0.5.9, and **required one-time backup / reinstall / restore** from earlier APKs.
+- [WS-05J QA APK updates](WS05J_STABLE_QA_UPDATES_2026-11-07.md): stable test-only signer, v0.5.9, **verified emulator update preservation**, and **required one-time backup / reinstall / restore** from earlier APKs.
+- [WS-05J build and QA receipt](WS05J_BUILD_QA_2026-11-07.md): exact source SHA, successful standard/emulator CI, downloadable cumulative APK and rollback checkpoint.
 - [Word Search GitHub](https://github.com/PlayerEden/GridMates-Word-Search): the only source of truth for this game. Work stays separate from the SudokuTogether repository.
 
 ## Implemented across the cumulative stack
@@ -26,4 +27,4 @@ Real Solo and offline Daily, word-search touch selection and multiple book sizes
 
 ## Next
 
-Complete WS-05J's actual emulator upgrade test and QA receipt/checkpoint, then develop the two distinct WS-06 Versus game modes (Shared Board Race and Speed Duel) without replacing or losing the already working Solo/Daily and nearby co-op systems.
+WS-05J emulator upgrade/QA receipt/checkpoint are complete. Next develop the two distinct WS-06 Versus game modes (Shared Board Race and Speed Duel) without replacing or losing the already working Solo/Daily and nearby co-op systems.
