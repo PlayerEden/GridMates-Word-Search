@@ -898,27 +898,31 @@ private fun WordGrid(
                             cancelled = true
                             sawSecondFinger = true
                         }
-                        if (pointer == null || !pointer.pressed) {
+                        if (pointer == null) {
                             active = false
-                        } else if (!cancelled && firstCell != null) {
-                            // Without consuming the drag here, the enclosing
-                            // Nearby verticalScroll wins over vertical words.
-                            pointer.consume()
-                            val cellWidth = sizePx.width.toFloat() / puzzle.size
-                            if (cellWidth > 0f) {
-                                val dx = (pointer.position.x -
-                                    (firstCell.col + 0.5f) * cellWidth) / cellWidth
-                                val dy = (pointer.position.y -
-                                    (firstCell.row + 0.5f) * cellWidth) / cellWidth
-                                val snap = WordDragSnap.update(firstCell, dx, dy,
-                                    puzzle.size, locked)
-                                locked = snap.direction
-                                if (snap.end != latestCell) {
-                                    latestCell = snap.end
-                                    dragEnd = snap.end
-                                    latestOnStep(snap.length)
+                        } else {
+                            if (!cancelled && firstCell != null) {
+                                // The UP event can carry the exact final cell;
+                                // processing moves only often stopped one
+                                // letter short on physical drags.
+                                if (pointer.pressed) pointer.consume()
+                                val cellWidth = sizePx.width.toFloat() / puzzle.size
+                                if (cellWidth > 0f) {
+                                    val dx = (pointer.position.x -
+                                        (firstCell.col + 0.5f) * cellWidth) / cellWidth
+                                    val dy = (pointer.position.y -
+                                        (firstCell.row + 0.5f) * cellWidth) / cellWidth
+                                    val snap = WordDragSnap.update(firstCell, dx, dy,
+                                        puzzle.size, locked)
+                                    locked = snap.direction
+                                    if (snap.end != latestCell) {
+                                        latestCell = snap.end
+                                        dragEnd = snap.end
+                                        latestOnStep(snap.length)
+                                    }
                                 }
                             }
+                            if (!pointer.pressed) active = false
                         }
                     }
                     if (!cancelled && !latestMultiTouch && firstCell != null) {
