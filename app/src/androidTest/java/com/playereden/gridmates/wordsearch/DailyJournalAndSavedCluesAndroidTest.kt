@@ -61,7 +61,7 @@ class DailyJournalAndSavedCluesAndroidTest {
             compose.onNodeWithText(dates.last()).assertExists()
             // Nothing is deleted/marked complete by opening a page.
             compose.runOnIdle { assertEquals(8, store.profile.dailyEntries.size) }
-            compose.onNodeWithText("Resume").onFirst().performClick()
+            compose.onAllNodesWithText("Resume").onFirst().performClick()
             compose.runOnIdle { assertEquals(dates[6], opened.get()) }
         } finally { clean(filename) }
     }
@@ -77,7 +77,8 @@ class DailyJournalAndSavedCluesAndroidTest {
             assertEquals(0, WordHintPolicy.remaining(run))
             assertEquals(1, savedClues(puzzle, run).size)
             assertEquals(3, savedClues(puzzle, run).single().level)
-            val before = store.exportBackup()
+            val savedHints = run.hints.toMap()
+            val savedFound = run.foundIds.toSet()
             compose.setContent {
                 GridMatesTheme {
                     Box(Modifier.width(360.dp).height(720.dp)) {
