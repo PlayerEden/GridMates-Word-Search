@@ -6,7 +6,7 @@ GridMates: Word Search is a standalone, offline-first native Android word-search
 
 ## Current development status — November 7, 2026
 
-**WS-06G v0.7.4 · automated Android QA passed (71 emulator tests) · physical two-phone acceptance pending.** The working Android app is on **cumulative stacked draft PRs**, not the small default main branch.
+**Active WS-07 quality/controls arc** — full [development roadmap](docs/DEVELOPMENT_ROADMAP.md) and [source-backed playtest research](docs/WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md). The owner's real two-phone test **found a P0 inability to mark words despite both phones connecting**. Current [draft v0.7.7 / WS-07A PR #54](https://github.com/PlayerEden/GridMates-Word-Search/pull/54) is **NOT yet verified**: the most recent full emulator run [#42411678348](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42411678348) executed 78 tests, **76 passed and 2 word gesture tests failed**, though the signed v0.7.6→v0.7.7 update preserved saves. The **verified automated fallback is v0.7.6 / 76 green tests**. The app remains in **stacked draft PRs**, not minimal `main`; no physical two-phone acceptance has passed yet.
 
 - [Latest cumulative draft PR #48 — Shared Co-op Board Looks](https://github.com/PlayerEden/GridMates-Word-Search/pull/48) builds on Postcards [#47](https://github.com/PlayerEden/GridMates-Word-Search/pull/47), Nearby Presence [#46](https://github.com/PlayerEden/GridMates-Word-Search/pull/46), Speed Duel journal [#45](https://github.com/PlayerEden/GridMates-Word-Search/pull/45), Speed Duel [#44](https://github.com/PlayerEden/GridMates-Word-Search/pull/44), Versus Journal [#43](https://github.com/PlayerEden/GridMates-Word-Search/pull/43), Shared Board Race [#42](https://github.com/PlayerEden/GridMates-Word-Search/pull/42), stable QA updates [#41](https://github.com/PlayerEden/GridMates-Word-Search/pull/41), screenshot/UI polish [#40](https://github.com/PlayerEden/GridMates-Word-Search/pull/40), then #39 and older drafts.
 - [Exact WS-06G Android QA receipt](docs/WS06G_BUILD_QA_2026-11-07.md): real API35 emulator **71 tests passed**, signed v0.7.3→v0.7.4 install-over preserving Solo/Daily/profile, Race and Duel journals; host-authoritative Co-op style protocol v7 tests, checksum and rollback checkpoint.
@@ -24,12 +24,13 @@ GridMates: Word Search is a standalone, offline-first native Android word-search
 - Friend-presence panel showing true local Wi-Fi connection and contributions, with counts-only opponent progress in Speed Duel. Completed Solo/Daily/Nearby puzzles can optionally preview an **offline 4:5 PNG result postcard** or share the existing privacy-safe text through Android Sharesheet; no remote names, chat, hidden solutions or room details are shared.
 - Readable paper/ink UI, compact navigation, larger text and landscape support. Emulator checks complement, not replace, real physical touch/accessibility review.
 
-**Coming next:** WS-06H full cumulative integration/release-readiness audit across Solo/Daily, all three Nearby modes, progress/backup/update, small-screen accessibility, and physical two-phone QA planning. Do not represent the free Co-op preview looks as rare/earned cosmetics. Physical two-phone LAN acceptance remains deferred; protocol v6 means both phones must use compatible v0.7.0+ builds.
+**Coming next:** [WS-07A–G quality milestones](docs/DEVELOPMENT_ROADMAP.md#live-development-priority--ws-07-refinement-arc-november-7-2026): fix touch coordinate mapping/direction locking, no-scroll adaptive gameplay, accessible 20×20 precision, physical two-phone Co-op/Race/Duel, hint/menus/content, save/performance regression and beta gate. Do not represent preview looks as rare/earned cosmetics. Both phones must use LAN protocol **v7 compatible** builds; v0.7.7 remains a QA candidate.
 
 ## Source of truth
 
 - [START HERE — current coding handoff](docs/START_HERE.md)
-- [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)
+- [Development Roadmap — active WS-07A–G](docs/DEVELOPMENT_ROADMAP.md)
+- [WS-07: Playtest evidence, input and accessibility research, UX specification](docs/WS07_PLAYTEST_RESEARCH_AND_UX_SPEC_2026-11-07.md)
 - [Master Game Design](docs/MASTER_GAME_DESIGN.md)
 - [WS-06G shared Co-op look rules and QA plan](docs/WS06G_SHARED_COOP_BOARD_LOOKS_QA_PLAN_2026-11-07.md)
 
