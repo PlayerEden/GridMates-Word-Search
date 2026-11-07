@@ -58,14 +58,16 @@ class NearbyFingerSelectionAndroidTest {
             }
         }
         compose.onNodeWithTag("word-grid-touch-area").performTouchInput {
-            val side = center.x * 2f
+            val sideX = center.x * 2f
+            val sideY = center.y * 2f
+            assertTrue("Puzzle grid must render square at its measured touch bounds", kotlin.math.abs(sideX - sideY) < 2f)
             val from = word.positions.first()
             val to = word.positions.last()
             swipe(
-                start = Offset((from.col + .5f) * side / board.cells,
-                    (from.row + .5f) * side / board.cells),
-                end = Offset((to.col + .5f) * side / board.cells,
-                    (to.row + .5f) * side / board.cells),
+                start = Offset((from.col + .5f) * sideX / board.cells,
+                    (from.row + .5f) * sideY / board.cells),
+                end = Offset((to.col + .5f) * sideX / board.cells,
+                    (to.row + .5f) * sideY / board.cells),
                 durationMillis = 550
             )
         }

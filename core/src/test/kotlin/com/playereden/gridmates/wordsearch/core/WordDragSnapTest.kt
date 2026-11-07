@@ -53,6 +53,15 @@ class WordDragSnapTest {
         assertNull(WordDragSnap.update(GridPoint(-1, 0), 4f, 4f, 8).direction)
     }
 
+    @Test fun recomputingDirectionFromFullSwipeCorrectsEarlyDiagonalWobble() {
+        val start = GridPoint(6, 5)
+        val wobble = WordDragSnap.update(start, 0.62f, 0.59f, 15)
+        assertEquals(DragDirection(1, 1), wobble.direction)
+        val fullSwipe = WordDragSnap.update(start, 7f, 0.16f, 15)
+        assertEquals(DragDirection(0, 1), fullSwipe.direction)
+        assertEquals(GridPoint(6, 12), fullSwipe.end)
+    }
+
     @Test fun noNaNCanGenerateAClaimPath() {
         val p = GridPoint(3, 3)
         val result = WordDragSnap.update(p, Float.NaN, 1f, 10)
