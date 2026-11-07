@@ -85,6 +85,12 @@ internal object ResultPostcard {
             "Postcards must originate from a validated local result"
         }
         require(lines.none { it.isBlank() || it.length > 220 })
+        require(lines[1] in setOf(
+            "Solo Puzzle complete!", "Daily Puzzle complete!",
+            "Nearby Co-op · Puzzle complete",
+            "Shared Board Race · Match complete",
+            "Speed Duel · Match complete"
+        ) && lines.last() == "Good puzzles. Good company.")
         val normal = BoardFontRegistry.resolve(context, "atkinson")
         val bold = Typeface.create(normal, Typeface.BOLD)
         val mono = BoardFontRegistry.resolve(context, "plex")
@@ -107,17 +113,17 @@ internal object ResultPostcard {
             // exported image size, independently of the phone's orientation.
             fill.color = Forest
             canvas.drawRoundRect(RectF(90f, 314f, 990f, 879f), 32f, 32f, fill)
-            val titleEnd = drawBlock(canvas, lines[1], 145f, 426f,
-                782f, 70f, Cream, bold, 82f)
+            val titleEnd = drawBlock(canvas, lines[1], 145f, 412f,
+                782f, 57f, Cream, bold, 70f)
             val factsEnd = drawBlock(canvas, lines[2], 145f,
-                titleEnd + 30f, 780f, 44f, Soft, normal, 57f)
+                titleEnd + 15f, 780f, 42f, Soft, normal, 53f)
             fill.color = Gold
             canvas.drawRoundRect(RectF(145f, factsEnd + 5f, 255f, factsEnd + 11f),
                 3f, 3f, fill)
-            var y = factsEnd + 84f
+            var y = factsEnd + 58f
             for (item in lines.subList(3, lines.size - 1)) {
                 y = drawBlock(canvas, item, 145f, y,
-                    780f, 46f, Cream, normal, 61f) + 12f
+                    780f, 43f, Cream, normal, 55f) + 8f
             }
             require(y <= 878f) { "Result too long for a safe postcard" }
 
