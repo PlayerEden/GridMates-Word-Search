@@ -1,4 +1,4 @@
-name: Word Search WS05G Results-First Final Emulator QA
+name: Word Search WS05H Profile Collection Settings Android QA
 
 # This workflow is intentionally opt-in / branch-scoped so the free-tier
 # Actions budget is not consumed by an emulator on every stacked draft PR.
@@ -14,6 +14,7 @@ on:
       - feature/ws05e-nearby-discovery-and-rejoin-2026-11-06
       - feature/ws05f-paperback-app-polish-2026-11-06
       - feature/ws05g-gameplay-results-polish-2026-11-06
+      - feature/ws05h-profile-collection-settings-polish-2026-11-06
     paths:
       - '.github/workflows/ws04d-b5-android-font-audit.yml'
 
@@ -85,6 +86,11 @@ jobs:
             # instrumentation test before Gradle removed the test target.
             adb pull /sdcard/Download/ws05g-gameplay.png qa-screenshots/gameplay.png
             adb pull /sdcard/Download/ws05g-results.png qa-screenshots/results.png
+            # Real Collection and Settings references captured by WS05H tests.
+            adb pull /sdcard/Download/ws05h-profile.png qa-screenshots/profile.png
+            adb pull /sdcard/Download/ws05h-fonts.png qa-screenshots/fonts.png
+            adb pull /sdcard/Download/ws05h-achievements.png qa-screenshots/achievements.png
+            adb pull /sdcard/Download/ws05h-settings.png qa-screenshots/settings.png
             adb shell settings put system font_scale 1.0
             adb shell am force-stop com.playereden.gridmates.wordsearch.qa
             adb shell am start -W -n com.playereden.gridmates.wordsearch.qa/com.playereden.gridmates.wordsearch.MainActivity
@@ -102,18 +108,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05G-Android-Tests
+          name: GridMates-WordSearch-WS05H-Android-Tests
           path: |
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Upload WS05G home/gameplay/results visual references
+      - name: Upload WS05H profile/achievements/settings visual references
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05G-UI-Screenshots
+          name: GridMates-WordSearch-WS05H-UI-Screenshots
           path: qa-screenshots/
           if-no-files-found: ignore
           retention-days: 7
@@ -122,10 +128,10 @@ jobs:
         run: |
           test -s app/build/outputs/apk/debug/app-debug.apk
           sha256sum app/build/outputs/apk/debug/app-debug.apk
-      - name: Upload source-matched WS05G QA APK
+      - name: Upload source-matched WS05H QA APK
         uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-WS05G-QA-v056
+          name: GridMates-WordSearch-WS05H-QA-v057
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
