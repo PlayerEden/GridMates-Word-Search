@@ -163,6 +163,12 @@ internal fun SoloSettingsScreen(store: SoloStore) {
         Text("Export saves a file to a location you choose. Restore asks before " +
             "replacing your current Word Search progress.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
+        Text("QA update note: v0.5.8 and earlier used a different debug signer. " +
+            "Export a backup first, then uninstall the old QA app, install " +
+            "v0.5.9, and Restore backup. From v0.5.9 onward, install newer " +
+            "QA APKs over the existing app to keep its data. Do not clear " +
+            "storage or uninstall without a verified backup.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {

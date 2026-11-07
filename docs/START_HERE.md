@@ -1,62 +1,30 @@
 # START HERE — GridMates: Word Search
 
-**Repository:** https://github.com/PlayerEden/GridMates-Word-Search  
-**As of:** November 5, 2026  
-**Status:** Design baseline only. No Word Search Android app, APK, game engine, content pack, or multiplayer implementation has been verified in this repository.
+**Current implementation stack:** WS-05J automated QA passed (real-device QA open), draft after [WS-05I #39](https://github.com/PlayerEden/GridMates-Word-Search/pull/39). The Android app is developed in cumulative, unmerged feature PRs, **not** on the repository's minimal main branch.
 
-## Three documents that control the project
+## Current state and documents
 
-1. [Master Game Design](MASTER_GAME_DESIGN.md) — the long-term vision, modes, UX, puzzle rules, planned architecture, QA and decisions.
-2. [Development Roadmap](DEVELOPMENT_ROADMAP.md) — what to build next, in order, with acceptance gates.
-3. [README](../README.md) — concise public entry point and repo navigation.
+- [Master game design](MASTER_GAME_DESIGN.md): the full accessible paperback-inspired Android puzzle game vision.
+- [Development roadmap](DEVELOPMENT_ROADMAP.md): phased implementation and acceptance requirements.
+- [WS-05I Android QA](WS05I_BUILD_QA_2026-11-06.md): v0.5.8, 47 API35 tests, compact-screen and 200% Android text captures; real devices still outstanding.
+- [WS-05J QA APK updates](WS05J_STABLE_QA_UPDATES_2026-11-07.md): stable test-only signer, v0.5.9, **verified emulator update preservation**, and **required one-time backup / reinstall / restore** from earlier APKs.
+- [WS-05J build and QA receipt](WS05J_BUILD_QA_2026-11-07.md): exact source SHA, successful standard/emulator CI, downloadable cumulative APK and rollback checkpoint.
+- [Word Search GitHub](https://github.com/PlayerEden/GridMates-Word-Search): the only source of truth for this game. Work stays separate from the SudokuTogether repository.
 
-**Next actionable milestone: WS-01 — create an independent native Android foundation and safe Sudoku reuse inventory.** Do not start by writing a giant Word Search engine and all five modes at once. Make an installable, testable project shell first.
+## Implemented across the cumulative stack
 
-## Locked player decisions
+Real Solo and offline Daily, word-search touch selection and multiple book sizes, hints and results, local profiles/achievements, free Woodland portrait collections and board fonts, manual JSON backup/restore, same-Wi-Fi co-op with chat/presence and reconnection scaffolding, polished paperback UI and compact/large-text improvements. The co-op LAN protocol is v4. Do not claim physical multiplayer QA passes until two phones are tested.
 
-- **GridMates: Word Search** is a standalone Android app with its own repository; Sudoku and future Crossword remain separate apps.
-- Share familiar GridMates experience/systems and reuse the **real** generated animal icons where possible.
-- Main experiences: Solo, Daily, nearby Co-op, Shared Board Race Versus, Speed Duel Versus.
-- Accessible, warm/paperback-inspired, modern native UX; older/less technical players should be comfortable.
-- Nearby Wi-Fi multiplayer with low-friction open rooms, optional protected codes, no mandatory online accounts.
-- This is a living plan; treat suggested size, balance, cosmetics and rewards as proposals until approved or playtested.
+## Locked choices and guardrails
 
-## Crucial Sudoku reference warning
+- Friendly to older and less technical players: readable, warm paper/ink visuals and low-friction nearby hosting/joining; optional room code.
+- Cosmetics are earned for free with achievements and progress. No paid cosmetics, ad-watched cosmetics or cosmetic store.
+- No ads, online login, cloud backend or purchases unless explicitly approved later.
+- Separate Word Search Android package and save file from Sudoku; do not modify Sudoku in this project.
+- The QA signing key in qa-signing is **public and test-only**. Never sign production releases with it, and never commit actual production signing keys or other secrets.
+- Older v0.5.8 and prior debug APKs have different ephemeral signing identity. Export backup before uninstalling and switching to v0.5.9. Future stable-signed QA updates should install over an existing app, with validation still required on real devices.
+- Draft PRs remain unmerged until owner hardware testing and review. Capture exact SHA, CI evidence and rollback checkpoint at major milestones; conserve GitHub Actions emulator minutes.
 
-The source app is not on Sudoku's tiny default main tree. Read the actual Android source and current verified feature branch:
+## Next
 
-- [Sudoku repo](https://github.com/PlayerEden/SudokuTogether)
-- [Latest relevant v0.11C draft PR #28](https://github.com/PlayerEden/SudokuTogether/pull/28), branch feat/gridmates-nearby-animals; as checked November 5, 2026 PR head SHA 975e31a1e8cbfebad1fbbc7602b3340c357da7ef.
-- [v0.11C QA](https://github.com/PlayerEden/SudokuTogether/blob/feat/gridmates-nearby-animals/docs/V0.11C_NEARBY_WOODLAND_QA.md)
-- [Reusable puzzle foundation design](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/REUSABLE_ANDROID_PUZZLE_FOUNDATION.md)
-- [GridMates series identity](https://github.com/PlayerEden/SudokuTogether/blob/development/docs/GRIDMATES_BRAND_AND_SERIES.md)
-
-Relevant reusable candidates: GameTheme, GameWidgets, Home/Join/Journal, LocalPlayerStore patterns, RoomDiscovery, profile/achievement patterns, AnimalPortraits and 12 Woodland PNG assets. Do **not** reuse Sudoku's 9×9 rules or wire Snapshot models verbatim. Distinct Word Search protocol, package, saves, source and signing identity are mandatory.
-
-The full original portrait provenance lives in the Sudoku branch's design/woodland/packaged-assets.json. The new Word Search repo does **not** yet contain those assets; source them carefully during WS-01/WS-04, with their original IDs and provenance.
-
-## Workflow and safety checklist
-
-- Read master/roadmap **and** current repo/code/PR state before editing.
-- Mark things proposed vs implemented; no fake “green build” or Play release claims.
-- Prefer small self-contained feature PRs and checkpoints, explicit tests and verified Android APK installs.
-- All actual new files, tests, docs and QA receipts belong in **this** repo. Update this handoff and roadmap after each stage.
-- Reproduce existing behavior with source-backed test evidence before refactoring.
-- Do not touch PlayerEden/SudokuTogether or change its package/signing/saves as part of Word Search work without explicit authorization.
-- No release keys, passwords, room tokens or user save data committed to this public repository.
-- Manual or limited GitHub Actions during development to avoid wasted minutes. Save source and commit SHA; Actions downloadable artifacts expire.
-- Real two-phone multiplayer is a required QA gate for LAN stages; emulator/socket tests alone are insufficient.
-- Do not implement live ads, purchases, global leaderboard or cloud identity simply because they appear as future options in the design.
-
-## Starter message for a fresh coding chat
-
-> Continue GridMates: Word Search in https://github.com/PlayerEden/GridMates-Word-Search. Read README, docs/START_HERE.md, docs/MASTER_GAME_DESIGN.md and docs/DEVELOPMENT_ROADMAP.md. Current state is a planning-only baseline. First pursue WS-01: inspect the latest Sudoku v0.11C source/QA PR #28 and its actual reusable assets, then create a distinct native Kotlin/Jetpack Compose Word Search Android foundation. Keep source, package, saves, LAN identity, QA signing and repository independent of Sudoku. Build and test a small native UI/asset proof, preserve SHA/checkpoint/QA evidence, and update the roadmap and handoff. Do not claim the game or LAN is already implemented. The product includes both Shared Board Race and Speed Duel as future Versus modes, but build progressively.
-
-## Design changes log
-
-- **2026-11-05:** First planning baseline created; next source development is WS-01.
-
-## Live first-step work tracking
-
-- [GitHub issue #1 — WS-01 Native foundation and safe reuse](https://github.com/PlayerEden/GridMates-Word-Search/issues/1) — **next**.
-- [GitHub issue #2 — WS-02 Word Search generator and input](https://github.com/PlayerEden/GridMates-Word-Search/issues/2) — follows verified WS-01.
+WS-05J emulator upgrade/QA receipt/checkpoint are complete. Next develop the two distinct WS-06 Versus game modes (Shared Board Race and Speed Duel) without replacing or losing the already working Solo/Daily and nearby co-op systems.

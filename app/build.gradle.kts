@@ -12,13 +12,25 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = 21
-        versionName = "0.5.9-phone-screenshot-j-alpha"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 21
+        versionName = "0.5.9-upgrade-protection-j-alpha"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Test-only public QA signer: NEVER use for a release or Google Play.
+    signingConfigs {
+        create("wordSearchQa") {
+            storeFile = rootProject.file("qa-signing/wordsearch-qa.p12")
+            storeType = "pkcs12"
+            storePassword = "android" // public QA-only credential
+            keyAlias = "wordsearchQa"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {
         getByName("debug") {
+            signingConfig = signingConfigs.getByName("wordSearchQa")
             // A QA build installs alongside the eventual production Word Search.
             applicationIdSuffix = ".qa"
             versionNameSuffix = "-qa"
