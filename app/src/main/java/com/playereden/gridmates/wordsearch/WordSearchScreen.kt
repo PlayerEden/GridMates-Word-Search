@@ -1,5 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
+import android.content.Intent
 import android.view.SoundEffectConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -56,8 +59,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -258,7 +264,7 @@ internal fun WordSearchScreen(
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 2.dp)) {
         val landscape = maxWidth > maxHeight * 1.25f
         val boardViewport = if (landscape) {
-            minOf(maxHeight - (if (finished) 222.dp else 196.dp),
+            minOf(maxHeight - (if (finished) 236.dp else 212.dp),
                 maxWidth * 0.51f).coerceAtLeast(106.dp)
         } else {
             minOf(maxWidth, maxHeight * (if (finished) 0.43f else 0.54f))
@@ -367,7 +373,7 @@ internal fun WordSearchScreen(
                     }
                 ) { Text("Hint ($hintsRemaining)") }
             }
-
+            PaperProgress(found.size, puzzle.targets.size)
 
             if (landscape) {
                 Row(Modifier.weight(1f).fillMaxWidth(),
@@ -377,12 +383,7 @@ internal fun WordSearchScreen(
                         ZoomableWordGrid(puzzle, found, hintPaths,
                             boardViewport, select, onStep, boardFontId)
                         if (!finished || reviewingCompletedBoard) {
-                            Text(status,
-                                color = if (status.startsWith("✓")) Forest else Muted,
-                                fontWeight = if (status.startsWith("✓")) FontWeight.SemiBold
-                                    else FontWeight.Normal,
-                                style = MaterialTheme.typography.labelSmall,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            PuzzleStatus(status, compact = true)
                         }
                     }
                     if (!finished || reviewingCompletedBoard) {
@@ -408,12 +409,7 @@ internal fun WordSearchScreen(
                         boardViewport, select, onStep, boardFontId)
                 }
                 if (!finished || reviewingCompletedBoard) {
-                    Text(status,
-                        color = if (status.startsWith("✓")) Forest else Muted,
-                        fontWeight = if (status.startsWith("✓")) FontWeight.SemiBold
-                            else FontWeight.Normal,
-                        style = MaterialTheme.typography.labelSmall,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    PuzzleStatus(status, compact = false)
                     WordList(puzzle, found, daily,
                         Modifier.weight(1f).fillMaxWidth(),
                         onShowResults = if (finished) { { reviewingCompletedBoard = false } }
