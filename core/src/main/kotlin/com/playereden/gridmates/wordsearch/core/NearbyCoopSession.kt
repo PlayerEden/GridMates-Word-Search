@@ -76,7 +76,9 @@ data class CoopSnapshot(
     val finished: Boolean,
     val match: NearbyMatch = NearbyMatch.COOP,
     /** Recipient-scoped private progression; present ONLY in Speed Duel. */
-    val duel: DuelView? = null
+    val duel: DuelView? = null,
+    /** Host-authoritative temporary Co-op appearance; not an unlock. */
+    val boardLookId: String = CoopBoardLook.CLASSIC.id
 ) {
     /** Race result exists only when the authoritative shared board is complete. */
     val raceStanding: RaceStanding? get() {
@@ -119,7 +121,8 @@ data class CoopClaimDecision(
 class NearbyCoopSession(
     run: SoloRun,
     val roomId: String = UUID.randomUUID().toString(),
-    val match: NearbyMatch = NearbyMatch.COOP
+    val match: NearbyMatch = NearbyMatch.COOP,
+    private val hostLook: CoopBoardLook = CoopBoardLook.CLASSIC
 ) {
     val spec: CoopPuzzleSpec = CoopPuzzleSpec.from(run)
     val puzzle: WordSearchPuzzle = spec.regenerate()
@@ -129,6 +132,7 @@ class NearbyCoopSession(
         CoopSeat.GUEST to LinkedHashMap<String, Pair<CoopClaimStatus, String?>>()
     )
     private var guestReserved = false
+    private var boardLook = if (match == NearbyMatch.COOP) hostLook else CoopBoardLook.CLASSIC
     private var guestConnected = false
     private var hostConnected = true
     private var revision = 0L
@@ -136,6 +140,22 @@ class NearbyCoopSession(
     @Synchronized
     fun setHostConnected(connected: Boolean): CoopSnapshot {
         hostConnected = connected
+        return snapshot()
+    }
+
+    /** Compute the first guest's Co-op look without reserving their identity.
+     * Never change a room once a guest has been admitted or finds have begun.
+     */
+    @Synchronized
+    fun offeredBoardLook(guestId: String): CoopBoardLook =
+        if (match == NearbyMatch.COOP && !guestReserved && owned.isEmpty())
+            CoopBoardLook.resolve(hostLook.id, guestId, true)
+        else boardLook
+
+    @Synchronized
+    fun freezeGuestBoardLook(guestId: String): CoopSnapshot {
+        require(match == NearbyMatch.COOP)
+        if (!guestReserved && owned.isEmpty()) boardLook = offeredBoardLook(guestId)
         return snapshot()
     }
 
@@ -157,7 +177,8 @@ class NearbyCoopSession(
     fun snapshot(): CoopSnapshot = CoopSnapshot(
         roomId, spec, revision, owned.values.toList(),
         guestReserved, guestConnected, hostConnected,
-        WordSearchRules.complete(puzzle, owned.keys), match
+        WordSearchRules.complete(puzzle, owned.keys), match,
+        boardLookId = boardLook.id
     )
 
     @Synchronized
@@ -205,6 +226,12 @@ class NearbyCoopSession(
             require(received.roomId.length in 8..100)
             val puzzle = received.spec.regenerate()
             require(received.revision >= 0L)
+            val look = CoopBoardLook.entries.firstOrNull { it.id == received.boardLookId }
+            require(look != null) { "Unknown shared board appearance" }
+            if (received.match != NearbyMatch.COOP)
+                require(look == CoopBoardLook.CLASSIC) {
+                    "Competitive modes cannot use borrowed Co-op appearance"
+                }
             if (received.match == NearbyMatch.SPEED_DUEL) {
                 // No shared claims or opponent found IDs may leak through Duel.
                 require(received.revision == 0L && received.claims.isEmpty())

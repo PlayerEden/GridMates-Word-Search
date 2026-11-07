@@ -658,7 +658,8 @@ internal fun ZoomableWordGrid(
     onStep: (Int) -> Unit,
     boardFontId: String,
     partnerFoundIds: Set<String> = emptySet(),
-    onModeChanged: (Boolean) -> Unit = {}
+    onModeChanged: (Boolean) -> Unit = {},
+    boardLookId: String = "classic"
 ) {
     val viewportPx = with(LocalDensity.current) { viewport.toPx() }
     val initialZoom = when {
@@ -760,7 +761,8 @@ internal fun ZoomableWordGrid(
                         translationY = transform.panY
                     },
                 onSelect = onSelect, onStep = onStep,
-                boardFontId = boardFontId, partnerFoundIds = partnerFoundIds
+                boardFontId = boardFontId, partnerFoundIds = partnerFoundIds,
+                boardLookId = boardLookId
             )
             if (moving) {
                 Box(Modifier.fillMaxSize()
@@ -794,8 +796,10 @@ private fun WordGrid(
     onSelect: (GridPoint, GridPoint) -> Unit,
     onStep: (Int) -> Unit,
     boardFontId: String,
-    partnerFoundIds: Set<String> = emptySet()
+    partnerFoundIds: Set<String> = emptySet(),
+    boardLookId: String = "classic"
 ) {
+    val palette = BoardLookPalettes.forId(boardLookId)
     val glyphPainter = rememberBoardGlyphPainter(boardFontId)
     var sizePx by remember(puzzle.id) { mutableStateOf(IntSize.Zero) }
     var dragStart by remember(puzzle.id) { mutableStateOf<GridPoint?>(null) }
@@ -830,7 +834,7 @@ private fun WordGrid(
 
     Box(
         modifier = modifier.aspectRatio(1f)
-            .background(Paper, RoundedCornerShape(12.dp))
+            .background(palette.background, RoundedCornerShape(12.dp))
             .drawBehind {
                 // Draw the *same exact* row/column boundaries used for
                 // actual letter centers and pointer hit mapping.
@@ -838,9 +842,9 @@ private fun WordGrid(
                 val thinRule = 0.6.dp.toPx()
                 for (index in 1 until puzzle.size) {
                     val x = index * cell
-                    drawLine(GridRule, Offset(x, 0f), Offset(x, size.height), thinRule)
+                    drawLine(palette.lines, Offset(x, 0f), Offset(x, size.height), thinRule)
                     val y = index * (size.height / puzzle.size)
-                    drawLine(GridRule, Offset(0f, y), Offset(size.width, y), thinRule)
+                    drawLine(palette.lines, Offset(0f, y), Offset(size.width, y), thinRule)
                 }
                 fun center(p: GridPoint) = Offset((p.col + 0.5f) * cell, (p.row + 0.5f) * cell)
                 hintPaths.forEach { path ->
@@ -875,9 +879,9 @@ private fun WordGrid(
                 // Type-specific real ink bounds determine optical centering.
                 // No independent fontScale: all content is enlarged by the
                 // whole-board graphics transform above.
-                glyphPainter.drawLetters(this, puzzle.rows, Ink)
+                glyphPainter.drawLetters(this, puzzle.rows, palette.letters)
             }
-            .border(2.dp, Forest, RoundedCornerShape(12.dp))
+            .border(2.dp, palette.frame, RoundedCornerShape(12.dp))
             .onSizeChanged { sizePx = it }
             .pointerInput(puzzle.id) {
                 detectDragGestures(

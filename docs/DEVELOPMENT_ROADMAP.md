@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State:** Active cumulative Android implementation (WS-06F v0.7.3 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06F exact QA receipt](WS06F_BUILD_QA_2026-11-07.md) for current truth.  
+**State:** Active cumulative Android implementation (WS-06G v0.7.4 automated QA PASS). The original table below is the historical milestone baseline; see dated implementation addenda and [WS-06G exact QA receipt](WS06G_BUILD_QA_2026-11-07.md) for current truth.  
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
@@ -254,3 +254,14 @@ Later milestone issues should be opened as work approaches, rather than creating
 - Stable QA-only signer, versionCode **27 / v0.7.3**, LAN v6 and schema4 unchanged. Real signed v0.7.2 code26 updated in place while preserving Solo, Daily, profile, saved Shared Board Race and Speed Duel results. [Source-matched QA receipt, checksum and rollback](WS06F_BUILD_QA_2026-11-07.md).
 - Initial emulator migration run failed when seeding a private save before creating its folder; [corrected second run](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42358477314) passed. No failed prior run is counted as accepted QA.
 - **Next WS-06G:** design a real Word Search shared Co-op visual theme policy with curated assets, accessibility fallback and round-stable selection; do not import Sudoku's proposed ranks or ownership model without a matching Word Search catalog. Physical two-phone testing remains owner-deferred; all stacked drafts stay unmerged.
+
+
+## WS-06G — Free Co-op board looks and host-authoritative round freeze (November 7, 2026)
+
+- **Automated PASS:** [standard Android CI #42360159954](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42360159954), [API35 emulator + actual historical signed update #42360155148](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42360155148): **71/71 on-device Android tests, zero failed/skipped**. Physical owner two-phone acceptance still OPEN.
+- Word Search-only curated, baked-in **Classic Paper / Linen Sketch / Blueprint Study** free appearance previews. Co-op host/guest choose locally; first acknowledged guest admission freezes the host-resolved shared look based on technical display priority, independent of which phone is host. Aborted joins do not reserve a look, reconnect cannot switch it.
+- Local-only **Use Classic on my phone** readability override affects one board renderer, not LAN state; player's earned **board font**, collection, Solo/Daily, Race and private-board Duel remain unchanged. These are not rare or earned cosmetic tiers.
+- Required LAN state `look` field and guest offer raise **protocol v6→v7**. Old v6 peers are incompatible across all Nearby modes; both phones must use v7. No remote assets, ownership transfers, real-world online backend or new save schema.
+- Actual stable-signed v0.7.3 code27 QA APK updated in place to v0.7.4 code28, preserving old Solo/Daily/profile and completed Shared Board Race / Speed Duel journals. [Exact source, checksum, emulator QA report and rollback checkpoint](WS06G_BUILD_QA_2026-11-07.md).
+- Initial source test compile had a mistaken `JSONObject.remove` return type; corrected and fully retested in the separate green run. Prior failures do not count as accepted gates.
+- **Next WS-06H:** whole-game integration and eventual Play-test readiness audit, particularly physical two-handset Wi-Fi/ready/finish/reconnect, room theme agreement, 320dp/200%-text/TalkBack, backups, signed app update and release prerequisites. Keep all stacked drafts unmerged.
