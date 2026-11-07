@@ -692,6 +692,7 @@ internal fun ZoomableWordGrid(
     // Allocate a truly square board using the height actually available AFTER
     // the toolbar. A requested 320dp square previously got squeezed to a shorter
     // rectangle on compact surfaces, disagreeing with letter and swipe geometry.
+    var preciseOpen by remember(puzzle.id) { mutableStateOf(false) }
     BoxWithConstraints(Modifier.width(viewport)) {
         val side = if (maxHeight == Dp.Infinity) viewport
             else minOf(viewport, (maxHeight - 56.dp).coerceAtLeast(96.dp))
@@ -700,7 +701,6 @@ internal fun ZoomableWordGrid(
             mutableStateOf(BoardViewportTransform(1f))
         }
         var multiTouch by remember(puzzle.id) { mutableStateOf(false) }
-        var preciseOpen by remember(puzzle.id) { mutableStateOf(false) }
 
         Column(Modifier.width(viewport),
             verticalArrangement = Arrangement.spacedBy(2.dp)) {
