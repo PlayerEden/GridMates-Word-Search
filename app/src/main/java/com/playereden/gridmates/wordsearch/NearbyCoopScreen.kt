@@ -81,7 +81,7 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
         PaperEyebrow("GridMates · Nearby Play")
         Text("Play Together", style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold, color = Forest)
-        Text("Two phones, three ways to play: Co-op, Race, or private-board Duel.",
+        Text("Host a game or join a friend on the same Wi-Fi.",
             color = Muted, style = MaterialTheme.typography.bodyMedium)
 
         if (state.message.isNotBlank()) {
@@ -93,36 +93,6 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
         if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
 
         if (snapshot == null && state.role == NearbyRole.NONE) {
-            TextButton(onClick = { showAppearanceOptions = !showAppearanceOptions },
-                modifier = Modifier.fillMaxWidth()) {
-                Text(if (showAppearanceOptions) "Hide board appearance options"
-                    else "Board appearance · " + CoopBoardLook.safe(preferredBoardLook).label +
-                        " (optional)")
-            }
-            if (showAppearanceOptions) Card(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Co-op board appearance",
-                        color = Forest, fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.titleMedium)
-                    Text("Optional free looks. You and your partner each choose before joining; " +
-                        "the shared preview uses a consistent display priority. No cosmetic " +
-                        "is bought, earned or transferred.",
-                        color = Muted, style = MaterialTheme.typography.bodySmall)
-                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        CoopBoardLook.entries.forEach { look ->
-                            FilterChip(
-                                selected = preferredBoardLook == look.id,
-                                onClick = { preferredBoardLook = look.id },
-                                label = { Text(look.label) })
-                        }
-                    }
-                    Text("Co-op only. Race and Speed Duel keep their normal board. " +
-                        "The room look stays fixed after the first partner joins.",
-                        color = Muted, style = MaterialTheme.typography.bodySmall)
-                }
-            }
             state.recovery?.let {
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp),
@@ -144,8 +114,6 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Host a nearby game",
                         color = Forest, style = MaterialTheme.typography.titleLarge)
-                    Text("Choose how to play, then your partner joins from Nearby games.",
-                        color = Muted)
                     Text("Game mode", fontWeight = FontWeight.SemiBold)
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -161,14 +129,10 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                     }
 
                     Text(when (match) {
-                        NearbyMatch.SPEED_DUEL.name ->
-                            "Duel: both tap Ready. GO reveals identical private boards. " +
-                                "First player to find all words wins; only counts are shared."
-                        NearbyMatch.SHARED_BOARD_RACE.name ->
-                            "Race: first valid claim owns a word. All words found ends the match."
-                        else -> "Co-op: uncover every word together, without a winner."
-                    },
-                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                        NearbyMatch.SPEED_DUEL.name -> "Duel: Ready / GO reveals private boards; only counts are shared."
+                        NearbyMatch.SHARED_BOARD_RACE.name -> "Race · First to claim each word scores"
+                        else -> "Co-op · Find words together"
+                    }, color = Muted, style = MaterialTheme.typography.bodySmall)
                     Button(onClick = {
                         runtime.host(ownName, WordTheme.valueOf(theme),
                             PuzzleBoardSize.valueOf(board), PuzzleChallenge.valueOf(challenge),
@@ -179,6 +143,12 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                             NearbyMatch.SHARED_BOARD_RACE.name -> "Host Shared Board Race"
                             else -> "Host Co-op game"
                         })
+                    }
+                    OutlinedButton(onClick = {
+                        showJoin = true
+                        runtime.search()
+                    }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                        Text("Join nearby game")
                     }
                     TextButton(onClick = { showHostOptions = !showHostOptions },
                         modifier = Modifier.fillMaxWidth()) {
@@ -229,19 +199,12 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
 
                 }
             }
-            Card(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Join someone", color = Forest,
-                        style = MaterialTheme.typography.titleLarge)
-                    Text("Ask your partner to host first.",
-                        color = Muted, style = MaterialTheme.typography.bodyMedium)
-                    Button(onClick = {
-                        showJoin = true
-                        runtime.search()
-                    }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
-                        Text(if (showJoin) "Find nearby games" else "Join nearby game")
-                    }
-                    if (showJoin) {
+            if (showJoin) Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Nearby games", color = Forest,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold)
                         Row(Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween) {
@@ -293,7 +256,40 @@ internal fun NearbyCoopScreen(store: SoloStore, rooms: NearbyRoomViewModel, onBa
                                 manualAddress.isNotBlank(),
                                 modifier = Modifier.fillMaxWidth()) { Text("Join with address") }
                         }
+
+                    TextButton(onClick = { showJoin = false; manual = false }) {
+                        Text("Close game finder")
                     }
+                }
+            }
+            TextButton(onClick = { showAppearanceOptions = !showAppearanceOptions },
+                modifier = Modifier.fillMaxWidth()) {
+                Text(if (showAppearanceOptions) "Hide board appearance options"
+                    else "Board appearance · " + CoopBoardLook.safe(preferredBoardLook).label +
+                        " (optional)")
+            }
+            if (showAppearanceOptions) Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Co-op board appearance",
+                        color = Forest, fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleMedium)
+                    Text("Optional free looks. You and your partner each choose before joining; " +
+                        "the shared preview uses a consistent display priority. No cosmetic " +
+                        "is bought, earned or transferred.",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        CoopBoardLook.entries.forEach { look ->
+                            FilterChip(
+                                selected = preferredBoardLook == look.id,
+                                onClick = { preferredBoardLook = look.id },
+                                label = { Text(look.label) })
+                        }
+                    }
+                    Text("Co-op only. Race and Speed Duel keep their normal board. " +
+                        "The room look stays fixed after the first partner joins.",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
             }
             Text("Nearby rooms work on trusted local networks. Guest Wi-Fi may block devices " +

@@ -229,15 +229,26 @@ private fun Heading(eyebrow: String, heading: String) {
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     onDaily: () -> Unit, onNearby: () -> Unit) {
     val run = store.profile.active
-    val puzzle = androidx.compose.runtime.remember(run.puzzleId) {
-        SoloProgressRules.puzzle(run)
-    }
+    val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
     val finished = WordSearchRules.complete(puzzle, run.foundIds)
     val challengeLabel = run.challenge?.label ?: run.difficulty.label
-    val boardLabel = run.boardSize?.cells ?: run.difficulty.gridSize
-    val name = store.profile.identity.displayName
+    val boardSize = run.boardSize?.cells ?: run.difficulty.gridSize
+    val name = store.profile.identity.displayName.trim().ifBlank { "Player" }
 
-    PaperbackCover(name)
+    // The Home page should be an immediately usable launcher, not a long
+    // stack of oversized explanation cards. Keep the paperback colors and
+    // hierarchy while making Solo, Daily, and Nearby visible at first glance.
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        PaperEyebrow("GridMates · Puzzle Library")
+        Text("Word Search", color = Forest,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold)
+        Text("Good puzzles. Good company.", color = Muted,
+            style = MaterialTheme.typography.bodyMedium)
+        Text("Welcome, " + name, color = Ink,
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
     store.warning?.let { message ->
         PaperPanel(Modifier.fillMaxWidth()) {
             Text(message, color = Gold, style = MaterialTheme.typography.bodyMedium)
@@ -247,51 +258,45 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     PaperPanel(Modifier.fillMaxWidth()) {
         PaperEyebrow("01 · Your current puzzle")
         Text(if (finished) "Ready for another?" else "Pick up where you left off",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold, color = Forest)
-        Text(run.theme.label + " · " + boardLabel + "×" + boardLabel +
-            " · " + challengeLabel,
-            color = Muted, style = MaterialTheme.typography.bodyMedium)
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold, color = Forest, maxLines = 2)
+        Text(run.theme.label + " · " + boardSize + "×" + boardSize +
+            " · " + challengeLabel +
+            (if (finished) " · Complete" else
+                " · " + run.foundIds.size + "/" + puzzle.targets.size + " found"),
+            color = Muted, style = MaterialTheme.typography.bodySmall,
+            maxLines = 2)
         PaperProgress(run.foundIds.size, puzzle.targets.size)
-        Text(if (finished) "All " + puzzle.targets.size + " words found"
-            else run.foundIds.size.toString() + " of " + puzzle.targets.size +
-                " words found · Saved on this device",
-            color = Muted, style = MaterialTheme.typography.bodySmall)
-        Button(onClick = onSolo,
-            modifier = Modifier.fillMaxWidth().height(50.dp)) {
+        Button(onClick = onSolo, modifier = Modifier.fillMaxWidth().height(48.dp)) {
             Text(if (finished) "Play Solo" else "Continue Solo")
         }
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("02 · A little every day")
-        Text("Daily puzzle", color = Forest,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold)
-        Text("A new word search each day. No streak pressure.",
-            color = Muted, style = MaterialTheme.typography.bodyMedium)
-        Text(store.profile.dailyCompletions.toString() + " daily puzzles completed",
-            color = Gold, style = MaterialTheme.typography.labelLarge)
-        Button(onClick = onDaily,
-            modifier = Modifier.fillMaxWidth().height(50.dp)) {
-            Text("Open Daily")
+        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                PaperEyebrow("02 · A little every day")
+                Text("Daily puzzle", style = MaterialTheme.typography.titleSmall,
+                    color = Forest, fontWeight = FontWeight.SemiBold, maxLines = 2)
+            }
+            Button(onClick = onDaily) { Text("Open Daily", maxLines = 1) }
         }
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("03 · Together is better")
-        Text("Play Together", color = Forest,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold)
-        Text("Team up or race on two phones connected to the same Wi-Fi.",
-            color = Muted, style = MaterialTheme.typography.bodyMedium)
-        Text("Co-op · Shared Race · Speed Duel",
-            color = Gold, style = MaterialTheme.typography.labelMedium)
-        Button(onClick = onNearby,
-            modifier = Modifier.fillMaxWidth().height(50.dp).semantics {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                PaperEyebrow("03 · Together is better")
+                Text("Same Wi-Fi", style = MaterialTheme.typography.titleSmall,
+                    color = Forest, fontWeight = FontWeight.SemiBold, maxLines = 1)
+            }
+            Button(onClick = onNearby, modifier = Modifier.semantics {
                 contentDescription = "Open Nearby co-op"
             }) {
-            Text("Play Together")
+                Text("Play Together", maxLines = 2)
+            }
         }
     }
 
