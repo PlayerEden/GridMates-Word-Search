@@ -568,7 +568,8 @@ private fun WordList(
     var remainingOnly by remember(puzzle.id) { mutableStateOf(false) }
     val targets = if (remainingOnly) puzzle.targets.filter { it.id !in found }
         else puzzle.targets
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Row(Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
@@ -583,37 +584,47 @@ private fun WordList(
                     label = { Text("Remaining") })
             }
         }
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            if (targets.isEmpty()) {
-                Text("All words found!", color = Forest,
-                    style = MaterialTheme.typography.bodyMedium)
-            }
-            targets.chunked(2).forEach { pair ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    pair.forEach { target ->
-                        val solved = target.id in found
-                        Box(
-                            Modifier.weight(1f).background(
-                                if (solved) FoundMarker.copy(alpha = 0.33f) else Paper,
-                                RoundedCornerShape(8.dp)
-                            ).padding(horizontal = 8.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                (if (solved) "✓ " else "○ ") + target.word,
-                                color = if (solved) Forest else Ink,
-                                fontWeight = if (solved) FontWeight.Normal else FontWeight.Medium,
-                                style = MaterialTheme.typography.bodyMedium,
-                                textDecoration = if (solved) TextDecoration.LineThrough else null,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                    if (pair.size == 1) Box(Modifier.weight(1f))
+        BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+            // Wide two-column index for normal text; a legible single column
+            // at 320dp / enlarged system fonts rather than cut-off words.
+            val columns = if (maxWidth < 350.dp ||
+                LocalDensity.current.fontScale >= 1.3f) 1 else 2
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                if (targets.isEmpty()) {
+                    Text("All words found!", color = Forest,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
+                targets.chunked(columns).forEach { pair ->
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        pair.forEach { target ->
+                            val solved = target.id in found
+                            val shape = RoundedCornerShape(9.dp)
+                            Box(Modifier.weight(1f)
+                                .background(
+                                    if (solved) FoundMarker.copy(alpha = 0.28f) else Paper,
+                                    shape)
+                                .border(1.dp, if (solved) Color(0xFFC5D9C8) else GridRule, shape)
+                                .padding(horizontal = 9.dp, vertical = 7.dp)
+                            ) {
+                                Text(
+                                    (if (solved) "✓ " else "○ ") + target.word,
+                                    color = if (solved) Forest else Ink,
+                                    fontWeight = if (solved) FontWeight.Normal
+                                        else FontWeight.Medium,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    textDecoration = if (solved) TextDecoration.LineThrough else null,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                        if (pair.size < columns) Box(Modifier.weight(1f))
+                    }
+                }
+                Text(if (daily) "Daily progress saved." else "Your puzzle saves automatically.",
+                    color = Muted, style = MaterialTheme.typography.labelSmall)
             }
-            Text(if (daily) "Daily progress saved." else "Your puzzle saves automatically.",
-                color = Muted, style = MaterialTheme.typography.labelSmall)
         }
     }
 }
