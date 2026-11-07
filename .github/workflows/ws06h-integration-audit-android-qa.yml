@@ -6,6 +6,7 @@ name: WS-06H Integration Audit and Data Safety Android Emulator QA
 # Includes bounded-backup-import JVM checks, malformed-race-save and stale-cache
 # Android tests, and an integrated home/daily/records/collection/nearby UX loop.
 # Rerun all gates after correcting the Compose smoke test's assertExists import.
+# Recheck all 74 Android tests after fixing newline delimiters in cache-age fixture.
 
 on:
   workflow_dispatch:
