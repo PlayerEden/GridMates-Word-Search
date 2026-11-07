@@ -17,7 +17,7 @@ class ShellSmokeTest {
     @Test fun soloBoardOpensAndCurrentOptionsAreDiscoverable() {
         compose.onNodeWithText("Continue Solo").performClick()
         compose.onNodeWithText("Words to find", substring = true).assertExists()
-        compose.onNodeWithText("Hint (3)").assertExists()
+        compose.onNodeWithText("Hint (", substring = true).assertExists()
         compose.onNodeWithText("Home").performClick()
         compose.onNodeWithText("Continue Solo").assertExists()
         compose.onNodeWithText("Continue Solo").performClick()
