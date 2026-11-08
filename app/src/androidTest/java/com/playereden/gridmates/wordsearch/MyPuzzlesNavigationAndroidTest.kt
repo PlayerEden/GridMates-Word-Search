@@ -35,7 +35,7 @@ class MyPuzzlesNavigationAndroidTest {
                 }
             }
             rule.onNodeWithText("My Puzzles").assertIsDisplayed().performClick()
-            rule.onNodeWithText("Paused · 1 / 24").assertExists()
+            rule.onNodeWithText("PAUSED · 1 / 24").assertExists()
             rule.onNodeWithText("Resume").performScrollTo().performClick()
             rule.onNodeWithText("Trace words · pinch to zoom", substring = true)
                 .assertExists()
