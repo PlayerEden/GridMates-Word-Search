@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "SOURCE_PINNED_CANDIDATE_ONLY_NOT_GAME_CONTENT",
+  "source_id": "esdb-us-2026-02-25",
+  "publisher": "Kevin Atkinson / English Speller Database (SCOWLv2)",
+  "canonical_upstream": "https://github.com/en-wl/wordlist",
+  "upstream_release_tag": "rel-2026.02.25",
+  "upstream_release_commit": "7e99edab8e32f9f9ea2b15f249ca8d4d67237410",
+  "release_url": "https://github.com/en-wl/wordlist/releases/tag/rel-2026.02.25",
+  "artifact": {
+    "name": "hunspell-en_US-2026.02.25.zip",
+    "url": "https://github.com/en-wl/wordlist/releases/download/rel-2026.02.25/hunspell-en_US-2026.02.25.zip",
+    "sha256": "ac8e73310e951d88c52c2cf2ba54ceaca34f8486a81630ac8a75dc5f931179f9",
+    "bytes": 187271,
+    "expected_dictionary_member": "en_US.dic"
+  },
+  "copyright_notice": {
+    "upstream_url": "https://github.com/en-wl/wordlist/blob/rel-2026.02.25/Copyright",
+    "pinned_repo_path": "data/lexicon/licenses/ESDB_SCOWL_COPYRIGHT_2026_02_25.txt",
+    "publisher_notice_required": true,
+    "scope": "American English official speller dictionary; not AU or >80-sized word list"
+  },
+  "extraction": {
+    "format": "hunspell-dic-roots",
+    "min_letters": 3,
+    "max_letters": 20,
+    "locale": "en-US",
+    "license_notice_required": true,
+    "output": "quarantine-only",
+    "allow_approval": false,
+    "note": "Dictionary lemmas/root forms only; morphological affix expansion not performed. Hunspell validity is not theme/familiarity approval."
+  }
+}
