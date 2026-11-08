@@ -1,0 +1,69 @@
+name: WS-09F-D V4 Preview Core Safety and Goldens
+
+# No Android app release; no Gradle dependency/billing-heavy emulator.
+on:
+  push:
+    branches:
+      - feature/ws09f-d-v4-preview-placement-core-2026-11-08
+    paths:
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/V4PreviewPlacement.kt'
+      - 'core/src/test/kotlin/com/playereden/gridmates/wordsearch/core/V4PreviewPlacementCoreTest.kt'
+      - 'core/src/test/resources/ws09fc_v4_test_only_candidates.txt'
+      - '.github/workflows/ws09f-d-v4-preview-core.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws09f-d-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verified-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify preview is disabled for users and draft words are test-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          root=Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core')
+          v4=root / 'V4PreviewPlacement.kt'
+          source=v4.read_text()
+          assert 'internal object V4PreviewPlacement' in source
+          assert 'wordsearch:v4:PREVIEW:en:' in source
+          assert 'candidate-pool-v1:' in source
+          assert 'fun previewPuzzle(' in source
+          assert 'wordsearch:v4:LAB:' not in source
+          resource=Path('core/src/test/resources/ws09fc_v4_test_only_candidates.txt').read_bytes()
+          expect='16969acf1ff1ab700f23201cb1fe6273d99c6e7cd29c7909e8b891440b3a46fe'
+          assert hashlib.sha256(resource).hexdigest() == expect, 'Unapproved test corpus drifted'
+          assert not list(root.glob('*LibraryV4*')), 'V4 reviewed library not approved'
+          model=Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/SoloProgress.kt').read_text()
+          assert 'V4PreviewPlacement' not in model
+          sizes=Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/WordSearchV2.kt').read_text()
+          assert 'BOOK_MARATHON' not in sizes and 'BOOK_COLOSSAL' not in sizes
+          print('PASS: unapproved words in test resources only; preview excluded from Solo and public presets.')
+          PY
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Test actual core including historical golden and V4 preview JUnit
+        run: gradle --no-daemon :core:test --console=plain
+      - name: Record evidence
+        shell: bash
+        run: |
+          {
+            echo '### PREVIEW-ONLY core integration passed'
+            echo '18 pinned old V4 laboratory 40/50 grid snapshots, 180 preview puzzles, 15,750 WordSearchRules selection paths; 6+ historical V1/V2/V3 snapshot tests remain in existing core:test.'
+            echo 'No production V4 dictionary, Solo routing, game UI, Android APK or saved schema change.'
+          } >> "$GITHUB_STEP_SUMMARY"
