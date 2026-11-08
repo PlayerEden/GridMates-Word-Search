@@ -86,7 +86,7 @@ class MultiSessionPersistenceAndroidTest {
             assertEquals(1, safe.getJSONArray("pausedSolo").length())
             val cases = listOf(
                 JSONObject(safe.toString()).put("pausedSolo", "not-an-array"),
-                JSONObject(safe.toString()).remove("pausedSolo").let { it },
+                JSONObject(safe.toString()).apply { remove("pausedSolo") },
                 JSONObject(safe.toString()).put("pausedSolo",
                     JSONArray().put(safe.getJSONObject("active"))),
                 JSONObject(safe.toString()).put("pausedSolo",
