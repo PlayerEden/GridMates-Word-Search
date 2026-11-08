@@ -1,6 +1,7 @@
 name: WS-09D Square Paperback Grid and Margins Android Emulator QA
 # Exact-source v0.8.8/code42 -> v0.8.9/code43 signed update retaining schema5 paused games and 104 Android tests.
 # New square-corner grid and responsive margins, unchanged historical puzzle generator.
+# Re-run on corrected Android Compose geometry + physical-swipe test source.
 # Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
 # The real two-phone Co-op P0 remains open and physical testing is deferred.
 
