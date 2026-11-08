@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State (November 7, 2026):** **WS-07E v0.8.1 automated PASS, 90/90 Android API35 tests** plus QA-signed v0.8.0→v0.8.1 saved-progress install-over; [exact-source receipt](WS07E_BUILD_QA_2026-11-07.md), [draft PR #58](https://github.com/PlayerEden/GridMates-Word-Search/pull/58). Physical two-phone Co-op P0 remains OPEN and owner testing deferred. Stacked drafts not merged to `main`, no production release.
+**State (November 7, 2026):** **WS-07F Records UI v0.8.2 automated PASS, 92/92 API35** and real same-QA-signer v0.8.1→v0.8.2 saved-data install-over; [source-matched receipt](WS07F_RECORDS_BUILD_QA_2026-11-07.md), [draft PR #60](https://github.com/PlayerEden/GridMates-Word-Search/pull/60). **Original WS-07F durability/performance and WS-07G beta readiness gates still open.** Physical two-phone P0 deferred. Nothing merged to `main` or published.
 
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
@@ -335,3 +335,8 @@ Later milestone issues should be opened as work approaches, rather than creating
 ### WS-07E first whole-app UX pass (November 7)
 
 [Full API35 run #42424216761](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42424216761) **90/90 PASS (0 skipped/failed)** on v0.8.1/code35. Three new Android tests verify a bounded/paged Daily Journal, already-paid hint recall at exhausted budget, and Options clue review without another charge; previous 87 cases remain green. Real signed v0.8.0→v0.8.1 install-over preserved schema4 Solo/Daily/identity/Race/Duel data. Exact tested code `edcdc08c53d82dccca83ee1b3cf4255c662d08aa`, APK SHA-256 `d7d6707ca96b5afc938cee15acc341a0ae994d5ffce8eda8d029224800de20a0`, [artifact and rollback](WS07E_BUILD_QA_2026-11-07.md), [owner checklist](WS07E_DAILY_CLUES_UX_ACCEPTANCE_2026-11-07.md). **This is only the bounded first WS-07E pass**, not approval of all app screens or actual two-phone play. Physical P0 #53 and large-font/TalkBack owner acceptance remain deferred.
+
+
+### WS-07F Records navigation subpass (November 7)
+
+[API35 run #42432833373](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42432833373) **92/92 Android tests PASS** and signed v0.8.1→v0.8.2 update preserved all saved histories. The preceding run #42430710954 failed one actual 360dp Race visibility regression; corrected tabs-first placement and verified selected Race/Duel headings **visibly accessible**. [Exact source, signer, APK checksum, rollback](WS07F_RECORDS_BUILD_QA_2026-11-07.md). This is a bounded UX pass under the broader WS-07E usability program, **not** completion of the roadmap's WS-07F long-session stress/performance audit. [Collection gallery pagination PR #61](https://github.com/PlayerEden/GridMates-Word-Search/pull/61) is separately staged and not yet full-QA verified. All real-phone gates remain deferred.
