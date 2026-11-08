@@ -9,6 +9,10 @@ on:
       - feature/ws09f-c4-core-model-compat-lab-2026-11-08
     paths:
       - 'labs/ws09f_c_kotlin/CoreModelCompatibility.kt'
+      - 'core/src/test/kotlin/ws09fc/lab/**'
+      - 'core/src/test/kotlin/com/playereden/gridmates/wordsearch/core/V4ResearchCoreCompatibilityTest.kt'
+      - 'core/src/test/resources/ws09fc_v4_test_only_candidates.txt'
+      - 'tools/ws09f_c4_core_test_mirror_audit.py'
       - '.github/workflows/ws09f-c4-core-model-compat.yml'
       - 'tools/ws09f_c_kotlin_fixture_audit.py'
 
@@ -30,6 +34,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/ws09f_c_kotlin_fixture_audit.py
+      - name: Prove core test-only files match the frozen V4 lab exactly
+        run: python3 tools/ws09f_c4_core_test_mirror_audit.py
       - name: Verify preinstalled Kotlin/JDK without Gradle downloads
         shell: bash
         run: |
@@ -53,4 +59,21 @@ jobs:
             echo '```'
             cat /tmp/ws09f-c4-corecompat.txt
             echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Run all core JUnit regression tests including hidden V4 model compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :core:test --console=plain
+          {
+            echo '### Actual Gradle core JUnit suite PASSED'
+            echo 'Legacy v1/v2/v3 history and hidden V4 core model tests ran in the real core:test task.'
+            echo 'The experimental V4 generator lives in core/src/test only, not Android runtime.'
           } >> "$GITHUB_STEP_SUMMARY"
