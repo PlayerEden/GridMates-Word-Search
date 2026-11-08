@@ -42,7 +42,9 @@ data class SoloProfile(
     /** Additive schema-4 race journal in the same atomic save and manual backup. */
     val raceResults: List<RaceResult> = emptyList(),
     /** Completely separate Speed Duel journal in the same atomic profile. */
-    val duelResults: List<DuelResult> = emptyList()
+    val duelResults: List<DuelResult> = emptyList(),
+    /** Schema-5 paused Solo puzzle library, newest paused first. No Daily games here. */
+    val pausedSolo: List<SoloRun> = emptyList()
 ) {
     val raceSummary: RaceSummary get() = RaceSummary.of(raceResults)
     val duelSummary: DuelSummary get() = DuelSummary.of(duelResults)
@@ -175,5 +177,63 @@ object SoloProgressRules {
             challenge = run.challenge
         )
         return profile.copy(results = listOf(record) + profile.results)
+    }
+}
+
+
+/**
+ * WS-09B: pure library operations. Retain active Solo as the selected session
+ * for old screens/records, and archive every unfinished game before switching.
+ * Never auto-trim saved games; a full library rejects new games until the
+ * player deliberately discards a paused puzzle.
+ */
+object SoloSessionLibrary {
+    const val MAX_PAUSED = 24
+
+    fun finished(run: SoloRun): Boolean =
+        WordSearchRules.complete(SoloProgressRules.puzzle(run), run.foundIds)
+
+    fun verify(profile: SoloProfile) {
+        require(profile.pausedSolo.size <= MAX_PAUSED) { "Too many paused Solo puzzles" }
+        val allIds = listOf(profile.active.puzzleId) +
+            profile.pausedSolo.map { it.puzzleId }
+        require(allIds.distinct().size == allIds.size) {
+            "Duplicated Solo puzzle in active and paused sessions"
+        }
+        profile.pausedSolo.forEach { run ->
+            require(SoloProgressRules.validate(run) == run) {
+                "Invalid progress in paused Solo puzzle"
+            }
+            require(!finished(run)) { "Completed Solo puzzle cannot be paused" }
+        }
+    }
+
+    /** Returns null without altering anything if the library is full. */
+    fun start(profile: SoloProfile, fresh: SoloRun): SoloProfile? {
+        if (fresh.puzzleId == profile.active.puzzleId ||
+            profile.pausedSolo.any { it.puzzleId == fresh.puzzleId }) return null
+        val paused = if (finished(profile.active)) profile.pausedSolo
+            else listOf(profile.active) + profile.pausedSolo
+        if (paused.size > MAX_PAUSED) return null
+        return profile.copy(active = fresh, pausedSolo = paused)
+            .also(::verify)
+    }
+
+    /** Switching is a swap: the previously active unfinished puzzle is kept. */
+    fun resume(profile: SoloProfile, puzzleId: String): SoloProfile? {
+        val selected = profile.pausedSolo.firstOrNull { it.puzzleId == puzzleId }
+            ?: return null
+        val other = profile.pausedSolo.filterNot { it.puzzleId == puzzleId }
+        val paused = if (finished(profile.active)) other
+            else listOf(profile.active) + other
+        return profile.copy(active = selected, pausedSolo = paused).also(::verify)
+    }
+
+    /** Destructive operation requires explicit UI confirmation, never implicit eviction. */
+    fun discardPaused(profile: SoloProfile, puzzleId: String): SoloProfile? {
+        if (profile.pausedSolo.none { it.puzzleId == puzzleId }) return null
+        return profile.copy(pausedSolo = profile.pausedSolo.filterNot {
+            it.puzzleId == puzzleId
+        })
     }
 }

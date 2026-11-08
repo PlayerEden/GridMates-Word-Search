@@ -24,6 +24,7 @@ import com.playereden.gridmates.wordsearch.core.CoopSnapshot
 import com.playereden.gridmates.wordsearch.core.CoopSeat
 import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.SoloResult
+import com.playereden.gridmates.wordsearch.core.SoloSessionLibrary
 import com.playereden.gridmates.wordsearch.core.SoloRun
 import com.playereden.gridmates.wordsearch.core.WordDifficulty
 import com.playereden.gridmates.wordsearch.core.WordSearchGenerator
@@ -127,7 +128,8 @@ internal class SoloStore(
 
     private fun decode(raw: String): SoloProfile {
         val root = JSONObject(raw)
-        require(root.getInt("schema") in 1..4) { "Unsupported save schema" }
+        val schema = root.getInt("schema")
+        require(schema in 1..5) { "Unsupported save schema" }
         val active = root.getJSONObject("active")
         val run = readRun(active)
         val clean = SoloProgressRules.validate(run)
@@ -229,9 +231,31 @@ internal class SoloStore(
                 ).validate()
             }
         }
+        // Schema 1–4 had exactly one active Solo puzzle. Starting with schema 5,
+        // suspended sessions are part of the SAME atomic save and JSON backup.
+        // Missing or wrong-type schema-5 data must fail closed, not erase games.
+        val pausedRaw = root.optJSONArray("pausedSolo")
+        if (schema == 5) require(pausedRaw != null) { "Missing paused Solo journal" }
+        else require(!root.has("pausedSolo")) { "Unexpected paused Solo journal" }
+        val paused = mutableListOf<SoloRun>()
+        if (pausedRaw != null) {
+            require(pausedRaw.length() <= SoloSessionLibrary.MAX_PAUSED) {
+                "Too many paused Solo puzzles"
+            }
+            for (i in 0 until pausedRaw.length()) {
+                val saved = readRun(pausedRaw.getJSONObject(i))
+                // Reject and protect a corrupt file rather than silently
+                // stripping any found word, hint or elapsed time.
+                require(SoloProgressRules.validate(saved) == saved) {
+                    "Invalid saved Solo progress"
+                }
+                paused += saved
+            }
+        }
         val loadedProfile = SoloProfile(clean, loaded, daily, rawIdentity,
             RaceJournalRules.validateImported(races),
-            DuelJournalRules.validateImported(duels))
+            DuelJournalRules.validateImported(duels), paused)
+        SoloSessionLibrary.verify(loadedProfile)
         return loadedProfile.copy(identity = WoodlandCollection.sanitize(rawIdentity, loadedProfile))
     }
 
@@ -320,9 +344,11 @@ internal class SoloStore(
                 .put("own", d.ownWords).put("partner", d.partnerWords)
                 .put("completedAt", d.completedAtMs))
         }
-        return JSONObject().put("schema", 4).put("active", active)
+        val paused = JSONArray()
+        for (run in value.pausedSolo) paused.put(writeRun(run))
+        return JSONObject().put("schema", 5).put("active", active)
             .put("results", results).put("daily", daily).put("identity", identity)
-            .put("races", races).put("duels", duels)
+            .put("races", races).put("duels", duels).put("pausedSolo", paused)
             .toString().toByteArray(StandardCharsets.UTF_8)
     }
 
@@ -364,7 +390,13 @@ internal class SoloStore(
                 "The original data is still protected."
             return false
         }
-        val checked = restored.copy(active = SoloProgressRules.validate(restored.active))
+        val checked = runCatching {
+            restored.copy(active = SoloProgressRules.validate(restored.active))
+                .also(SoloSessionLibrary::verify)
+        }.getOrElse {
+            warning = "Invalid Solo backup. Your existing progress was not replaced."
+            return false
+        }
         val previous = profile
         profile = checked.copy(identity = WoodlandCollection.sanitize(checked.identity, checked))
         flush()
@@ -508,28 +540,48 @@ internal class SoloStore(
         return warning == null
     }
 
-    /** Compatibility path used by historical QA fixtures. Never mutates v1 rules. */
-    fun choose(theme: WordTheme, difficulty: WordDifficulty) {
-        if (blocked) return
-        profile = profile.copy(active = SoloProgressRules.fresh(theme, difficulty, nextSeed()))
+    /** Commit a whole session switch or import; roll back in-memory state on disk failure. */
+    private fun commitSession(next: SoloProfile): Boolean {
+        if (blocked) return false
+        val previous = profile
+        profile = next
         flush()
+        if (warning != null) {
+            profile = previous
+            return false
+        }
+        return true
     }
 
-    fun chooseV2(theme: WordTheme, board: PuzzleBoardSize, challenge: PuzzleChallenge) {
-        if (blocked) return
-        // Build before replacing the previous saved board. Invalid input cannot
-        // discard the active session, and no new game is started without action.
-        val candidate = SoloProgressRules.freshV2(theme, board, challenge, nextSeed())
+    /** Historical v1 choice remains supported; it now preserves unfinished Solo. */
+    fun choose(theme: WordTheme, difficulty: WordDifficulty): Boolean {
+        if (blocked) return false
+        val candidate = SoloProgressRules.fresh(theme, difficulty, nextSeed())
         SoloProgressRules.puzzle(candidate)
-        profile = profile.copy(active = candidate)
-        flush()
+        val updated = SoloSessionLibrary.start(profile, candidate)
+        if (updated == null) {
+            warning = "My Puzzles is full. Remove a paused puzzle to start another."
+            return false
+        }
+        return commitSession(updated)
     }
 
-    fun newPuzzle() {
-        if (blocked) return
+    fun chooseV2(theme: WordTheme, board: PuzzleBoardSize,
+                 challenge: PuzzleChallenge): Boolean {
+        if (blocked) return false
+        val candidate = SoloProgressRules.freshV2(theme, board, challenge, nextSeed())
+        SoloProgressRules.puzzle(candidate) // verify BEFORE changing saved session
+        val updated = SoloSessionLibrary.start(profile, candidate)
+        if (updated == null) {
+            warning = "My Puzzles is full. Remove a paused puzzle to start another."
+            return false
+        }
+        return commitSession(updated)
+    }
+
+    fun newPuzzle(): Boolean {
+        if (blocked) return false
         val current = profile.active
-        // Fresh Solo plays use book-sized choices. Previously saved 8x8/10x10
-        // and original 12x12 v2 boards still load untouched until replaced.
         val board = current.boardSize?.takeIf { it in PuzzleBoardSize.bookPresets }
             ?: PuzzleBoardSize.BOOK_CLASSIC
         val challenge = current.challenge ?: when (current.difficulty) {
@@ -537,12 +589,28 @@ internal class SoloStore(
             WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
             WordDifficulty.HARD -> PuzzleChallenge.EXPERT
         }
-        chooseV2(current.theme, board, challenge)
+        return chooseV2(current.theme, board, challenge)
+    }
+
+    /** Selected archived entry becomes active; previous unfinished active is retained. */
+    fun resumeSolo(puzzleId: String): Boolean {
+        if (blocked) return false
+        val updated = SoloSessionLibrary.resume(profile, puzzleId) ?: return false
+        return commitSession(updated)
+    }
+
+    /** A paused puzzle is only removed after a separate confirmation in the UI. */
+    fun discardPausedSolo(puzzleId: String): Boolean {
+        if (blocked) return false
+        val updated = SoloSessionLibrary.discardPaused(profile, puzzleId) ?: return false
+        return commitSession(updated)
     }
 
     private fun nextSeed(): Long {
-        // Avoid two rapid sessions accidentally receiving the same ID.
-        return maxOf(System.currentTimeMillis(), profile.active.seed + 1)
+        val seeds = (listOf(profile.active) + profile.pausedSolo)
+            .map { it.seed }.filter { it >= 0 && it < Long.MAX_VALUE }
+        val maxPrior = seeds.maxOrNull() ?: 0L
+        return maxOf(System.currentTimeMillis(), maxPrior + 1)
     }
 
     fun claim(start: GridPoint, end: GridPoint): WordClaim {
