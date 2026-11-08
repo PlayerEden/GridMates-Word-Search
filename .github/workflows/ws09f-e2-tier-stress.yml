@@ -1,0 +1,51 @@
+name: WS-09F-E2 Tiered V4 1800-seed JVM Stress (No APK)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09f-e-v4-tiered-corpus-preview-2026-11-08
+    paths:
+      - 'labs/ws09f_e_tier/Stress.kt'
+      - '.github/workflows/ws09f-e2-tier-stress.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws09f-e2-stress-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bounded-tier-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate that proposed trial tiers have no palindromes/holds
+        shell: bash
+        run: python3 tools/ws09f_e_tier_workbench_audit.py
+      - name: Compile the actual Kotlin core and standalone 1800-case preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v kotlinc
+          kotlinc -version
+          CORE=core/src/main/kotlin/com/playereden/gridmates/wordsearch/core
+          kotlinc "$CORE/WordSearch.kt" "$CORE/WordSearchV2.kt" \
+            "$CORE/WordSearchV3.kt" "$CORE/V4PreviewPlacement.kt" \
+            "$CORE/V4PreviewTierSelection.kt" labs/ws09f_e_tier/Stress.kt \
+            -include-runtime -d "$RUNNER_TEMP/ws09f-e2-stress.jar"
+          timeout 240s java -Xmx256m -jar "$RUNNER_TEMP/ws09f-e2-stress.jar" \
+            core/src/test/resources/ws09f_e_v4_provisional_tiers.txt \
+            | tee /tmp/ws09f-e2-stress.txt
+          grep -F 'PASS 1800/1800 tiered candidate previews' /tmp/ws09f-e2-stress.txt
+          {
+            echo '### Proposed content tier stress -- NOT a release'
+            echo 'Actual V1/V2/V3 + V4-preview core Kotlin source; 1,800 tier-selected 40/50 puzzles.'
+            echo 'Each word placement has a 24-attempt inner cap; each candidate selection a separate 8-draw outer cap.'
+            echo '```'
+            cat /tmp/ws09f-e2-stress.txt
+            echo '```'
+            echo 'JVM runner timing only -- not Android performance or editorial approval.'
+          } >> "$GITHUB_STEP_SUMMARY"
