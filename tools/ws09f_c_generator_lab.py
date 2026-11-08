@@ -26,7 +26,7 @@ DIRECTIONS = {
     "classic": [(0, 1), (1, 0), (1, 1), (1, -1), (0, -1), (-1, 0)],
     "expert": ALL,
 }
-SEEDS = (11, 42, 2026)
+SEEDS = (11, 42, 2026, 0, 1, 7, 19, 77, 144, 999)
 MAX_ATTEMPTS = 24
 SAMPLES_PER_WORD = 160
 
@@ -70,6 +70,41 @@ def count_occurrences(grid: list[list[str]], word: str) -> int:
                     if count > 1:
                         return count
     return count
+
+
+def verify_puzzle(puzzle: LabPuzzle, size: int, mode: str) -> None:
+    """Independently check every saved path, word and eight-way occurrence.
+
+    The generator cannot pass only because the filler happened to form the
+    requested word somewhere else: the stored solution path must itself be
+    contiguous, legal for the mode and spell the target exactly.
+    """
+    if mode not in DIRECTIONS:
+        raise ValueError("Unknown laboratory challenge mode")
+    if len(puzzle.grid) != size or any(len(row) != size for row in puzzle.grid):
+        raise ValueError("Wrong grid dimensions")
+    if any(not (isinstance(c, str) and len(c) == 1 and "A" <= c <= "Z")
+           for row in puzzle.grid for c in row):
+        raise ValueError("Grid contains non A-Z letter")
+    if len(puzzle.words) != len(puzzle.paths) or len(set(puzzle.words)) != len(puzzle.words):
+        raise ValueError("Wrong path count or duplicate target word")
+    for word, path in zip(puzzle.words, puzzle.paths):
+        if len(path) != len(word) or len(path) < 2:
+            raise ValueError(f"Wrong path length for {word}")
+        dy = path[1][0] - path[0][0]
+        dx = path[1][1] - path[0][1]
+        if (dy, dx) not in DIRECTIONS[mode]:
+            raise ValueError(f"Illegal direction for {mode}: {word}")
+        if any(not (0 <= y < size and 0 <= x < size)
+               for y, x in path):
+            raise ValueError(f"Out-of-range path for {word}")
+        if any(path[i] != (path[0][0]+i*dy, path[0][1]+i*dx)
+               for i in range(len(path))):
+            raise ValueError(f"Noncontiguous path for {word}")
+        if "".join(puzzle.grid[y][x] for y, x in path) != word:
+            raise ValueError(f"Stored path does not spell {word}")
+        if count_occurrences(puzzle.grid, word) != 1:
+            raise ValueError(f"Eight-direction occurrence is not unique: {word}")
 
 
 def seed_rng(theme: str, size: int, mode: str, seed: int, attempt: int) -> Random:
@@ -140,6 +175,10 @@ def try_generate(pool: list[str], size: int, target: int, mode: str,
 def generate(theme: str, size: int, mode: str, seed: int,
              pool: list[str]) -> LabPuzzle:
     target = EXPERIMENT_TARGETS[f"{size}x{size}"]
+    if mode not in DIRECTIONS:
+        raise ValueError(f"Unknown lab mode: {mode}")
+    if len(pool) < target:
+        raise ValueError(f"Insufficient 40/50 research candidates: {len(pool)} < {target}")
     failures = []
     for attempt in range(MAX_ATTEMPTS):
         rng = seed_rng(theme, size, mode, seed, attempt)
@@ -173,10 +212,7 @@ def main() -> None:
                 puzzles = [generate(theme, size, mode, seed, pool) for seed in SEEDS]
                 for puzzle in puzzles:
                     assert len(puzzle.words) == EXPERIMENT_TARGETS[f"{size}x{size}"]
-                    assert len(set(puzzle.words)) == len(puzzle.words)
-                    assert all(len(row) == size for row in puzzle.grid)
-                    assert all(count_occurrences(puzzle.grid, w) == 1
-                               for w in puzzle.words)
+                    verify_puzzle(puzzle, size, mode)
                 first = puzzles[0]
                 checks.append((theme, size, mode, first.digest()))
                 print(f"{theme:<8} {size}x{size} {mode:<7}: "

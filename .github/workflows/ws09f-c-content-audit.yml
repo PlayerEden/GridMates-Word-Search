@@ -10,6 +10,7 @@ on:
     paths:
       - 'tools/ws09f_c_content_audit.py'
       - 'tools/ws09f_c_generator_lab.py'
+      - 'tools/test_ws09f_c_generator_lab.py'
       - 'design/marathon/v4_candidate_additions.json'
       - '.github/workflows/ws09f-c-content-audit.yml'
 
@@ -38,6 +39,11 @@ jobs:
             cat /tmp/ws09fc-audit.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Frozen research goldens, corruption and deterministic replay tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools -p 'test_ws09f_c_generator_lab.py' -v
       - name: Probe deterministic 40x40 and 50x50 placement / 8-direction uniqueness
         shell: bash
         run: |
