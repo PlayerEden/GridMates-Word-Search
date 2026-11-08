@@ -1,0 +1,56 @@
+name: WS-09F-C2 Kotlin V4 Generator Lab
+# Research-only; lab Kotlin is outside Android Gradle source sets.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09f-c2-kotlin-generator-lab-2026-11-08
+    paths:
+      - 'labs/ws09f_c_kotlin/**'
+      - 'tools/ws09f_c_kotlin_fixture_audit.py'
+      - '.github/workflows/ws09f-c2-kotlin-lab.yml'
+permissions:
+  contents: read
+concurrency:
+  group: ws09f-c2-lab-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  research-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check test-only vocabulary matches the audited V3 and V4 candidate draft
+        run: python3 tools/ws09f_c_kotlin_fixture_audit.py
+      - name: Check local Kotlin compiler without downloads
+        id: compiler
+        shell: bash
+        run: |
+          if command -v kotlinc >/dev/null 2>&1; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+            kotlinc -version
+          else
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            echo "::warning::No preinstalled kotlinc. Fixture validated; Kotlin compilation NOT RUN."
+          fi
+      - name: Compile the isolated JVM lab and test 180 repeatable layouts
+        if: steps.compiler.outputs.available == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          kotlinc labs/ws09f_c_kotlin/V4EngineLab.kt labs/ws09f_c_kotlin/Smoke.kt \
+            -include-runtime -d "$RUNNER_TEMP/ws09f-v4-lab.jar"
+          java -jar "$RUNNER_TEMP/ws09f-v4-lab.jar" labs/ws09f_c_kotlin/candidates_test_only.txt
+          {
+            echo '### Kotlin lab executed and checked'
+            echo '180 seed combinations and deterministic repeatability passed.'
+            echo 'No Android, editorial, physical performance or production acceptance implied.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Record explicit unverified Kotlin gate
+        if: steps.compiler.outputs.available != 'true'
+        run: |
+          {
+            echo '### Kotlin compilation NOT RUN'
+            echo 'No preinstalled Kotlin compiler; Python source-fixture parity is the only verified gate.'
+            echo 'Use local Kotlin SDK then re-run the laboratory on candidate words.'
+          } >> "$GITHUB_STEP_SUMMARY"
