@@ -28,6 +28,7 @@ object BookPageSessionCodec {
     private const val SHA_SIZE = 32
     private val ID = Regex("[a-z][a-z0-9-]{2,63}")
     private val PUZZLE_ID = Regex("[A-Za-z0-9:_-]{15,200}")
+    private val TARGET_ID = Regex("[A-Za-z0-9:_-]{1,200}")
     private val HEX = Regex("[0-9a-f]{64}")
 
     fun encode(catalog: BookCatalog, journal: BookPageSessionJournal): ByteArray {
@@ -47,10 +48,10 @@ object BookPageSessionCodec {
                 write(data, state.boardSha256, HEX)
                 data.writeLong(state.elapsedSeconds)
                 data.writeInt(state.foundIds.size)
-                state.foundIds.sorted().forEach { write(data, it, PUZZLE_ID) }
+                state.foundIds.sorted().forEach { write(data, it, TARGET_ID) }
                 data.writeInt(state.hints.size)
                 state.hints.toSortedMap().forEach { (target, level) ->
-                    write(data, target, PUZZLE_ID)
+                    write(data, target, TARGET_ID)
                     data.writeInt(level)
                 }
             }
@@ -90,7 +91,7 @@ object BookPageSessionCodec {
                 require(wordCount in 0..128) { "Invalid found word count" }
                 val found = LinkedHashSet<String>()
                 repeat(wordCount) {
-                    require(found.add(read(data, PUZZLE_ID, 200))) {
+                    require(found.add(read(data, TARGET_ID, 200))) {
                         "Duplicated found target"
                     }
                 }
@@ -98,7 +99,7 @@ object BookPageSessionCodec {
                 require(hintCount in 0..128) { "Invalid hint count" }
                 val hints = LinkedHashMap<String, Int>()
                 repeat(hintCount) {
-                    val id = read(data, PUZZLE_ID, 200)
+                    val id = read(data, TARGET_ID, 200)
                     val level = data.readInt()
                     require(hints.put(id, level) == null) { "Duplicated hint target" }
                 }
@@ -119,14 +120,14 @@ object BookPageSessionCodec {
     private fun write(data: DataOutputStream, value: String, pattern: Regex) {
         require(pattern.matches(value)) { "Invalid book session field" }
         val encoded = value.toByteArray(Charsets.UTF_8)
-        require(encoded.size in 3..200) { "Invalid book session text length" }
+        require(encoded.size in 1..200) { "Invalid book session text length" }
         data.writeInt(encoded.size)
         data.write(encoded)
     }
 
     private fun read(data: DataInputStream, pattern: Regex, max: Int): String {
         val count = data.readInt()
-        require(count in 3..max) { "Invalid field size" }
+        require(count in 1..max) { "Invalid field size" }
         val bytes = ByteArray(count)
         data.readFully(bytes)
         val text = Charsets.UTF_8.newDecoder()
