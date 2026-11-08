@@ -47,39 +47,43 @@ class V4ProvisionalTierCoreTest {
         var claims = 0
         val seeds = listOf(11L, 42L, 2026L, 0L, 1L, 7L, 19L, 77L, 144L, 999L)
         val sampledSpaceExtras = mutableSetOf<String>()
+        var worstOuterDraws = 0
+        var usedAlternatePool = 0
         for (theme in WordTheme.entries) {
             val gentle = words(data, theme, "TRIAL_RELAXED")
             val advanced = words(data, theme, "TRIAL_ADVANCED")
             val extra = words(data, theme, "UNREVIEWED_ADDITION")
             for (side in listOf(40, 50)) for (mode in PuzzleChallenge.entries)
                 for (seed in seeds) {
-                    val selected = V4PreviewTierSelection.select(
-                        theme, side, mode, seed, gentle, advanced)
+                    val outcome = try {
+                        V4PreviewTierSelection.previewOutcome(
+                            theme, side, mode, seed, gentle, advanced)
+                    } catch (e: IllegalStateException) {
+                        throw AssertionError(
+                            "EXHAUSTED ALL BOUNDED POOL DRAWS theme=" + theme.name +
+                                " side=" + side + " mode=" + mode.name + " seed=" + seed, e)
+                    }
+                    val selected = outcome.selection
                     val expected = when (mode) {
                         PuzzleChallenge.RELAXED -> 0
                         PuzzleChallenge.CLASSIC -> (if (side == 40) 70 else 105) / 10
                         PuzzleChallenge.EXPERT -> (if (side == 40) 70 else 105) / 4
                     }
+                    assertTrue("Outer content draw must be bounded",
+                        outcome.poolDraws in 1..V4PreviewTierSelection.MAX_POOL_DRAWS)
+                    worstOuterDraws = maxOf(worstOuterDraws, outcome.poolDraws)
+                    if (outcome.poolDraws > 1) usedAlternatePool++
                     assertEquals(expected, selected.advancedCount)
                     assertEquals(expected, selected.words.count { it in advanced })
                     assertEquals(if (side == 40) 70 else 105, selected.words.size)
-                    val p = try {
-                        V4PreviewTierSelection.previewPuzzle(
-                            theme, side, mode, seed, gentle, advanced)
-                    } catch (e: IllegalStateException) {
-                        throw AssertionError(
-                            "BOUNDED PLACEMENT FAILURE theme=" + theme.name +
-                                " side=" + side + " mode=" + mode.name + " seed=" + seed +
-                                " trial_pool=" + selected.words.size +
-                                " advanced_count=" + selected.advancedCount, e)
-                    }
+                    val p = outcome.puzzle
                     assertTrue(p.id.startsWith("wordsearch:v4:PREVIEW:en:"))
                     assertEquals(selected.words.toSet(), p.targets.map { it.word }.toSet())
                     assertEquals(side, p.size)
                     assertEquals(4, p.contentVersion)
-                    val again = V4PreviewTierSelection.previewPuzzle(
+                    val again = V4PreviewTierSelection.previewOutcome(
                         theme, side, mode, seed, gentle, advanced)
-                    assertEquals("Seeded preview must replay exactly", p, again)
+                    assertEquals("Seeded tier+placement must replay exactly", outcome, again)
                     var found = emptySet<String>()
                     for (target in p.targets) {
                         assertEquals(target.word,
@@ -97,6 +101,9 @@ class V4ProvisionalTierCoreTest {
         }
         assertEquals(180, generated)
         assertEquals(15750, claims)
+        println("TIERED_V4_SAMPLE_RESULT: 180/180 generated; max_pool_draws=" +
+            worstOuterDraws + "; puzzles_with_alternate_pool=" + usedAlternatePool +
+            "; placement_cap_per_draw=24")
         assertTrue("Space additions must be exercised in trial previews",
             sampledSpaceExtras.isNotEmpty())
     }
