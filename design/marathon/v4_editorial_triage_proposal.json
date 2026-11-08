@@ -66,7 +66,7 @@
       }
     },
     "SPACE": {
-      "editor_note": "Keep astronomy, launch and imaginative science-fiction distinct; inspect proper names and word-spacing conventions before approving a children's/older-audience Relaxed puzzle.",
+      "editor_note": "Keep astronomy, launch and imaginative science-fiction distinct; inspect proper names and word-spacing conventions before approving a children's/older-audience Relaxed puzzle. A provisional 125-word Relaxed planning pool is four words short after advanced/hold filters; ten possible replacement/additional concepts are listed for human review, without touching pinned generator goldens.",
       "provisional_advanced_only": [
         "GANYMEDE",
         "ENCELADUS",
@@ -120,7 +120,59 @@
         "SKYLINE": "Less space-themed",
         "SKYMAP": "Compound, check audience familiarity",
         "BROWNDWARF": "Usually two-word astronomical term"
-      }
+      },
+      "possible_friendly_additions_for_review": [
+        {
+          "answer": "FULLMOON",
+          "display": "Full moon",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "NEWMOON",
+          "display": "New moon",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "MOONPHASE",
+          "display": "Moon phase",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "MOONBEAM",
+          "display": "Moonbeam",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "STARTRAIL",
+          "display": "Star trail",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "NIGHTSKY",
+          "display": "Night sky",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "MIDNIGHT",
+          "display": "Midnight",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "CRESCENT",
+          "display": "Crescent",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "TWILIGHT",
+          "display": "Twilight",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "SKYGLOW",
+          "display": "Skyglow",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        }
+      ]
     },
     "GARDEN": {
       "editor_note": "Check fused two-word gardening terms and whether difficult botany or soil-science vocabulary belongs only in Expert.",
