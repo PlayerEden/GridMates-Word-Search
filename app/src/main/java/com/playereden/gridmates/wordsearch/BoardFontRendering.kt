@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
+import com.playereden.gridmates.wordsearch.core.BoardRenderWindow
 import com.playereden.gridmates.wordsearch.core.BoardFontCollection
 
 /** Every font referenced here is packaged from an exact, byte-pinned OFL source. */
@@ -103,11 +104,27 @@ internal class BoardGlyphPainter(private val typeface: Typeface) {
             bounds.right + x, bounds.bottom + y)
     }
 
-    fun drawLetters(scope: DrawScope, rows: List<String>, ink: Color) {
+    /**
+     * Draw the same full-board glyph coordinates, but only issue CPU canvas
+     * drawText calls for the cells visible through the large-board viewport.
+     *
+     * An absent window keeps the exact historical full-board drawing path,
+     * including Collection previews and every legacy puzzle.
+     */
+    fun drawLetters(
+        scope: DrawScope, rows: List<String>, ink: Color,
+        window: BoardRenderWindow? = null
+    ) {
         if (rows.isEmpty()) return
-        val width = scope.size.width / rows[0].length
+        val count = rows[0].length
+        if (count == 0) return
+        val width = scope.size.width / count
         val height = scope.size.height / rows.size
         if (width <= 0f || height <= 0f) return
+        if (window != null) require(window.totalCells == rows.size &&
+            count == window.totalCells) { "Render window must match full square puzzle" }
+        val drawRows = window?.rows ?: rows.indices
+        val drawColumns = window?.columns ?: (0 until count)
         paint.color = android.graphics.Color.argb(
             (ink.alpha * 255f).toInt(),
             (ink.red * 255f).toInt(),
@@ -117,9 +134,10 @@ internal class BoardGlyphPainter(private val typeface: Typeface) {
         paint.textSize = fitFontSize(width, height)
         scope.drawIntoCanvas { bridge ->
             val canvas = bridge.nativeCanvas
-            rows.forEachIndexed { row, letters ->
-                letters.forEachIndexed { col, letter ->
-                    val glyph = letter.toString()
+            for (row in drawRows) {
+                val letters = rows[row]
+                for (col in drawColumns) {
+                    val glyph = letters[col].toString()
                     paint.getTextBounds(glyph, 0, glyph.length, bounds)
                     val x = (col + 0.5f) * width -
                         (bounds.left + bounds.right) / 2f
@@ -130,6 +148,7 @@ internal class BoardGlyphPainter(private val typeface: Typeface) {
             }
         }
     }
+
 }
 
 @Composable
