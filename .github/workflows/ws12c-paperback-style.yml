@@ -1,0 +1,70 @@
+name: WS-12C Reproducible Quiet Paperback Style QA
+
+# Art proof only. No approved images, Android resource integrations, or source generator changes.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws12c-reproducible-paperback-art-system-2026-11-08
+    paths:
+      - 'design/asset-pipeline/paperback-v1-tokens.json'
+      - 'tools/asset_pipeline/render_paperback.py'
+      - 'tools/asset_pipeline/test_paperback.py'
+      - '.github/workflows/ws12c-paperback-style.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws12c-paperback-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  style-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify all old WS-12 asset/rights guards + new deterministic template tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_*.py' -v
+          python3 tools/asset_pipeline/validate.py --repo-root .
+      - name: Generate book backgrounds, theme emblems and readable native-text HTML preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/asset_pipeline/render_paperback.py \
+            --tokens design/asset-pipeline/paperback-v1-tokens.json \
+            --output-dir "$RUNNER_TEMP/ws12c-quiet-paperbacks" \
+            | tee /tmp/ws12c-render-report.json
+          python3 - <<'PY'
+          import json, os, pathlib, xml.etree.ElementTree as ET
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'ws12c-quiet-paperbacks'
+          j=json.loads((out/'render_sha256.json').read_text())
+          assert j['theme_count']==3
+          assert len(j['files'])==7
+          assert j['baked_text_images']==0
+          assert not j['production_app_assets_modified']
+          assert not j['adobe_refined']
+          for p in list((out/'books').glob('*.svg'))+list((out/'emblems').glob('*.svg')):
+              ET.parse(p)
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+              f.write('### WS-12C quiet illustrated paperback / vector-native proof\n')
+              f.write('- 3 deterministic 1200×1600 SVG decorative backgrounds, 3 matching vector emblems and 1 semantic HTML visual review page.\n')
+              f.write('- Same exact Compose-theme cream/paper/forest/ink/gold palette; title and progress stay real editable UI, not AI text.\n')
+              f.write('- New themes reuse the same template and motif library. 0 approved, 0 Adobe-refined and 0 Android assets.\n')
+              f.write('- SVG SHA-256 receipts included. Prototype only; please review actual phone-size appearance before acceptance.\n')
+          print('PASS: 3 books + 3 matching emblem proofs, no baked UI words or Android integration.')
+          PY
+      - name: Publish independent owner-reviewable style proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: WS12C-QUIET-PAPERBACK-3-BOOK-VECTOR-STYLE-PROOF
+          path: ${{ runner.temp }}/ws12c-quiet-paperbacks/
+          if-no-files-found: error
+          retention-days: 14
