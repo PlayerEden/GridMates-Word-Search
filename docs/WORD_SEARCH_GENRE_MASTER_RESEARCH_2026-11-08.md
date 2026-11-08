@@ -1,3 +1,5 @@
+**Long-term library decision — November 8, 2026:** Aim for **10,000+ unique, approved words across 30+ themed categories** rather than keeping the permanent design at 210–250 words per theme. That smaller number remains a useful *interim content-quality goal*. See [WS-10 content roadmap #87](https://github.com/PlayerEden/GridMates-Word-Search/issues/87) and [draft foundation PR #86](https://github.com/PlayerEden/GridMates-Word-Search/pull/86). **No 10K bulk import or approval has occurred.**
+
 # Word Search — Master Genre Research & Design Reference
 
 **Maintained for:** GridMates: Word Search  
