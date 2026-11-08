@@ -48,6 +48,29 @@
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
 
+## November 8, 2026 — Active WS-10 Vocabulary Scale Program
+
+**Owner direction:** Build an offline-friendly word-search library with **10,000+ unique, human-approved, playable English answers** across **30+ coherent themes**, rather than treating the current few-hundred-word packs as the permanent ceiling. [Tracking issue #87](https://github.com/PlayerEden/GridMates-Word-Search/issues/87) · [initial 33-topic schema draft PR #86](https://github.com/PlayerEden/GridMates-Word-Search/pull/86) · [detailed WS-10 program](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws10-thousands-word-lexicon-foundation-2026-11-08/docs/WS10_TEN_THOUSAND_WORD_LEXICON_ROADMAP_2026-11-08.md).
+
+**Progress categories must remain separate:** raw words in an external source → rights-cleared quarantined *candidates* → thematically classified *review batches* → editorially *approved* unique words → **eligible** for a published, versioned game pack. A term mapped to three categories counts as **one** unique word. A licensed source does not mean each entry is appropriate for family-friendly Relaxed puzzles.
+
+| ID / dependency | Phase and player benefit | State / what is genuinely verified | Acceptance before moving on |
+| --- | --- | --- | --- |
+| **WS-10A** | Canonical IDs, source rights ledger, 33-topic/subtopic registry, draft CSV and strict QA | **AUTOMATED GREEN; NOT IN APP:** [PR #86](https://github.com/PlayerEden/GridMates-Word-Search/pull/86), [8/8 tests, source SHA-pinned #42517594304](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42517594304). 40 illustrative candidate words / 76 tentative assignments / **0 approved**. | Thousands-row schema capacity, duplicate/label/review/rights gating demonstrated, never auto-approve |
+| **WS-10B1** | Rights-verified reproducible English source, zip/hash pinning and intake to **quarantine**, not the app | **NEXT / ACTIVE:** source research now identifies ESDB release 2026.02.25, American speller zip; rights notices and source SHA must be recorded and retained | Exact upstream URL + SHA-256 + copyright/attribution; reject any changed archive, malformed entries, unsafe ZIP and unverified source |
+| **WS-10B2** | Candidate pipeline that ingests **20K–40K potential words** and outputs honest QA/counts | **PLANNED:** no bulk word pack approved | Reproducible candidate artifact, dedupe against existing IDs, flag human-review concerns, zero automatic approvals, count by source/length/flags; no app size increase |
+| **WS-10C1** | Review system: topic matching, family-appropriate familiarity, acceptable labels and specialist holds | **PLANNED** | Human-signed review batches of 100–250, 30+ coherent themes, source provenance per candidate, audit trail and rejected/held records |
+| **WS-10C2** | Genuine vocabulary expansion milestones | **PLANNED:** **1K → 3K → 5K → 10K approved unique**. Progress to target is **0/10,000** in the new lexicon catalog today | Counts only words with reviewed metadata, rights cleared, approved topic mapping and usable generator rules; no inflated assignment count |
+| **WS-10D** | Offline approved content snapshot: fast themed puzzle generation without login | **BLOCKED until human curation & immutable version contract** | Compacted APK/AAB offline assets, stable corpus hash, new permanent content IDs, versioned deterministic seed replay, fixed older V1/V2/V3 generators/enum ordinals and schema-safe backup |
+| **WS-10E** | Every new puzzle *feels* different without random clustering | **REFERENCE QA PASSED, PRODUCTION BLOCKED:** [V4 balanced lab PR #85](https://github.com/PlayerEden/GridMates-Word-Search/pull/85), [1,800/1,800 lab quality checks](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42514815037), **not** an installed game feature | 100+ consecutive puzzles/theme: subtopic breadth, word overlap/recency, exact-path reuse, allowed directions, 10×10 actual-target coverage, real phone reading comfort |
+| **WS-10F** | Real phone release signoff for expanded themed content | **BLOCKED:** old QA v0.9.4/code48 baseline remains separate | 320dp/200% font/landscape/105-word navigation, low memory/FPS, TalkBack, actual save-preserving same-signer upgrade, two-phone acceptance, rollback and release review |
+
+**Priority order:** WS-10B1/B2 can run alongside **existing** stable Solo polish; WS-10C curation can run in parallel with separate V4 and Android UX work. Only connect approved WS-10D content after the V4 production-version/saved-game gates are ready. Existing v0.9.4 APK and all historical published/seeding behavior must be preserved.
+
+**External source research:** ESDB/SCOWL 2026.02.25 release information and copyright terms: [official releases](https://github.com/en-wl/wordlist/releases/tag/rel-2026.02.25) / [official license notice](https://github.com/en-wl/wordlist/blob/v2/Copyright). Wordfreq code/data licensing is different and must **not** be silently combined. No release estimate is implied by these tasks.
+
+---
+
 ## How to use this roadmap
 
 A milestone is done only when its acceptance evidence exists in **this** repository. A passing GitHub check is not a substitute for actual device play when gameplay/networking is involved. Use bounded branches and PRs, documented tests, and a known-green checkpoint after each major phase. Do not bulk-port Sudoku or break either app's save/release identity.
@@ -73,6 +96,8 @@ A milestone is done only when its acceptance evidence exists in **this** reposit
 | **WS-05** | Nearby Co-op | PLANNED | Open Nearby host/join, optional code, shared word claims, chat/presence, reconnect | Two actual Android phones + protocol/failure tests |
 | **WS-06** | Both Versus modes | PLANNED | Shared Board Race and Speed Duel, separate records, fair completion logic | Two-phone races, same-word collisions, near-ties and disconnect QA |
 | **WS-07** | Content and UX polish | PLANNED | More themes, hint refinements, free achievement-earned fonts and cosmetics, profile/collection polish; optional sharing and non-currency Daily milestone rewards if approved | Physical UX/accessibility/art/content quality audit |
+| **WS-09F/G** | V4 giant-board placement, spatial quality and 105-word list UX | **EXPERIMENTAL CORE/QA GREEN; NO PUBLIC V4 SOLO** | Bounded spread-scored 40×40/50×50 research, alphabetical 105-word list, content proposals | Versioned approved V4 corpus, saves, real Android input/performance, maintain V1/V2/V3 golden compatibility |
+| **WS-10A–F** | 10,000+ unique approved-word lexicon | **10A CI GREEN; 10B NEXT, 10C–F PLANNED** | Source-verified candidate intake, human editorial themed packs, offline versioned content, repeat-play freshness | 10,000 approved (not imported) with rights/labels, content goldens and phone save/UX QA |
 | **WS-08** | Beta and launch readiness | PLANNED | Production signing/build, privacy/store preparation, Play testing; advertising and purchases deferred pending a new owner decision | Play test eligibility, AAB, real-device signoff, policy disclosures |
 
 | **ML-FUTURE** | Spanish and multilingual packs, UI localization, Unicode-safe engine | **RESEARCHED / DEFERRED** | Legacy-safe puzzle v2, reviewed Spanish vocab, independent UI/puzzle language, locale-aware Daily & LAN | Unicode, pack/license, real Android, save and two-phone tests |
