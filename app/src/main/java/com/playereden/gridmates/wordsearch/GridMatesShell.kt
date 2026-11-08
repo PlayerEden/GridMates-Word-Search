@@ -55,7 +55,7 @@ import com.playereden.gridmates.wordsearch.core.WordSearchRules
 private enum class Page(val label: String) {
     PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
     SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle"),
-    MY_PUZZLES("My Puzzles")
+    MY_PUZZLES("My Puzzles"), SOLO_SETUP("New Puzzle")
 }
 
 @Composable
@@ -118,6 +118,12 @@ private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
 @Composable
 internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel) {
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
+    var soloSetupReturnPage by rememberSaveable { mutableStateOf(Page.PLAY.name) }
+    fun openSoloSetup(origin: Page) {
+        if (origin == Page.PUZZLE) soloStore.flush()
+        soloSetupReturnPage = origin.name
+        pageName = Page.SOLO_SETUP.name
+    }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
     val compactNavigation = LocalConfiguration.current.screenWidthDp < 360 ||
         LocalDensity.current.fontScale >= 1.5f
@@ -130,14 +136,18 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
     // confirmation dialog and remains handled by NearbyCoopScreen.
     BackHandler(enabled = page != Page.PLAY && page != Page.NEARBY) {
         if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) soloStore.flush()
-        pageName = if (page == Page.DAILY_PUZZLE) Page.DAILY.name
-            else Page.PLAY.name
+        pageName = when (page) {
+            Page.DAILY_PUZZLE -> Page.DAILY.name
+            Page.SOLO_SETUP -> soloSetupReturnPage
+            else -> Page.PLAY.name
+        }
     }
 
     Scaffold(
         containerColor = Cream,
         bottomBar = {
-            if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE && page != Page.NEARBY) NavigationBar(containerColor = Paper) {
+            if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE &&
+                page != Page.NEARBY && page != Page.SOLO_SETUP) NavigationBar(containerColor = Paper) {
                 Page.entries.filter {
                     it == Page.PLAY || it == Page.RECORDS ||
                         it == Page.COLLECTION || it == Page.SETTINGS
@@ -180,7 +190,9 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
                         pageName = if (page == Page.DAILY_PUZZLE)
                             Page.DAILY.name else Page.PLAY.name
                     },
-                    onRecords = { pageName = Page.RECORDS.name }
+                    onRecords = { pageName = Page.RECORDS.name },
+                    onNewPuzzle = if (page == Page.DAILY_PUZZLE) null
+                        else { { openSoloSetup(Page.PUZZLE) } }
                 )
             }
         } else Column(
@@ -196,20 +208,19 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
                     onHelp = { pageName = Page.HELP.name },
                     onSolo = { pageName = Page.PUZZLE.name },
                     onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
-                    onNewSolo = {
-                        if (soloStore.newPuzzle()) pageName = Page.PUZZLE.name
-                    },
+                    onNewSolo = { openSoloSetup(Page.PLAY) },
                     onDaily = { pageName = Page.DAILY.name },
                     onNearby = { pageName = Page.NEARBY.name })
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
                     onBack = { pageName = Page.PLAY.name },
-                    onNewSolo = {
-                        if (soloStore.newPuzzle()) pageName = Page.PUZZLE.name
-                    },
+                    onNewSolo = { openSoloSetup(Page.MY_PUZZLES) },
                     onResume = { id ->
                         if (soloStore.profile.active.puzzleId == id ||
                             soloStore.resumeSolo(id)) pageName = Page.PUZZLE.name
                     })
+                Page.SOLO_SETUP -> SoloSetupScreen(soloStore,
+                    onBack = { pageName = soloSetupReturnPage },
+                    onStarted = { pageName = Page.PUZZLE.name })
                 Page.PUZZLE, Page.DAILY_PUZZLE, Page.NEARBY -> Unit
                 Page.DAILY -> DailyLandingScreen(soloStore,
                     onPlay = { date ->
@@ -273,7 +284,14 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("01 · Your current puzzle")
+        Row(Modifier.fillMaxWidth(),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            PaperEyebrow("01 · Solo")
+            if (!finished) TextButton(onClick = onNewSolo) {
+                Text("New puzzle")
+            }
+        }
         Text(if (finished) "Ready for another?" else "Pick up where you left off",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold, color = Forest, maxLines = 2)
