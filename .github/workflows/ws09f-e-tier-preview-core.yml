@@ -57,3 +57,22 @@ jobs:
             echo 'Proposed vocabulary and Space additions exist under core TEST resources only.'
             echo 'No public 40/50 Solo, saved V4 IDs, signed APK or editorial approval.'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Print exact failing JUnit case from XML, if any
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import pathlib, xml.etree.ElementTree as ET
+          for path in pathlib.Path('core/build/test-results/test').glob('TEST-*.xml'):
+              try:
+                  root = ET.parse(path).getroot()
+              except Exception as exc:
+                  print('Could not parse', path, exc)
+                  continue
+              for case in root.findall('.//testcase'):
+                  for fail in list(case.findall('failure')) + list(case.findall('error')):
+                      print('EXACT FAILED TEST', case.get('classname'), case.get('name'))
+                      print('ASSERTION DETAIL', fail.get('message'))
+                      print((fail.text or '')[:1500])
+          PY
