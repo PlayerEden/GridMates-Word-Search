@@ -1,0 +1,73 @@
+name: WS-09F-C3 Kotlin Giant Board Seed Stress
+
+# Independent experimental engine. No Gradle, Android, build/sign or shipping content.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09f-c3-giant-generator-stress-2026-11-08
+    paths:
+      - 'labs/ws09f_c_kotlin/**'
+      - 'design/marathon/v4_editorial_triage_proposal.json'
+      - 'tools/ws09f_c_editorial_supply_report.py'
+      - 'tools/ws09f_c_kotlin_fixture_audit.py'
+      - '.github/workflows/ws09f-c3-kotlin-stress.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws09f-c3-stress-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stress-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify test-only vocabulary against frozen V3 + unapproved V4 draft
+        run: python3 tools/ws09f_c_kotlin_fixture_audit.py
+      - name: Audit proposed gentle-mode word eligibility and editorial review queue
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/ws09f_c_editorial_supply_report.py | tee /tmp/ws09fc-editorial.txt
+          {
+            echo '### Editorial supply proposal (NOT approved content)'
+            echo '```'
+            cat /tmp/ws09fc-editorial.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Require a preinstalled JDK Kotlin compiler (never download Gradle)
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v kotlinc
+          kotlinc -version
+          java -version
+      - name: Compile and verify 18 pinned golden grids and 180 replay cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          kotlinc labs/ws09f_c_kotlin/V4EngineLab.kt labs/ws09f_c_kotlin/Smoke.kt \
+            -include-runtime -d "$RUNNER_TEMP/ws09fc-smoke.jar"
+          timeout 120s java -Xmx256m -jar "$RUNNER_TEMP/ws09fc-smoke.jar" \
+            labs/ws09f_c_kotlin/candidates_test_only.txt
+      - name: Compile stress suite and inspect 1,800 candidate boards
+        shell: bash
+        run: |
+          set -euo pipefail
+          kotlinc labs/ws09f_c_kotlin/V4EngineLab.kt labs/ws09f_c_kotlin/Stress.kt \
+            -include-runtime -d "$RUNNER_TEMP/ws09fc-stress.jar"
+          timeout 240s java -Xmx256m -jar "$RUNNER_TEMP/ws09fc-stress.jar" \
+            labs/ws09f_c_kotlin/candidates_test_only.txt | tee /tmp/ws09fc-stress.txt
+          {
+            echo '### V4 Kotlin research stress (not Android)'
+            echo '18 pinned cross-commit laboratory goldens and 180 replay cases pass first.'
+            echo 'The stress gate requires 1,800/1,800 deterministic boards and valid paths.'
+            echo 'All timing/memory figures are JVM runner-only, NOT Android FPS/allocations.'
+            echo '```'
+            cat /tmp/ws09fc-stress.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
