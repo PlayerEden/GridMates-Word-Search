@@ -51,6 +51,7 @@ class BookPageSessionStoreAndroidTest {
         val page = "woodland-page-one"
         try {
             val solo = SoloStore(context, soloName)
+            solo.flush() // commit a stable existing profile before reopening it
             val oldProfile = solo.profile
             val store = BookPageSessionStore(context, catalog, name)
             assertTrue(store.open(book, page))
