@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BoardViewportTransform
+import com.playereden.gridmates.wordsearch.core.LargeBoardViewport
 import com.playereden.gridmates.wordsearch.core.PaperbackPageLayout
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.DragDirection
@@ -632,13 +633,22 @@ internal fun ZoomableWordGrid(
     // the toolbar. A requested 320dp square previously got squeezed to a shorter
     // rectangle on compact surfaces, disagreeing with letter and swipe geometry.
     var preciseOpen by remember(puzzle.id) { mutableStateOf(false) }
+    val largeBoard = puzzle.size >= 25
     BoxWithConstraints(Modifier.width(viewport)) {
+        // Large boards get one extra map/position line below the toolbar.
+        val toolbarSpace = if (largeBoard) 94.dp else 56.dp
         val side = if (maxHeight == Dp.Infinity) viewport
-            else minOf(viewport, (maxHeight - 56.dp).coerceAtLeast(96.dp))
+            else minOf(viewport, (maxHeight - toolbarSpace).coerceAtLeast(96.dp))
         val sidePx = with(LocalDensity.current) { side.toPx() }
+        // Keep the original 2.5x transform untouched for legacy boards.
         var transform by remember(puzzle.id, sidePx) {
             mutableStateOf(BoardViewportTransform(1f))
         }
+        var largeTransform by remember(puzzle.id, sidePx) {
+            mutableStateOf(LargeBoardViewport())
+        }
+        var regionOpen by remember(puzzle.id) { mutableStateOf(false) }
+        val currentZoom = if (largeBoard) largeTransform.zoom else transform.zoom
         var multiTouch by remember(puzzle.id) { mutableStateOf(false) }
 
         Column(Modifier.width(viewport),
@@ -657,22 +667,53 @@ internal fun ZoomableWordGrid(
                     }
                 ) { Text("Select", maxLines = 1) }
                 IconButton(onClick = {
-                    transform = transform.zoomed(transform.zoom - 0.25f, sidePx)
-                }, enabled = transform.zoom > 1f,
+                    if (largeBoard) {
+                        largeTransform = largeTransform.zoomed(
+                            largeTransform.zoom - 0.75f, sidePx)
+                    } else {
+                        transform = transform.zoomed(transform.zoom - 0.25f, sidePx)
+                    }
+                }, enabled = currentZoom > 1f,
                     modifier = Modifier.size(48.dp).semantics {
                         contentDescription = "Zoom out"
                     }) { Text("−", style = MaterialTheme.typography.titleMedium) }
                 IconButton(onClick = {
-                    transform = BoardViewportTransform(1f)
+                    if (largeBoard) largeTransform = LargeBoardViewport()
+                    else transform = BoardViewportTransform(1f)
                 }, modifier = Modifier.size(48.dp).semantics {
                     contentDescription = "Fit entire puzzle board"
                 }) { Text("Fit") }
                 IconButton(onClick = {
-                    transform = transform.zoomed(transform.zoom + 0.25f, sidePx)
-                }, enabled = transform.zoom < 2.5f,
+                    if (largeBoard) {
+                        largeTransform = largeTransform.zoomed(
+                            largeTransform.zoom + 0.75f, sidePx)
+                    } else {
+                        transform = transform.zoomed(transform.zoom + 0.25f, sidePx)
+                    }
+                }, enabled = currentZoom <
+                    (if (largeBoard) LargeBoardViewport.MAX_ZOOM else 2.5f),
                     modifier = Modifier.size(48.dp).semantics {
                         contentDescription = "Zoom in"
                     }) { Text("+", style = MaterialTheme.typography.titleMedium) }
+            }
+            if (largeBoard) {
+                // The map is a navigation aid, not a partition of the puzzle.
+                // Moving via the map does not touch any found-word state.
+                val rows = largeTransform.visibleRows(sidePx, puzzle.size)
+                val cols = largeTransform.visibleColumns(sidePx, puzzle.size)
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text("Rows ${rows.first+1}–${rows.last+1} · " +
+                        "Cols ${cols.first+1}–${cols.last+1} · " +
+                        "${String.format(java.util.Locale.US, "%.1f", largeTransform.zoom)}×",
+                        color = Muted, style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1, modifier = Modifier.weight(1f))
+                    TextButton(onClick = { regionOpen = true },
+                        modifier = Modifier.semantics {
+                            contentDescription = "Open board region map"
+                        }) { Text("Map") }
+                }
             }
             Box(Modifier.size(side).align(Alignment.CenterHorizontally)
                 .clipToBounds()
@@ -688,10 +729,17 @@ internal fun ZoomableWordGrid(
                                 val pan = event.calculatePan()
                                 val center = event.calculateCentroid(useCurrent = false)
                                 if (center != Offset.Unspecified) {
-                                    transform = transform.zoomedAt(
-                                        transform.zoom * scale, sidePx,
-                                        center.x, center.y
-                                    ).panned(pan.x, pan.y, sidePx)
+                                    if (largeBoard) {
+                                        largeTransform = largeTransform.zoomedAt(
+                                            largeTransform.zoom * scale, sidePx,
+                                            center.x, center.y
+                                        ).panned(pan.x, pan.y, sidePx)
+                                    } else {
+                                        transform = transform.zoomedAt(
+                                            transform.zoom * scale, sidePx,
+                                            center.x, center.y
+                                        ).panned(pan.x, pan.y, sidePx)
+                                    }
                                 }
                                 event.changes.forEach { it.consume() }
                             } else if (sawMulti) {
@@ -705,11 +753,11 @@ internal fun ZoomableWordGrid(
                 WordGrid(
                     puzzle, found, hintPaths,
                     modifier = Modifier.size(side).graphicsLayer {
-                        scaleX = transform.zoom
-                        scaleY = transform.zoom
+                        scaleX = currentZoom
+                        scaleY = currentZoom
                         transformOrigin = TransformOrigin(0f, 0f)
-                        translationX = transform.panX
-                        translationY = transform.panY
+                        translationX = if (largeBoard) largeTransform.panX else transform.panX
+                        translationY = if (largeBoard) largeTransform.panY else transform.panY
                     },
                     onSelect = onSelect, onStep = onStep,
                     boardFontId = boardFontId,
@@ -719,6 +767,17 @@ internal fun ZoomableWordGrid(
                     onPreciseRequest = { preciseOpen = true }
                 )
             }
+        }
+        if (largeBoard && regionOpen) {
+            LargeBoardRegionDialog(
+                cells = puzzle.size, viewport = largeTransform, sidePx = sidePx,
+                onJumpToRegion = { rowRegion, colRegion ->
+                    largeTransform = largeTransform.jumpToRegion(
+                        rowRegion, colRegion, puzzle.size, sidePx)
+                    regionOpen = false
+                },
+                onDismiss = { regionOpen = false }
+            )
         }
     }
     if (preciseOpen) {
