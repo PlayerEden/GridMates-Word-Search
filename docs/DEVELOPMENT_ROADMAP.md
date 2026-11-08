@@ -75,6 +75,18 @@
 
 ---
 
+## WS-11 — Puzzle Bookshelf / themed book collections (recovered feature)
+
+**Status: PLANNED / DESIGN TRACKED — no playable book UI or book-specific save yet.** Originally scoped under [large word-library issue #18](https://github.com/PlayerEden/GridMates-Word-Search/issues/18) as curated **puzzle books with fixed chapter seeds alongside procedural Free Play**. It was not canceled, but became obscured by the 10,000+ lexicon intake and cosmetic Collection work. Its player-facing milestone is now [WS-11 Bookshelf issue #90](https://github.com/PlayerEden/GridMates-Word-Search/issues/90).
+
+**Experience boundaries:** A bookshelf of themed volumes with readable covers and chapter/page previews, per-book progress, bookmarks and a one-tap **Continue Reading**; Free Play remains endless and Daily remains date-driven. Keep avatars/fonts/cosmetics distinct from actual puzzle *books*. Prototype names such as Woodland Vol. I / Space Vol. I / Garden Vol. I are suggestions pending design approval, not implemented content.
+
+**Implementation stages:** **WS-11A** book navigation and accessible UX → **11B** immutable book/chapter manifest and storage safety unit tests → **11C** curated, approved 3-theme pilot books with fixed seeds/word manifest → **11D** Android browse/play/continue/completion integration → **11E** real-device, seed-version replay, resume/backup/upgrade and consecutive-page novelty QA. Visual and metadata work can progress before full word approvals; real books depend on **WS-10C/D** reviewed themed corpus, permanent content IDs and publisher-approved book artwork. **Never store experimental `wordsearch:v4:PREVIEW` or `BALANCED-PREVIEW` IDs.** Do not change old V1/V2/V3 seed replay, Daily or schema5 saves.
+
+**Acceptance:** A family tester can browse offline books, open any eligible chapter, find words, quit, resume from their bookmark, complete a book, close/reopen/update the app without progress loss, and still use Free Play/Daily. Confirm on actual narrow Android phones; do not call a cosmetic collection tab a completed book library.
+
+---
+
 ## How to use this roadmap
 
 A milestone is done only when its acceptance evidence exists in **this** repository. A passing GitHub check is not a substitute for actual device play when gameplay/networking is involved. Use bounded branches and PRs, documented tests, and a known-green checkpoint after each major phase. Do not bulk-port Sudoku or break either app's save/release identity.
@@ -102,6 +114,7 @@ A milestone is done only when its acceptance evidence exists in **this** reposit
 | **WS-07** | Content and UX polish | PLANNED | More themes, hint refinements, free achievement-earned fonts and cosmetics, profile/collection polish; optional sharing and non-currency Daily milestone rewards if approved | Physical UX/accessibility/art/content quality audit |
 | **WS-09F/G** | V4 giant-board placement, spatial quality and 105-word list UX | **EXPERIMENTAL CORE/QA GREEN; NO PUBLIC V4 SOLO** | Bounded spread-scored 40×40/50×50 research, alphabetical 105-word list, content proposals | Versioned approved V4 corpus, saves, real Android input/performance, maintain V1/V2/V3 golden compatibility |
 | **WS-10A–F** | 10,000+ unique approved-word lexicon | **10A CI GREEN; 10B NEXT, 10C–F PLANNED** | Source-verified candidate intake, human editorial themed packs, offline versioned content, repeat-play freshness | 10,000 approved (not imported) with rights/labels, content goldens and phone save/UX QA |
+| **WS-11A–E** | Puzzle Bookshelf — curated themed books, fixed chapters and bookmarks | **PLANNED; issue #90** | Browse paper-book-style volumes, replayable chapter manifest, local progress and Continue Reading; separate from Free Play/Daily/cosmetics | Approved versioned content, fixed-seed golden snapshots, save/backup/upgrade tests and real-phone accessibility |
 | **WS-08** | Beta and launch readiness | PLANNED | Production signing/build, privacy/store preparation, Play testing; advertising and purchases deferred pending a new owner decision | Play test eligibility, AAB, real-device signoff, policy disclosures |
 
 | **ML-FUTURE** | Spanish and multilingual packs, UI localization, Unicode-safe engine | **RESEARCHED / DEFERRED** | Legacy-safe puzzle v2, reviewed Spanish vocab, independent UI/puzzle language, locale-aware Daily & LAN | Unicode, pack/license, real Android, save and two-phone tests |
