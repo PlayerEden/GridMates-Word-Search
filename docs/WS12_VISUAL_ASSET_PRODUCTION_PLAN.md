@@ -1,6 +1,6 @@
 # WS-12 — Visual Production Pipeline: AI Concepts, Adobe Refinement, Frozen Game Assets
 
-**Planning status:** Documented in [WS-12 #91](https://github.com/PlayerEden/GridMates-Word-Search/issues/91). No artwork generated, reviewed or installed in the current APK as a result of this plan.
+**Current status (Nov 8, 2026):** [WS-12 issue #91](https://github.com/PlayerEden/GridMates-Word-Search/issues/91) · [first concept and guard PR #92](https://github.com/PlayerEden/GridMates-Word-Search/pull/92) · [8/8 source-hash/approval unit tests green](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42521766235). **Two actual generated concept style boards, three cropped book-cover concepts and three miniature phone previews now exist in a conversation ZIP**; only the SHA-256 hashes and review statuses are in GitHub. **No owner approval, Adobe editing, fully source-controlled image assets or Android integration has occurred.** Adobe connector initialization returned an internal error; retry the Adobe refinement later.
 
 ## Art direction
 
@@ -62,4 +62,4 @@ Full playable **WS-11** chapters still depend on **WS-10's editorial-approved, i
 
 The connected Adobe toolset includes Adobe Express editing/export, image cropping/adjustments and image-to-vector workflows, plus Adobe Fonts research. **Each operation needs the appropriate file or supported URL, connection permissions and source assets**, and tools may change. Do not claim a project is already in Adobe or that Adobe has approved any use merely because tools exist. Third-party stock assets, fonts, photography and generated content each require their own rights and distribution assessment.
 
-**Status remains planned** until real files, manifests, reviews and on-device QA exist.
+**Status:** Initial generated visuals and CI-reviewed metadata exist, but full production approval and Android integration remain planned. First actual reviewable concept specification: [WS-12A pilot art bible (draft branch)](https://github.com/PlayerEden/GridMates-Word-Search/blob/feature/ws12a-b-pilot-cover-concepts-and-review-qa-2026-11-08/docs/WS12A_PILOT_BOOK_ART_BIBLE_2026-11-08.md). **Do not call these Adobe-refined or app-ready assets.**
