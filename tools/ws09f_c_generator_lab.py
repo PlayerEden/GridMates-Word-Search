@@ -190,7 +190,14 @@ def try_generate(pool: list[str], size: int, target: int, mode: str,
     for word in words:
         if count_occurrences(grid, word) != 1:
             return None, f"nonunique-occurrence-{word}"
-    return LabPuzzle(grid, words, paths, 1, coverage), "ok"
+    proposal = LabPuzzle(grid, words, paths, 1, coverage)
+    # A fully filled board is not necessarily an interesting exploration
+    # board. Filler-only Map sections strand the player in empty territory.
+    # Reject rather than shipping that layout; the caller has a strict,
+    # deterministic MAX_ATTEMPTS budget, no infinite placement retries.
+    if not all(proposal.active_cells_per_region()):
+        return None, "filler-only-map-region"
+    return proposal, "ok"
 
 
 def generate(theme: str, size: int, mode: str, seed: int,
