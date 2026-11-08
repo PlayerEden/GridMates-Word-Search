@@ -178,9 +178,10 @@ p.intro{font-size:14px;line-height:1.6;color:#55665C;max-width:62ch}
 .series span{display:block;font-size:clamp(5px,.9vw,11px);letter-spacing:.12em;font-weight:700}
 .book h2{position:absolute;left:15%;right:7%;top:77%;text-align:center;
  margin:0;font-family:Georgia,serif;font-size:clamp(12px,2.1vw,30px);color:var(--forest)}
-.volume{position:absolute;left:15%;right:7%;bottom:5%;text-align:center;
+.volume{position:absolute;left:15%;right:7%;bottom:12%;text-align:center;
  margin:0;font-size:clamp(7px,1.1vw,14px);letter-spacing:.09em;color:var(--gold);font-weight:700}
-@media(max-width:420px){main{padding:12px}.shelf{gap:6px}.book h2{font-size:clamp(10px,3vw,13px)}}
+@media(max-width:740px){.shelf{grid-template-columns:repeat(2,minmax(0,1fr))}.series div{font-size:clamp(17px,3.2vw,25px)}.book h2{font-size:clamp(18px,3.1vw,26px)}.series span{font-size:10px}.volume{font-size:12px}}
+@media(max-width:420px){main{padding:12px}.shelf{grid-template-columns:1fr;max-width:270px;margin-inline:auto;gap:16px}.series div{font-size:24px}.book h2{font-size:25px}.series span{font-size:10px}.volume{font-size:12px}}
 .note{border-top:1px solid #DFE0D6;padding-top:16px;font-size:13px;color:#55665C}
 </style>
 <main><h1>GridMates — Quiet Paperbacks v1</h1>
