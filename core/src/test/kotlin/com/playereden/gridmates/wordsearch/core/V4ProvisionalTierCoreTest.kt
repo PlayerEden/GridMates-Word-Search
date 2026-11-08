@@ -63,8 +63,16 @@ class V4ProvisionalTierCoreTest {
                     assertEquals(expected, selected.advancedCount)
                     assertEquals(expected, selected.words.count { it in advanced })
                     assertEquals(if (side == 40) 70 else 105, selected.words.size)
-                    val p = V4PreviewTierSelection.previewPuzzle(
-                        theme, side, mode, seed, gentle, advanced)
+                    val p = try {
+                        V4PreviewTierSelection.previewPuzzle(
+                            theme, side, mode, seed, gentle, advanced)
+                    } catch (e: IllegalStateException) {
+                        throw AssertionError(
+                            "BOUNDED PLACEMENT FAILURE theme=" + theme.name +
+                                " side=" + side + " mode=" + mode.name + " seed=" + seed +
+                                " trial_pool=" + selected.words.size +
+                                " advanced_count=" + selected.advancedCount, e)
+                    }
                     assertTrue(p.id.startsWith("wordsearch:v4:PREVIEW:en:"))
                     assertEquals(selected.words.toSet(), p.targets.map { it.word }.toSet())
                     assertEquals(side, p.size)
