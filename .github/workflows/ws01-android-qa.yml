@@ -17,6 +17,13 @@ on:
 permissions:
   contents: read
 
+# Avoid burning GitHub Actions minutes building superseded PR commits.
+# Separate pull requests retain independent workflows, and manual
+# workflow_dispatch runs use their own ref-specific group.
+concurrency:
+  group: wordsearch-standard-android-qa-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   android-qa:
     runs-on: ubuntu-latest
