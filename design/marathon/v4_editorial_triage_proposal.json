@@ -1,0 +1,210 @@
+{
+  "status": "UNAPPROVED_EDITORIAL_TRIAGE_PROPOSAL",
+  "generation_impact": "NONE; this file MUST NOT be loaded by V4EngineLab or by the Android app",
+  "description": "Proposal for a paperback-friendly vocabulary. It is not a dictionary, expert review, final familiarity tier, or accepted replacement for the lab goldens. Preserve word IDs, generator source and all historical saves.",
+  "provisional_relaxed_size50_target": 105,
+  "planning_goal_familiar_pool_minimum": 125,
+  "themes": {
+    "WOODLAND": {
+      "editor_note": "Review compound styling, word familiarity and geographic suitability. Many advanced suggestions are legitimate but too specialized for a gentle Relaxed puzzle.",
+      "provisional_advanced_only": [
+        "RINGTAIL",
+        "CANID",
+        "FELINE",
+        "MAMMAL",
+        "RODENT",
+        "CROSSBILL",
+        "HARRIER",
+        "WOODCOCK",
+        "GOSHAWK",
+        "PEREGRINE",
+        "TANAGER",
+        "GRACKLE",
+        "KILLDEER",
+        "JACKDAW",
+        "ROOTLET",
+        "TREELINE",
+        "PINEGROVE",
+        "SHRUBBERY",
+        "FERNERY",
+        "RIDGELINE",
+        "FOOTHILLS",
+        "WETLANDS",
+        "MARSHLAND",
+        "FILBERT",
+        "TAMARACK",
+        "BASSWOOD",
+        "SASSAFRAS",
+        "ECOTONE",
+        "RIPARIAN",
+        "BIODIVERSITY",
+        "BIOREGION",
+        "DECIDUOUS",
+        "CONIFEROUS",
+        "GYMNOSPERM",
+        "BRYOPHYTE",
+        "EPIPHYTE",
+        "UNDERSTORY",
+        "CARNIVORE",
+        "HERBIVORE",
+        "OMNIVORE",
+        "SYMBIOSIS",
+        "LITTERFALL",
+        "MYCORRHIZA",
+        "SAPROTROPH"
+      ],
+      "hold_for_editor_review": {
+        "BOGWOOD": "Specialized term; verify definition and fit",
+        "MUDTRACK": "Unnatural compound; consider replacing",
+        "DUSKLIGHT": "Compound/style check",
+        "FOGBOUND": "Style/usage check",
+        "TWIGGY": "Potentially awkward descriptor",
+        "BARNOWL": "Display as barn owl?",
+        "HORNEDOWL": "Display as horned owl?",
+        "BIRDNEST": "Display as bird nest?",
+        "TREEBARK": "Display as tree bark?"
+      }
+    },
+    "SPACE": {
+      "editor_note": "Keep astronomy, launch and imaginative science-fiction distinct; inspect proper names and word-spacing conventions before approving a children's/older-audience Relaxed puzzle. A provisional 125-word Relaxed planning pool is four words short after advanced/hold filters; ten possible replacement/additional concepts are listed for human review, without touching pinned generator goldens.",
+      "provisional_advanced_only": [
+        "GANYMEDE",
+        "ENCELADUS",
+        "HAUMEA",
+        "MAKEMAKE",
+        "ARIEL",
+        "MIRANDA",
+        "CHARON",
+        "HELIOSTAT",
+        "GYROSCOPE",
+        "STARTRACKER",
+        "TELEMETRY",
+        "LIDAR",
+        "TURBOPUMP",
+        "CRYOGENIC",
+        "ASTROPHYSICS",
+        "NEBULOSITY",
+        "LUMINOSITY",
+        "ECLIPTIC",
+        "OBLIQUITY",
+        "PARSEC",
+        "BARYCENTER",
+        "CIRCUMBINARY",
+        "EPHEMERIS",
+        "ASTROBIOLOGY",
+        "GRAVITON",
+        "SPECTRAL",
+        "KEPLERIAN",
+        "SIDEREAL",
+        "NUCLEUS",
+        "ACCRETION",
+        "PLASMOID",
+        "EVENTHORIZON",
+        "TERRAFORMING",
+        "HYDRAZINE",
+        "SOLENOID",
+        "GEODESIC",
+        "CHANDRA",
+        "APERTURE",
+        "AXISTILT"
+      ],
+      "hold_for_editor_review": {
+        "STAGEONE": "Often two words; rocket naming consistency",
+        "SKYWATCH": "Ambiguous noun/verb or name",
+        "WARPDRIVE": "Speculative fiction, not astronomy",
+        "LIGHTSPEED": "Presentation and meaning check",
+        "STARSHIP": "Speculative fiction theme suitability",
+        "STARPORT": "Speculative fiction theme suitability",
+        "STARFORMATION": "Normally two words",
+        "TIMESPACE": "Less usual phrasing than spacetime",
+        "SKYLINE": "Less space-themed",
+        "SKYMAP": "Compound, check audience familiarity",
+        "BROWNDWARF": "Usually two-word astronomical term"
+      },
+      "possible_friendly_additions_for_review": [
+        {
+          "answer": "FULLMOON",
+          "display": "Full moon",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "NEWMOON",
+          "display": "New moon",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "MOONPHASE",
+          "display": "Moon phase",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "MOONBEAM",
+          "display": "Moonbeam",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "STARTRAIL",
+          "display": "Star trail",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "NIGHTSKY",
+          "display": "Night sky",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "MIDNIGHT",
+          "display": "Midnight",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "CRESCENT",
+          "display": "Crescent",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "TWILIGHT",
+          "display": "Twilight",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        },
+        {
+          "answer": "SKYGLOW",
+          "display": "Skyglow",
+          "editor_status": "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        }
+      ]
+    },
+    "GARDEN": {
+      "editor_note": "Check fused two-word gardening terms and whether difficult botany or soil-science vocabulary belongs only in Expert.",
+      "provisional_advanced_only": [
+        "FOXTAIL",
+        "FERNLEAF",
+        "BLUEBONNET",
+        "BEEBALM",
+        "LEMONBALM",
+        "BUTTERNUT",
+        "HOVERFLY",
+        "LACEWING",
+        "NEMATODE",
+        "VERMICULITE",
+        "PERLITE",
+        "PROPAGATION",
+        "GRAFTING",
+        "DEADHEADING",
+        "ROTOTILLER"
+      ],
+      "hold_for_editor_review": {
+        "PLUMTREE": "Usually two words",
+        "HOSEPIPE": "Regional wording; consider garden hose",
+        "PLANTPOTS": "Usually plant pots",
+        "GROWBAG": "Regional wording/familiarity check",
+        "WORMCAST": "Check plural/standard gardening term",
+        "SEEDBANK": "Often two words",
+        "RAISEDBED": "Usually two words",
+        "SOILTEST": "Usually two words",
+        "COLDFRAME": "Usually two words",
+        "GREENBEANS": "Usually two words"
+      }
+    }
+  }
+}
