@@ -236,7 +236,7 @@ internal fun BookPageGameplayScreen(
                     color = Muted, style = MaterialTheme.typography.labelMedium
                 )
             }
-            Text(book.title + " · Page " + (
+            Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
                 catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
                 color = Forest, fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge)
