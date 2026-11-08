@@ -16,7 +16,7 @@ adb shell "run-as $PKG sh -c 'mkdir -p files'"
 
 # Target IDs were captured from an unchanged v0.8.6 generator, not invented.
 # JSON numbers for 64-bit Daily seeds MUST be decimal literals (not JS doubles).
-fixture="$(cat app/src/androidTest/assets/ws09b_legacy_partial_v086.json)"
+fixture="$(cat app/src/androidTest/assets/ws09a2_legacy_partial_v086.json)"
 printf '%s' "$fixture" | adb shell "run-as $PKG sh -c 'cat > $SAVE'"
 
 # Force actual old APK to read and flush this valid partially played profile.
