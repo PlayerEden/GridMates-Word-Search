@@ -12,7 +12,7 @@
 
 | ID | Priority/status | Outcome | Acceptance |
 | --- | --- | --- | --- |
-| **WS-09A** | **P0 — NEXT** | Freeze historical v1/v2 puzzle layouts and protect older QA APK/backup migrations, notably a family tester's unknown older app | Old partial found words, hints, elapsed time and exact grid/target placements survive upgrade + restore; incompatible signing never triggers blind uninstall |
+| **WS-09A** | **P0 — IN PROGRESS (A1 automated PASS)** | **WS-09A1** tests-only v0.8.6/code40 baseline [96/96 API35 + signed v0.8.5→v0.8.6 PASS](WS09A1_BUILD_QA_2026-11-07.md). **A2 NEXT:** hardcoded old puzzle goldens and real older partially played APK migration | Original v1/v2 layout hashes and old partially solved words/hints must survive across actual versioned generation changes, not just within one build; older family APK backup verified separately |
 | **WS-09B** | **P0 — PLANNED** | Multiple unfinished Solo games and reliable session library (schema/DB decision after audit) | Three simultaneous saves resume after process death/update/backup; no silent replacement |
 | **WS-09C** | **P1 — PLANNED** | Simple pre-game mode/theme/size/challenge selection; Home Continue vs New | Setup occurs before gameplay; recent choices retained; Daily/Nearby remain clear |
 | **WS-09D** | **P0 UX — PLANNED** | Square zero-radius grid, no clipped corner cells, responsive ~16–20dp book-style side margins and precise viewport controls | Corner words fully visible/selectable; 320dp/large text/portrait/landscape; owner visual pass |
@@ -21,7 +21,7 @@
 | **WS-09G** | **P1 — PLANNED** | Compact Portraits/Fonts/Achievements, Records, Home and Settings refinement | Better space efficiency without reducing tap targets or legibility |
 | **WS-09H** | **P0 QA — PLANNED** | Integrated historical installs and backup, responsive/performance test, owner solo APK acceptance | Evidence-backed exact-source checkpoint; old-progress preservation; no false two-phone pass |
 
-**Immediate first development slice:** WS-09A1 **compatibility fixtures and tests only**, with no v1/v2 generator modifications, no new save schema, no release signing and no changes to either installed phone. Keep small draft PRs and pin exact green source. Physical Co-op P0 remains a separate blocker.
+**First slice WS-09A1 automated PASS:** [source-matched v0.8.6/code40 test receipt](WS09A1_BUILD_QA_2026-11-07.md), 96/96 API35 and signed old→new installation, exact executable source `d528afbfa157839a94813206b57b7b312f1af3d4` and checkpoint. No code/rules/save schema change apart from QA metadata and new test cases. **Next WS-09A2:** hardcoded old-grid golden snapshots and actual previous-version partial-progress installation tests. Keep draft PRs; physical Co-op P0 remains separate.
 
 ---
 
