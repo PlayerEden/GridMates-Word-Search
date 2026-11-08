@@ -25,7 +25,7 @@ class V4ProvisionalTierCoreTest {
         val data = tiers()
         assertEquals(12, data.size)
         val counts = mapOf(WordTheme.WOODLAND to 126,
-            WordTheme.SPACE to 131, WordTheme.GARDEN to 135)
+            WordTheme.SPACE to 130, WordTheme.GARDEN to 135)
         WordTheme.entries.forEach { theme ->
             val gentle = words(data, theme, "TRIAL_RELAXED")
             val advanced = words(data, theme, "TRIAL_ADVANCED")
@@ -34,6 +34,10 @@ class V4ProvisionalTierCoreTest {
             assertEquals(counts.getValue(theme), gentle.size)
             assertTrue(gentle.size >= 125)
             assertTrue(held.none { it in gentle || it in advanced })
+            assertTrue((gentle + advanced).none { it == it.reversed() })
+            if (theme == WordTheme.SPACE) {
+                assertTrue("RADAR must be held due to reversed duplicate paths", "RADAR" in held)
+            }
             assertTrue(extra.all { it in gentle })
             assertEquals(if (theme == WordTheme.SPACE) 10 else 0, extra.size)
             assertTrue(advanced.isNotEmpty())
@@ -123,6 +127,13 @@ class V4ProvisionalTierCoreTest {
             WordTheme.GARDEN, 50, PuzzleChallenge.CLASSIC, 1L,
             common + listOf("RIVER", "RIVERBANK"), advanced)
         }.isFailure)
+        val palindromeResult = runCatching { V4PreviewTierSelection.select(
+            WordTheme.GARDEN, 50, PuzzleChallenge.RELAXED, 1L,
+            common + listOf("RADAR"), advanced)
+        }
+        assertTrue(palindromeResult.isFailure)
+        assertTrue(palindromeResult.exceptionOrNull()?.message?.contains(
+            "palindrome", ignoreCase = true) == true)
         assertEquals(listOf(8, 10, 12, 12, 15, 20, 25, 30),
             PuzzleBoardSize.entries.map { it.cells })
         assertFalse(PuzzleBoardSize.soloPresets.any { it.cells >= 40 })
