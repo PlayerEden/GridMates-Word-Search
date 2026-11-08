@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State (November 7, 2026):** Latest source-matched verified QA candidate **WS-07I v0.8.5/code39, 94/94 API35 tests PASS**, stable test-signer v0.8.4→v0.8.5 upgrade preserved Solo/Daily/identity/Race/Duel; [draft PR #63](https://github.com/PlayerEden/GridMates-Word-Search/pull/63), [full emulator evidence](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42438847935), exact verified checkpoint `b3cd0ccd6ad09c1f610bb44cea597da7df091b38`. **New WS-09 foundation expansion is staged ahead of pre-existing WS-08 beta/release gates.** Physical two-phone P0 [#53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53) remains open/deferred; no merges or publication.
+**State (November 7 ET / November 8 UTC):** Verified **WS-09A2 v0.8.7/code41** at exact executable source `2bd6b6a005d361ebc3304a5d46044b83b7b0c283` — **97/97 API35 tests PASS**, pinned nine v1/v2/Daily goldens and real same-QA-signer v0.8.6→v0.8.7 **partially solved** Solo/Daily/profile/Race/Duel saved-data upgrade. [Build QA receipt](WS09A2_BUILD_QA_2026-11-07.md), [draft PR #66](https://github.com/PlayerEden/GridMates-Word-Search/pull/66). **WS-09B multiple active saved puzzles NEXT** ahead of existing WS-08 beta/release gate; physical two-phone P0 #53 and family older APK migration still OPEN. No merges/production releases.
 
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
