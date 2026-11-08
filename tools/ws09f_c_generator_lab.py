@@ -43,6 +43,20 @@ class LabPuzzle:
         raw = "\n".join("".join(row) for row in self.grid)
         return sha256(raw.encode("ascii")).hexdigest()[:16]
 
+    def active_cells_per_region(self) -> list[int]:
+        """Number of *target-path* cells in each 10x10 Map region.
+
+        Ignore filler letters. A region with no target-path cells is an
+        empty detour in a long puzzle, even though the drawn grid is full.
+        """
+        size = len(self.grid)
+        regions = (size + 9) // 10
+        touched = [set() for _ in range(regions * regions)]
+        for path in self.paths:
+            for y, x in path:
+                touched[(y // 10) * regions + (x // 10)].add((y, x))
+        return [len(cells) for cells in touched]
+
     def crossing_words(self) -> int:
         count = 0
         for path in self.paths:
@@ -105,6 +119,13 @@ def verify_puzzle(puzzle: LabPuzzle, size: int, mode: str) -> None:
             raise ValueError(f"Stored path does not spell {word}")
         if count_occurrences(puzzle.grid, word) != 1:
             raise ValueError(f"Eight-direction occurrence is not unique: {word}")
+
+
+    regions = puzzle.active_cells_per_region()
+    if len(regions) != ((size + 9) // 10) ** 2:
+        raise ValueError("Wrong Map region geometry")
+    if not regions or min(regions) == 0:
+        raise ValueError("A 10x10 Map region has no actual target-path cells")
 
 
 def seed_rng(theme: str, size: int, mode: str, seed: int, attempt: int) -> Random:
@@ -220,6 +241,8 @@ def main() -> None:
                       f"max_attempts={max(p.attempts for p in puzzles)}, "
                       f"placement_coverage={sum(p.placement_coverage for p in puzzles)/len(puzzles):.1%}, "
                       f"crossing_words_first={first.crossing_words()}, "
+                      f"min_real_word_cells_per_map_region="
+                      f"{min(min(p.active_cells_per_region()) for p in puzzles)}, "
                       f"first_grid_sha={first.digest()}")
     elapsed = time.perf_counter() - start
     print(f"PASS: {len(checks)*len(SEEDS)} experimental grids, each has "

@@ -102,6 +102,17 @@ class V4ResearchGeneratorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate target"):
             verify_puzzle(duplicates, 40, "classic")
 
+    def test_every_map_region_contains_real_words_not_only_filler(self):
+        for theme in self.pools:
+            with self.subTest(theme=theme):
+                for size in (40, 50):
+                    puzzle = generate(theme, size, "classic", 2026, self.pools[theme])
+                    counts = puzzle.active_cells_per_region()
+                    self.assertEqual((size // 10) ** 2, len(counts))
+                    self.assertGreater(min(counts), 0)
+                    self.assertLessEqual(max(counts), size * size)
+                    self.assertGreater(puzzle.crossing_words(), 0)
+
     def test_relaxed_directions_are_only_horizontal_and_vertical_forward(self):
         self.assertEqual({(0, 1), (1, 0)}, set(DIRECTIONS["relaxed"]))
         self.assertEqual(8, len(DIRECTIONS["expert"]))
