@@ -1,4 +1,4 @@
-"word_id","topic_id","subtopic_id","tier","review_status","editor_notes""reviewed_by","reviewed_on"
+"word_id","topic_id","subtopic_id","tier","review_status","editor_notes","reviewed_by","reviewed_on"
 "gm000001","woodland","habitats","familiar","candidate","Illustrative classification; review pending.","",""
 "gm000001","nature","landscapes","familiar","candidate","Illustrative classification; review pending.","",""
 "gm000002","woodland","forest-animals","familiar","candidate","Illustrative classification; review pending.","",""
