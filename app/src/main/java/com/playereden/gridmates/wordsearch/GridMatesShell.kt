@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,7 +54,7 @@ import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
 
 private enum class Page(val label: String) {
-    PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
+    PLAY("Play"), BOOKS_QA("Books QA"), RECORDS("Records"), COLLECTION("Collection"),
     SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle"),
     MY_PUZZLES("My Puzzles"), SOLO_SETUP("New Puzzle")
 }
@@ -116,7 +117,13 @@ private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
 }
 
 @Composable
-internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel) {
+internal fun GridMatesShell(
+    soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel,
+    qaBookshelf: QaBookshelfRuntime? = null
+) {
+    val context = LocalContext.current
+    val defaultQaRuntime = remember(context) { QaBookshelfRuntime(context) }
+    val qa = qaBookshelf ?: defaultQaRuntime
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     var soloSetupReturnPage by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     fun openSoloSetup(origin: Page) {
@@ -147,7 +154,8 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
         containerColor = Cream,
         bottomBar = {
             if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE &&
-                page != Page.NEARBY && page != Page.SOLO_SETUP) NavigationBar(containerColor = Paper) {
+                page != Page.NEARBY && page != Page.SOLO_SETUP &&
+                page != Page.BOOKS_QA) NavigationBar(containerColor = Paper) {
                 Page.entries.filter {
                     it == Page.PLAY || it == Page.RECORDS ||
                         it == Page.COLLECTION || it == Page.SETTINGS
@@ -181,6 +189,23 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
                     pageName = Page.PLAY.name
                 })
             }
+        } else if (page == Page.BOOKS_QA && qa.enabled) {
+            // Local vals are stable and avoid regenerating preview books at Home.
+            val progressStore = qa.progressStore
+            val sessionStore = qa.sessionStore
+            if (progressStore != null && sessionStore != null) {
+                Box(Modifier.fillMaxSize().padding(contentPadding)) {
+                    BookLibraryFlow(
+                        catalog = qa.catalog,
+                        progressStore = progressStore,
+                        sessionStore = sessionStore,
+                        boardFontId = soloStore.effectiveBoardFontId,
+                        onExit = { pageName = Page.PLAY.name }
+                    )
+                }
+            } else {
+                Text("Test books are unavailable in this build.")
+            }
         } else if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 WordSearchScreen(
@@ -210,7 +235,10 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
                     onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
                     onNewSolo = { openSoloSetup(Page.PLAY) },
                     onDaily = { pageName = Page.DAILY.name },
-                    onNearby = { pageName = Page.NEARBY.name })
+                    onNearby = { pageName = Page.NEARBY.name },
+                    onQaBooks = if (qa.enabled) {
+                        { pageName = Page.BOOKS_QA.name }
+                    } else null)
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
                     onBack = { pageName = Page.PLAY.name },
                     onNewSolo = { openSoloSetup(Page.MY_PUZZLES) },
@@ -221,7 +249,7 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
                 Page.SOLO_SETUP -> SoloSetupScreen(soloStore,
                     onBack = { pageName = soloSetupReturnPage },
                     onStarted = { pageName = Page.PUZZLE.name })
-                Page.PUZZLE, Page.DAILY_PUZZLE, Page.NEARBY -> Unit
+                Page.PUZZLE, Page.DAILY_PUZZLE, Page.NEARBY, Page.BOOKS_QA -> Unit
                 Page.DAILY -> DailyLandingScreen(soloStore,
                     onPlay = { date ->
                         soloStore.openDaily(date)
@@ -255,7 +283,8 @@ private fun Heading(eyebrow: String, heading: String) {
 @Composable
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     onMyPuzzles: () -> Unit, onNewSolo: () -> Unit,
-    onDaily: () -> Unit, onNearby: () -> Unit) {
+    onDaily: () -> Unit, onNearby: () -> Unit,
+    onQaBooks: (() -> Unit)? = null) {
     val run = store.profile.active
     val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
     val finished = WordSearchRules.complete(puzzle, run.foundIds)
@@ -337,6 +366,22 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
                 contentDescription = "Open Nearby co-op"
             }) {
                 Text("Play Together", maxLines = 2)
+            }
+        }
+    }
+
+    if (onQaBooks != null) {
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow("04 · DEVELOPMENT PREVIEW · NOT FINAL CONTENT")
+            Text("Puzzle Books — TEST ONLY", color = Forest,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold)
+            Text("Try Woodland, Space and Garden test books. " +
+                "Your ordinary Solo and Daily games are separate.",
+                color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Button(onClick = onQaBooks,
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                Text("Test Puzzle Books")
             }
         }
     }

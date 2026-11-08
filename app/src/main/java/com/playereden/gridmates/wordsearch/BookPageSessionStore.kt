@@ -34,6 +34,12 @@ internal class BookPageSessionStore(
     private var current = BookPageSessionJournal()
 
     val journal: BookPageSessionJournal get() = current
+    private var foreground: Boolean = true
+
+    /** QA activity lifecycle: do not accumulate elapsed puzzle time while in background. */
+    fun setForeground(active: Boolean) {
+        foreground = active
+    }
     var blocked: Boolean = false
         private set
     var warning: String? = null
@@ -95,6 +101,7 @@ internal class BookPageSessionStore(
 
     fun tick(bookId: String, pageId: String, seconds: Long = 1L): Boolean {
         if (blocked) return false
+        if (!foreground) return true
         return try {
             val updated = BookPageSessionRules.tick(
                 catalog, current, bookId, pageId, seconds

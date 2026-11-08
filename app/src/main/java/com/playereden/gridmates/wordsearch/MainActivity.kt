@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 class MainActivity : ComponentActivity() {
     private val soloStore by lazy { SoloStore(applicationContext) }
     private val nearbyRooms by lazy { ViewModelProvider(this)[NearbyRoomViewModel::class.java] }
+    private val qaBookshelf by lazy { QaBookshelfRuntime(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             GridMatesTheme {
-                GridMatesShell(soloStore, nearbyRooms)
+                GridMatesShell(soloStore, nearbyRooms, qaBookshelf)
             }
         }
     }
@@ -27,12 +28,14 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         soloStore.setForeground(true)
+        qaBookshelf.setForeground(true)
     }
 
     override fun onStop() {
         // Compose's LaunchedEffect can survive the Activity moving to STOPPED.
         // Never count background time as active puzzle play.
         soloStore.setForeground(false)
+        qaBookshelf.setForeground(false)
         super.onStop()
     }
 }
