@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.PuzzleBoardSize
@@ -44,13 +45,16 @@ class PaperbackViewportAndroidTest {
         val bounds = grid.getUnclippedBoundsInRoot()
         assertTrue("left book gutter should be at least 16dp", bounds.left >= 15.dp)
         assertTrue("right book gutter should be at least 16dp", bounds.right <= 305.dp)
-        assertEquals("Grid should stay truly square", bounds.width.value,
-            bounds.height.value, 1.5f)
+        assertEquals("Grid should stay truly square",
+            (bounds.right - bounds.left).value,
+            (bounds.bottom - bounds.top).value, 1.5f)
         rule.onNodeWithContentDescription("Zoom in").performClick()
         rule.onNodeWithContentDescription("Fit entire puzzle board").performClick()
         val after = grid.getUnclippedBoundsInRoot()
-        assertEquals(bounds.width.value, after.width.value, 1.5f)
-        assertEquals(bounds.height.value, after.height.value, 1.5f)
+        assertEquals((bounds.right - bounds.left).value,
+            (after.right - after.left).value, 1.5f)
+        assertEquals((bounds.bottom - bounds.top).value,
+            (after.bottom - after.top).value, 1.5f)
         } finally {
             for (suffix in listOf("", ".bak", ".new")) {
                 java.io.File(context.filesDir, filename + suffix).delete()
@@ -76,15 +80,19 @@ class PaperbackViewportAndroidTest {
         }
         val grid = rule.onNodeWithTag("word-grid-touch-area")
         grid.assertExists()
+        // performTouchInput operates in local pixels. Convert the measured
+        // square in root dp to native Android display pixels first.
+        val bounds = grid.getUnclippedBoundsInRoot()
+        val density = androidx.test.platform.app.InstrumentationRegistry
+            .getInstrumentation().targetContext.resources.displayMetrics.density
+        val sidePx = (bounds.right - bounds.left).value * density
+        fun cellCenter(p: GridPoint): Offset = Offset(
+            (p.col + 0.5f) * sidePx / puzzle.size,
+            (p.row + 0.5f) * sidePx / puzzle.size
+        )
         grid.performTouchInput {
-            val start = word.positions.first()
-            val end = word.positions.last()
-            fun cellCenter(p: GridPoint): Offset = Offset(
-                (p.col + 0.5f) * size.width / puzzle.size,
-                (p.row + 0.5f) * size.height / puzzle.size
-            )
-            swipe(start = cellCenter(start), end = cellCenter(end),
-                durationMillis = 480)
+            swipe(start = cellCenter(word.positions.first()),
+                end = cellCenter(word.positions.last()), durationMillis = 480)
         }
         rule.waitForIdle()
         assertEquals("Swiping a real printed word should keep exact cell mapping",
