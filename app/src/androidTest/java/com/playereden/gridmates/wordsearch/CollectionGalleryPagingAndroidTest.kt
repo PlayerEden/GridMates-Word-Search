@@ -40,8 +40,11 @@ class CollectionGalleryPagingAndroidTest {
             }
             compose.onNodeWithText("Your Collection").assertIsDisplayed()
             compose.onNodeWithText("Edit display name").assertExists()
-            compose.onNodeWithTag("portraits-next").performScrollTo()
-                .assertIsEnabled().performClick()
+            compose.onNodeWithText("COLLECTION PROGRESS").assertExists()
+            // Gallery navigation must be visible on first entry, without scrolling
+            // past profile and lifetime progress cards.
+            compose.onNodeWithTag("portraits-next")
+                .assertIsDisplayed().assertIsEnabled().performClick()
             compose.onNodeWithText("Page 2 of", substring = true)
                 .performScrollTo().assertIsDisplayed()
 
