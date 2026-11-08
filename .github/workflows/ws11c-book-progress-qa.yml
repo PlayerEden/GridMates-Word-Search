@@ -1,0 +1,64 @@
+name: WS-11C Offline Book Journal and Recovery QA
+
+# This is a source-only milestone. Approved pages and UI remain gated.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws11c-offline-book-journal-persistence-2026-11-08
+    paths:
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/Book*'
+      - 'core/src/test/kotlin/com/playereden/gridmates/wordsearch/core/Book*'
+      - 'app/src/main/java/com/playereden/gridmates/wordsearch/BookLibraryStore.kt'
+      - 'app/src/androidTest/java/com/playereden/gridmates/wordsearch/BookLibraryStoreAndroidTest.kt'
+      - '.github/workflows/ws11c-book-progress-qa.yml'
+permissions:
+  contents: read
+
+concurrency:
+  group: ws11c-book-journal-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  book-journal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Run all existing core JUnit golden tests and versioned offline journal codec tests
+        run: gradle --no-daemon :core:test --console=plain
+      - name: Guard against prematurely shipping unapproved books
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          core=Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core')
+          app=Path('app/src/main/java/com/playereden/gridmates/wordsearch')
+          codec=(core/'BookProgressCodec.kt').read_text()
+          store=(app/'BookLibraryStore.kt').read_text()
+          assert 'const val VERSION = 1' in codec
+          assert 'MessageDigest.isEqual' in codec
+          assert 'BookProgressRules.validate(catalog, result)' in codec
+          assert 'AtomicFile(' in store
+          assert 'if (blocked) return false' in store
+          assert 'BookLibraryProgress' not in (core/'SoloProgress.kt').read_text()
+          assert 'BookLibraryStore' not in (app/'MainActivity.kt').read_text()
+          assert 'BookLibraryStore' not in (app/'SoloStore.kt').read_text()
+          assert not list(app.glob('*Books*Screen.kt'))
+          print('PASS: isolated books journal, intact Solo schema, no falsely playable books.')
+          PY
+      - name: Record development boundary
+        run: |
+          {
+            echo '### WS-11C source-only offline book journal'
+            echo 'Core regression + codec tests passed. Android AtomicFile integration is authored; emulator execution remains a separate QA gate.'
+            echo 'No published books, changes to schema5/old saves, visible Library, Adobe art, or new playable book APK.'
+          } >> "$GITHUB_STEP_SUMMARY"
