@@ -17,9 +17,16 @@
 - Reproduction on a machine with Kotlin: `kotlinc labs/ws09f_c_kotlin/V4EngineLab.kt labs/ws09f_c_kotlin/Smoke.kt -include-runtime -d /tmp/ws09fc.jar && java -jar /tmp/ws09fc.jar labs/ws09f_c_kotlin/candidates_test_only.txt`. Python audit: `python3 tools/ws09f_c_kotlin_fixture_audit.py`.
 - CI detects missing standalone Kotlin compiler explicitly; it must not silently treat fixture-only success as a Kotlin compile pass.
 
+## Follow-up literal goldens — PASS
+
+- **Exact source with 18 frozen grid goldens:** `2484a7b4b35c889a90f915a7aa41316a02a18806`.
+- [Real Kotlin/JVM capture run #42471203834](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42471203834) recorded one literal seed-11 grid fingerprint for **all 18** theme × size × mode combinations.
+- The fingerprints were embedded as **hardcoded expected literals** in `labs/ws09f_c_kotlin/Smoke.kt`; [independent fresh GitHub Actions run #42471276898](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42471276898) **SUCCESS**: fixture parity + new Kotlin compile + **18 cross-commit golden comparisons** and 180 generated/replayed scenarios all passed.
+- These are **laboratory golden grids only**; do not equate them to the frozen production v1/v2/v3 golden puzzle fingerprints or a shipping v4 content contract. Actual app integration remains a separate gate.
+
 ## Next gates, not yet passed
 1. Editorial review and assignment of familiar/advanced/rare word categories; accessibility and readable word lists for 105 targets. Any edit to a shipped v4 corpus later must increment its content version. Do not silently mutate a seeded published puzzle.
-2. Capture **literal cross-commit Kotlin golden checksums** for selected cases and run broader failure-seed, negative-content and performance matrices (include 100–1,000 seeds and low-end CPU/memory sampling before release acceptance). The 10-seed suite is an initial smoke, not proof all seeds succeed.
+2. **18 literal cross-commit Kotlin grid goldens are now pinned and passing.** Next: broader failure-seed, negative-content and performance matrices (100–1,000 seeds and low-end CPU/memory sampling before release acceptance). The 10-seed-per-combination suite remains an initial smoke, not proof all seeds succeed.
 3. Move a reviewed, frozen v4 content library and generator into `core` in a **new isolated integration PR** only after preserving v1/v2/v3 golden fingerprints and historical puzzle reconstruction. Preserve existing enums/ordinals and IDs.
 4. Prototype 40/50 viewport, Map crossing, selection/hit testing, zoom and readable 105-target list. Compare p50/p95 frames and memory on real Android; long-play resume and backup. No 40/50 public Solo selection before device acceptance.
 5. v0.9.4 viewport-save [PR #74](https://github.com/PlayerEden/GridMates-Word-Search/pull/74) **still lacks Android compile and old→new signer-safe upgrade proof** because external Gradle/Kotlin downloads hit HTTP504. Keep last verified Android executable **v0.9.3/code47, 111/111 Android tests** as rollback. Older family app signing/version and independently restored backup unknown. Physical two-phone Co-op #53 remains open.
