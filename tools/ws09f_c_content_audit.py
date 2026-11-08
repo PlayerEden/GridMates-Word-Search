@@ -82,7 +82,7 @@ def audit(source: str) -> dict[str, dict]:
 def git_blob_sha1(raw: bytes) -> str:
     # The exact GitHub V3 blob SHA is a source-compatibility gate, not a
     # claim that v4 is part of the v3 executable.
-    header = f"blob {len(raw)}\\0".encode("ascii")
+    header = f"blob {len(raw)}\0".encode("ascii")
     return hashlib.sha1(header + raw).hexdigest()
 
 
