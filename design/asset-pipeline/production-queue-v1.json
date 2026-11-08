@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "library": "gridmates-word-search",
+  "art_system_id": "gridmates-ws.paperback-illustrated.v1",
+  "status": "PLANNED_AND_PROTOTYPE_ONLY_NO_RELEASE_APPROVAL",
+  "approved_registry": "design/asset-pipeline/approved-assets.json",
+  "token_source": "design/asset-pipeline/paperback-v1-tokens.json",
+  "style_bible": "docs/WS12_ART_DIRECTION_STYLE_BIBLE.md",
+  "production_playbook": "docs/WS12_AI_ASSET_PRODUCTION_PLAYBOOK.md",
+  "frozen_originals_policy": "No new production imports/replaces of the 12 existing Woodland portraits; no change to portrait IDs/unlocks or historical save schemas",
+  "first_owner_review": "Woodland: cover + emblem + chapter marker + bookmark + seal as a single family on the real Bookshelf screen at 320dp",
+  "books": [
+    {
+      "theme_id": "woodland",
+      "motif": "pine-grove",
+      "priority": 1,
+      "review_status": "prototype-family-unapproved",
+      "approval_evidence": null,
+      "assets": [
+        {
+          "asset_id": "gmws-woodland-cover-v1",
+          "kind": "cover",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback.py",
+          "target_preview_dp": 140,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-woodland-spine-v1",
+          "kind": "spine",
+          "status": "planned",
+          "source_renderer": null,
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "create derived vector using same v1 motif and palette"
+        },
+        {
+          "asset_id": "gmws-woodland-theme-emblem-v1",
+          "kind": "theme-emblem",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-woodland-chapter-marker-v1",
+          "kind": "chapter-marker",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-woodland-bookmark-v1",
+          "kind": "bookmark",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-woodland-completion-seal-v1",
+          "kind": "completion-seal",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        }
+      ]
+    },
+    {
+      "theme_id": "space",
+      "motif": "orbit",
+      "priority": 2,
+      "review_status": "prototype-family-unapproved",
+      "approval_evidence": null,
+      "assets": [
+        {
+          "asset_id": "gmws-space-cover-v1",
+          "kind": "cover",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback.py",
+          "target_preview_dp": 140,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-space-spine-v1",
+          "kind": "spine",
+          "status": "planned",
+          "source_renderer": null,
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "create derived vector using same v1 motif and palette"
+        },
+        {
+          "asset_id": "gmws-space-theme-emblem-v1",
+          "kind": "theme-emblem",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-space-chapter-marker-v1",
+          "kind": "chapter-marker",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-space-bookmark-v1",
+          "kind": "bookmark",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-space-completion-seal-v1",
+          "kind": "completion-seal",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        }
+      ]
+    },
+    {
+      "theme_id": "garden",
+      "motif": "flower-stem",
+      "priority": 2,
+      "review_status": "prototype-family-unapproved",
+      "approval_evidence": null,
+      "assets": [
+        {
+          "asset_id": "gmws-garden-cover-v1",
+          "kind": "cover",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback.py",
+          "target_preview_dp": 140,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-garden-spine-v1",
+          "kind": "spine",
+          "status": "planned",
+          "source_renderer": null,
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "create derived vector using same v1 motif and palette"
+        },
+        {
+          "asset_id": "gmws-garden-theme-emblem-v1",
+          "kind": "theme-emblem",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-garden-chapter-marker-v1",
+          "kind": "chapter-marker",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-garden-bookmark-v1",
+          "kind": "bookmark",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        },
+        {
+          "asset_id": "gmws-garden-completion-seal-v1",
+          "kind": "completion-seal",
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_paperback_accents.py",
+          "target_preview_dp": 48,
+          "native_text_required": true,
+          "owner_approved": false,
+          "next_gate": "review source-reproducible preview at target size next to the other books"
+        }
+      ]
+    }
+  ],
+  "collections": [
+    {
+      "family_id": "woodland-original-portraits",
+      "intent": "frozen-existing-approved-assets",
+      "status": "preserve-originals",
+      "policy": "Protect original 12 portraits, approved-art source provenance, IDs and unlock thresholds; do not register as new generated art"
+    },
+    {
+      "family_id": "future-portrait-anchor",
+      "intent": "new additive themed portraits",
+      "status": "planned",
+      "policy": "Approve one model sheet and framing geometry against existing Woodland profile UI before rendering any new portrait"
+    },
+    {
+      "family_id": "portrait-expansion-batch-one",
+      "intent": "first small consistent portrait batch",
+      "status": "planned",
+      "policy": "Derive 3-6 subjects from approved portrait anchor; all visible together on a 48dp/96dp contact sheet"
+    },
+    {
+      "family_id": "achievement-badges",
+      "intent": "one consistent achievement/reward icon family",
+      "status": "planned",
+      "policy": "Reuse small print-style motifs, consistent outer ring; clear at 24dp/48dp"
+    },
+    {
+      "family_id": "font-collection-cards",
+      "intent": "show actual earned fonts in Collection",
+      "status": "planned",
+      "policy": "Native licensed font previews and familiar paper cards; no rendered fake glyph sprites"
+    },
+    {
+      "family_id": "book-completion-rewards",
+      "intent": "collection rewards distinct from book-page status",
+      "status": "planned",
+      "policy": "Use v1 stamp silhouette as a starting motif; don't modify existing unlock logic"
+    },
+    {
+      "family_id": "shelf-and-empty-state-accents",
+      "intent": "optional quiet UI decoration",
+      "status": "planned",
+      "policy": "Only if it improves comprehension and never steals content space from 320dp/200% text"
+    }
+  ],
+  "release_gates": [
+    "source-and-rights",
+    "owner-visual-approval",
+    "small-size-and-200pct-text",
+    "approved-registry-and-hashes",
+    "android-real-device",
+    "old-portraits-and-saves-unchanged"
+  ]
+}
