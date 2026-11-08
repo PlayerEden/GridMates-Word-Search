@@ -93,10 +93,16 @@ def main():
         print(f"{name}: preview_relaxed={len(common)} (unreviewed_extra={len(extra)}), "
               f"advanced={len(rare)}, editor_hold={len(holds)}; "
               f"105-of-{len(common)} supply possible, substring-free")
-    assert all(not name.endswith("V4PreviewTierSelection.kt") or
-               "UNAPPROVED" not in Path("core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/"
-                                      + name).read_text()
-               for name in ("V4PreviewTierSelection.kt",))
+    root = Path("core/src/main/kotlin/com/playereden/gridmates/wordsearch/core")
+    selector = (root / "V4PreviewTierSelection.kt").read_text(encoding="utf8")
+    assert "internal object V4PreviewTierSelection" in selector
+    assert "fun previewPuzzle(" in selector
+    assert not any(word in selector for word in ("FULLMOON", "BROWNDWARF", "GARDEN|", "SPACE|"))
+    solo = (root / "SoloProgress.kt").read_text(encoding="utf8")
+    assert "V4PreviewTierSelection" not in solo
+    assert "V4PreviewTierSelection" not in Path(
+        "app/src/main/java/com/playereden/gridmates/wordsearch/WordSearchScreen.kt"
+    ).read_text(encoding="utf8")
     print("PASS exact V3 + frozen experimental corpus + original triage source parity.")
     print("NO editorial approval, public V4 board, saved V4 ID, or APK is implied.")
 
