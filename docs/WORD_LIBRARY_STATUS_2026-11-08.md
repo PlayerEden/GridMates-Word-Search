@@ -1,3 +1,5 @@
+**Updated owner goal — November 8, 2026:** Grow to **10,000+ unique, human-approved, playable words across 30+ topic families**. The earlier 210–250 words/theme is a *short-term baseline*, not the ultimate library ambition. Track [WS-10 issue #87](https://github.com/PlayerEden/GridMates-Word-Search/issues/87) and [independent lexicon foundation PR #86](https://github.com/PlayerEden/GridMates-Word-Search/pull/86) (33 proposed topics; 40 draft sample words; **zero approved new words**). This does not change frozen V1–V3 packs or enable V4 in Android.
+
 # GridMates: Word Search — Word Library Inventory, Quality & Expansion Plan
 
 **Audited:** November 8, 2026  
