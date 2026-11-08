@@ -141,8 +141,8 @@ internal class SoloStore(
                 theme = WordTheme.valueOf(item.getString("theme")),
                 difficulty = WordDifficulty.valueOf(item.getString("difficulty")),
                 wordCount = item.getInt("words"),
-                elapsedSeconds = item.getLong("seconds").coerceAtLeast(0),
-                hintSteps = item.getInt("hints").coerceAtLeast(0),
+                elapsedSeconds = item.getLong("seconds"),
+                hintSteps = item.getInt("hints"),
                 completedAtMs = item.getLong("completedAt"),
                 boardSize = item.optString("board", "").takeIf { it.isNotBlank() }
                     ?.let { PuzzleBoardSize.valueOf(it) },
@@ -150,10 +150,17 @@ internal class SoloStore(
                     ?.let { PuzzleChallenge.valueOf(it) }
             )
         }
-        val valid = loaded.filter {
+        // Fail closed rather than silently shrink a player's completion history
+        // when old or imported JSON includes corrupt records. The original file
+        // remains intact, and import previews never mutate the installed profile.
+        require(loaded.all {
             it.puzzleId.isNotBlank() && it.wordCount in 1..30 &&
-                it.completedAtMs > 0 && it.hintSteps >= 0
-        }.distinctBy { it.puzzleId }
+                it.elapsedSeconds >= 0L && it.hintSteps >= 0 &&
+                it.completedAtMs > 0L
+        }) { "Malformed Solo completion record" }
+        require(loaded.map { it.puzzleId }.distinct().size == loaded.size) {
+            "Duplicate Solo completion record"
+        }
         val daily = mutableListOf<DailyProgress>()
         val dailyRaw = root.optJSONArray("daily")
         require(!root.has("daily") || dailyRaw != null) { "Malformed Daily journal" }
@@ -222,7 +229,7 @@ internal class SoloStore(
                 ).validate()
             }
         }
-        val loadedProfile = SoloProfile(clean, valid, daily, rawIdentity,
+        val loadedProfile = SoloProfile(clean, loaded, daily, rawIdentity,
             RaceJournalRules.validateImported(races),
             DuelJournalRules.validateImported(duels))
         return loadedProfile.copy(identity = WoodlandCollection.sanitize(rawIdentity, loadedProfile))
