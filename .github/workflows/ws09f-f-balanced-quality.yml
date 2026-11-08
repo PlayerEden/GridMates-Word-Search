@@ -1,0 +1,47 @@
+name: WS-09F-F2 Balanced V4 Placement A-B QA (No APK)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09f-f-spatial-and-variation-audit-2026-11-08
+    paths:
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/V4BalancedPlacement.kt'
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/V4PuzzleQuality.kt'
+      - 'labs/ws09f_f_quality/BalancedStress.kt'
+      - '.github/workflows/ws09f-f-balanced-quality.yml'
+
+permissions:
+  contents: read
+concurrency:
+  group: ws09f-f2-balanced-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-placement-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the trial dictionary safety rules
+        run: python3 tools/ws09f_e_tier_workbench_audit.py
+      - name: Build separate quality-gated V4 experimental engine and run 180 boards
+        shell: bash
+        run: |
+          set -euo pipefail
+          CORE=core/src/main/kotlin/com/playereden/gridmates/wordsearch/core
+          kotlinc "$CORE/WordSearch.kt" "$CORE/WordSearchV2.kt" \
+            "$CORE/WordSearchV3.kt" "$CORE/V4PreviewPlacement.kt" \
+            "$CORE/V4PreviewTierSelection.kt" "$CORE/V4PuzzleQuality.kt" \
+            "$CORE/V4BalancedPlacement.kt" labs/ws09f_f_quality/BalancedStress.kt \
+            -include-runtime -d "$RUNNER_TEMP/ws09f-f2-balanced.jar"
+          timeout 240s java -Xmx256m -jar "$RUNNER_TEMP/ws09f-f2-balanced.jar" \
+            core/src/test/resources/ws09f_e_v4_provisional_tiers.txt 10 \
+            | tee /tmp/ws09f-f2-balanced.txt
+          {
+            echo '### Experimental quality-gated V4; NOT the original frozen 18 goldens'
+            echo '```'
+            cat /tmp/ws09f-f2-balanced.txt
+            echo '```'
+            echo 'No Android APK, approved word list, Solo routing, save ID or physical QA.'
+          } >> "$GITHUB_STEP_SUMMARY"
