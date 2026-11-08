@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PlayerEden/GridMates-Word-Search/blob/main/design/asset-pipeline/asset-manifest.schema.json",
+  "title": "GridMates Word Search - planned visual asset registry",
+  "description": "Schema only. No entries are approved or integrated by the existence of this file. All production asset files must be source and hash checked.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "library",
+    "assets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "library": {
+      "const": "gridmates-word-search"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      }
+    }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset_id",
+        "kind",
+        "theme_id",
+        "source_type",
+        "review_status",
+        "source_file",
+        "source_sha256",
+        "export_file",
+        "export_sha256",
+        "license_id",
+        "fallback_asset_id",
+        "accessible_label",
+        "history"
+      ],
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]{5,80}$"
+        },
+        "kind": {
+          "enum": [
+            "book-cover",
+            "book-spine",
+            "chapter-marker",
+            "theme-emblem",
+            "completion-stamp",
+            "bookmark",
+            "shelf-decor",
+            "profile-portrait",
+            "collection-badge",
+            "pencil-highlight",
+            "page-border"
+          ]
+        },
+        "theme_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{2,50}$"
+        },
+        "book_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_type": {
+          "enum": [
+            "human-original",
+            "ai-generated",
+            "human-adapted",
+            "licensed-third-party"
+          ]
+        },
+        "review_status": {
+          "enum": [
+            "concept",
+            "shortlisted",
+            "awaiting-rights",
+            "awaiting-visual-review",
+            "approved",
+            "rejected",
+            "retired"
+          ]
+        },
+        "source_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "export_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "export_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "license_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "license_notice_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fallback_asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accessible_label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dimensions_px": {
+          "type": "object",
+          "required": [
+            "width",
+            "height"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "editor_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approval_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "approval_evidence": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "operation",
+              "tool",
+              "notes"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "review_status": {
+                "const": "approved"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "editor_name",
+              "approval_date",
+              "approval_evidence",
+              "dimensions_px"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
