@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "status": "PROPOSED_NOT_ACTIVE_IN_ANDROID",
+  "topics": [
+    {
+      "id": "woodland",
+      "label": "Woodland & Forests",
+      "status": "proposed",
+      "subtopics": [
+        "trees",
+        "forest-animals",
+        "birds",
+        "habitats",
+        "trails"
+      ]
+    },
+    {
+      "id": "space",
+      "label": "Space & Astronomy",
+      "status": "proposed",
+      "subtopics": [
+        "solar-system",
+        "stars",
+        "spacecraft",
+        "exploration",
+        "observatories"
+      ]
+    },
+    {
+      "id": "garden",
+      "label": "Garden",
+      "status": "proposed",
+      "subtopics": [
+        "flowers",
+        "plants",
+        "tools",
+        "pollinators",
+        "growing"
+      ]
+    },
+    {
+      "id": "animals",
+      "label": "Animals & Pets",
+      "status": "proposed",
+      "subtopics": [
+        "mammals",
+        "pets",
+        "habitats",
+        "animal-care"
+      ]
+    },
+    {
+      "id": "ocean",
+      "label": "Ocean & Marine Life",
+      "status": "proposed",
+      "subtopics": [
+        "marine-mammals",
+        "fish",
+        "shore",
+        "ecosystems"
+      ]
+    },
+    {
+      "id": "food",
+      "label": "Food & Cooking",
+      "status": "proposed",
+      "subtopics": [
+        "ingredients",
+        "dishes",
+        "techniques",
+        "flavors"
+      ]
+    },
+    {
+      "id": "travel",
+      "label": "Travel",
+      "status": "proposed",
+      "subtopics": [
+        "journeys",
+        "destinations",
+        "packing",
+        "lodging"
+      ]
+    },
+    {
+      "id": "geography",
+      "label": "Geography",
+      "status": "proposed",
+      "subtopics": [
+        "landforms",
+        "maps",
+        "waterways",
+        "places"
+      ]
+    },
+    {
+      "id": "sports",
+      "label": "Sports",
+      "status": "proposed",
+      "subtopics": [
+        "team-sports",
+        "individual-sports",
+        "equipment",
+        "events"
+      ]
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "status": "proposed",
+      "subtopics": [
+        "instruments",
+        "genres",
+        "performance",
+        "theory"
+      ]
+    },
+    {
+      "id": "history",
+      "label": "History",
+      "status": "proposed",
+      "subtopics": [
+        "eras",
+        "civilizations",
+        "inventions",
+        "artifacts"
+      ]
+    },
+    {
+      "id": "science",
+      "label": "Science",
+      "status": "proposed",
+      "subtopics": [
+        "physics",
+        "chemistry",
+        "biology",
+        "geology"
+      ]
+    },
+    {
+      "id": "technology",
+      "label": "Technology",
+      "status": "proposed",
+      "subtopics": [
+        "computing",
+        "devices",
+        "networks",
+        "robotics"
+      ]
+    },
+    {
+      "id": "weather",
+      "label": "Weather",
+      "status": "proposed",
+      "subtopics": [
+        "clouds",
+        "storms",
+        "seasons",
+        "forecasting"
+      ]
+    },
+    {
+      "id": "holidays",
+      "label": "Holidays & Celebrations",
+      "status": "proposed",
+      "subtopics": [
+        "winter",
+        "autumn",
+        "celebrations",
+        "traditions"
+      ]
+    },
+    {
+      "id": "home",
+      "label": "Home & Family",
+      "status": "proposed",
+      "subtopics": [
+        "rooms",
+        "furniture",
+        "chores",
+        "activities",
+        "objects"
+      ]
+    },
+    {
+      "id": "jobs",
+      "label": "Jobs & Careers",
+      "status": "proposed",
+      "subtopics": [
+        "trades",
+        "offices",
+        "public-service",
+        "healthcare"
+      ]
+    },
+    {
+      "id": "school",
+      "label": "School & Learning",
+      "status": "proposed",
+      "subtopics": [
+        "subjects",
+        "supplies",
+        "activities",
+        "learning"
+      ]
+    },
+    {
+      "id": "art",
+      "label": "Art & Design",
+      "status": "proposed",
+      "subtopics": [
+        "styles",
+        "materials",
+        "crafts",
+        "design"
+      ]
+    },
+    {
+      "id": "books",
+      "label": "Books & Literature",
+      "status": "proposed",
+      "subtopics": [
+        "genres",
+        "storytelling",
+        "publishing",
+        "libraries"
+      ]
+    },
+    {
+      "id": "vehicles",
+      "label": "Vehicles & Transportation",
+      "status": "proposed",
+      "subtopics": [
+        "land",
+        "air",
+        "water",
+        "maintenance"
+      ]
+    },
+    {
+      "id": "nature",
+      "label": "Nature & Outdoors",
+      "status": "proposed",
+      "subtopics": [
+        "landscapes",
+        "wildlife",
+        "ecosystems",
+        "conservation"
+      ]
+    },
+    {
+      "id": "flowers",
+      "label": "Flowers & Botany",
+      "status": "proposed",
+      "subtopics": [
+        "garden-blooms",
+        "wildflowers",
+        "botany"
+      ]
+    },
+    {
+      "id": "birds",
+      "label": "Birds",
+      "status": "proposed",
+      "subtopics": [
+        "songbirds",
+        "raptors",
+        "waterbirds",
+        "nests"
+      ]
+    },
+    {
+      "id": "insects",
+      "label": "Insects & Pollinators",
+      "status": "proposed",
+      "subtopics": [
+        "pollinators",
+        "garden-insects",
+        "habitats"
+      ]
+    },
+    {
+      "id": "language",
+      "label": "Language & Words",
+      "status": "proposed",
+      "subtopics": [
+        "writing",
+        "vocabulary",
+        "grammar",
+        "stories"
+      ]
+    },
+    {
+      "id": "architecture",
+      "label": "Architecture",
+      "status": "proposed",
+      "subtopics": [
+        "buildings",
+        "materials",
+        "structures",
+        "styles"
+      ]
+    },
+    {
+      "id": "clothing",
+      "label": "Clothing & Fabrics",
+      "status": "proposed",
+      "subtopics": [
+        "garments",
+        "fabrics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "seasons",
+      "label": "Four Seasons",
+      "status": "proposed",
+      "subtopics": [
+        "spring",
+        "summer",
+        "autumn",
+        "winter"
+      ]
+    },
+    {
+      "id": "mythology",
+      "label": "Mythology & Folklore",
+      "status": "proposed",
+      "subtopics": [
+        "creatures",
+        "folklore",
+        "traditions"
+      ]
+    },
+    {
+      "id": "everyday",
+      "label": "Everyday Life",
+      "status": "proposed",
+      "subtopics": [
+        "household",
+        "activities",
+        "places",
+        "objects"
+      ]
+    },
+    {
+      "id": "games",
+      "label": "Games & Recreation",
+      "status": "proposed",
+      "subtopics": [
+        "board-games",
+        "card-games",
+        "playground",
+        "puzzles"
+      ]
+    },
+    {
+      "id": "fruits-vegetables",
+      "label": "Fruits & Vegetables",
+      "status": "proposed",
+      "subtopics": [
+        "fruits",
+        "vegetables",
+        "harvest",
+        "cooking"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# WS-10A — 10,000+ Lexicon Foundation QA Receipt
+
+**2026-11-08 — source-pinned automated QA success. This does NOT mean ten thousand words have been added.**
+
+- **Owner goal:** More than **10,000 unique, editor-approved, actually selectable English answers** (not assignments, duplicates, or candidate imports). Proposed multi-topic catalog spans 33 topic families; final scope and vocabulary subject to curation.
+- **Actual branch data at QA:** **40 small sample candidate words, 76 tentative topic assignments, 33 proposed theme families, zero approved words**. External SCOWL, ENABLE, and wordfreq corpora were **not imported**.
+- **Architecture:** Global immutable word IDs and normalized English answers, separate many-to-many theme/subtopic classification, proposed editorial tiers, human reviewer/date fields, explicit source and license ledger. Current CSV is intentionally outside Android app source and has **no live generator integration**.
+- **Technical guardrails:** malformed CSV, duplicate canonical answers and IDs, wrong labels, absent topic references, missing editor approval, source clearance and false cross-theme double-counting are rejected. Global dictionary is **not** incorrectly required to be substring-free; conflict-checking belongs to individual selected puzzles.
+- **Verified GitHub Actions:** [WS-10 lexicon validation run #42517594304](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42517594304), **SUCCESS**, code/test SHA `5edfaf585d70a95db5ea3f55c42d9669c4e0ea8c`: 8/8 Python unit tests PASS, including a **temporary in-memory/test-directory 10,000-word synthetic capacity addition** (10,040 total test entries). Fake capacity rows are **not** in GitHub candidate CSV and are **not** word suggestions.
+- **Immutable tested-code checkpoint:** [WS-10A 8 tests green](https://github.com/PlayerEden/GridMates-Word-Search/tree/checkpoint/ws10-lexicon-33-themes-10k-capacity-8-tests-green-2026-11-08). Post-QA documentation-only commits are not part of this pinned source.
+- **Compatibility:** existing Kotlin v1/v2/v3 word list sources/seed behavior, saved schema, theme enum, app version, signed APK, UI and main branch runtime were not changed. The separate fully signed-update tested v0.9.4/code48 Word Search APK remains untouched.
+- **Next uncompleted work:** exact legally cleared source import with preserved notices, genuine candidate ingestion into a quarantine catalog, human review of themes/familiarity/display labels, 10K **real approved** inventory, compact offline loader, new versioned content ID/reconstruction, actual device QA.
+
+**Security/licensing:** no copyrighted or license-obligated word corpus was bulk copied in this milestone. Source research is only a set of links and rights-review reminders, not authorization to distribute its data.

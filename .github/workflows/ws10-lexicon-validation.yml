@@ -1,0 +1,51 @@
+name: WS-10 Canonical Lexicon Schema, Rights & 10K Capacity QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws10-thousands-word-lexicon-foundation-2026-11-08
+    paths:
+      - 'data/lexicon/**'
+      - 'tools/lexicon/**'
+      - '.github/workflows/ws10-lexicon-validation.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws10-lexicon-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate all checked-in lexicon entries and approval/provenance states
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/lexicon/validate.py --data-dir data/lexicon \
+            --json-out /tmp/ws10-lexicon-report.json \
+            | tee /tmp/ws10-lexicon-report.txt
+          grep -F '"global_approved_playable_unique": 0' /tmp/ws10-lexicon-report.txt
+          grep -F '"global_candidate_unique": 40' /tmp/ws10-lexicon-report.txt
+          grep -F '"topic_families_proposed_or_active": 33' /tmp/ws10-lexicon-report.txt
+          {
+            echo '### WS-10 foundational catalog audit — NOT a bulk import'
+            echo '```json'
+            cat /tmp/ws10-lexicon-report.json
+            echo '```'
+            echo 'No Android APK, 10K imported words, editorial approvals, production signing or prior generator modifications.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Test duplicate blocking, editor signoff and 10,000-row capacity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/lexicon -p 'test_*.py' -v
+          echo 'PASS: lexicon audit + 10,000 temporary fake capacity rows. Dummy test rows never shipped.' >> "$GITHUB_STEP_SUMMARY"

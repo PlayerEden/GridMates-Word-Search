@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status_note": "Research ledger. No external corpus is imported or cleared.",
+  "sources": [
+    {
+      "id": "gridmates-internal",
+      "label": "Project-maintained original and illustrative proposed terms",
+      "type": "internal",
+      "license": "project-original",
+      "rights_review": "internal-existing",
+      "attribution": "Project-maintained; draft entries require editorial review.",
+      "source_url": null
+    },
+    {
+      "id": "scowl-research",
+      "label": "SCOWL / English Speller Database",
+      "type": "external-research-only",
+      "license": "verify-current-revision-notice",
+      "rights_review": "not-cleared",
+      "attribution": "No data imported; verify exact copyright notices",
+      "source_url": "https://github.com/en-wl/wordlist"
+    },
+    {
+      "id": "enable-research",
+      "label": "ENABLE word list",
+      "type": "external-research-only",
+      "license": "verify-original-public-domain-provenance",
+      "rights_review": "not-cleared",
+      "attribution": "No data imported",
+      "source_url": null
+    },
+    {
+      "id": "wordfreq-research",
+      "label": "Robyn Speer wordfreq",
+      "type": "external-research-only",
+      "license": "Apache-2.0-code_CC-BY-SA-4.0-data-check",
+      "rights_review": "not-cleared",
+      "attribution": "No data imported; separate code vs. data licensing",
+      "source_url": "https://github.com/rspeer/wordfreq"
+    }
+  ]
+}
