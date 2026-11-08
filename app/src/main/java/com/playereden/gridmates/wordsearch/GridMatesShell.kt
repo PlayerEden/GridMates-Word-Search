@@ -54,7 +54,7 @@ import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
 
 private enum class Page(val label: String) {
-    PLAY("Play"), BOOKS_QA("Books QA"), RECORDS("Records"), COLLECTION("Collection"),
+    PLAY("Play"), BOOKS_QA("Books QA"), ART_LAB("Art Lab"), RECORDS("Records"), COLLECTION("Collection"),
     SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle"),
     MY_PUZZLES("My Puzzles"), SOLO_SETUP("New Puzzle")
 }
@@ -155,7 +155,7 @@ internal fun GridMatesShell(
         bottomBar = {
             if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE &&
                 page != Page.NEARBY && page != Page.SOLO_SETUP &&
-                page != Page.BOOKS_QA) NavigationBar(containerColor = Paper) {
+                page != Page.BOOKS_QA && page != Page.ART_LAB) NavigationBar(containerColor = Paper) {
                 Page.entries.filter {
                     it == Page.PLAY || it == Page.RECORDS ||
                         it == Page.COLLECTION || it == Page.SETTINGS
@@ -206,6 +206,8 @@ internal fun GridMatesShell(
             } else {
                 Text("Test books are unavailable in this build.")
             }
+        } else if (page == Page.ART_LAB && qa.enabled) {
+            QaArtLabScreen(onBack = { pageName = Page.PLAY.name })
         } else if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 WordSearchScreen(
@@ -238,6 +240,9 @@ internal fun GridMatesShell(
                     onNearby = { pageName = Page.NEARBY.name },
                     onQaBooks = if (qa.enabled) {
                         { pageName = Page.BOOKS_QA.name }
+                    } else null,
+                    onArtLab = if (qa.enabled) {
+                        { pageName = Page.ART_LAB.name }
                     } else null)
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
                     onBack = { pageName = Page.PLAY.name },
@@ -249,7 +254,7 @@ internal fun GridMatesShell(
                 Page.SOLO_SETUP -> SoloSetupScreen(soloStore,
                     onBack = { pageName = soloSetupReturnPage },
                     onStarted = { pageName = Page.PUZZLE.name })
-                Page.PUZZLE, Page.DAILY_PUZZLE, Page.NEARBY, Page.BOOKS_QA -> Unit
+                Page.PUZZLE, Page.DAILY_PUZZLE, Page.NEARBY, Page.BOOKS_QA, Page.ART_LAB -> Unit
                 Page.DAILY -> DailyLandingScreen(soloStore,
                     onPlay = { date ->
                         soloStore.openDaily(date)
@@ -284,7 +289,8 @@ private fun Heading(eyebrow: String, heading: String) {
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     onMyPuzzles: () -> Unit, onNewSolo: () -> Unit,
     onDaily: () -> Unit, onNearby: () -> Unit,
-    onQaBooks: (() -> Unit)? = null) {
+    onQaBooks: (() -> Unit)? = null,
+    onArtLab: (() -> Unit)? = null) {
     val run = store.profile.active
     val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
     val finished = WordSearchRules.complete(puzzle, run.foundIds)
@@ -382,6 +388,22 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
             Button(onClick = onQaBooks,
                 modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 Text("Test Puzzle Books")
+            }
+        }
+    }
+
+    if (onArtLab != null) {
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow("05 · ART STUDY · NOT FINAL ARTWORK")
+            Text("Library Art Lab — TEST ONLY", color = Forest,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold)
+            Text("Compare Woodland, Space and Garden book covers, spines, " +
+                "emblems, chapter markers and rewards. Original books remain unchanged.",
+                color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Button(onClick = onArtLab,
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                Text("View Library Artwork")
             }
         }
     }
