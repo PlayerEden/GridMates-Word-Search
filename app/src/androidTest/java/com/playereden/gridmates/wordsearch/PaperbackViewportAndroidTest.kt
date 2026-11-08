@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.PuzzleBoardSize
 import com.playereden.gridmates.wordsearch.core.PuzzleChallenge
-import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.WordSearchGeneratorV2
 import com.playereden.gridmates.wordsearch.core.WordTheme
 import org.junit.Assert.assertEquals
@@ -28,21 +27,18 @@ class PaperbackViewportAndroidTest {
     @get:Rule val rule = createComposeRule()
 
     @Test fun narrowBookGridHasSquareBoundsAndSideGuttersWithFitAndZoomControls() {
-        val run = SoloProgressRules.freshV2(WordTheme.WOODLAND,
-            PuzzleBoardSize.BOOK_CLASSIC, PuzzleChallenge.CLASSIC, 42L)
-        val puzzle = SoloProgressRules.puzzle(run)
-        rule.setContent {
-            GridMatesTheme {
-                Box(Modifier.width(320.dp).height(690.dp)) {
-                    WordSearchScreen(
-                        store = SoloStore(
-                            androidx.test.platform.app.InstrumentationRegistry
-                                .getInstrumentation().targetContext,
-                            "ws09d_margins_" + "sandbox.json"),
-                        onBack = {}, onRecords = {})
+        val context = androidx.test.platform.app.InstrumentationRegistry
+            .getInstrumentation().targetContext
+        val filename = "ws09d_margins_" + System.nanoTime() + ".json"
+        val store = SoloStore(context, filename)
+        try {
+            rule.setContent {
+                GridMatesTheme {
+                    Box(Modifier.width(320.dp).height(690.dp)) {
+                        WordSearchScreen(store = store, onBack = {}, onRecords = {})
+                    }
                 }
             }
-        }
         val grid = rule.onNodeWithTag("word-grid-touch-area")
         grid.assertExists()
         val bounds = grid.getUnclippedBoundsInRoot()
@@ -55,6 +51,11 @@ class PaperbackViewportAndroidTest {
         val after = grid.getUnclippedBoundsInRoot()
         assertEquals(bounds.width.value, after.width.value, 1.5f)
         assertEquals(bounds.height.value, after.height.value, 1.5f)
+        } finally {
+            for (suffix in listOf("", ".bak", ".new")) {
+                java.io.File(context.filesDir, filename + suffix).delete()
+            }
+        }
     }
 
     @Test fun zoomableBoardUsesEntireUnroundedSquareForRealWordSwipe() {
