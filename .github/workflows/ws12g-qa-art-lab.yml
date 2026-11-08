@@ -29,6 +29,32 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout original approved Woodland portraits (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: PlayerEden/SudokuTogether
+          ref: 975e31a1e8cbfebad1fbbc7602b3340c357da7ef
+          path: _approved_sudoku
+          persist-credentials: false
+      - name: Restore original 12 Woodland portraits by verified hashes
+        run: python3 scripts/import_woodland_portraits.py --source _approved_sudoku
+      - name: Checkout approved OFL font sources (pinned, sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: google/fonts
+          ref: 24ddc1f324cac5d9f5aedca126d298f56e3f1640
+          path: _approved_fonts
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            ofl/atkinsonhyperlegible
+            ofl/ibmplexmono
+            ofl/dmmono
+            ofl/patrickhand
+      - name: Import original reviewed font resources and licenses
+        run: |
+          python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
+          python3 scripts/import_font_library.py --source _approved_fonts
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
