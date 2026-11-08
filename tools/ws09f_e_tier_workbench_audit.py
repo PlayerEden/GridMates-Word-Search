@@ -62,7 +62,13 @@ def main():
         review = triage["themes"][name]
         v3_rare = v3_advanced(source, name)
         proposed_rare = review["provisional_advanced_only"]
-        holds = list(review["hold_for_editor_review"])
+        original_holds = list(review["hold_for_editor_review"])
+        # A palindrome will ALWAYS appear twice in a directional search
+        # (forward and reverse along the same path); never offer it as a
+        # target if generation insists on exactly one 8-way occurrence.
+        generator_exclusions = [w for w in source_pool
+                                if w == w[::-1] and w not in original_holds]
+        holds = original_holds + generator_exclusions
         extra = [item["answer"] for item in
                  review.get("possible_friendly_additions_for_review", [])]
         for item in review.get("possible_friendly_additions_for_review", []):
@@ -81,6 +87,9 @@ def main():
         assert entry["unreviewed_extra_concepts"] == extra
         assert entry["original_candidate_pool"] == len(source_pool)
         assert entry["manual_hold_count"] == len(holds)
+        assert set(entry.get("generator_compatibility_exclusions", {})) == set(generator_exclusions)
+        assert set(entry["editorial_holds"]) == set(holds)
+        assert all(w != w[::-1] for w in common + rare), "Impossible palindrome in giant target pool"
         assert entry["proposed_advanced_count"] == len(rare)
         assert entry["provisional_relaxed_eligible_count"] == len(common)
         assert entry["unreviewed_extra_count"] == len(extra)
@@ -91,7 +100,8 @@ def main():
             normalized = re.sub("[^A-Za-z]", "", label).upper()
             assert normalized == word, f"{name}: label does not match answer {word}: {label}"
         print(f"{name}: preview_relaxed={len(common)} (unreviewed_extra={len(extra)}), "
-              f"advanced={len(rare)}, editor_hold={len(holds)}; "
+              f"advanced={len(rare)}, editor_hold={len(original_holds)}, " +
+              f"palindrome_excluded={len(generator_exclusions)}; "
               f"105-of-{len(common)} supply possible, substring-free")
     root = Path("core/src/main/kotlin/com/playereden/gridmates/wordsearch/core")
     selector = (root / "V4PreviewTierSelection.kt").read_text(encoding="utf8")
