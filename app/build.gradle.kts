@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 50
-        versionName = "0.9.6-bookshelf-list-review"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 51
+        versionName = "0.9.7-qa-book-art-lab"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -70,4 +70,21 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
+}
+
+/**
+ * Debug-only source-backed book art. Each QA build reproduces the exact 18
+ * SVG prototypes from WS-12C/D/F before merging local Android assets.
+ * No release variant references this task or assets; no online service used.
+ */
+val generateWs12QaArt by tasks.registering(Exec::class) {
+    workingDir = rootProject.projectDir
+    commandLine(
+        "python3", "tools/asset_pipeline/render_family_review.py",
+        "--tokens", "design/asset-pipeline/paperback-v1-tokens.json",
+        "--output-dir", "app/src/debug/assets/ws12"
+    )
+}
+tasks.matching { it.name == "mergeDebugAssets" }.configureEach {
+    dependsOn(generateWs12QaArt)
 }
