@@ -1,0 +1,56 @@
+name: WS-09F-C4 Core Model Compatibility (Research Only)
+
+# Standalone JDK Kotlin: uses actual frozen core source but no Gradle or Android.
+# The experimental V4 engine and candidate words remain in /labs, not in APKs.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09f-c4-core-model-compat-lab-2026-11-08
+    paths:
+      - 'labs/ws09f_c_kotlin/CoreModelCompatibility.kt'
+      - '.github/workflows/ws09f-c4-core-model-compat.yml'
+      - 'tools/ws09f_c_kotlin_fixture_audit.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws09f-c4-compat-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check candidate content frozen in research fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/ws09f_c_kotlin_fixture_audit.py
+      - name: Verify preinstalled Kotlin/JDK without Gradle downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v kotlinc
+          kotlinc -version
+      - name: Compile actual frozen core generators and V4 lab bridge
+        shell: bash
+        run: |
+          set -euo pipefail
+          CORE=core/src/main/kotlin/com/playereden/gridmates/wordsearch/core
+          kotlinc "$CORE/WordSearch.kt" "$CORE/WordSearchV2.kt" "$CORE/WordSearchV3.kt" \
+            labs/ws09f_c_kotlin/V4EngineLab.kt labs/ws09f_c_kotlin/CoreModelCompatibility.kt \
+            -include-runtime -d "$RUNNER_TEMP/ws09f-c4-corecompat.jar"
+          timeout 120s java -Xmx256m -jar "$RUNNER_TEMP/ws09f-c4-corecompat.jar" \
+            labs/ws09f_c_kotlin/candidates_test_only.txt | tee /tmp/ws09f-c4-corecompat.txt
+          {
+            echo '### Core-model V4 research compatibility'
+            echo 'Compiles exact frozen real v1/v2/v3 core Kotlin source; checks 6 historical goldens, saved enum ordinals, and 180 V4 lab-to-core model conversions.'
+            echo 'No Android app integration, no 40/50 production routing, no signed APK.'
+            echo '```'
+            cat /tmp/ws09f-c4-corecompat.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
