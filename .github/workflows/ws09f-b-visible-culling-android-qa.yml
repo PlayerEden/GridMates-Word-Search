@@ -2,6 +2,7 @@ name: WS-09F-B Visible-area Large-board Rendering Android Emulator QA
 # Source-matched same-signer v0.9.2/code46 -> v0.9.3/code47, preserving schema5 and two paused puzzles.
 # Versioned v1/v2/v3 goldens frozen; viewport culling is draw-only, no mutation.
 # Pure culling budget/marker-intersection tests and Android visible ink parity.
+# Final source-matched rerun after pixel-map import fix; preceding Maven 504 was transient.
 # Baseline is previously verified source-matched v0.9.2 code46.
 # Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
 # The real two-phone Co-op P0 remains open and physical testing is deferred.
