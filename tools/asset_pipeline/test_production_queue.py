@@ -24,6 +24,7 @@ class ProductionQueueTests(unittest.TestCase):
             "docs/WS12_AI_ASSET_PRODUCTION_PLAYBOOK.md",
             "tools/asset_pipeline/render_paperback.py",
             "tools/asset_pipeline/render_paperback_accents.py",
+            "tools/asset_pipeline/render_family_review.py",
         ]
         for relative in files:
             path = self.root / relative
