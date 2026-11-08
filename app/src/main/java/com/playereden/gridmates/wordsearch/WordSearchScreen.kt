@@ -172,8 +172,7 @@ internal fun WordSearchScreen(
     }
 
     fun startNew() {
-        store.newPuzzle()
-        newPuzzleOpen = false
+        if (store.newPuzzle()) newPuzzleOpen = false
     }
 
     if (changeOpen && !daily) {
@@ -216,16 +215,17 @@ internal fun WordSearchScreen(
                         }
                     }
                     Text("Board size sets the space and number of words. Challenge changes " +
-                        "the directions and word mix. Starting replaces your unfinished Solo board.",
+                        "the directions and word mix. Your unfinished Solo board stays in My Puzzles.",
                         style = MaterialTheme.typography.bodySmall, color = Muted)
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    store.chooseV2(WordTheme.valueOf(pendingTheme),
-                        PuzzleBoardSize.valueOf(pendingBoard),
-                        PuzzleChallenge.valueOf(pendingChallenge))
-                    changeOpen = false
+                    if (store.chooseV2(WordTheme.valueOf(pendingTheme),
+                            PuzzleBoardSize.valueOf(pendingBoard),
+                            PuzzleChallenge.valueOf(pendingChallenge))) {
+                        changeOpen = false
+                    }
                 }) { Text("Start puzzle") }
             },
             dismissButton = { TextButton(onClick = { changeOpen = false }) { Text("Cancel") } }
@@ -262,7 +262,8 @@ internal fun WordSearchScreen(
         AlertDialog(
             onDismissRequest = { newPuzzleOpen = false },
             title = { Text("Start another puzzle?") },
-            text = { Text("Starting a new puzzle replaces your unfinished board. Completed results remain in Records.") },
+            text = { Text("Your unfinished puzzle will be saved in My Puzzles. " +
+                "Completed results stay in Records.") },
             confirmButton = { TextButton(onClick = { startNew() }) { Text("New puzzle") } },
             dismissButton = { TextButton(onClick = { newPuzzleOpen = false }) { Text("Keep playing") } }
         )
