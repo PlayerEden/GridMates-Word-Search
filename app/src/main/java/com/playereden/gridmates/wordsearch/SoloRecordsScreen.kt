@@ -3,12 +3,22 @@ package com.playereden.gridmates.wordsearch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,9 +31,28 @@ import java.util.Date
 internal fun SoloRecordsScreen(profile: SoloProfile) {
     Text("Your puzzle journal", color = Forest,
         style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-    Text("Your completed Solo puzzles are saved privately on this device.",
+    Text("Your puzzle and match history stays on this device.",
         color = Muted, style = MaterialTheme.typography.bodyMedium)
 
+    var journalTab by rememberSaveable { mutableStateOf("Solo") }
+    var soloPage by rememberSaveable { mutableIntStateOf(0) }
+    var racePage by rememberSaveable { mutableIntStateOf(0) }
+    var duelPage by rememberSaveable { mutableIntStateOf(0) }
+
+    Text("Browse your results", color = Forest,
+        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf("Solo", "Race", "Duel").forEach { section ->
+            FilterChip(selected = journalTab == section,
+                onClick = { journalTab = section },
+                label = { Text(section) })
+        }
+    }
+    // Only the Solo tab needs Solo and Daily summary cards; putting them
+    // above Race/Duel makes the selected match history inaccessible without
+    // scrolling past unrelated statistics on compact screens.
+    if (journalTab == "Solo") {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         MetricCard("Completed", profile.completions.toString(), Modifier.weight(1f))
         MetricCard("Words found", profile.totalWords.toString(), Modifier.weight(1f))
@@ -41,6 +70,11 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
         }
     }
 
+    }
+
+    // Each category has its own remembered page. No journal is silently
+    // truncated at 12/15/25 entries and no stored result is deleted.
+    if (journalTab == "Race") {
     Text("Shared Board Race", color = Forest,
         style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     Text("Shared Board Race results saved locally. Co-op isn't counted as a win or loss.",
@@ -68,7 +102,8 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
     } else {
         Text("Your most recent races", color = Forest,
             fontWeight = FontWeight.SemiBold)
-        profile.raceResults.take(15).forEach { race ->
+        val page = racePage.coerceIn(0, (profile.raceResults.size - 1).coerceAtLeast(0) / 4)
+        profile.raceResults.drop(page * 4).take(4).forEach { race ->
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -93,6 +128,11 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
         }
     }
 
+    if (profile.raceResults.isNotEmpty()) JournalPages(
+        count = profile.raceResults.size, page = racePage, pageSize = 4,
+        onPage = { racePage = it })
+    }
+    if (journalTab == "Duel") {
     Text("Speed Duel", color = Forest,
         style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     Text("Separate private-board matches. First host-confirmed completion wins. " +
@@ -120,7 +160,8 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
         }
     } else {
         Text("Recent Speed Duels", color = Forest, fontWeight = FontWeight.SemiBold)
-        profile.duelResults.take(12).forEach { duel ->
+        val page = duelPage.coerceIn(0, (profile.duelResults.size - 1).coerceAtLeast(0) / 4)
+        profile.duelResults.drop(page * 4).take(4).forEach { duel ->
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -142,6 +183,11 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
         }
     }
 
+    if (profile.duelResults.isNotEmpty()) JournalPages(
+        count = profile.duelResults.size, page = duelPage, pageSize = 4,
+        onPage = { duelPage = it })
+    }
+    if (journalTab == "Solo") {
     Text("Recent puzzles", color = Forest,
         style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     if (profile.results.isEmpty()) {
@@ -153,7 +199,8 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
             }
         }
     } else {
-        for (record in profile.results.take(25)) {
+        val page = soloPage.coerceIn(0, (profile.results.size - 1).coerceAtLeast(0) / 4)
+        for (record in profile.results.drop(page * 4).take(4)) {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(Modifier.fillMaxWidth(),
@@ -179,6 +226,32 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
                     )
                 }
             }
+        }
+    }
+    if (profile.results.isNotEmpty()) JournalPages(
+        count = profile.results.size, page = soloPage, pageSize = 4,
+        onPage = { soloPage = it })
+    }
+}
+
+/** Pure page math; every saved record remains reachable by the pager. */
+internal fun journalPageCount(count: Int, pageSize: Int): Int =
+    ((count.coerceAtLeast(0) + pageSize - 1) / pageSize).coerceAtLeast(1)
+
+@Composable
+private fun JournalPages(count: Int, page: Int, pageSize: Int, onPage: (Int) -> Unit) {
+    val pages = journalPageCount(count, pageSize)
+    if (pages <= 1) return
+    val current = page.coerceIn(0, pages - 1)
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween) {
+        TextButton(onClick = { onPage(current - 1) }, enabled = current > 0) {
+            Text("Previous")
+        }
+        Text("Page ${current + 1} of $pages",
+            color = Muted, style = MaterialTheme.typography.labelMedium)
+        TextButton(onClick = { onPage(current + 1) }, enabled = current < pages - 1) {
+            Text("Next")
         }
     }
 }
