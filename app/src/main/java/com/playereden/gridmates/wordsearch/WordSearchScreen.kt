@@ -65,6 +65,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -79,6 +80,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BoardViewportTransform
+import com.playereden.gridmates.wordsearch.core.PaperbackPageLayout
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.DragDirection
 import com.playereden.gridmates.wordsearch.core.GridPoint
@@ -188,7 +190,15 @@ internal fun WordSearchScreen(
 
     // All screen sizes share the same two-row HUD. The separate word panel
     // consumes remaining measured space rather than being pushed offscreen.
-    BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 2.dp)) {
+    // Keep a real paperback margin around the puzzle rather than pressing
+    // its outer letters against the phone bezel. Dimensions remain based on
+    // the square content viewport, not the unpadded screen.
+    val pageMargin = PaperbackPageLayout.sideMarginDp(
+        LocalConfiguration.current.screenWidthDp
+    ).dp
+    BoxWithConstraints(Modifier.fillMaxSize().padding(
+        horizontal = pageMargin, vertical = 5.dp
+    )) {
         val landscape = maxWidth > maxHeight * 1.25f
         val compactHud = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.5f
         val boardViewport = if (landscape) {
@@ -537,7 +547,9 @@ private fun WordList(
             val columns = if (maxWidth < 320.dp || enlarged) 1 else 2
             // The list is paged instead of scrollable. Keep all visible
             // targets within the space left below the fixed puzzle board.
-            val rowBudget = if (enlarged) 62.dp else 43.dp
+            // Two-line entries must never spill under the pager. Keep more
+            // vertical space than the old single-line pill layout allowed.
+            val rowBudget = if (enlarged) 86.dp else 54.dp
             val rowsPerPage = ((maxHeight - 40.dp) / rowBudget)
                 .toInt().coerceIn(1, 5)
             val perPage = columns * rowsPerPage
@@ -555,12 +567,13 @@ private fun WordList(
                             horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             pair.forEach { target ->
                                 val solved = target.id in found
-                                val shape = RoundedCornerShape(9.dp)
+                                // Printed book-style square entries, not
+                                // rounded pills which visually trim letters.
                                 Box(Modifier.weight(1f)
                                     .background(if (solved) FoundMarker.copy(alpha = 0.28f)
-                                        else Paper, shape)
+                                        else Paper)
                                     .border(1.dp,
-                                        if (solved) Color(0xFFC5D9C8) else GridRule, shape)
+                                        if (solved) Color(0xFFC5D9C8) else GridRule)
                                     .padding(horizontal = 8.dp, vertical = 5.dp)
                                 ) {
                                     Text((if (solved) "✓ " else "○ ") + target.word,
@@ -570,7 +583,8 @@ private fun WordList(
                                         style = MaterialTheme.typography.bodyMedium,
                                         textDecoration = if (solved)
                                             TextDecoration.LineThrough else null,
-                                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Clip)
                                 }
                             }
                             if (pair.size < columns) Box(Modifier.weight(1f))
@@ -773,7 +787,9 @@ private fun WordGrid(
 
     Box(
         modifier = modifier.aspectRatio(1f)
-            .background(palette.background, RoundedCornerShape(12.dp))
+            // The full corner cells are square like a printed puzzle book.
+            // Rounded corners hide parts of corner letters/selection traces.
+            .background(palette.background)
             .drawBehind {
                 // Draw the *same exact* row/column boundaries used for
                 // actual letter centers and pointer hit mapping.
@@ -820,7 +836,7 @@ private fun WordGrid(
                 // whole-board graphics transform above.
                 glyphPainter.drawLetters(this, puzzle.rows, palette.letters)
             }
-            .border(2.dp, palette.frame, RoundedCornerShape(12.dp))
+            .border(2.dp, palette.frame)
             .onSizeChanged { sizePx = it }
             .testTag("word-grid-touch-area")
             // One meaningful accessibility target rather than 400 small
