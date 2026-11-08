@@ -1,0 +1,60 @@
+name: WS-12D Paperback Companion Accent Proof QA
+
+# Visual design assets are prototypes: never package Android resources here.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws12d-paperback-chapter-bookmark-seal-proof-2026-11-08
+    paths:
+      - 'tools/asset_pipeline/**'
+      - 'design/asset-pipeline/**'
+      - '.github/workflows/ws12d-paperback-accents.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  paperback-accent-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify prior art approvals and deterministic book + companion art
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_*.py' -v
+          python3 tools/asset_pipeline/validate.py --repo-root .
+      - name: Export prototype-only SVG accents and SHA receipts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/asset_pipeline/render_paperback_accents.py \
+            --tokens design/asset-pipeline/paperback-v1-tokens.json \
+            --output-dir /tmp/ws12d-paperback-accents
+          python3 - <<'PY'
+          import json,pathlib,xml.etree.ElementTree as ET
+          folder=pathlib.Path('/tmp/ws12d-paperback-accents')
+          report=json.loads((folder/'render_sha256.json').read_text(encoding='utf8'))
+          assert report['theme_count']==3, report
+          assert len(report['files'])==9, report
+          assert set(report['art_types'])=={'chapters','bookmarks','seals'}
+          assert not report['owner_approved'] and not report['adobe_refined']
+          assert not report['android_resources_modified'] and not report['text_baked_into_art']
+          for path in folder.rglob('*.svg'):
+              root=ET.parse(path).getroot()
+              assert root.tag=='{http://www.w3.org/2000/svg}svg'
+              assert not list(root.iter('{http://www.w3.org/2000/svg}text'))
+          print('PASS: 9 prototype SVG companion accents with reproducible SHA receipts.')
+          with open('/tmp/ws12d-summary.md','w') as f:
+              f.write('WS-12D: nine matching book accents; prototype only; 0 Android/approved/Adobe assets.\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WS12D-3-THEMES-9-MATCHING-ACCENT-PROTOTYPES
+          path: /tmp/ws12d-paperback-accents/
+          if-no-files-found: error
+          retention-days: 14
