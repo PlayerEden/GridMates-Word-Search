@@ -13,11 +13,19 @@ enum class PuzzleBoardSize(val label: String, val cells: Int, val targets: Int) 
     // Paperback-sized choices for NEW Solo puzzles. Old v2 puzzles remain valid.
     BOOK_SHORT("Short", 12, 12),
     BOOK_CLASSIC("Standard", 15, 16),
-    BOOK_BIG("Extended", 20, 24);
+    BOOK_BIG("Extended", 20, 24),
+
+    // Version 3 only. Never reuse these values to create v2 content.
+    BOOK_GRAND("Grand", 25, 32),
+    BOOK_GIANT("Giant", 30, 44);
 
     companion object {
         val bookPresets: List<PuzzleBoardSize> =
             listOf(BOOK_SHORT, BOOK_CLASSIC, BOOK_BIG)
+        val largePresets: List<PuzzleBoardSize> =
+            listOf(BOOK_GRAND, BOOK_GIANT)
+        val soloPresets: List<PuzzleBoardSize> = bookPresets + largePresets
+        val v2Presets: List<PuzzleBoardSize> = entries.filterNot { it in largePresets }
     }
 }
 enum class PuzzleChallenge(val label: String, val description: String) {
@@ -104,6 +112,9 @@ object WordSearchGeneratorV2 {
 
     fun generate(theme: WordTheme, board: PuzzleBoardSize,
                  challenge: PuzzleChallenge, seed: Long): WordSearchPuzzle {
+        require(board !in PuzzleBoardSize.largePresets) {
+            "New 25×25 and 30×30 boards require the separate v3 generator"
+        }
         val size = board.cells
         // A rare crowded layout must not make an otherwise valid puzzle fail.
         // Each retry explores a different deterministic word subset.

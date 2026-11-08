@@ -14,7 +14,7 @@ class WordSearchGeneratorV2Test {
 
     @Test fun sizeAndChallengeAreIndependentAndGeneratedWordsAreFindable() {
         for (theme in WordTheme.entries)
-            for (board in PuzzleBoardSize.entries)
+            for (board in PuzzleBoardSize.v2Presets)
                 for (challenge in PuzzleChallenge.entries)
                     for (seed in listOf(1L, 43L, 2002L, 10991L)) {
                         val p = try {

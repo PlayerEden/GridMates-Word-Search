@@ -88,10 +88,10 @@ internal class SoloStore(
             ?.let { saved -> WordTheme.entries.firstOrNull { it.name == saved } }
             ?: active.theme
         val board = soloSetupPrefs.getString("board", null)
-            ?.let { saved -> PuzzleBoardSize.bookPresets.firstOrNull {
+            ?.let { saved -> PuzzleBoardSize.soloPresets.firstOrNull {
                 it.name == saved
             } }
-            ?: active.boardSize?.takeIf { it in PuzzleBoardSize.bookPresets }
+            ?: active.boardSize?.takeIf { it in PuzzleBoardSize.soloPresets }
             ?: PuzzleBoardSize.BOOK_CLASSIC
         val challenge = soloSetupPrefs.getString("challenge", null)
             ?.let { saved -> PuzzleChallenge.entries.firstOrNull {
@@ -195,7 +195,7 @@ internal class SoloStore(
         // when old or imported JSON includes corrupt records. The original file
         // remains intact, and import previews never mutate the installed profile.
         require(loaded.all {
-            it.puzzleId.isNotBlank() && it.wordCount in 1..30 &&
+            it.puzzleId.isNotBlank() && it.wordCount in 1..44 &&
                 it.elapsedSeconds >= 0L && it.hintSteps >= 0 &&
                 it.completedAtMs > 0L
         }) { "Malformed Solo completion record" }
@@ -605,10 +605,11 @@ internal class SoloStore(
         return commitSession(updated)
     }
 
-    fun chooseV2(theme: WordTheme, board: PuzzleBoardSize,
-                 challenge: PuzzleChallenge): Boolean {
+    /** All new Solo sizes. V3 boards never pass through frozen V2 generation. */
+    fun chooseSolo(theme: WordTheme, board: PuzzleBoardSize,
+                   challenge: PuzzleChallenge): Boolean {
         if (blocked) return false
-        val candidate = SoloProgressRules.freshV2(theme, board, challenge, nextSeed())
+        val candidate = SoloProgressRules.freshForBoard(theme, board, challenge, nextSeed())
         SoloProgressRules.puzzle(candidate) // verify BEFORE changing saved session
         val updated = SoloSessionLibrary.start(profile, candidate)
         if (updated == null) {
@@ -624,17 +625,24 @@ internal class SoloStore(
         return true
     }
 
+    /** Existing callers of the V2 API remain supported for legacy book sizes. */
+    fun chooseV2(theme: WordTheme, board: PuzzleBoardSize,
+                 challenge: PuzzleChallenge): Boolean {
+        require(board in PuzzleBoardSize.v2Presets)
+        return chooseSolo(theme, board, challenge)
+    }
+
     fun newPuzzle(): Boolean {
         if (blocked) return false
         val current = profile.active
-        val board = current.boardSize?.takeIf { it in PuzzleBoardSize.bookPresets }
+        val board = current.boardSize?.takeIf { it in PuzzleBoardSize.soloPresets }
             ?: PuzzleBoardSize.BOOK_CLASSIC
         val challenge = current.challenge ?: when (current.difficulty) {
             WordDifficulty.EASY -> PuzzleChallenge.RELAXED
             WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
             WordDifficulty.HARD -> PuzzleChallenge.EXPERT
         }
-        return chooseV2(current.theme, board, challenge)
+        return chooseSolo(current.theme, board, challenge)
     }
 
     /** Selected archived entry becomes active; previous unfinished active is retained. */
