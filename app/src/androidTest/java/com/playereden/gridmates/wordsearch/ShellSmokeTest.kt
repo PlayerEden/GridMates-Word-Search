@@ -22,9 +22,13 @@ class ShellSmokeTest {
         compose.onNodeWithText("Continue Solo").assertExists()
         compose.onNodeWithText("Continue Solo").performClick()
         compose.onNodeWithText("Options").performClick()
-        compose.onNodeWithText("Customize puzzle").assertExists()
+        compose.onNodeWithText("Customize puzzle").assertDoesNotExist()
         compose.onNodeWithText("New puzzle").assertExists()
         compose.onNodeWithText("Feedback settings").assertExists()
+        compose.onNodeWithText("New puzzle").performClick()
+        compose.onNodeWithText("Start puzzle").assertExists()
+        compose.onNodeWithText("Cancel").performClick()
+        compose.onNodeWithText("Words to find", substring = true).assertExists()
     }
 
     @Test fun collectionTabContainsRealWoodlandProfilesNotPrototypeCopy() {

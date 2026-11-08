@@ -1,6 +1,7 @@
 name: WS-09C Pre-game Solo Setup Android Emulator QA
 # Exact-source v0.8.8/code42 -> v0.8.9/code43 signed update retaining schema5 paused games and 104 Android tests.
-# Existing multiple-saved-games fixture exercised by old and updated APKs.
+# Retest after aligning older UI expectations with pre-game navigation and
+# ensuring the persisted-preference fixture flushes before process restart.
 # Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
 # The real two-phone Co-op P0 remains open and physical testing is deferred.
 

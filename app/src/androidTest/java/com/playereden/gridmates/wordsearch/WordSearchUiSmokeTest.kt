@@ -30,7 +30,8 @@ class WordSearchUiSmokeTest {
             assertEquals(puzzle.targets.size, store.profile.active.foundIds.size)
             rule.setContent {
                 GridMatesTheme {
-                    WordSearchScreen(store = store, onBack = {}, onRecords = {})
+                    WordSearchScreen(store = store, onBack = {}, onRecords = {},
+                        onNewPuzzle = {})
                 }
             }
             rule.onNodeWithText("Puzzle complete!", substring = true).assertExists()

@@ -47,6 +47,7 @@ class SoloSetupPreferenceAndroidTest {
         val name = "ws09c_legacy_" + System.nanoTime() + ".json"
         try {
             val store = SoloStore(ctx, name)
+            store.flush() // a new empty store otherwise has no on-disk profile
             val before = store.profile
             ctx.getSharedPreferences(name + "_solo_setup", 0).edit()
                 .putString("theme", "INVALID")

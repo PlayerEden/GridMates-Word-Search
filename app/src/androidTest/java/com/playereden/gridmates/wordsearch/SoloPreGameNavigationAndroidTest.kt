@@ -48,7 +48,7 @@ class SoloPreGameNavigationAndroidTest {
 
             rule.onNodeWithText("New puzzle").performClick()
             rule.onNodeWithText("Woodland").performClick()
-            rule.onNodeWithText("Space").performClick()
+            rule.onNodeWithText("Outer Space").performClick()
             rule.onNodeWithText("Standard · 15×15 · 16 words").performClick()
             rule.onNodeWithText("Extended · 20×20 · 24 words").performClick()
             rule.onNodeWithText("Classic").performClick()
