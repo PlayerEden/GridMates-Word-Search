@@ -254,9 +254,11 @@ internal fun CollectionScreen(store: SoloStore) {
         val pages = ((orderedAchievements.size + achievementPageSize - 1) /
             achievementPageSize).coerceAtLeast(1)
         val current = achievementPage.coerceIn(0, pages - 1)
+        // Put paging ahead of the long card stack: on narrow phones the
+        // controls must remain discoverable immediately after changing tabs.
+        CollectionPager(current, pages, id = "achievements", onChange = { achievementPage = it })
         orderedAchievements.drop(current * achievementPageSize).take(achievementPageSize)
             .forEach { item -> AchievementCard(item) }
-        CollectionPager(current, pages, id = "achievements", onChange = { achievementPage = it })
     } else {
         Text(portraits.count { it.unlocked }.toString() +
             " / " + portraits.size + " Woodland portraits available",
@@ -270,6 +272,10 @@ internal fun CollectionScreen(store: SoloStore) {
             },
             color = Muted, style = MaterialTheme.typography.bodySmall
         )
+        val portraitPages = ((portraits.size + portraitPageSize - 1) /
+            portraitPageSize).coerceAtLeast(1)
+        CollectionPager(portraitPage.coerceIn(0, portraitPages - 1),
+            portraitPages, id = "portraits", onChange = { portraitPage = it })
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val columns = if (maxWidth < 350.dp ||
                 LocalDensity.current.fontScale >= 1.3f) 1 else 2
@@ -292,10 +298,6 @@ internal fun CollectionScreen(store: SoloStore) {
                 }
             }
         }
-        val pages = ((portraits.size + portraitPageSize - 1) /
-            portraitPageSize).coerceAtLeast(1)
-        CollectionPager(portraitPage.coerceIn(0, pages - 1), pages,
-            id = "portraits", onChange = { portraitPage = it })
         Text("Unlocks depend on completed Solo and Daily puzzles. " +
             "No random purchases, streak deadlines or paid portraits.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
