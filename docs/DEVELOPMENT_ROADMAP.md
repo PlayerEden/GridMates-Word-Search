@@ -87,6 +87,25 @@
 
 ---
 
+## WS-12 — Generated visual assets and Adobe refinement pipeline
+
+**Status:** PLANNED; [WS-12 issue #91](https://github.com/PlayerEden/GridMates-Word-Search/issues/91). [Production and tooling specification](WS12_VISUAL_ASSET_PRODUCTION_PLAN.md) and [draft source/approval manifest schema](../design/asset-pipeline/asset-manifest.schema.json) are now documented. **No image has been generated, approved or packaged by this planning work.**
+
+**Owner direction:** Use generated sprites and illustrations for flavor and identity **where suitable**, then polish/edit selected designs using available Adobe workflows (Adobe Express layout and editable titles; image crop/color/cleanup; Illustrator/vectorization for clean emblems; font research with correct commercial-app licensing). Review before exporting; ship only static, frozen, approved resources with provenance, hashes and safe fallbacks. Avoid AI-generated tiny gameplay icons or lettering baked into covers; keep core gameplay and progress information as native accessible UI.
+
+| ID | Deliverable | Dependency / acceptance |
+| --- | --- | --- |
+| **WS-12A** | Cross-theme art-direction bible and pilot cover briefs (Woodland / Space / Garden) | Cozy paperback identity, original Woodland portraits preserved, 320dp/200%-font design rules |
+| **WS-12B** | Asset manifests, source/edit/rights ledger and stable IDs | Review states, editor approval, source & optimized SHA-256, frozen approved assets, no mystery files |
+| **WS-12C** | Generated-then-Adobe-refined cover/spine/emblem pilot pack | Shortlist, refine, rights audit, owner visual approval, readable static exports |
+| **WS-12D** | Earned cosmetic visuals (portraits, stamps, bookmarks, highlight/page-border themes) | Distinct from **playable Bookshelf**, consistent with existing asset IDs and free-unlock direction |
+| **WS-12E** | Android packaging, fallbacks, raster/vector optimization | No changed puzzle seeds, save schema or signer; APK-size, memory and UX checks |
+| **WS-12F** | Full source-hashed visual QA and reusable future-theme pipeline | Exact artifact manifests, multiple phone sizes, accessible alternatives, rollback plan |
+
+**Connection:** **WS-11A/B** can design Bookshelf UX and book metadata without finalized artwork; the **WS-11C/D pilot books** should use the WS-12C *approved* cover/emblem set once it exists and must wait for stable WS-10 versioned editorial content for actual fixed puzzles. **WS-10** future themes can reuse the art pipeline rather than generating inconsistent assets ad hoc. Font/art redistribution rights must be checked independently of the availability of Adobe tools. Preserve the previously approved Woodland art and all historical puzzle saves.
+
+---
+
 ## How to use this roadmap
 
 A milestone is done only when its acceptance evidence exists in **this** repository. A passing GitHub check is not a substitute for actual device play when gameplay/networking is involved. Use bounded branches and PRs, documented tests, and a known-green checkpoint after each major phase. Do not bulk-port Sudoku or break either app's save/release identity.
@@ -115,6 +134,7 @@ A milestone is done only when its acceptance evidence exists in **this** reposit
 | **WS-09F/G** | V4 giant-board placement, spatial quality and 105-word list UX | **EXPERIMENTAL CORE/QA GREEN; NO PUBLIC V4 SOLO** | Bounded spread-scored 40×40/50×50 research, alphabetical 105-word list, content proposals | Versioned approved V4 corpus, saves, real Android input/performance, maintain V1/V2/V3 golden compatibility |
 | **WS-10A–F** | 10,000+ unique approved-word lexicon | **10A CI GREEN; 10B NEXT, 10C–F PLANNED** | Source-verified candidate intake, human editorial themed packs, offline versioned content, repeat-play freshness | 10,000 approved (not imported) with rights/labels, content goldens and phone save/UX QA |
 | **WS-11A–E** | Puzzle Bookshelf — curated themed books, fixed chapters and bookmarks | **PLANNED; issue #90** | Browse paper-book-style volumes, replayable chapter manifest, local progress and Continue Reading; separate from Free Play/Daily/cosmetics | Approved versioned content, fixed-seed golden snapshots, save/backup/upgrade tests and real-phone accessibility |
+| **WS-12A–F** | Approved generated sprites + Adobe-refined visual production | **PLANNED; issue #91 / guide committed** | Book covers/spines/emblems, stamps, cosmetic art, original asset hash/rights ledger, polished static exports | Coherent style, editor signoff, source-hashed manifest, narrow-phone/readability/performance QA and safe fallbacks |
 | **WS-08** | Beta and launch readiness | PLANNED | Production signing/build, privacy/store preparation, Play testing; advertising and purchases deferred pending a new owner decision | Play test eligibility, AAB, real-device signoff, policy disclosures |
 
 | **ML-FUTURE** | Spanish and multilingual packs, UI localization, Unicode-safe engine | **RESEARCHED / DEFERRED** | Legacy-safe puzzle v2, reviewed Spanish vocab, independent UI/puzzle language, locale-aware Daily & LAN | Unicode, pack/license, real Android, save and two-phone tests |
