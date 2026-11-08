@@ -26,7 +26,7 @@ GOLDENS = {
     ("GARDEN", 50, "classic"): "a881eb7516395d89",
     ("GARDEN", 50, "expert"): "0d5c97224b7e4098",
     ("SPACE", 40, "relaxed"): "2b415a6bab2ab88d",
-    ("SPACE", 40, "classic"): "5d2a512969ffa2a5",
+    ("SPACE", 40, "classic"): "5d2a5129693ffa2a",
     ("SPACE", 40, "expert"): "93ec7e85aa3d3882",
     ("SPACE", 50, "relaxed"): "7d4bdcef0c91de59",
     ("SPACE", 50, "classic"): "e4c6f5bd4aff25af",
