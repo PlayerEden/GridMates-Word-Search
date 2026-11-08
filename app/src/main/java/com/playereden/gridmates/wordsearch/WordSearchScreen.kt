@@ -565,7 +565,10 @@ internal fun WordList(
             // Two-line entries must never spill under the pager. Keep more
             // vertical space than the old single-line pill layout allowed.
             val rowBudget = if (enlarged) 86.dp else 54.dp
-            val rowsPerPage = ((maxHeight - 40.dp) / rowBudget)
+            // Reserve one additional index/range row on giant puzzles.
+            // Without it a 200%-font list can push the pager off screen.
+            val reservedControls = if (giantWordList) 88.dp else 40.dp
+            val rowsPerPage = ((maxHeight - reservedControls) / rowBudget)
                 .toInt().coerceIn(1, 5)
             val perPage = columns * rowsPerPage
             val pageCount = ((targets.size + perPage - 1) / perPage).coerceAtLeast(1)
