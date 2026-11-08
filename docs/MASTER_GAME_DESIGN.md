@@ -332,6 +332,16 @@ For Word Search:
 - Rewards, if implemented, must be atomic, idempotent per dated challenge, and persisted safely.
 - Decide later whether GridMates titles share a common wallet; **assume they do not** for first release.
 
+### 7.4 Puzzle Bookshelf / thematic book collections — WS-11
+
+**Previously designed under [word-library research #18](https://github.com/PlayerEden/GridMates-Word-Search/issues/18) and restored as [dedicated WS-11 milestone #90](https://github.com/PlayerEden/GridMates-Word-Search/issues/90). This is NOT implemented in the current Android Collection tab.** The app's profile Collection currently focuses on portraits, fonts and earned cosmetics; these are distinct from content-filled, playable puzzle books.
+
+The **Library / Bookshelf** is a familiar paperback-inspired place to browse collections of curated, reproducible word-search *chapters*, with covers, chapter progress and a clear Continue Reading/bookmark action. First thematic pilots could be Woodland Vol. I, Space Vol. I and Garden Vol. I, pending editorial/content/visual approval. Books sit **alongside** endless randomly generated Free Play and deterministic Daily; none replaces another. Keep basic content accessible, offline and low-pressure; no forced login or paid/randomized entitlement for essential gameplay.
+
+Each chapter must pin a published `book_id`, `chapter_id`, fixed word/puzzle manifest or seed, approved lexicon/corpus version, generator version, size/difficulty and content hash. Chapter identity/selection must survive app upgrades; source-control actual golden puzzles and backup/recovery tests. A progress store tracks completed chapters, optional book completion and the current bookmark without rewriting existing Solo/Daily/puzzle-save schemas. **Research-only V4 PREVIEW IDs are not valid published book IDs.**
+
+**Roadmap:** WS-11A UX/metadata design; B immutable book/chapter schema; C curated approved pilot; D Android browsing/continue/play and persistence; E real-phone readability, offline/signed upgrade, chapter uniqueness and saved-book reconstruction QA. WS-10C/D approved themed content and stable IDs are dependencies for real chapters, but bookshelf design and isolated metadata tests can proceed sooner.
+
 ---
 
 ## 8. Monetization and publication boundaries
