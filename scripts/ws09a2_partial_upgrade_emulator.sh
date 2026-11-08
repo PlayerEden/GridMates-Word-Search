@@ -43,7 +43,7 @@ assert daily["2026-11-05"]["hints"] == {"BLOOM": 1}
 assert daily["2026-11-06"]["seed"] == 4153857886328470466
 assert daily["2026-11-06"]["found"] == ["BADGER"]
 assert daily["2026-11-06"]["hints"] == {"MOUSE": 2}
-assert old["identity"]["name"] == "WS09A2 Preserved Puzzle Player"
+assert old["identity"]["name"] == "WS09A2 Progress Tester"
 assert len(old["races"]) == len(old["duels"]) == 1
 print("PASS: actual v0.8.6 app read/flushed valid partial Solo and Daily content.")
 PY
