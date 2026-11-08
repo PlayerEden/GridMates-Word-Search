@@ -1,0 +1,4 @@
+<resources>
+    <!-- Debug-only launcher name. Release still uses normal app_name. -->
+    <string name="app_name">Word Search TEST</string>
+</resources>
