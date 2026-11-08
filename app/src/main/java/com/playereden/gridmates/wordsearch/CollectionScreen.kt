@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Modifier
@@ -255,7 +256,7 @@ internal fun CollectionScreen(store: SoloStore) {
         val current = achievementPage.coerceIn(0, pages - 1)
         orderedAchievements.drop(current * achievementPageSize).take(achievementPageSize)
             .forEach { item -> AchievementCard(item) }
-        CollectionPager(current, pages, onChange = { achievementPage = it })
+        CollectionPager(current, pages, id = "achievements", onChange = { achievementPage = it })
     } else {
         Text(portraits.count { it.unlocked }.toString() +
             " / " + portraits.size + " Woodland portraits available",
@@ -294,7 +295,7 @@ internal fun CollectionScreen(store: SoloStore) {
         val pages = ((portraits.size + portraitPageSize - 1) /
             portraitPageSize).coerceAtLeast(1)
         CollectionPager(portraitPage.coerceIn(0, pages - 1), pages,
-            onChange = { portraitPage = it })
+            id = "portraits", onChange = { portraitPage = it })
         Text("Unlocks depend on completed Solo and Daily puzzles. " +
             "No random purchases, streak deadlines or paid portraits.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
@@ -447,16 +448,18 @@ private fun AchievementCard(item: AchievementProgress) {
 
 /** Compact but complete gallery navigation: no rewards are hidden or discarded. */
 @Composable
-private fun CollectionPager(page: Int, pageCount: Int, onChange: (Int) -> Unit) {
+private fun CollectionPager(page: Int, pageCount: Int, id: String, onChange: (Int) -> Unit) {
     if (pageCount <= 1) return
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween) {
-        TextButton(onClick = { onChange(page - 1) }, enabled = page > 0) {
+        TextButton(onClick = { onChange(page - 1) }, enabled = page > 0,
+            modifier = Modifier.heightIn(min = 48.dp).testTag("$id-previous")) {
             Text("Previous")
         }
         Text("Page ${page + 1} of $pageCount",
             color = Muted, style = MaterialTheme.typography.labelMedium)
-        TextButton(onClick = { onChange(page + 1) }, enabled = page < pageCount - 1) {
+        TextButton(onClick = { onChange(page + 1) }, enabled = page < pageCount - 1,
+            modifier = Modifier.heightIn(min = 48.dp).testTag("$id-next")) {
             Text("Next")
         }
     }
