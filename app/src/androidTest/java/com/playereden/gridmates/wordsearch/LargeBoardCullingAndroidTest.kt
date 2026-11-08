@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -69,11 +70,9 @@ class LargeBoardCullingAndroidTest {
         assertEquals(full.width, culled.width)
         assertEquals(full.height, culled.height)
         var mismatches = 0
-        var painted = 0
         for (y in 0 until full.height step 2)
             for (x in 0 until full.width step 2) {
                 if (full[x,y] != culled[x,y]) mismatches++
-                if (full[x,y] != androidx.compose.ui.graphics.Color.White) painted++
             }
         assertTrue("Culling should not visibly alter central viewport ink",
             mismatches <= (full.width / 2) * (full.height / 2) / 100)
