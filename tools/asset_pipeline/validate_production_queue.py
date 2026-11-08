@@ -139,11 +139,13 @@ def audit_queue(root: Path) -> dict:
         raise ValueError("Original Woodland portraits must remain frozen")
 
     gates = q.get("release_gates", [])
-    if not isinstance(gates, list) or len(set(gates)) != len(gates) or len(gates) < 6:
-        raise ValueError("Missing distinct human/technical release gates")
+    if not isinstance(gates, list) or len(set(gates)) != len(gates):
+        raise ValueError("Release gates must be distinct")
     if not {"owner-visual-approval", "source-and-rights", "android-real-device",
             "old-portraits-and-saves-unchanged"}.issubset(gates):
         raise ValueError("Owner, legal, device and legacy protection gates are mandatory")
+    if len(gates) < 6:
+        raise ValueError("Missing distinct human/technical release gates")
 
     return {
         "status": "QUEUE_ONLY_NO_OWNER_APPROVAL",
