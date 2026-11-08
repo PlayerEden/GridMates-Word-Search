@@ -9,6 +9,8 @@ on:
       - feature/ws09f-c-content-supply-audit-2026-11-08
     paths:
       - 'tools/ws09f_c_content_audit.py'
+      - 'tools/ws09f_c_generator_lab.py'
+      - 'design/marathon/v4_candidate_additions.json'
       - '.github/workflows/ws09f-c-content-audit.yml'
 
 permissions:
@@ -21,7 +23,7 @@ concurrency:
 jobs:
   audit-v3-supply:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - name: Audit frozen v3 vocabulary before version-4 design
@@ -34,5 +36,17 @@ jobs:
             echo 'This is a lab analysis, not proof of 40×40/50×50 gameplay.'
             echo '```'
             cat /tmp/ws09fc-audit.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Probe deterministic 40x40 and 50x50 placement / 8-direction uniqueness
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/ws09f_c_generator_lab.py | tee /tmp/ws09fc-generator.txt
+          {
+            echo '### Experimental 40/50 puzzle-generator research'
+            echo 'Python-only candidate placement matrix, not the Android Kotlin engine.'
+            echo '```'
+            cat /tmp/ws09fc-generator.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
