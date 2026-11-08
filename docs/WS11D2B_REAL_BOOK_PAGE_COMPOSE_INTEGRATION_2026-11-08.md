@@ -24,6 +24,12 @@ A completed page shows its original registered answers for review; **Practice ag
 - No change to existing Home navigation, Solo, Daily, Nearby, cosmetic Collection, old portraits, or schema-5 saves.
 - No public Library button appears yet. **The first production BookCatalog remains intentionally empty** pending WS-10 editorial, content-rights and golden board approvals.
 
+## Internal navigation adapter added
+
+`BookLibraryFlow.kt` now connects the native `PuzzleBookshelfScreen`, `PuzzleBookDetailScreen` and new `BookPageGameplayScreen` into a complete internal route. Its only inputs are a caller-supplied approved `BookCatalog`, both independent book stores, effective board font and an Exit action. It does not create a catalog, activate an unapproved book, or alter `GridMatesShell`/MainActivity. A failed/unknown save shows recovery copy rather than pretending the library is empty.
+
+`BookLibraryFlowAndroidTest.kt` adds a synthetic-only instrumented route from Library to Garden chapter to real shared board and back, with an actual AtomicFile bookmark saved and a persisted session after returning. These test fixtures are excluded from production source. The Android CI compiles these tests; actual emulator/phone execution remains a distinct gate.
+
 ## Source tests added
 
 `BookPageGameplayScreenAndroidTest` has three **instrumentation source** tests:
