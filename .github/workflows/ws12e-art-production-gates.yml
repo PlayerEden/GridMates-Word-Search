@@ -1,0 +1,45 @@
+name: WS-12E Art Production and Approval Gates
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws12e-visual-production-system-and-ai-art-qa-2026-11-08
+  pull_request:
+    paths:
+      - 'design/asset-pipeline/**'
+      - 'tools/asset_pipeline/**'
+      - 'docs/WS12_*'
+      - '.github/workflows/ws12e-art-production-gates.yml'
+permissions:
+  contents: read
+jobs:
+  art-policy-and-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run existing art source determinism and ten new approval tests
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_*.py' -v
+      - name: Source-art manifest and family queue validation
+        run: |
+          python3 tools/asset_pipeline/validate.py --repo-root .
+          python3 tools/asset_pipeline/validate_production_queue.py --repo-root .
+      - name: Confirm this source-only PR does not ship unapproved art
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('design/asset-pipeline/production-queue-v1.json').read_text())
+          approved=json.loads(Path('design/asset-pipeline/approved-assets.json').read_text())
+          assert q['status'] == 'PLANNED_AND_PROTOTYPE_ONLY_NO_RELEASE_APPROVAL'
+          assert not approved['assets'], 'This PR has no verified owner art approvals'
+          assert all(a['status'] in {'prototype','planned'} and
+                     a['owner_approved'] is False
+                     for b in q['books'] for a in b['assets'])
+          print('PASS: complete prototype families, no false app art/approvals')
+          PY
+      - name: Record source-only boundary
+        run: |
+          echo '### WS-12E production system source QA' >> "$GITHUB_STEP_SUMMARY"
+          echo 'All existing art-source tests and new queue tests passed.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No owner-approved art, Android resources, new APK or Adobe edits.' >> "$GITHUB_STEP_SUMMARY"
