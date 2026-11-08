@@ -189,16 +189,22 @@ internal fun GridMatesShell(
                     pageName = Page.PLAY.name
                 })
             }
-        } else if (page == Page.BOOKS_QA && qa.enabled &&
-            qa.progressStore != null && qa.sessionStore != null) {
-            Box(Modifier.fillMaxSize().padding(contentPadding)) {
-                BookLibraryFlow(
-                    catalog = qa.catalog,
-                    progressStore = qa.progressStore,
-                    sessionStore = qa.sessionStore,
-                    boardFontId = soloStore.effectiveBoardFontId,
-                    onExit = { pageName = Page.PLAY.name }
-                )
+        } else if (page == Page.BOOKS_QA && qa.enabled) {
+            // Local vals are stable and avoid regenerating preview books at Home.
+            val progressStore = qa.progressStore
+            val sessionStore = qa.sessionStore
+            if (progressStore != null && sessionStore != null) {
+                Box(Modifier.fillMaxSize().padding(contentPadding)) {
+                    BookLibraryFlow(
+                        catalog = qa.catalog,
+                        progressStore = progressStore,
+                        sessionStore = sessionStore,
+                        boardFontId = soloStore.effectiveBoardFontId,
+                        onExit = { pageName = Page.PLAY.name }
+                    )
+                }
+            } else {
+                Text("Test books are unavailable in this build.")
             }
         } else if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
