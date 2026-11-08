@@ -1,0 +1,71 @@
+{
+  "schema": 4,
+  "active": {
+    "theme": "WOODLAND",
+    "difficulty": "MEDIUM",
+    "seed": 42,
+    "found": ["RACCOON"],
+    "hints": { "SAPLING": 2 },
+    "seconds": 734,
+    "board": "BOOK_CLASSIC",
+    "challenge": "CLASSIC"
+  },
+  "results": [],
+  "daily": [
+    {
+      "date": "2026-11-05",
+      "run": {
+        "theme": "GARDEN",
+        "difficulty": "EASY",
+        "seed": 2984779710590232787,
+        "found": ["PEONY"],
+        "hints": { "BLOOM": 1 },
+        "seconds": 83
+      }
+    },
+    {
+      "date": "2026-11-06",
+      "run": {
+        "theme": "WOODLAND",
+        "difficulty": "EASY",
+        "seed": 4153857886328470466,
+        "found": ["BADGER"],
+        "hints": { "MOUSE": 2 },
+        "seconds": 117
+      }
+    }
+  ],
+  "identity": {
+    "name": "WS09A2 Preserved Puzzle Player",
+    "portraitId": "woodland_owl"
+  },
+  "races": [
+    {
+      "room": "ws09a2-legacy-race",
+      "puzzle": "wordsearch:v2:en:GARDEN:BOOK_SHORT:RELAXED:1234",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "theme": "GARDEN",
+      "board": "BOOK_SHORT",
+      "challenge": "RELAXED",
+      "seat": "HOST",
+      "own": 8,
+      "partner": 4,
+      "completedAt": 1700000000000
+    }
+  ],
+  "duels": [
+    {
+      "room": "ws09a2-legacy-duel",
+      "puzzle": "wordsearch:v2:en:GARDEN:BOOK_SHORT:RELAXED:5678",
+      "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "theme": "GARDEN",
+      "board": "BOOK_SHORT",
+      "challenge": "RELAXED",
+      "seat": "HOST",
+      "winner": "HOST",
+      "own": 12,
+      "partner": 4,
+      "completedAt": 1700000001000
+    }
+  ]
+}
