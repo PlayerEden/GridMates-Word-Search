@@ -1,3 +1,5 @@
+**Genre research reference (Nov 8, 2026):** [Word Search — History, Audience, Rules, Stats & Design](./WORD_SEARCH_GENRE_MASTER_RESEARCH_2026-11-08.md) · [Word Library Inventory and Editorial Audit](./WORD_LIBRARY_STATUS_2026-11-08.md). These are living **research/reference documents**, not new Android build or release claims.
+
 **Current cosmetic policy (Nov 6, 2026):** All portraits, board fonts and marker styles are **free unlockables earned through gameplay/achievements**; a usable, legible default remains free. No font shop, paid fonts, billing integration, watch-to-unlock ads or gacha in the active development plan. Future monetization references elsewhere in this specification are optional possibilities only and require a separate explicit decision. Keep earned entitlements idempotent and persisted across restart; unknown equipped font IDs must safely fall back to the default.
 
 # GridMates: Word Search — Master Game Design Document
