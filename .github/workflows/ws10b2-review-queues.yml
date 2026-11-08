@@ -1,0 +1,85 @@
+name: WS-10B2 Review Queue from 36K Quarantine + Three Game Themes
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws10b2-v4-three-theme-review-queue-2026-11-08
+    paths:
+      - 'data/lexicon/intake/v4_three_theme_research_seed_suggestions.csv'
+      - 'tools/lexicon/prepare_theme_review.py'
+      - 'tools/lexicon/test_prepare_theme_review.py'
+      - '.github/workflows/ws10b2-review-queues.yml'
+
+permissions:
+  contents: read
+concurrency:
+  group: ws10b2-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theme-review-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run WS-10A/B1/B2 tests and assert no approved words
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/lexicon -p 'test_*.py' -v
+          python3 tools/lexicon/validate.py --data-dir data/lexicon             --json-out "$RUNNER_TEMP/existing-catalog-validation.json"
+      - name: Download exact official US dictionary ZIP and verify pinned SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2             --connect-timeout 12 --max-time 90 --silent --show-error             'https://github.com/en-wl/wordlist/releases/download/rel-2026.02.25/hunspell-en_US-2026.02.25.zip'             --output "$RUNNER_TEMP/esdb-en-us.zip"
+          echo 'ac8e73310e951d88c52c2cf2ba54ceaca34f8486a81630ac8a75dc5f931179f9  '"$RUNNER_TEMP/esdb-en-us.zip"             | sha256sum --check --status
+          test "$(wc -c < "$RUNNER_TEMP/esdb-en-us.zip")" -eq 187271
+      - name: Reproduce 36K source-only candidates in quarantine
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/lexicon/import_esdb_quarantine.py             --archive "$RUNNER_TEMP/esdb-en-us.zip"             --output-dir "$RUNNER_TEMP/ws10b2-quarantine" > /tmp/ws10b2-source-report.txt
+          grep -F '"approved_unique_added_to_game": 0' /tmp/ws10b2-source-report.txt
+      - name: Crosswalk existing Woodland, Space and Garden research with source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/lexicon/prepare_theme_review.py             --quarantine "$RUNNER_TEMP/ws10b2-quarantine/quarantine_candidates.csv"             --output-dir "$RUNNER_TEMP/ws10b2-review" | tee /tmp/ws10b2-review-report.txt
+          grep -F '"approved_unique_words": 0' /tmp/ws10b2-review-report.txt
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          original = json.loads((root/'ws10b2-quarantine/intake_report.json').read_text())
+          review = json.loads((root/'ws10b2-review/review_queue_report.json').read_text())
+          assert original['candidate_unique_unreviewed'] == 36213
+          assert review['quarantined_source_candidates'] == 36213
+          assert review['priority_research_seed_theme_assignments'] == 563
+          assert review['research_holds'] == 31
+          assert review['topic_review_queues'] == {
+              'woodland': 185, 'space': 183, 'garden': 164
+          }
+          assert review['approved_unique_words'] == review['approved_topic_assignments'] == 0
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('### WS-10B2 review-ready, not approved\n')
+              f.write('- **36,213** pinned-source quarantined dictionary candidates (no UI content).\n')
+              f.write('- **563** initial game-research theme suggestions: **532** reviewer queue rows (Woodland 185, Space 183, Garden 164) plus **31** research holds.\n')
+              f.write('- Every review decision is **BLANK**, every row explicitly requires human approval.\n')
+              f.write('- Notice and provenance included; old saved games, Android APK and dictionary untouched.\n')
+              f.write('- Source-absent words are highlighted for independent checking, not silently deleted.\n')
+          print('PASS: 36,213 source candidates; 532 original-theme reviewer rows; 31 holds; 0 approved.')
+          PY
+      - name: Publish 3 theme review sheets and source vault (NOT a game release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: WS10B2-EDITOR-REVIEW-3-THEMES-AND-36213-UNREVIEWED-SOURCE
+          path: |
+            ${{ runner.temp }}/ws10b2-review/
+            ${{ runner.temp }}/ws10b2-quarantine/
+          if-no-files-found: error
+          retention-days: 14
