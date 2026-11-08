@@ -60,7 +60,14 @@ internal object V4PreviewTierSelection {
         require(tentativeAdvanced.size >= advancedCount) {
             "Not enough advanced preview entries for this trial"
         }
-        V4PreviewPlacement.validatePool(tentativeRelaxed + tentativeAdvanced, target)
+        val allCandidates = tentativeRelaxed + tentativeAdvanced
+        // A five-letter palindrome such as RADAR is read in both opposite
+        // directions when placed once, violating our exact eight-way
+        // occurrence==1 rule regardless of seed/retries.
+        require(allCandidates.none { it == it.reversed() }) {
+            "V4 preview cannot include palindrome targets under eight-way uniqueness"
+        }
+        V4PreviewPlacement.validatePool(allCandidates, target)
         val common = shuffled(tentativeRelaxed, seeded(seed, theme, size, mode, "relaxed", drawIndex))
             .take(target - advancedCount)
         val advanced = shuffled(tentativeAdvanced, seeded(seed, theme, size, mode, "advanced", drawIndex))
