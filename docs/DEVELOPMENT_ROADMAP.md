@@ -1,7 +1,7 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State (November 7, 2026):** Latest source-matched verified QA candidate **WS-07I v0.8.5/code39, 94/94 API35 tests PASS**, stable test-signer v0.8.4→v0.8.5 upgrade preserved Solo/Daily/identity/Race/Duel; [draft PR #63](https://github.com/PlayerEden/GridMates-Word-Search/pull/63), [full emulator evidence](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42438847935), exact verified checkpoint `b3cd0ccd6ad09c1f610bb44cea597da7df091b38`. **New WS-09 foundation expansion is staged ahead of pre-existing WS-08 beta/release gates.** Physical two-phone P0 [#53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53) remains open/deferred; no merges or publication.
+**State (November 7 ET / November 8 UTC):** Verified **WS-09A2 v0.8.7/code41** at exact executable source `2bd6b6a005d361ebc3304a5d46044b83b7b0c283` — **97/97 API35 tests PASS**, pinned nine v1/v2/Daily goldens and real same-QA-signer v0.8.6→v0.8.7 **partially solved** Solo/Daily/profile/Race/Duel saved-data upgrade. [Build QA receipt](WS09A2_BUILD_QA_2026-11-07.md), [draft PR #66](https://github.com/PlayerEden/GridMates-Word-Search/pull/66). **WS-09B multiple active saved puzzles NEXT** ahead of existing WS-08 beta/release gate; physical two-phone P0 #53 and family older APK migration still OPEN. No merges/production releases.
 
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
@@ -12,7 +12,7 @@
 
 | ID | Priority/status | Outcome | Acceptance |
 | --- | --- | --- | --- |
-| **WS-09A** | **P0 — IN PROGRESS (A1 automated PASS)** | **WS-09A1** tests-only v0.8.6/code40 baseline [96/96 API35 + signed v0.8.5→v0.8.6 PASS](WS09A1_BUILD_QA_2026-11-07.md). **A2 NEXT:** hardcoded old puzzle goldens and real older partially played APK migration | Original v1/v2 layout hashes and old partially solved words/hints must survive across actual versioned generation changes, not just within one build; older family APK backup verified separately |
+| **WS-09A** | **A1+A2 AUTOMATED PASS; family APK migration OPEN** | A1 [v0.8.6, 96/96](WS09A1_BUILD_QA_2026-11-07.md); A2 [v0.8.7, 97/97](WS09A2_BUILD_QA_2026-11-07.md) with nine pinned v1/v2/Daily fingerprints and real v0.8.6→v0.8.7 saved partial Solo/Daily/Race/Duel upgrade. **WS-09B NEXT.** | An older family tester's actual APK version/signing/backup remain unknown; no destructive migration; future engine work must preserve frozen goldens |
 | **WS-09B** | **P0 — PLANNED** | Multiple unfinished Solo games and reliable session library (schema/DB decision after audit) | Three simultaneous saves resume after process death/update/backup; no silent replacement |
 | **WS-09C** | **P1 — PLANNED** | Simple pre-game mode/theme/size/challenge selection; Home Continue vs New | Setup occurs before gameplay; recent choices retained; Daily/Nearby remain clear |
 | **WS-09D** | **P0 UX — PLANNED** | Square zero-radius grid, no clipped corner cells, responsive ~16–20dp book-style side margins and precise viewport controls | Corner words fully visible/selectable; 320dp/large text/portrait/landscape; owner visual pass |
@@ -21,7 +21,7 @@
 | **WS-09G** | **P1 — PLANNED** | Compact Portraits/Fonts/Achievements, Records, Home and Settings refinement | Better space efficiency without reducing tap targets or legibility |
 | **WS-09H** | **P0 QA — PLANNED** | Integrated historical installs and backup, responsive/performance test, owner solo APK acceptance | Evidence-backed exact-source checkpoint; old-progress preservation; no false two-phone pass |
 
-**First slice WS-09A1 automated PASS:** [source-matched v0.8.6/code40 test receipt](WS09A1_BUILD_QA_2026-11-07.md), 96/96 API35 and signed old→new installation, exact executable source `d528afbfa157839a94813206b57b7b312f1af3d4` and checkpoint. No code/rules/save schema change apart from QA metadata and new test cases. **Next WS-09A2:** hardcoded old-grid golden snapshots and actual previous-version partial-progress installation tests. Keep draft PRs; physical Co-op P0 remains separate.
+**WS-09A1 and A2 automated PASS:** [A1 96/96](WS09A1_BUILD_QA_2026-11-07.md) plus [A2 97/97, fixed historic goldens and true nonempty saved-progress signed APK upgrade](WS09A2_BUILD_QA_2026-11-07.md). Exact v0.8.7 executable SHA `2bd6b6a005d361ebc3304a5d46044b83b7b0c283`, rollback checkpoint pinned. **Next WS-09B:** architect multiple resumable Solo puzzles and migration without losing schema4 history. The family member's unknown older signed APK and physical Co-op P0 #53 are still separate OPEN gates; no merge/release.
 
 ---
 
