@@ -32,7 +32,7 @@ jobs:
       - name: Download exact previously tested v0.8.1 QA APK
         uses: actions/download-artifact@v4
         with:
-          name: GridMates-WordSearch-WS07E-Records-Journal-v082
+          name: GridMates-WordSearch-WS07E-Daily-Clues-v081
           run-id: 42424216761
           github-token: ${{ github.token }}
           repository: PlayerEden/GridMates-Word-Search
