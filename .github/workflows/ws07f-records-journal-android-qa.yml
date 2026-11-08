@@ -1,0 +1,124 @@
+name: WS-07F Records Journal Navigation Android Emulator QA
+
+# Source-matched emulator QA is opt-in/branch-scoped to conserve Actions minutes.
+# It executes full Co-op, Race, Duel, Solo/Daily and save regression tests.
+# Source-matched real v0.8.1-to-v0.8.2 install-over, both result journals preserved.
+# Executes real pointer-injected touch tests for 15x15 and 20x20 board;
+# Rerun all gates after final compact Solo word pages and win/save HUD adjustments.
+# Touch follow-up: include finger-UP final coordinates and report selected endpoints.
+# WS-07F: verify paged Daily journal, no-cost saved clue review, and cumulative regressions.
+# Source-matched rerun: corrected stale saved-clue test assertion and compact Daily grouping.
+# Includes previous 90 tests plus 2 Records navigation tests and v0.8.1 -> v0.8.2 signed upgrade.
+# includes the exact same-signer v0.8.1 -> v0.8.2 update and save checks.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws07f-records-journal-navigation-2026-11-07
+    paths:
+      - '.github/workflows/ws07f-records-journal-android-qa.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  race-emulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact previously tested v0.8.1 QA APK
+        uses: actions/download-artifact@v4
+        with:
+          name: GridMates-WordSearch-WS07E-Records-Journal-v082
+          run-id: 42424216761
+          github-token: ${{ github.token }}
+          repository: PlayerEden/GridMates-Word-Search
+          path: qa-baseline
+      - name: Verify historical source-matched artifact checksum
+        run: |
+          echo 'd7d6707ca96b5afc938cee15acc341a0ae994d5ffce8eda8d029224800de20a0  qa-baseline/app-debug.apk' | sha256sum --check
+          echo 'cbe50b2b4a34f3a8433e28ddc0efd5307a1adf9aa91e324ca757f40c6aec91ee  qa-signing/wordsearch-qa.p12' | sha256sum --check
+      - name: Checkout approved Woodland originals
+        uses: actions/checkout@v4
+        with:
+          repository: PlayerEden/SudokuTogether
+          ref: 975e31a1e8cbfebad1fbbc7602b3340c357da7ef
+          path: _approved_sudoku
+          persist-credentials: false
+      - run: python3 scripts/import_woodland_portraits.py --source _approved_sudoku
+      - name: Checkout pinned licensed fonts
+        uses: actions/checkout@v4
+        with:
+          repository: google/fonts
+          ref: 24ddc1f324cac5d9f5aedca126d298f56e3f1640
+          path: _approved_fonts
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            ofl/atkinsonhyperlegible
+            ofl/ibmplexmono
+            ofl/dmmono
+            ofl/patrickhand
+      - name: Validate and package fonts and licenses
+        run: |
+          python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
+          python3 scripts/import_font_library.py --source _approved_fonts
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build code35 Records journal candidate and full regression
+        run: gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:compileDebugAndroidTestKotlin :app:assembleDebug
+      - name: Check APK package version and same trusted QA test signer
+        run: |
+          OLD=qa-baseline/app-debug.apk
+          NEW=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$NEW"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          "$AAPT" dump badging "$OLD" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='35'"
+          "$AAPT" dump badging "$NEW" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='36'"
+          SIGN="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$SIGN" verify --print-certs "$OLD" | grep 'Signer #1 certificate SHA-256 digest:' > /tmp/oldcert
+          "$SIGN" verify --print-certs "$NEW" | grep 'Signer #1 certificate SHA-256 digest:' > /tmp/newcert
+          diff -u /tmp/oldcert /tmp/newcert
+          cat /tmp/newcert
+      - name: Enable KVM for real API35 emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=static_node"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run v0.8.1-to-v0.8.2 APK upgrade and full on-device data integrity regression
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_4
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: bash ./scripts/ws07f_upgrade_emulator.sh
+      - name: Record checksum for cumulative v0.8.2 QA APK
+        run: sha256sum app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload instrumented test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GridMates-WordSearch-WS07F-Android-Test-Reports
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Publish cumulative stable-signed v0.8.2 QA APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GridMates-WordSearch-WS07F-Records-Journal-v082
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+          if-no-files-found: error
