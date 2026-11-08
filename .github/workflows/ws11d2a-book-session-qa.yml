@@ -1,0 +1,68 @@
+name: WS-11D2A Book Page Sessions, Resume and Two-File Recovery
+
+# Dedicated, low-cost source regression. Full Android QA still runs for PRs.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws11d2a-book-page-session-and-resume-2026-11-08
+    paths:
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/BookPageSession*'
+      - 'core/src/test/kotlin/com/playereden/gridmates/wordsearch/core/BookPageSessionTest.kt'
+      - 'app/src/main/java/com/playereden/gridmates/wordsearch/BookPageSessionStore.kt'
+      - 'app/src/androidTest/java/com/playereden/gridmates/wordsearch/BookPageSessionStoreAndroidTest.kt'
+      - '.github/workflows/ws11d2a-book-session-qa.yml'
+permissions:
+  contents: read
+
+concurrency:
+  group: ws11d2a-book-session-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  book-session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Run all existing core regression tests and new session recovery tests
+        run: gradle --no-daemon :core:test --console=plain
+      - name: Verify no accidental activation or old-save/schema modification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core')
+          app=Path('app/src/main/java/com/playereden/gridmates/wordsearch')
+          sessions=(root/'BookPageSession.kt').read_text()
+          codec=(root/'BookPageSessionCodec.kt').read_text()
+          store=(app/'BookPageSessionStore.kt').read_text()
+          assert 'WordSearchGeneratorV2.CONTENT_VERSION' in sessions
+          assert 'WordSearchGeneratorV3.CONTENT_VERSION' in sessions
+          assert 'BookProgressRules.recordVerifiedCompletion' in sessions
+          assert 'clearCommitted' in sessions and 'verifiedCompletion' in sessions
+          assert 'MessageDigest.isEqual' in codec
+          assert "'G'.code.toByte()" in codec
+          assert 'AtomicFile(' in store and 'recoverSolvedPages' in store
+          assert 'BookPageSessionStore' not in (app/'MainActivity.kt').read_text()
+          assert 'BookPageSessionStore' not in (app/'GridMatesShell.kt').read_text()
+          assert 'BookPageSession' not in (root/'SoloProgress.kt').read_text()
+          assert 'BookPageSession' not in (app/'SoloStore.kt').read_text()
+          print('PASS: safe in-progress book sessions, frozen legacy Solo, not player-visible.')
+          PY
+      - name: Record truthful scope
+        run: |
+          {
+            echo '### WS-11D2A source checkpoint'
+            echo 'Actual core JUnit and previous regression tests passed, including book session codec/resume/corruption and two-phase recovery.'
+            echo 'Android instrumentation source tests added; compiled by separate PR Android QA, not executed on a device here.'
+            echo 'No approved book pages, published catalog or Book Page screen hookup; no Solo schema migration or playable book APK.'
+          } >> "$GITHUB_STEP_SUMMARY"
