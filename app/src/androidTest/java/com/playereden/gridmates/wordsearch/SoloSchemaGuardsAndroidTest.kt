@@ -1,6 +1,7 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.test.platform.app.InstrumentationRegistry
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -72,6 +73,72 @@ class SoloSchemaGuardsAndroidTest {
             assertTrue(restored.active.foundIds.isEmpty())
             assertTrue(restored.active.hints.isEmpty())
             assertEquals(store.profile.active.puzzleId, restored.active.puzzleId)
+        } finally { clean(name) }
+    }
+
+    @Test fun invalidOrDuplicateSoloResultsFailClosedWithoutErasingLocalHistory() {
+        val name = "ws07i_solo_result_guard_" + System.nanoTime() + ".json"
+        val save = File(ctx.filesDir, name)
+        try {
+            val store = SoloStore(ctx, name)
+            val baseline = store.exportBackup()
+            val before = store.profile
+            val entry = JSONObject()
+                .put("id", "wordsearch:v2:en:WOODLAND:BOOK_CLASSIC:CLASSIC:123456")
+                .put("theme", "WOODLAND")
+                .put("difficulty", "MEDIUM")
+                .put("words", 12)
+                .put("seconds", 90)
+                .put("hints", 1)
+                .put("completedAt", 1783456789000L)
+                .put("board", "BOOK_CLASSIC")
+                .put("challenge", "CLASSIC")
+            val goodRoot = JSONObject(baseline)
+                .put("results", JSONArray().put(entry))
+            val imported = store.previewBackup(goodRoot.toString())
+            assertEquals(1, imported.results.size)
+            assertEquals(entry.getString("id"), imported.results.single().puzzleId)
+            // Preview is read-only: even a valid backup isn't installed without confirmation.
+            assertEquals(before, store.profile)
+
+            val corruptions = listOf<Pair<String, (JSONObject) -> Unit>>(
+                "duplicate id" to { root ->
+                    root.getJSONArray("results").put(JSONObject(entry.toString()))
+                },
+                "blank id" to { root ->
+                    root.getJSONArray("results").getJSONObject(0).put("id", "")
+                },
+                "zero words" to { root ->
+                    root.getJSONArray("results").getJSONObject(0).put("words", 0)
+                },
+                "negative elapsed time" to { root ->
+                    root.getJSONArray("results").getJSONObject(0).put("seconds", -1)
+                },
+                "negative hint count" to { root ->
+                    root.getJSONArray("results").getJSONObject(0).put("hints", -1)
+                },
+                "invalid completion timestamp" to { root ->
+                    root.getJSONArray("results").getJSONObject(0).put("completedAt", 0)
+                },
+                "non-object result" to { root ->
+                    root.getJSONArray("results").put("invalid-entry")
+                }
+            )
+            for ((label, poison) in corruptions) {
+                val invalid = JSONObject(goodRoot.toString()).also { poison(it) }.toString()
+                assertTrue("$label import should be rejected, never silently truncated",
+                    runCatching { store.previewBackup(invalid) }.isFailure)
+                assertEquals("$label import must not mutate current progress", before, store.profile)
+
+                save.writeText(invalid, Charsets.UTF_8)
+                val reopened = SoloStore(ctx, name)
+                assertTrue("$label corrupt installed save should warn", reopened.warning != null)
+                assertTrue("$label must block export of fabricated fallback",
+                    runCatching { reopened.exportBackup() }.isFailure)
+                reopened.flush()
+                assertEquals("$label original bytes protected", invalid, save.readText(Charsets.UTF_8))
+                save.writeText(baseline, Charsets.UTF_8)
+            }
         } finally { clean(name) }
     }
 
