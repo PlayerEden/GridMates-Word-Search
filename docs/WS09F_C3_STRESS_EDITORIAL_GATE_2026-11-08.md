@@ -2,6 +2,12 @@
 
 **November 8, 2026 · DRAFT LAB ONLY.** Stacks on [WS-09F-C2 Kotlin generator #79](https://github.com/PlayerEden/GridMates-Word-Search/pull/79), and its prerequisite [Python content lab #78](https://github.com/PlayerEden/GridMates-Word-Search/pull/78). No Android source, Play signing, puzzle sizes in New Solo, save schema, LAN protocol, or frozen version-1/2/3 generator is modified.
 
+## Final source-pinned checkpoint
+
+- **Final fully verified research source:** `8b45f35af7470e11d5887d1c2c953118a39c79c6` (Kotlin engine/stress, 18 pinned lab goldens, source-fixture parity and ten Space editorial suggestions audited together).
+- [Exact-source GitHub Actions #42472796378](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42472796378) **SUCCESS**: editorial validation + Kotlin compilation + 18 pinned goldens + 180 replay checks + **1,800/1,800 stress**; Space's ten additional suggestions pass substring-precheck but are explicitly **not editorially approved or included in the generator**.
+- [Immutable research rollback checkpoint](https://github.com/PlayerEden/GridMates-Word-Search/tree/checkpoint/ws09f-c3-kotlin-v4-1800-seeds-goldens-editorial-audit-green-2026-11-08). The final PR contains documentation committed later; do not confuse its docs-only head SHA with the compiled/tested source SHA.
+
 ## Full deterministic seed stress
 
 **Verified source** `53235e940099007d2e04b54d339e4418234c0354`:
