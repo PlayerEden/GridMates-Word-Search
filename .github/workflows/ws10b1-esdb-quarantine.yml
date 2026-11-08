@@ -1,0 +1,78 @@
+name: WS-10B1 Pinned US Word Dictionary Quarantine Import
+
+# Bulk word candidates are NEVER committed to playable Android source.
+# The archive version/hash and complete copyright notices are pinned.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws10b1-pinned-esdb-intake-2026-11-08
+    paths:
+      - 'data/lexicon/intake/**'
+      - 'data/lexicon/licenses/**'
+      - 'tools/lexicon/import_esdb_quarantine.py'
+      - 'tools/lexicon/test_import_esdb_quarantine.py'
+      - '.github/workflows/ws10b1-esdb-quarantine.yml'
+
+permissions:
+  contents: read
+concurrency:
+  group: ws10b1-us-import-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pinned-us-intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test fail-closed archive, license and candidate classification rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/lexicon -p 'test_*.py' -v
+          python3 tools/lexicon/validate.py --data-dir data/lexicon             --json-out /tmp/ws10-existing-candidates.json
+      - name: Download exactly pinned official en-US dictionary release
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://github.com/en-wl/wordlist/releases/download/rel-2026.02.25/hunspell-en_US-2026.02.25.zip'
+          curl --fail --location --retry 3 --retry-delay 2 --connect-timeout 12             --max-time 90 --silent --show-error             "$URL" --output "$RUNNER_TEMP/esdb-en-us.zip"
+          echo 'ac8e73310e951d88c52c2cf2ba54ceaca34f8486a81630ac8a75dc5f931179f9  '"$RUNNER_TEMP/esdb-en-us.zip"             | sha256sum --check --status
+          test "$(wc -c < "$RUNNER_TEMP/esdb-en-us.zip")" -eq 187271
+          echo 'PASS: exact official release ZIP SHA-256 and byte size.'
+      - name: Extract spelling roots to isolated, UNREVIEWED quarantine (never Android)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/lexicon/import_esdb_quarantine.py             --archive "$RUNNER_TEMP/esdb-en-us.zip"             --output-dir "$RUNNER_TEMP/ws10b1-quarantine"             | tee /tmp/ws10b1-report.txt
+          grep -F '"approved_unique_added_to_game": 0' /tmp/ws10b1-report.txt
+          python3 - <<'PY'
+          import json, os, pathlib
+          output = pathlib.Path(os.environ["RUNNER_TEMP"]) / 'ws10b1-quarantine'
+          report = json.loads((output / 'intake_report.json').read_text())
+          assert report['candidate_unique_unreviewed'] >= 10000, (
+              'Unexpectedly small full dictionary source; investigate upstream format')
+          assert report['license_notice_included']
+          assert report['approved_unique_added_to_game'] == 0
+          assert report['thematically_assigned_to_game'] == 0
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('### WS-10B1 — Pinned ESDB en-US quarantine import\n')
+              f.write(f"- **{report['candidate_unique_unreviewed']:,} unreviewed dictionary-root candidates**, not yet theme-curated or playable.\n")
+              f.write(f"- Source verified: release {report['source_release_tag']}, SHA-256 {report['archive_sha256_verified']}\n")
+              f.write(f"- Already in 40-word sample: {report['candidate_already_in_starter_catalog']} (not double-counted).\n")
+              f.write(f"- Palindrome candidates flagged: {report['candidate_palindrome_flags']} (not globally deleted).\n")
+              f.write('- Exact pinned copyright notice included with artifact. **0 approved, 0 added to Android.**\n')
+              f.write('- Manual thematic assignment, usage/appropriateness review and end-user redistribution notices are still required.\n')
+          print('PASS: >=10k real source roots in quarantined artifact; zero automatic approvals.')
+          PY
+      - name: Publish source-attributed candidate vault for editorial staging ONLY
+        uses: actions/upload-artifact@v4
+        with:
+          name: WS10B1-ESDB-US-20260225-UNREVIEWED-CANDIDATES-AND-COPYRIGHT
+          path: ${{ runner.temp }}/ws10b1-quarantine/
+          if-no-files-found: error
+          retention-days: 14
