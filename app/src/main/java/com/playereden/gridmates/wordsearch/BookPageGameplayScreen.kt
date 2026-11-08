@@ -304,7 +304,7 @@ internal fun BookPageGameplayScreen(
                             choose, onStep = {}, boardFontId = boardFontId)
                     }
                     WordList(board, wordsFound, daily = false,
-                        modifier = Modifier.weight(1f).fillMaxHeight())
+                        modifier = Modifier.weight(1f).fillMaxHeight(), scrollAll = true)
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -312,7 +312,7 @@ internal fun BookPageGameplayScreen(
                         choose, onStep = {}, boardFontId = boardFontId)
                 }
                 WordList(board, wordsFound, daily = false,
-                    modifier = Modifier.fillMaxWidth().weight(1f))
+                    modifier = Modifier.fillMaxWidth().weight(1f), scrollAll = true)
             }
         }
     }
