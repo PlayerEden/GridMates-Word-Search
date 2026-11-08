@@ -8,7 +8,7 @@
   "style_bible": "docs/WS12_ART_DIRECTION_STYLE_BIBLE.md",
   "production_playbook": "docs/WS12_AI_ASSET_PRODUCTION_PLAYBOOK.md",
   "frozen_originals_policy": "No new production imports/replaces of the 12 existing Woodland portraits; no change to portrait IDs/unlocks or historical save schemas",
-  "first_owner_review": "Woodland: cover + emblem + chapter marker + bookmark + seal as a single family on the real Bookshelf screen at 320dp",
+  "first_owner_review": "Woodland six-piece family (existing five SVG prototypes + new derived spine) reviewed next to the actual 320dp Bookshelf screenshot",
   "books": [
     {
       "theme_id": "woodland",
@@ -30,12 +30,12 @@
         {
           "asset_id": "gmws-woodland-spine-v1",
           "kind": "spine",
-          "status": "planned",
-          "source_renderer": null,
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_family_review.py",
           "target_preview_dp": 48,
           "native_text_required": true,
           "owner_approved": false,
-          "next_gate": "create derived vector using same v1 motif and palette"
+          "next_gate": "review matching generated spine with cover and 4 companion motifs at 48dp/140dp; do not ship before owner signoff"
         },
         {
           "asset_id": "gmws-woodland-theme-emblem-v1",
@@ -99,12 +99,12 @@
         {
           "asset_id": "gmws-space-spine-v1",
           "kind": "spine",
-          "status": "planned",
-          "source_renderer": null,
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_family_review.py",
           "target_preview_dp": 48,
           "native_text_required": true,
           "owner_approved": false,
-          "next_gate": "create derived vector using same v1 motif and palette"
+          "next_gate": "review matching generated spine with cover and 4 companion motifs at 48dp/140dp; do not ship before owner signoff"
         },
         {
           "asset_id": "gmws-space-theme-emblem-v1",
@@ -168,12 +168,12 @@
         {
           "asset_id": "gmws-garden-spine-v1",
           "kind": "spine",
-          "status": "planned",
-          "source_renderer": null,
+          "status": "prototype",
+          "source_renderer": "tools/asset_pipeline/render_family_review.py",
           "target_preview_dp": 48,
           "native_text_required": true,
           "owner_approved": false,
-          "next_gate": "create derived vector using same v1 motif and palette"
+          "next_gate": "review matching generated spine with cover and 4 companion motifs at 48dp/140dp; do not ship before owner signoff"
         },
         {
           "asset_id": "gmws-garden-theme-emblem-v1",
