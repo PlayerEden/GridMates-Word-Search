@@ -10,6 +10,14 @@
 
 ---
 
+## WS-09 owner playtest direction — foundation before expansion (November 7, 2026)
+
+The owner and a family player reviewed **15 actual v0.8.5 Android phone screenshots**. Agreed direction: zero-radius **square actual grid** without clipped corner letters, responsive book-style side margins, calm/readable paperback presentation, and simpler pre-game mode/theme/board/challenge selection instead of configuring the puzzle after entering it. Support multiple unfinished Solo puzzles and eventually one **continuous** 100×100 Marathon board with optional regional navigation (regions are not separate puzzles). Improve giant-board panning, 2-tap selection, word-list accessibility, Home, Records, Collections, Fonts and Settings. Preserve small puzzles, content/difficulty independence, and readable typography. **Do not treat 100×100 as already feasible/implemented.**
+
+**Critical release priority:** A family tester is actively playing an older APK; identify exact version/signer and verify portable export before any destructive migration. Freeze legacy puzzle seed-to-layout behavior, make new generators versioned and verify genuine signed upgrade/restore of partial found words, hints, timers, Daily/profile/match journals. Default QA only; all drafts unmerged. Existing WS-08 beta gate and physical Co-op P0 stay open. Work and exact acceptance criteria live in **[WS-09 foundation plan](WS09_FOUNDATIONS_GAMEPLAY_SAVE_MARATHON_2026-11-07.md)** and the [master roadmap](DEVELOPMENT_ROADMAP.md).
+
+---
+
 ## 0. Status key and decision authority
 
 - **DECIDED** = directly agreed in the planning conversation or inherited as an established GridMates series direction.
