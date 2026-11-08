@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - name: Download exact previously tested v0.8.2 QA APK
+      - name: Download exact previously tested v0.8.3 QA APK
         uses: actions/download-artifact@v4
         with:
           name: GridMates-WordSearch-WS07G-Collections-v083
@@ -73,8 +73,8 @@ jobs:
           NEW=app/build/outputs/apk/debug/app-debug.apk
           test -s "$NEW"
           AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
-          "$AAPT" dump badging "$OLD" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='38'"
-          "$AAPT" dump badging "$NEW" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='37'"
+          "$AAPT" dump badging "$OLD" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='37'"
+          "$AAPT" dump badging "$NEW" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='38'"
           SIGN="$ANDROID_HOME/build-tools/35.0.0/apksigner"
           "$SIGN" verify --print-certs "$OLD" | grep 'Signer #1 certificate SHA-256 digest:' > /tmp/oldcert
           "$SIGN" verify --print-certs "$NEW" | grep 'Signer #1 certificate SHA-256 digest:' > /tmp/newcert
