@@ -1,6 +1,6 @@
 # WS-07F — Records journal navigation
 
-**Status:** Implementation in [draft PR #60](https://github.com/PlayerEden/GridMates-Word-Search/pull/60), Android verification pending. Stacked on verified WS-07E #58; no `main` merge.
+**Status:** Implementation in [draft PR #60](https://github.com/PlayerEden/GridMates-Word-Search/pull/60), **Automated PASS 92/92 API35; owner visual and two-phone acceptance OPEN.** Stacked on verified WS-07E #58; no `main` merge.
 
 ## User problem
 The original Records page stacked Solo, Race and Duel summaries and histories vertically. Even after long scrolling, it displayed only the newest 25 Solo, 15 Race and 12 Duel records, silently hiding older history.
@@ -14,12 +14,12 @@ The original Records page stacked Solo, Race and Duel summaries and histories ve
 - QA-only Android **v0.8.2 code36** with unchanged QA signer.
 
 ## Acceptance
-- [ ] Standard Android build, lint, unit tests and instrumentation compile PASS.
-- [ ] Android UI tests: Solo, Race, Duel tabs expose only the selected section; at 360×720dp the selected Race/Duel heading is actually **visible**, not merely mounted off-screen. The test uses the real shell's scrolling layout.
-- [ ] Page math: 0 and 4 entries => one page, 5 => two, 25 => seven, 50 => thirteen.
-- [ ] Full API35 suite (prior 90 plus two new) PASS with zero failures/skips.
-- [ ] Real QA-signed v0.8.1 code35→v0.8.2 code36 install-over preserves Solo, Daily, identity, Race, Duel and save schema4.
-- [ ] Record exact source SHA, APK checksum, signer, artifacts, expiry, checkpoint and rollback after green full run.
+- [x] Standard Android build, lint, unit tests and instrumentation compile PASS.
+- [x] Android UI tests: Solo, Race, Duel tabs expose only the selected section; at 360×720dp the selected Race/Duel heading is actually **visible**, not merely mounted off-screen. The test uses the real shell's scrolling layout.
+- [x] Page math: 0 and 4 entries => one page, 5 => two, 25 => seven, 50 => thirteen.
+- [x] Full API35 suite (prior 90 plus two new) PASS with zero failures/skips.
+- [x] Real QA-signed v0.8.1 code35→v0.8.2 code36 install-over preserves Solo, Daily, identity, Race, Duel and save schema4.
+- [x] Record exact source SHA, APK checksum, signer, artifacts, expiry, checkpoint and rollback after green full run.
 - [ ] Real device/two-phone acceptance **deferred by owner**, original Co-op P0 #53 OPEN; no production release.
 
 ## Further refinement
@@ -31,3 +31,8 @@ Collections/achievements still deserve their own accessibility and content audit
 ## Emulator run diagnosis (first WS-07F execution)
 
 [API35 run #42430710954](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42430710954) installed v0.8.2 over v0.8.1 and preserved existing Solo/Daily/identity/Race/Duel records, but **failed 1 of 92 UI tests**: the new Race heading was not discoverable from an unscrollable 360×720dp test viewport. The correction moves the mode tabs above Solo/Daily-only summary cards and tests visibility inside the actual scrollable shell layout. This earlier run is **NOT** a passing WS-07F checkpoint. Full QA must rerun at the updated source revision.
+
+
+## Verified automated outcome
+
+[Full source-matched receipt](WS07F_RECORDS_BUILD_QA_2026-11-07.md): **92/92 API35 tests green**, first failed 360dp Race visibility repaired, actual signed v0.8.1→v0.8.2 saves retained; tested executable `85ee1c05a8d3f34c8486282ac74fb58b64e29927`, APK SHA-256 `53f2ac5f9226312a2e04101445c8f755b129ab81abcbcd910faf7926e2181d2f`. **Physical owner testing not performed.**
