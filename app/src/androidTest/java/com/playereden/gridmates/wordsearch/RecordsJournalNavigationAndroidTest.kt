@@ -1,6 +1,8 @@
 package com.playereden.gridmates.wordsearch
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
@@ -33,22 +35,23 @@ class RecordsJournalNavigationAndroidTest {
             val store = SoloStore(context, name)
             compose.setContent {
                 GridMatesTheme {
-                    Box(Modifier.width(360.dp).height(720.dp)) {
+                    Column(Modifier.width(360.dp).height(720.dp)
+                        .verticalScroll(rememberScrollState())) {
                         SoloRecordsScreen(store.profile)
                     }
                 }
             }
             compose.onNodeWithText("Browse your results").assertExists()
             compose.onNodeWithText("Solo").assertExists()
-            compose.onNodeWithText("Race").assertExists()
-            compose.onNodeWithText("Duel").assertExists()
+            compose.onNodeWithText("Race").assertIsDisplayed()
+            compose.onNodeWithText("Duel").assertIsDisplayed()
             compose.onNodeWithText("Recent puzzles").assertExists()
             compose.onNodeWithText("Shared Board Race").assertDoesNotExist()
             compose.onNodeWithText("Race").performClick()
-            compose.onNodeWithText("Shared Board Race").assertExists()
+            compose.onNodeWithText("Shared Board Race").assertIsDisplayed()
             compose.onNodeWithText("Recent puzzles").assertDoesNotExist()
             compose.onNodeWithText("Duel").performClick()
-            compose.onNodeWithText("Speed Duel").assertExists()
+            compose.onNodeWithText("Speed Duel").assertIsDisplayed()
             compose.onNodeWithText("Shared Board Race").assertDoesNotExist()
             compose.onNodeWithText("Solo").performClick()
             compose.onNodeWithText("Recent puzzles").assertExists()
