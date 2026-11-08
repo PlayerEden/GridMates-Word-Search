@@ -81,6 +81,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BoardViewportTransform
 import com.playereden.gridmates.wordsearch.core.LargeBoardViewport
+import com.playereden.gridmates.wordsearch.core.BoardRenderWindow
 import com.playereden.gridmates.wordsearch.core.PaperbackPageLayout
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.DragDirection
@@ -750,6 +751,12 @@ internal fun ZoomableWordGrid(
                     }
                 }
             ) {
+                // At Fit draw every cell as before. Once zoomed, only
+                // visible/one-cell-overscan ink and rules are sent to Canvas.
+                // Hit testing still works in full puzzle coordinates.
+                val drawWindow = if (largeBoard && currentZoom > 1f)
+                    BoardRenderWindow.around(largeTransform, sidePx, puzzle.size)
+                    else null
                 WordGrid(
                     puzzle, found, hintPaths,
                     modifier = Modifier.size(side).graphicsLayer {
@@ -763,6 +770,7 @@ internal fun ZoomableWordGrid(
                     boardFontId = boardFontId,
                     partnerFoundIds = partnerFoundIds,
                     boardLookId = boardLookId,
+                    renderWindow = drawWindow,
                     multiTouchActive = multiTouch,
                     onPreciseRequest = { preciseOpen = true }
                 )
@@ -798,6 +806,7 @@ private fun WordGrid(
     boardFontId: String,
     partnerFoundIds: Set<String> = emptySet(),
     boardLookId: String = "classic",
+    renderWindow: BoardRenderWindow? = null,
     multiTouchActive: Boolean = false,
     onPreciseRequest: () -> Unit = {}
 ) {
@@ -850,19 +859,31 @@ private fun WordGrid(
             // Rounded corners hide parts of corner letters/selection traces.
             .background(palette.background)
             .drawBehind {
-                // Draw the *same exact* row/column boundaries used for
-                // actual letter centers and pointer hit mapping.
+                // Same full-board coordinates as selection geometry, but
+                // zoomed large boards only issue draw calls near the screen.
                 val cell = size.width / puzzle.size
+                val rowCell = size.height / puzzle.size
                 val thinRule = 0.6.dp.toPx()
-                for (index in 1 until puzzle.size) {
+                val rowsToDraw = renderWindow?.rows ?: (0 until puzzle.size)
+                val colsToDraw = renderWindow?.columns ?: (0 until puzzle.size)
+                val top = rowsToDraw.first * rowCell
+                val bottom = (rowsToDraw.last + 1) * rowCell
+                val left = colsToDraw.first * cell
+                val right = (colsToDraw.last + 1) * cell
+                for (index in (colsToDraw.first + 1)..colsToDraw.last) {
                     val x = index * cell
-                    drawLine(palette.lines, Offset(x, 0f), Offset(x, size.height), thinRule)
-                    val y = index * (size.height / puzzle.size)
-                    drawLine(palette.lines, Offset(0f, y), Offset(size.width, y), thinRule)
+                    drawLine(palette.lines, Offset(x, top),
+                        Offset(x, bottom), thinRule)
+                }
+                for (index in (rowsToDraw.first + 1)..rowsToDraw.last) {
+                    val y = index * rowCell
+                    drawLine(palette.lines, Offset(left, y),
+                        Offset(right, y), thinRule)
                 }
                 fun center(p: GridPoint) = Offset((p.col + 0.5f) * cell, (p.row + 0.5f) * cell)
                 hintPaths.forEach { path ->
-                    if (path.size > 1) drawLine(
+                    if (path.size > 1 &&
+                        (renderWindow == null || renderWindow.mayIntersect(path))) drawLine(
                         ActiveMarker.copy(alpha = 0.22f),
                         center(path.first()), center(path.last()),
                         strokeWidth = cell * 0.38f,
@@ -870,7 +891,8 @@ private fun WordGrid(
                     )
                 }
                 confirmed.forEach { (path, isPartner) ->
-                    if (path.size > 1) drawLine(
+                    if (path.size > 1 &&
+                        (renderWindow == null || renderWindow.mayIntersect(path))) drawLine(
                         (if (isPartner) PartnerMarker else FoundMarker).copy(alpha = 0.58f),
                         center(path.first()), center(path.last()),
                         strokeWidth = cell * 0.54f,
@@ -878,13 +900,15 @@ private fun WordGrid(
                     )
                 }
                 when {
-                    active.size > 1 -> drawLine(
+                    active.size > 1 &&
+                        (renderWindow == null || renderWindow.mayIntersect(active)) -> drawLine(
                         ActiveMarker.copy(alpha = 0.66f),
                         center(active.first()), center(active.last()),
                         strokeWidth = cell * 0.58f,
                         cap = StrokeCap.Round
                     )
-                    active.size == 1 -> drawCircle(
+                    active.size == 1 &&
+                        (renderWindow == null || renderWindow.mayIntersect(active)) -> drawCircle(
                         ActiveMarker.copy(alpha = 0.52f),
                         radius = cell * 0.30f,
                         center = center(active.first())
@@ -893,7 +917,7 @@ private fun WordGrid(
                 // Type-specific real ink bounds determine optical centering.
                 // No independent fontScale: all content is enlarged by the
                 // whole-board graphics transform above.
-                glyphPainter.drawLetters(this, puzzle.rows, palette.letters)
+                glyphPainter.drawLetters(this, puzzle.rows, palette.letters, renderWindow)
             }
             .border(2.dp, palette.frame)
             .onSizeChanged { sizePx = it }
