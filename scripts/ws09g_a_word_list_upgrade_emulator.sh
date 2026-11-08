@@ -83,5 +83,7 @@ assert new["daily"][1]["run"]["found"] == ["BADGER"]
 print("PASS: same-signer v0.9.3 -> v0.9.4 retained active Solo, two paused puzzles, Daily and Versus records.")
 PY
 
-gradle --no-daemon :app:connectedDebugAndroidTest
-echo 'PASS: WS-09G-A A-Z future giant-word-list UI, original legacy 114+3 instrumented Android tests and same-signer schema5 v0.9.3-to-private-v0.9.4 install-over.'
+gradle --no-daemon :app:connectedDebugAndroidTest | tee /tmp/ws09g-a-android-tests.log
+grep -F 'Starting 117 tests' /tmp/ws09g-a-android-tests.log
+grep -F 'Finished 117 tests' /tmp/ws09g-a-android-tests.log
+echo 'PASS: WS-09G-A future giant-word-list UI, 117 Android tests (114 previous + 3 new), and same-signer schema5 v0.9.3-to-private-v0.9.4 install-over.'
