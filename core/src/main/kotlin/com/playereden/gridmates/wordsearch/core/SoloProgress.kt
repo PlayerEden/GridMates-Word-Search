@@ -16,7 +16,9 @@ data class SoloRun(
 ) {
     val puzzleId: String get() =
         if (boardSize != null && challenge != null)
-            WordSearchGeneratorV2.puzzleId(theme, boardSize, challenge, seed)
+            if (boardSize in PuzzleBoardSize.largePresets)
+                WordSearchGeneratorV3.puzzleId(theme, boardSize, challenge, seed)
+            else WordSearchGeneratorV2.puzzleId(theme, boardSize, challenge, seed)
         else "wordsearch:v1:" + theme.name + ":" + difficulty.name + ":" + seed
 }
 
@@ -64,6 +66,8 @@ object WordHintPolicy {
         if (daily) return 2
         val cells = run.boardSize?.cells ?: run.difficulty.gridSize
         return when {
+            cells >= 30 -> 8
+            cells >= 25 -> 6
             cells >= 20 -> 4
             cells >= 15 -> 3
             else -> 2
@@ -95,8 +99,25 @@ object SoloProgressRules {
     fun freshV2(
         theme: WordTheme, board: PuzzleBoardSize,
         challenge: PuzzleChallenge, seed: Long
-    ): SoloRun = SoloRun(theme, challenge.legacyDifficulty, seed,
-        boardSize = board, challenge = challenge)
+    ): SoloRun {
+        require(board in PuzzleBoardSize.v2Presets) { "V2 run cannot use a v3 board" }
+        return SoloRun(theme, challenge.legacyDifficulty, seed,
+            boardSize = board, challenge = challenge)
+    }
+
+    fun freshV3(
+        theme: WordTheme, board: PuzzleBoardSize,
+        challenge: PuzzleChallenge, seed: Long
+    ): SoloRun {
+        require(board in PuzzleBoardSize.largePresets) { "V3 needs a large board" }
+        return SoloRun(theme, challenge.legacyDifficulty, seed,
+            boardSize = board, challenge = challenge)
+    }
+
+    fun freshForBoard(theme: WordTheme, board: PuzzleBoardSize,
+                      challenge: PuzzleChallenge, seed: Long): SoloRun =
+        if (board in PuzzleBoardSize.largePresets) freshV3(theme, board, challenge, seed)
+        else freshV2(theme, board, challenge, seed)
 
     /** Version dispatch is the only place that reconstructs a saved puzzle. */
     @Synchronized
@@ -106,11 +127,13 @@ object SoloProgressRules {
         }
         val id = run.puzzleId
         puzzleCache[id]?.let { return it }
-        val generated = if (run.boardSize == null) {
-            WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
-        } else {
-            WordSearchGeneratorV2.generate(
-                run.theme, run.boardSize, requireNotNull(run.challenge), run.seed
+        val generated = when (val board = run.boardSize) {
+            null -> WordSearchGenerator.generate(run.theme, run.difficulty, run.seed)
+            in PuzzleBoardSize.largePresets -> WordSearchGeneratorV3.generate(
+                run.theme, board, requireNotNull(run.challenge), run.seed
+            )
+            else -> WordSearchGeneratorV2.generate(
+                run.theme, board, requireNotNull(run.challenge), run.seed
             )
         }
         check(generated.id == id) { "Puzzle ID mismatch for cached seed" }

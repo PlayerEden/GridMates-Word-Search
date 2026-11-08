@@ -31,7 +31,7 @@ import com.playereden.gridmates.wordsearch.core.WordTheme
 /**
  * WS-09C setup is a distinct route, not an in-game dialog. Nothing changes in
  * SoloStore until Start puzzle succeeds; cancel/back is always non-destructive.
- * Only live book-size generator options are offered, never future 100×100 sizes.
+ * Live 12–30 cell presets only. The giant 100×100 viewport is future work.
  */
 @Composable
 internal fun SoloSetupScreen(
@@ -67,7 +67,7 @@ internal fun SoloSetupScreen(
         SetupChoice(
             title = "Board size",
             selection = "${board.label} · ${board.cells}×${board.cells} · ${board.targets} words",
-            options = PuzzleBoardSize.bookPresets.map {
+            options = PuzzleBoardSize.soloPresets.map {
                 it.name to "${it.label} · ${it.cells}×${it.cells} · ${it.targets} words"
             },
             onSelect = { boardName = it }
@@ -93,7 +93,7 @@ internal fun SoloSetupScreen(
         store.warning?.let { Text(it, color = Gold,
             style = MaterialTheme.typography.bodySmall) }
         Button(onClick = {
-            if (store.chooseV2(theme, board, challenge)) onStarted()
+            if (store.chooseSolo(theme, board, challenge)) onStarted()
         }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
             Text("Start puzzle", maxLines = 1)
         }
