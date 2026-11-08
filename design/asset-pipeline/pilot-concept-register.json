@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "content_status": "CONCEPTS_ONLY_UNAPPROVED_NOT_IN_ANDROID",
+  "created_on": "2026-11-08",
+  "concept_bundle_filename": "GridMates_WS12_Pilot_Book_Concepts.zip",
+  "concept_bundle_location": "conversation-attachment-only",
+  "derived_from": "generated-set-b-book-styleboard",
+  "source_concept_options": [
+    {
+      "id": "set-a",
+      "filename": "set_a_book_styleboard.png",
+      "sha256": "ba069acde08a6b2947e2090c5c8e401a95b374cfb3c2616c3b2a190c2ccb5320",
+      "status": "concept"
+    },
+    {
+      "id": "set-b",
+      "filename": "set_b_book_styleboard.png",
+      "sha256": "77d44a072a3bdc94f82efb9f0021b69f5eb1dc6951472744c040d08d725a6b48",
+      "status": "concept"
+    }
+  ],
+  "book_concept_candidates": [
+    {
+      "asset_id": "gmws-book-woodland-vol1-concept-b1",
+      "theme": "woodland",
+      "book_title_proposal": "Woodland",
+      "volume": "I",
+      "crop_filename": "woodland_volume_1_concept_crop.webp",
+      "crop_sha256": "11305468e35470a140cbcefdd45c1e50ab539bc7fe9aea0b1192fa472711b7c7",
+      "thumbnail_filename": "woodland_small_phone_preview.webp",
+      "thumbnail_sha256": "7bd05e0bc4565eeecc24a3e810197bc2a971a6f124d2d2ee691be42bb0d6731d",
+      "crop_bbox": [
+        142,
+        5,
+        554,
+        569
+      ],
+      "review_status": "concept",
+      "display_text_baked_into_pixels": true,
+      "native_ui_text_required": true,
+      "adobe_refined": false,
+      "owner_approved": false,
+      "exported_to_android": false
+    },
+    {
+      "asset_id": "gmws-book-space-vol1-concept-b1",
+      "theme": "space",
+      "book_title_proposal": "Space",
+      "volume": "I",
+      "crop_filename": "space_volume_1_concept_crop.webp",
+      "crop_sha256": "53996108765107c789765c579276f2d7c2582b8b2e6adce73c9c2a9fa076ce4b",
+      "thumbnail_filename": "space_small_phone_preview.webp",
+      "thumbnail_sha256": "6ac505fcbcb7ca7d6301163ac1c60ea08789eebf2f4c520fc6c60a5f9f1384bd",
+      "crop_bbox": [
+        566,
+        5,
+        1029,
+        569
+      ],
+      "review_status": "concept",
+      "display_text_baked_into_pixels": true,
+      "native_ui_text_required": true,
+      "adobe_refined": false,
+      "owner_approved": false,
+      "exported_to_android": false
+    },
+    {
+      "asset_id": "gmws-book-garden-vol1-concept-b1",
+      "theme": "garden",
+      "book_title_proposal": "Garden",
+      "volume": "I",
+      "crop_filename": "garden_volume_1_concept_crop.webp",
+      "crop_sha256": "2bf3d7424046c71e9a61763c9e3b32377eb0f5e5126ee7e90b5e26ed1181fc74",
+      "thumbnail_filename": "garden_small_phone_preview.webp",
+      "thumbnail_sha256": "91537168518acf5837778cc7af6173ed7e955cec57f6ea5566b154b93023390f",
+      "crop_bbox": [
+        1030,
+        5,
+        1404,
+        569
+      ],
+      "review_status": "concept",
+      "display_text_baked_into_pixels": true,
+      "native_ui_text_required": true,
+      "adobe_refined": false,
+      "owner_approved": false,
+      "exported_to_android": false
+    }
+  ],
+  "next_required_steps": [
+    "Select preferred art direction; no automatic approval",
+    "Import exact source artwork and verify all hashes against concept bundle",
+    "Refine in Adobe when connection available; record Adobe document URNs, operations and exports",
+    "Separate theme art from editable book title, volume and progress text",
+    "Review legal, accessibility, legibility and app package size",
+    "Freeze approved assets with versioned immutable asset IDs and byte hashes",
+    "Verify physical Android phone visuals before packaging"
+  ],
+  "note": "Artwork exists only as user-visible conversation concept bundle at creation; this register is metadata, not a binary file, a reviewed image or a published Android resource."
+}
