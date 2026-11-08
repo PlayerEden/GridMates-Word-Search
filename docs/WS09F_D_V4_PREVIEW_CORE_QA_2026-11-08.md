@@ -15,7 +15,7 @@ This stage is stacked on [WS-09G-A UI navigation draft PR #82](https://github.co
 
 ## Verification
 
-- [Dedicated v4 preview core CI #42510018590](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42510018590) — **PENDING at initial document commit**. Never describe the new `core:test` code as passed until this workflow reports success. Failure requires a corrective commit and another full test.
+- **Exact-source V4 preview core CI SUCCESS:** [dedicated workflow #42510018590](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42510018590) at source SHA `5a9efbf93e29cd3cc9f514bba6f0bc1f7547ca82`. Python safety/content-hash gate PASSED; Gradle `:core:test` **BUILD SUCCESSFUL** (1m 35s). This full core suite includes the new 180-puzzle/18-literal-grid-golden/15,750-real-claim regression and all historical v1/v2/v3 core tests. The JUnit assertions are not summarized as individual counts by Gradle's console output; those counts are the exact expectations in checked-in tests, and the overall task passed. [Immutable tested-code checkpoint](https://github.com/PlayerEden/GridMates-Word-Search/tree/checkpoint/ws09f-d-v4-core-preview-180-grids-historic-tests-green-2026-11-08). Documentation-only commits later than this SHA do not change the tested engine.
 - [Previous source-verified 117-case Android test of the WS09G-A base](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42506712015) remains unaffected. Do not attribute that run to this new source.
 - No new APK is published; owner/family devices and saves are untouched.
 
