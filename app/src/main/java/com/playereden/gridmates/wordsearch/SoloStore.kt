@@ -27,6 +27,8 @@ import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.SoloResult
 import com.playereden.gridmates.wordsearch.core.SoloSessionLibrary
 import com.playereden.gridmates.wordsearch.core.SoloRun
+import com.playereden.gridmates.wordsearch.core.LargeBoardBookmark
+import com.playereden.gridmates.wordsearch.core.LargeBoardViewport
 import com.playereden.gridmates.wordsearch.core.WordDifficulty
 import com.playereden.gridmates.wordsearch.core.WordSearchGenerator
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
@@ -125,6 +127,57 @@ internal class SoloStore(
         selectedBoardFontId = id
         fontPrefs.edit().putString("selected_id", id).apply()
         return true
+    }
+
+    // Optional view-only preferences. Schema-5 progress and portable JSON backup
+    // remain byte-format compatible; an absent/corrupt bookmark simply starts Fit.
+    // A later opt-in backup migration can include viewing positions separately.
+    private val largeBoardViewPrefs = context.getSharedPreferences(
+        saveName + "_large_board_views", Context.MODE_PRIVATE
+    )
+
+    /** Only the currently active 25/30-cell Solo game can restore a view. */
+    fun largeBoardBookmark(puzzleId: String): LargeBoardBookmark? {
+        if (blocked || profile.active.puzzleId != puzzleId ||
+            (profile.active.boardSize?.cells ?: 0) < 25) return null
+        val raw = runCatching {
+            largeBoardViewPrefs.getString(puzzleId, null)
+        }.getOrNull() ?: return null
+        val fields = raw.split(',')
+        if (fields.size != 3) return null
+        return LargeBoardBookmark.fromFieldsOrNull(
+            puzzleId,
+            fields[0].toFloatOrNull(),
+            fields[1].toFloatOrNull(),
+            fields[2].toFloatOrNull()
+        )
+    }
+
+    /**
+     * Persist a settled zoom/map/pan position, never a gameplay claim.
+     * This intentionally does NOT flush or mutate the schema-5 SoloProfile.
+     */
+    fun saveLargeBoardBookmark(bookmark: LargeBoardBookmark) {
+        if (blocked || profile.active.puzzleId != bookmark.puzzleId ||
+            (profile.active.boardSize?.cells ?: 0) < 25) return
+        val encoded = "${bookmark.zoom},${bookmark.centerX},${bookmark.centerY}"
+        if (largeBoardViewPrefs.getString(bookmark.puzzleId, null) != encoded) {
+            largeBoardViewPrefs.edit().putString(bookmark.puzzleId, encoded).apply()
+        }
+    }
+
+    /** Keep at most the active and paused game's views after a safe session commit. */
+    private fun pruneLargeBoardBookmarks() {
+        if (blocked) return
+        val retained = (listOf(profile.active) + profile.pausedSolo)
+            .filter { (it.boardSize?.cells ?: 0) >= 25 }
+            .map { it.puzzleId }.toSet()
+        val stale = largeBoardViewPrefs.all.keys.filter { it !in retained }
+        if (stale.isNotEmpty()) {
+            largeBoardViewPrefs.edit().apply {
+                stale.forEach(::remove)
+            }.apply()
+        }
     }
 
     private var blocked = false
@@ -469,6 +522,7 @@ internal class SoloStore(
             profile = previous
             return false
         }
+        pruneLargeBoardBookmarks()
         return true
     }
 
@@ -614,6 +668,7 @@ internal class SoloStore(
             profile = previous
             return false
         }
+        pruneLargeBoardBookmarks()
         return true
     }
 
