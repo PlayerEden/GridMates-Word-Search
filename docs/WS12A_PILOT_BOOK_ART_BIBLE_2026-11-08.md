@@ -62,7 +62,7 @@ For **each selected theme concept**:
 
 - [ ] Review both style-board directions and choose **one** shared family.
 - [ ] Decide whether books should be simpler/more paper-like than these ornate concept sheets.
-- [ ] Eliminate incorrect/ambiguous/gibberish small decorative text.
+- [ ] Eliminate incorrect/ambiguous/gibberish small decorative text. **Set A contains a generated ® after GridMates—remove it unless formal trademark registration is verified.** Do not embed a generated logo or legal mark into approved UI.
 - [ ] Confirm no unlicensed names, trademarks, third-party photos or protected logos.
 - [ ] Confirm exact portrait/icon provenance and preserve existing cosmetically unlocked items.
 - [ ] Inspect 140dp/180dp/240dp thumbnails against simple metadata text, 320dp wide screens and 200% fonts.
