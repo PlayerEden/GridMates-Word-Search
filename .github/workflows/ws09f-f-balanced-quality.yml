@@ -9,6 +9,7 @@ on:
       - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/V4BalancedPlacement.kt'
       - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/V4PuzzleQuality.kt'
       - 'labs/ws09f_f_quality/BalancedStress.kt'
+      - 'core/src/test/kotlin/com/playereden/gridmates/wordsearch/core/V4BalancedPlacementQualityTest.kt'
       - '.github/workflows/ws09f-f-balanced-quality.yml'
 
 permissions:
@@ -25,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check the trial dictionary safety rules
         run: python3 tools/ws09f_e_tier_workbench_audit.py
-      - name: Build separate quality-gated V4 experimental engine and run 180 boards
+      - name: Build separate quality-gated V4 experimental engine and run 1800 boards
         shell: bash
         run: |
           set -euo pipefail
@@ -36,7 +37,7 @@ jobs:
             "$CORE/V4BalancedPlacement.kt" labs/ws09f_f_quality/BalancedStress.kt \
             -include-runtime -d "$RUNNER_TEMP/ws09f-f2-balanced.jar"
           timeout 240s java -Xmx256m -jar "$RUNNER_TEMP/ws09f-f2-balanced.jar" \
-            core/src/test/resources/ws09f_e_v4_provisional_tiers.txt 10 \
+            core/src/test/resources/ws09f_e_v4_provisional_tiers.txt 100 \
             | tee /tmp/ws09f-f2-balanced.txt
           {
             echo '### Experimental quality-gated V4; NOT the original frozen 18 goldens'
@@ -44,4 +45,20 @@ jobs:
             cat /tmp/ws09f-f2-balanced.txt
             echo '```'
             echo 'No Android APK, approved word list, Solo routing, save ID or physical QA.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Run all real core JUnit tests including synthetic cluster rejection
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :core:test --console=plain
+          {
+            echo '### All actual core JUnit tests passed'
+            echo 'Includes bad-layout rejection, 54 fully verified balanced boards, V1/V2/V3 goldens and prior V4 lab goldens.'
           } >> "$GITHUB_STEP_SUMMARY"
