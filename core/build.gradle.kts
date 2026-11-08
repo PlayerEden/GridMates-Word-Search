@@ -12,4 +12,6 @@ dependencies {
 
 tasks.test {
     useJUnit()
+    // Temporary v3 fingerprint acquisition, remove after hashes are pinned.
+    testLogging.showStandardStreams = true
 }
