@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -52,7 +54,8 @@ import com.playereden.gridmates.wordsearch.core.WordSearchRules
 
 private enum class Page(val label: String) {
     PLAY("Play"), RECORDS("Records"), COLLECTION("Collection"),
-    SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle")
+    SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle"),
+    MY_PUZZLES("My Puzzles")
 }
 
 @Composable
@@ -192,8 +195,21 @@ internal fun GridMatesShell(soloStore: SoloStore, nearbyRooms: NearbyRoomViewMod
                 Page.PLAY -> HomeScreen(soloStore,
                     onHelp = { pageName = Page.HELP.name },
                     onSolo = { pageName = Page.PUZZLE.name },
+                    onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
+                    onNewSolo = {
+                        if (soloStore.newPuzzle()) pageName = Page.PUZZLE.name
+                    },
                     onDaily = { pageName = Page.DAILY.name },
                     onNearby = { pageName = Page.NEARBY.name })
+                Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
+                    onBack = { pageName = Page.PLAY.name },
+                    onNewSolo = {
+                        if (soloStore.newPuzzle()) pageName = Page.PUZZLE.name
+                    },
+                    onResume = { id ->
+                        if (soloStore.profile.active.puzzleId == id ||
+                            soloStore.resumeSolo(id)) pageName = Page.PUZZLE.name
+                    })
                 Page.PUZZLE, Page.DAILY_PUZZLE, Page.NEARBY -> Unit
                 Page.DAILY -> DailyLandingScreen(soloStore,
                     onPlay = { date ->
@@ -227,6 +243,7 @@ private fun Heading(eyebrow: String, heading: String) {
 
 @Composable
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
+    onMyPuzzles: () -> Unit, onNewSolo: () -> Unit,
     onDaily: () -> Unit, onNearby: () -> Unit) {
     val run = store.profile.active
     val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
@@ -267,8 +284,14 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
             color = Muted, style = MaterialTheme.typography.bodySmall,
             maxLines = 2)
         PaperProgress(run.foundIds.size, puzzle.targets.size)
-        Button(onClick = onSolo, modifier = Modifier.fillMaxWidth().height(48.dp)) {
-            Text(if (finished) "Play Solo" else "Continue Solo")
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = if (finished) onNewSolo else onSolo,
+                modifier = Modifier.weight(1f).height(48.dp)) {
+                Text(if (finished) "New Solo" else "Continue Solo", maxLines = 1)
+            }
+            OutlinedButton(onClick = onMyPuzzles, modifier = Modifier.height(48.dp)) {
+                Text("My Puzzles", maxLines = 1)
+            }
         }
     }
 
@@ -302,6 +325,99 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
 
     TextButton(onClick = onHelp, modifier = Modifier.fillMaxWidth()) {
         Text("How to play")
+    }
+}
+
+/**
+ * WS-09B first usable paused-game library. The current session remains in the
+ * historic 'active' field; other sessions live in schema-5's pausedSolo list.
+ * Nothing is removed except through the explicit confirmation below.
+ */
+@Composable
+private fun SavedSoloScreen(
+    store: SoloStore,
+    onBack: () -> Unit,
+    onNewSolo: () -> Unit,
+    onResume: (String) -> Unit
+) {
+    val active = store.profile.active
+    val paused = store.profile.pausedSolo
+    var removeId by rememberSaveable { mutableStateOf<String?>(null) }
+    val removeRun = paused.firstOrNull { it.puzzleId == removeId }
+    if (removeRun != null) {
+        AlertDialog(
+            onDismissRequest = { removeId = null },
+            title = { Text("Remove saved puzzle?") },
+            text = { Text("This removes only this unfinished Solo puzzle. " +
+                "Other games, Daily puzzles and completed records stay saved. " +
+                "This cannot be undone unless you have a backup.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (store.discardPausedSolo(removeRun.puzzleId)) removeId = null
+                }) { Text("Remove puzzle") }
+            },
+            dismissButton = {
+                TextButton(onClick = { removeId = null }) { Text("Keep puzzle") }
+            }
+        )
+    }
+    PaperEyebrow("Solo · Puzzle Library")
+    Text("My Puzzles", style = MaterialTheme.typography.headlineSmall,
+        color = Forest, fontWeight = FontWeight.Bold)
+    Text("Switch games anytime. An unfinished puzzle keeps its found words, " +
+        "hints and time when you leave it.",
+        color = Muted, style = MaterialTheme.typography.bodyMedium)
+    store.warning?.let {
+        Text(it, color = Gold, style = MaterialTheme.typography.bodySmall)
+    }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        TextButton(onClick = onBack) { Text("Back to Play") }
+        Spacer(Modifier.weight(1f))
+        Button(onClick = onNewSolo) { Text("New Solo") }
+    }
+
+    @Composable
+    fun PuzzleSummary(run: com.playereden.gridmates.wordsearch.core.SoloRun) {
+        val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
+        val dimension = run.boardSize?.cells ?: run.difficulty.gridSize
+        val challenge = run.challenge?.label ?: run.difficulty.label
+        Text("${run.theme.label} · ${dimension}×${dimension} · $challenge",
+            color = Forest, style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold)
+        Text("${run.foundIds.size} of ${puzzle.targets.size} found · ${run.elapsedSeconds / 60}m",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+        PaperProgress(run.foundIds.size, puzzle.targets.size)
+    }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        PaperEyebrow("Currently playing")
+        PuzzleSummary(active)
+        Button(onClick = { onResume(active.puzzleId) },
+            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text(if (com.playereden.gridmates.wordsearch.core.SoloSessionLibrary.finished(active))
+                "Review current puzzle" else "Continue current puzzle")
+        }
+    }
+
+    PaperEyebrow("Paused · ${paused.size} / ${com.playereden.gridmates.wordsearch.core.SoloSessionLibrary.MAX_PAUSED}")
+    if (paused.isEmpty()) {
+        Text("No paused games yet. Starting another Solo puzzle saves your current " +
+            "unfinished board here.", color = Muted,
+            style = MaterialTheme.typography.bodyMedium)
+    }
+    paused.forEach { run ->
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PuzzleSummary(run)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { onResume(run.puzzleId) },
+                    modifier = Modifier.weight(1f).height(48.dp)) {
+                    Text("Resume")
+                }
+                TextButton(onClick = { removeId = run.puzzleId }) {
+                    Text("Remove")
+                }
+            }
+        }
     }
 }
 

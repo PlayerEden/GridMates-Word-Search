@@ -27,7 +27,7 @@ class V2PuzzlePersistenceTest {
             val dailyId = requireNotNull(initial.selectedDaily).run.puzzleId
             assertTrue(dailyId.startsWith("wordsearch:v1:"))
             val backup = initial.exportBackup()
-            assertTrue(backup.contains("\"schema\":4"))
+            assertTrue(backup.contains("\"schema\":5"))
             val loaded = SoloStore(context,fileName)
             assertEquals(created.puzzleId,loaded.profile.active.puzzleId)
             assertEquals(PuzzleBoardSize.COMPACT,loaded.profile.active.boardSize)
@@ -58,7 +58,7 @@ class V2PuzzlePersistenceTest {
             assertEquals(old, SoloProgressRules.puzzle(loaded.profile.active))
             assertEquals(17L,loaded.profile.active.elapsedSeconds)
             val upgraded = loaded.exportBackup()
-            assertTrue(upgraded.contains("\"schema\":4"))
+            assertTrue(upgraded.contains("\"schema\":5"))
             val reread = SoloStore(context,fileName)
             assertEquals(old,SoloProgressRules.puzzle(reread.profile.active))
         } finally {
