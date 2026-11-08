@@ -3,6 +3,9 @@ name: WS-09F-B2 Persisted Large-board Viewport Android Emulator QA
 # Schema5 stays unchanged; optional per-run viewport metadata survives paused saves/backup.
 # Full historical puzzle goldens, real touch/map UI and Android persistence tested.
 # v0.9.3 source-matched APK and signer pinned by SHA-256.
+# Rerun after correcting the bookmark UI instrumentation's row/column dropdown
+# selection sequence; preserve all 114 Android tests and the signed code47->48
+# install-over gate. A failed/partial run never publishes an approved APK.
 # Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
 # The real two-phone Co-op P0 remains open and physical testing is deferred.
 
