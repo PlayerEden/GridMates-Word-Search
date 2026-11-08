@@ -12,4 +12,6 @@ dependencies {
 
 tasks.test {
     useJUnit()
+    // Temporary WS-09A2 baseline acquisition; remove after pinning literal goldens.
+    testLogging.showStandardStreams = true
 }
