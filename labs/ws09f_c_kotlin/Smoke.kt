@@ -22,6 +22,7 @@ fun main(args: Array<String>) {
             for (seed in seeds) {
                 val puzzle = V4EngineLab.generate(theme, size, mode, seed, pool)
                 V4EngineLab.verify(puzzle, mode)
+                if (seed == 11L) println("GOLDEN-V4 $theme ${size}x$size $mode seed=11 grid=${puzzle.hash()}")
                 // The same theme/size/challenge/seed MUST reconstruct exactly.
                 val replay = V4EngineLab.generate(theme, size, mode, seed, pool)
                 check(puzzle.hash() == replay.hash())
