@@ -19,3 +19,6 @@ captures/
 # checkout after SHA-256 verification. Do not accidentally re-commit them.
 _approved_sudoku/
 app/src/main/res/drawable-nodpi/woodland_*.png
+
+# QA Art Lab source-generated, never commit preview assets as release artwork.
+app/src/debug/assets/ws12/

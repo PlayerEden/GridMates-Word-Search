@@ -1,0 +1,107 @@
+name: WS-12G QA Art Lab, Debug APK and Release Art Isolation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws12g-qa-art-lab-android-v51-2026-11-08
+    paths:
+      - 'app/**'
+      - 'tools/asset_pipeline/**'
+      - 'design/asset-pipeline/**'
+      - '.github/workflows/ws12g-qa-art-lab.yml'
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'tools/asset_pipeline/**'
+      - 'design/asset-pipeline/**'
+      - '.github/workflows/ws12g-qa-art-lab.yml'
+
+permissions:
+  contents: read
+concurrency:
+  group: ws12g-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa-art-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout original approved Woodland portraits (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: PlayerEden/SudokuTogether
+          ref: 975e31a1e8cbfebad1fbbc7602b3340c357da7ef
+          path: _approved_sudoku
+          persist-credentials: false
+      - name: Restore original 12 Woodland portraits by verified hashes
+        run: python3 scripts/import_woodland_portraits.py --source _approved_sudoku
+      - name: Checkout approved OFL font sources (pinned, sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: google/fonts
+          ref: 24ddc1f324cac5d9f5aedca126d298f56e3f1640
+          path: _approved_fonts
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            ofl/atkinsonhyperlegible
+            ofl/ibmplexmono
+            ofl/dmmono
+            ofl/patrickhand
+      - name: Import original reviewed font resources and licenses
+        run: |
+          python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
+          python3 scripts/import_font_library.py --source _approved_fonts
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile Android DEBUG with 18 art pieces and RELEASE without them
+        run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
+      - name: Verify exactly 18 offline SVG art assets in debug and zero in release
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, zipfile, hashlib
+          root=pathlib.Path('app/src/debug/assets/ws12')
+          manifest=json.loads((root/'render_sha256.json').read_text())
+          assert manifest['art_file_count']==18, manifest
+          assert manifest['owner_approved'] is False
+          assert manifest['android_resources_modified'] is False
+          for rel, expected in manifest['files'].items():
+              assert hashlib.sha256((root/rel).read_bytes()).hexdigest() == expected
+          debug=pathlib.Path('app/build/outputs/apk/debug/app-debug.apk')
+          releases=list(pathlib.Path('app/build/outputs/apk/release').glob('*.apk'))
+          assert debug.is_file() and releases, 'Missing debug or release APK'
+          with zipfile.ZipFile(debug) as z:
+              art=[x for x in z.namelist() if x.startswith('assets/ws12/') and x.endswith('.svg')]
+              assert len(art)==18, (len(art),art)
+              assert 'assets/ws12/review.html' in z.namelist()
+              assert 'assets/ws12/render_sha256.json' in z.namelist()
+              assert z.read('assets/ws12/review.html').count(b'<h2>')==3
+          with zipfile.ZipFile(releases[0]) as z:
+              assert not [x for x in z.namelist() if x.startswith('assets/ws12/')], 'PROTOTYPE ART LEAKED TO RELEASE'
+          print('PASS: 18 SHA-checked prototype graphics in QA, ZERO in release; original game data untouched.')
+          PY
+      - name: Upload install-over QA Art Lab APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GRIDMATES-WS12G-ART-LAB-ANDROID-V51-QA-ONLY
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+      - name: Clarify source and execution limits
+        run: |
+          {
+            echo '### WS-12G Android source/prototype art preview'
+            echo 'Debug APK has exactly 18 verified source-generated SVG art assets; release APK has none.'
+            echo 'QA v51 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
+            echo 'The artwork is unapproved, and Art Lab does NOT replace production book cards or unlocks.'
+          } >> "$GITHUB_STEP_SUMMARY"
