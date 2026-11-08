@@ -1,0 +1,133 @@
+name: WS-09G-A Future 105-word A-Z Index Android QA
+# Private UI experiment. Retain true code47->code48 schema5 upgrade and 117 tests.
+# Future 70/105-word A-Z index is tested with synthetic puzzles, not shipped V4 content.
+# v0.9.4 remains the previously verified QA build; this branch is NOT a release.
+# v0.9.3 source-matched APK and signer pinned by SHA-256.
+# New instrumentation tests A–Z navigation and Remaining on a 300dp screen.
+# Keep previous 114 tests; add 3 new tests and the historical code47->48
+# install-over gate. Do not distribute any branch APK from this research workflow.
+# Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
+# The real two-phone Co-op P0 remains open and physical testing is deferred.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09g-a-large-word-list-index-2026-11-08
+    paths:
+      - '.github/workflows/ws09g-a-large-word-list-android-qa.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  race-emulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact previously tested v0.9.3 QA APK
+        uses: actions/download-artifact@v4
+        with:
+          name: GridMates-WordSearch-WS09F-B-CulledV093
+          run-id: 42464409118
+          github-token: ${{ github.token }}
+          repository: PlayerEden/GridMates-Word-Search
+          path: qa-baseline
+      - name: Verify historical source-matched artifact checksum
+        run: |
+          echo 'a81f37daa6b63244e9612476c5925ca4b2074fa67378db8bbef8aae054c6b129  qa-baseline/app-debug.apk' | sha256sum --check
+          echo 'cbe50b2b4a34f3a8433e28ddc0efd5307a1adf9aa91e324ca757f40c6aec91ee  qa-signing/wordsearch-qa.p12' | sha256sum --check
+      - name: Checkout approved Woodland originals
+        uses: actions/checkout@v4
+        with:
+          repository: PlayerEden/SudokuTogether
+          ref: 975e31a1e8cbfebad1fbbc7602b3340c357da7ef
+          path: _approved_sudoku
+          persist-credentials: false
+      - run: python3 scripts/import_woodland_portraits.py --source _approved_sudoku
+      - name: Checkout pinned licensed fonts
+        uses: actions/checkout@v4
+        with:
+          repository: google/fonts
+          ref: 24ddc1f324cac5d9f5aedca126d298f56e3f1640
+          path: _approved_fonts
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            ofl/atkinsonhyperlegible
+            ofl/ibmplexmono
+            ofl/dmmono
+            ofl/patrickhand
+      - name: Validate and package fonts and licenses
+        run: |
+          python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
+          python3 scripts/import_font_library.py --source _approved_fonts
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up cached Gradle 8.11.1
+        id: setup_gradle
+        continue-on-error: true
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      # The setup action has intermittently received HTTP 504 from its
+      # distribution service. Do not weaken any build or test gate: recover
+      # from the checksum-pinned official Gradle distribution instead.
+      - name: Recover official checksum-verified Gradle 8.11.1
+        if: steps.setup_gradle.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 5 --retry-all-errors \
+            'https://downloads.gradle.org/distributions/gradle-8.11.1-bin.zip' \
+            --output "$RUNNER_TEMP/gradle-8.11.1-bin.zip"
+          echo 'f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6  '"$RUNNER_TEMP"'/gradle-8.11.1-bin.zip' | sha256sum --check
+          unzip -q "$RUNNER_TEMP/gradle-8.11.1-bin.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.11.1/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/gradle-8.11.1/bin/gradle" --version
+      - name: Compile full v0.9.4 plus future 105-word list, unit tests and lint
+        run: gradle --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:compileDebugAndroidTestKotlin :app:assembleDebug
+      - name: Check APK package version and same trusted QA test signer
+        run: |
+          OLD=qa-baseline/app-debug.apk
+          NEW=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$NEW"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          "$AAPT" dump badging "$OLD" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='47'"
+          "$AAPT" dump badging "$NEW" | grep -F "name='com.playereden.gridmates.wordsearch.qa' versionCode='48'"
+          SIGN="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$SIGN" verify --print-certs "$OLD" | grep 'Signer #1 certificate SHA-256 digest:' > /tmp/oldcert
+          "$SIGN" verify --print-certs "$NEW" | grep 'Signer #1 certificate SHA-256 digest:' > /tmp/newcert
+          diff -u /tmp/oldcert /tmp/newcert
+          cat /tmp/newcert
+      - name: Enable KVM for real API35 emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=static_node"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Recheck signed v0.9.3-to-v0.9.4 upgrade and all 117 Android tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_4
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: bash ./scripts/ws09g_a_word_list_upgrade_emulator.sh
+      - name: Record internal source-matched test APK checksum (not for distribution)
+        run: sha256sum app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload instrumented test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GridMates-WordSearch-WS09G-A-117-Android-Test-Reports
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+          retention-days: 7
+          if-no-files-found: ignore
