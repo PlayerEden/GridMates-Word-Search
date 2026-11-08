@@ -86,6 +86,35 @@ internal object V4PuzzleQuality {
         )
     }
 
+    /**
+     * Research acceptance gate, to be tuned only with recorded evidence and
+     * playtesting. Measures literal target paths; a filler-only region fails.
+     */
+    fun issues(report: Report, challenge: PuzzleChallenge): List<String> {
+        val failures = ArrayList<String>()
+        if (report.minQuadrantCenters < report.targetCount / 10)
+            failures += "unbalanced_quadrants"
+        if (report.centerTilesOccupied < 12)
+            failures += "sparse_4x4_target_centers"
+        if (report.regionsWithTargetCells < report.totalRegions)
+            failures += "missing_10x10_region"
+        if (report.minDistinctTargetCellsInRegion < 5)
+            failures += "underused_10x10_region"
+        val minDirections = when (challenge) {
+            PuzzleChallenge.RELAXED -> 2
+            PuzzleChallenge.CLASSIC -> 4
+            PuzzleChallenge.EXPERT -> 6
+        }
+        if (report.uniqueDirections < minDirections)
+            failures += "insufficient_directions"
+        if (report.maxDirectionShare >
+                (if (challenge == PuzzleChallenge.RELAXED) 0.65 else 0.48))
+            failures += "dominant_direction"
+        if (report.lengthBands.count { it > 0 } < 2)
+            failures += "one_word_length_band"
+        return failures
+    }
+
     /** Compare two different seeds WITHOUT falsely claiming all words can differ. */
     fun compare(first: WordSearchPuzzle, second: WordSearchPuzzle): Pair<Int, Int> {
         require(first.id != second.id && first.size == second.size)
