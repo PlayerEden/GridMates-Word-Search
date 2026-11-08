@@ -1,4 +1,6 @@
 name: WS-07G Collections Pagination Android Emulator QA
+# Source-matched repair: move gallery pager before tall cards and require visible Achievements Next.
+# The initial 93-test run failed only the offscreen Achievements pager regression.
 # Re-run: first full 93-test QA revealed an offscreen Race heading at 360dp.
 # Inherited verified WS-07F Records tests; keep owner physical P0 open.
 
