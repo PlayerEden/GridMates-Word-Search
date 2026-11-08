@@ -344,6 +344,16 @@ Each chapter must pin a published `book_id`, `chapter_id`, fixed word/puzzle man
 
 ---
 
+### 7.5 Generated art, Adobe refinement and production asset approval — WS-12
+
+**[WS-12 issue #91](https://github.com/PlayerEden/GridMates-Word-Search/issues/91)** formalizes generated art and Adobe-supported cleanup/refinement for the playable **WS-11 Bookshelf** and *separate* cosmetic Collections. See [visual production plan](WS12_VISUAL_ASSET_PRODUCTION_PLAN.md) and [draft asset manifest](../design/asset-pipeline/asset-manifest.schema.json).
+
+**Design principle:** create/select concepts, refine in Adobe Express and appropriate image/vector tools, conduct a human visual and rights review, then freeze approved exact source files/optimized exports with stable identifiers and SHA-256. Bookshelf pilots target Woodland/Space/Garden cover, spine, emblem and chapter/stamp identities. Real titles/progress/buttons stay native UI text; readability and touch accuracy outrank decorative sprites. Existing original Woodland portraits and their IDs are never casually replaced. Fonts and third-party Adobe/Stock assets require distribution-license review. The availability of plugins is not automatic clearance to ship any asset.
+
+**WS-11C/D depends on approved WS-12C pilot visuals** for its finished presentation, and WS-10 approved content for playable fixed chapters. Planning and manifests alone do **not** mean any art or Android feature is already built.
+
+---
+
 ## 8. Monetization and publication boundaries
 
 Carry forward the Sudoku family's decided business direction as the **Word Search starting proposal**, subject to this game's release approval:
