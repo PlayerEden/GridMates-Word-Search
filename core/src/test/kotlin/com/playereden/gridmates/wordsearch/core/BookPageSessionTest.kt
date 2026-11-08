@@ -243,7 +243,9 @@ class BookPageSessionTest {
             f.catalog, cleaned, completed, id, page
         ))
         assertTrue(BookProgressRules.isComplete(f.catalog, completed, id))
-        assertEquals(f.space.id, f.space.id) // the other book remains independent
+        assertEquals(0, BookProgressRules.completedCount(
+            f.catalog, completed, "space-volume-one"
+        )) // the other book remains independent
     }
 
     @Test fun legacySoloAndDailyGenerationAreNotChanged() {
