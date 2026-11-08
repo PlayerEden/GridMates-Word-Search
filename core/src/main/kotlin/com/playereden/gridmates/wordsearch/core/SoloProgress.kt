@@ -12,7 +12,9 @@ data class SoloRun(
     val hints: Map<String, Int> = emptyMap(),
     val elapsedSeconds: Long = 0L,
     val boardSize: PuzzleBoardSize? = null,
-    val challenge: PuzzleChallenge? = null
+    val challenge: PuzzleChallenge? = null,
+    /** Optional, per-puzzle viewing position. Never contributes to puzzle identity. */
+    val viewportBookmark: LargeBoardBookmark? = null
 ) {
     val puzzleId: String get() =
         if (boardSize != null && challenge != null)
