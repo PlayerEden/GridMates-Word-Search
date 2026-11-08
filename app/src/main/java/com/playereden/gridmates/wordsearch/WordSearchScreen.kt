@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -84,6 +85,7 @@ import com.playereden.gridmates.wordsearch.core.LargeBoardViewport
 import com.playereden.gridmates.wordsearch.core.LargeBoardBookmark
 import com.playereden.gridmates.wordsearch.core.BoardRenderWindow
 import com.playereden.gridmates.wordsearch.core.PaperbackPageLayout
+import com.playereden.gridmates.wordsearch.core.PaperbackWordIndex
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.DragDirection
 import com.playereden.gridmates.wordsearch.core.GridPoint
@@ -522,7 +524,7 @@ private fun CompletionPanel(
 }
 
 @Composable
-private fun WordList(
+internal fun WordList(
     puzzle: WordSearchPuzzle,
     found: Set<String>,
     daily: Boolean,
@@ -531,8 +533,14 @@ private fun WordList(
 ) {
     var remainingOnly by remember(puzzle.id) { mutableStateOf(false) }
     var page by remember(puzzle.id, remainingOnly) { mutableStateOf(0) }
-    val targets = if (remainingOnly) puzzle.targets.filter { it.id !in found }
-        else puzzle.targets
+    var indexOpen by remember(puzzle.id) { mutableStateOf(false) }
+    val giantWordList = PaperbackWordIndex.isGiant(puzzle.targets.size)
+    // Keep the existing placement-order presentation for all released boards.
+    // Giant boards only: alphabetize a display copy, never saved target order.
+    val targets = if (giantWordList)
+        PaperbackWordIndex.visibleWords(puzzle.targets, found, remainingOnly)
+    else if (remainingOnly) puzzle.targets.filter { it.id !in found }
+    else puzzle.targets
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(Modifier.fillMaxWidth(),
@@ -563,8 +571,25 @@ private fun WordList(
             val pageCount = ((targets.size + perPage - 1) / perPage).coerceAtLeast(1)
             val visiblePage = page.coerceIn(0, pageCount - 1)
             val visibleTargets = targets.drop(visiblePage * perPage).take(perPage)
+            val visibleRange = PaperbackWordIndex.visibleRange(targets.size, visiblePage, perPage)
             Column(Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (giantWordList) {
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        val rangeLabel = if (targets.isEmpty()) "No words remaining"
+                            else "Words ${visibleRange.first}–${visibleRange.last} of ${targets.size}"
+                        Text(rangeLabel, modifier = Modifier.weight(1f)
+                            .testTag("word-list-range"),
+                            color = Muted, style = MaterialTheme.typography.labelSmall,
+                            maxLines = 2)
+                        TextButton(onClick = { indexOpen = true },
+                            modifier = Modifier.testTag("word-list-az-index")) {
+                            Text("A–Z index")
+                        }
+                    }
+                }
                 if (targets.isEmpty()) {
                     Text("All words found!", color = Forest,
                         style = MaterialTheme.typography.bodyMedium)
@@ -610,6 +635,53 @@ private fun WordList(
                             enabled = visiblePage < pageCount - 1) { Text("Next") }
                     }
                 }
+            }
+            if (giantWordList && indexOpen) {
+                val letters = PaperbackWordIndex.availableLetters(targets)
+                AlertDialog(
+                    onDismissRequest = { indexOpen = false },
+                    title = { Text("Find words by letter", color = Forest) },
+                    text = {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("Jump to the first word beginning with a letter. " +
+                                "Only letters on this list are shown.",
+                                color = Muted, style = MaterialTheme.typography.bodySmall)
+                            if (letters.isEmpty()) {
+                                Text("All words found!", color = Forest)
+                            } else {
+                                Column(Modifier.heightIn(max = 360.dp)
+                                    .verticalScroll(rememberScrollState()),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    letters.chunked(4).forEach { rowLetters ->
+                                        Row(Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                            rowLetters.forEach { letter ->
+                                                TextButton(
+                                                    onClick = {
+                                                        page = PaperbackWordIndex.pageForLetter(
+                                                            targets, letter, perPage) ?: visiblePage
+                                                        indexOpen = false
+                                                    },
+                                                    modifier = Modifier.weight(1f)
+                                                        .heightIn(min = 48.dp)
+                                                        .testTag("word-list-letter-$letter")
+                                                ) { Text(letter.toString()) }
+                                            }
+                                            repeat(4 - rowLetters.size) {
+                                                Box(Modifier.weight(1f))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { indexOpen = false }) {
+                            Text("Close")
+                        }
+                    }
+                )
             }
         }
     }
