@@ -5,7 +5,7 @@
     "50": 105
   },
   "threshold": 125,
-  "policy": "Relaxed excludes v3 advanced, new proposed advanced-only and review holds; Space adds 10 additional strictly draft words solely to test supply and layout. Classic/Expert may draw from both proposed tiers, with different advanced quotas. All labels are unapproved display proposals.",
+  "policy": "Relaxed excludes v3 advanced, new proposed advanced-only and review holds; Space adds 10 additional strictly draft words solely to test supply and layout. Classic/Expert may draw from both proposed tiers, with different advanced quotas. All labels are unapproved display proposals. Critical generator constraint: exclude all palindromes of 5+ letters from all eight-direction unique-occurrence content (RADAR is excluded from Space).",
   "source": "core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/WordSearchV3.kt + core/src/test/resources/ws09fc_v4_test_only_candidates.txt + design/marathon/v4_editorial_triage_proposal.json",
   "themes": {
     "WOODLAND": {
@@ -229,11 +229,11 @@
     },
     "SPACE": {
       "original_candidate_pool": 185,
-      "provisional_relaxed_eligible_count": 131,
-      "original_relaxed_eligible": 121,
+      "provisional_relaxed_eligible_count": 130,
+      "original_relaxed_eligible": 120,
       "unreviewed_extra_count": 10,
       "proposed_advanced_count": 53,
-      "manual_hold_count": 11,
+      "manual_hold_count": 12,
       "relaxed_candidates": [
         "CONSTELLATION",
         "INTERSTELLAR",
@@ -355,7 +355,6 @@
         "ROVER",
         "TITAN",
         "CERES",
-        "RADAR",
         "FULLMOON",
         "NEWMOON",
         "MOONPHASE",
@@ -433,7 +432,8 @@
         "TIMESPACE": "Less usual phrasing than spacetime",
         "SKYLINE": "Less space-themed",
         "SKYMAP": "Compound, check audience familiarity",
-        "BROWNDWARF": "Usually two-word astronomical term"
+        "BROWNDWARF": "Usually two-word astronomical term",
+        "RADAR": "Palindrome: one placed path reads both forward and backward; all-eight-direction uniqueness cannot equal one"
       },
       "extra_space_concepts_status": "UNREVIEWED_AND_NOT_IN_ORIGINAL_LAB_GOLDENS",
       "unreviewed_extra_concepts": [
@@ -472,6 +472,9 @@
         "CRESCENT": "Crescent",
         "TWILIGHT": "Twilight",
         "SKYGLOW": "Skyglow"
+      },
+      "generator_compatibility_exclusions": {
+        "RADAR": "Palindrome: one placed path reads both forward and backward; all-eight-direction uniqueness cannot equal one"
       }
     },
     "GARDEN": {
