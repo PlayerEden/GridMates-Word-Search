@@ -1,0 +1,59 @@
+name: WS-09F-E Provisional V4 Vocabulary Tiers (Research Only)
+
+# Source-derived candidate review, NOT editorial approval or playable content.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09f-e-v4-tiered-corpus-preview-2026-11-08
+    paths:
+      - 'design/marathon/v4_editorial_triage_proposal.json'
+      - 'design/marathon/v4_candidate_tiers_workbench_2026-11-08.json'
+      - 'tools/ws09f_e_tier_workbench_audit.py'
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/V4PreviewTierSelection.kt'
+      - 'core/src/test/kotlin/com/playereden/gridmates/wordsearch/core/V4ProvisionalTierCoreTest.kt'
+      - 'core/src/test/resources/ws09f_e_v4_provisional_tiers.txt'
+      - '.github/workflows/ws09f-e-tier-preview-core.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws09f-e-tiers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tiered-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source-derived draft tiers, labels and explicit holds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/ws09f_e_tier_workbench_audit.py | tee /tmp/ws09f-e-editorial.txt
+          {
+            echo '### Proposed V4 familiarity tiers -- NOT editor-approved'
+            echo '```'
+            cat /tmp/ws09f-e-editorial.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Run complete real core JUnit and 180 tiered giant-board research previews
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :core:test --console=plain
+          {
+            echo '### Real core JUnit suite passed'
+            echo 'Includes 180 tiered research V4 previews and original frozen V1/V2/V3/V4-preview goldens.'
+            echo 'Proposed vocabulary and Space additions exist under core TEST resources only.'
+            echo 'No public 40/50 Solo, saved V4 IDs, signed APK or editorial approval.'
+          } >> "$GITHUB_STEP_SUMMARY"
