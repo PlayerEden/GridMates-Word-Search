@@ -1,0 +1,67 @@
+name: WS-11A/B Bookshelf Metadata and Progress Safety QA
+
+# Core source only. Not a published book, UI, asset, or APK.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws11ab-book-catalog-progress-foundation-2026-11-08
+    paths:
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/BookCatalog.kt'
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/BookProgress.kt'
+      - 'core/src/test/kotlin/com/playereden/gridmates/wordsearch/core/BookCatalogTest.kt'
+      - '.github/workflows/ws11ab-bookshelf-core.yml'
+      - 'docs/WS11AB_BOOKSHELF_UX_AND_CHAPTER_METADATA_2026-11-08.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws11ab-book-core-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  book-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile and run ALL core tests including historical golden snapshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :core:test --console=plain
+      - name: Verify no Android book UI, fake published books or profile/schema changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          catalog=Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/BookCatalog.kt').read_text()
+          progress=Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/BookProgress.kt').read_text()
+          assert 'class BookCatalog(val books: List<PuzzleBook> = emptyList())' in catalog
+          assert 'matchesPublishedPuzzle' in catalog
+          assert 'requireCompatibleUpgrade' in catalog
+          assert 'recordVerifiedCompletion' in progress
+          assert 'not wired into the existing schema-5 Solo profile' in progress.lower().replace('not wired','not wired') or 'Not wired into the existing schema-5 Solo profile' in progress
+          assert 'BookLibraryProgress' not in Path('core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/SoloProgress.kt').read_text()
+          assert 'BookLibraryProgress' not in Path('app/src/main/java/com/playereden/gridmates/wordsearch/SoloStore.kt').read_text()
+          assert not list(Path('app/src/main').rglob('*Book*Screen.kt'))
+          print('PASS: editorial content deliberately empty; core book progress independent of current game save.')
+          PY
+      - name: Record precise release boundary
+        shell: bash
+        run: |
+          {
+            echo '### WS-11A/B source-only integrity proof'
+            echo 'All existing core regression/golden tests and the new book tests passed.'
+            echo 'No published volumes, approved words, Android screen, schema-5 change, new APK, Adobe art or device QA.'
+            echo 'Next: approve WS-10 vocabulary and real page payloads, then add persistence + Android Library.'
+          } >> "$GITHUB_STEP_SUMMARY"
