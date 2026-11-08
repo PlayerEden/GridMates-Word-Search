@@ -1,5 +1,6 @@
 name: WS-09B Multiple Saved Solo Puzzles Android Emulator QA
 # Exact-source v0.8.7/code41 -> v0.8.8/code42 signed schema4-to-5 partial-save migration and 100 Android tests.
+# Corrected My Puzzles Android test import; rerun full signed migration at the fixed source.
 # Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
 # The real two-phone Co-op P0 remains open and physical testing is deferred.
 
