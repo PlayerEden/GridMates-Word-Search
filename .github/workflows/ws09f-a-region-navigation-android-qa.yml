@@ -2,6 +2,7 @@ name: WS-09F-A Continuous Large-board Navigation Android Emulator QA
 # Source-matched same-signer v0.9.1/code45 -> v0.9.2/code46, preserving schema5 and two paused puzzles.
 # Versioned v1/v2/v3 generator goldens frozen; board map is navigation only.
 # Pure 25/30/40/50/75/100 map tests and real 320dp Android map interactions.
+# Rerun on fixed Compose node assertions; first run failed androidTest compilation.
 # Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
 # The real two-phone Co-op P0 remains open and physical testing is deferred.
 
