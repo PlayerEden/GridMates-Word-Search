@@ -67,14 +67,35 @@ class WordSearchGeneratorV3Test {
         assertEquals(puzzle,SoloProgressRules.puzzle(hinted))
     }
 
-    @Test fun captureThreeNewV3ReferenceBoardsBeforePinning() {
-        // Temporary acquisition; replace with immutable literals before acceptance.
-        val examples=listOf(
-            WordSearchGeneratorV3.generate(WordTheme.WOODLAND,PuzzleBoardSize.BOOK_GRAND,PuzzleChallenge.RELAXED,42L),
-            WordSearchGeneratorV3.generate(WordTheme.SPACE,PuzzleBoardSize.BOOK_GIANT,PuzzleChallenge.CLASSIC,20261108L),
-            WordSearchGeneratorV3.generate(WordTheme.GARDEN,PuzzleBoardSize.BOOK_GIANT,PuzzleChallenge.EXPERT,76124L))
-        examples.forEach { p ->
-            println("WS09E_CAPTURE|${p.id}|${digest(p)}|${p.targets.take(2).joinToString(","){it.id}}")
+    /** Literal fingerprints captured from the first successful v3 core build.
+     * Never derive expected values from the generator under test. */
+    private data class Golden(
+        val theme: WordTheme, val board: PuzzleBoardSize,
+        val challenge: PuzzleChallenge, val seed: Long,
+        val hash: String, val first: String, val second: String
+    )
+    private val goldens = listOf(
+        Golden(WordTheme.WOODLAND, PuzzleBoardSize.BOOK_GRAND,
+            PuzzleChallenge.RELAXED, 42L,
+            "b0de609f74c15b1d6631d497d14e467645654488ca1b9c330b37362553494d17",
+            "NIGHTINGALE", "HUMMINGBIRD"),
+        Golden(WordTheme.SPACE, PuzzleBoardSize.BOOK_GIANT,
+            PuzzleChallenge.CLASSIC, 20261108L,
+            "ea668c622cc0923111b2504d34331c9823e07576bfda367678fe09e1353a4509",
+            "CONSTELLATION", "MAGNETOSPHERE"),
+        Golden(WordTheme.GARDEN, PuzzleBoardSize.BOOK_GIANT,
+            PuzzleChallenge.EXPERT, 76124L,
+            "5493e412fcb5cc589cd82e688738b2a9171b0689753e2b2e849e2e867e845250",
+            "MEADOWSWEET", "HUMMINGBIRD")
+    )
+
+    @Test fun version3ExactGridAndPlacementGoldensNeverDrift() {
+        assertEquals(3, goldens.size)
+        goldens.forEach { g ->
+            val p = WordSearchGeneratorV3.generate(g.theme,g.board,g.challenge,g.seed)
+            assertEquals("Archived v3 letters, positions or target order changed: ${p.id}",
+                g.hash,digest(p))
+            assertEquals(listOf(g.first,g.second),p.targets.take(2).map { it.id })
         }
     }
 
