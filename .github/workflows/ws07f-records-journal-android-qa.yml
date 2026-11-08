@@ -6,7 +6,7 @@ name: WS-07F Records Journal Navigation Android Emulator QA
 # Executes real pointer-injected touch tests for 15x15 and 20x20 board;
 # Rerun all gates after final compact Solo word pages and win/save HUD adjustments.
 # Touch follow-up: include finger-UP final coordinates and report selected endpoints.
-# WS-07F: verify paged Daily journal, no-cost saved clue review, and cumulative regressions.
+# WS-07F: source-match final Records tabs, complete history paging, and signed v0.8.2 upgrade.
 # Source-matched rerun: corrected stale saved-clue test assertion and compact Daily grouping.
 # Includes previous 90 tests plus 2 Records navigation tests and v0.8.1 -> v0.8.2 signed upgrade.
 # includes the exact same-signer v0.8.1 -> v0.8.2 update and save checks.
