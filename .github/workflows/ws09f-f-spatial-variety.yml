@@ -1,0 +1,49 @@
+name: WS-09F-F V4 Spatial Coverage & Variety Audit (No APK)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws09f-f-spatial-and-variation-audit-2026-11-08
+    paths:
+      - 'labs/ws09f_f_quality/**'
+      - 'core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/V4PuzzleQuality.kt'
+      - '.github/workflows/ws09f-f-spatial-variety.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws09f-f-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm source-tier preview audit and no public giant boards
+        run: python3 tools/ws09f_e_tier_workbench_audit.py
+      - name: Compile actual core and independent 1,800-board spread audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v kotlinc
+          CORE=core/src/main/kotlin/com/playereden/gridmates/wordsearch/core
+          kotlinc "$CORE/WordSearch.kt" "$CORE/WordSearchV2.kt" \
+            "$CORE/WordSearchV3.kt" "$CORE/V4PreviewPlacement.kt" \
+            "$CORE/V4PreviewTierSelection.kt" "$CORE/V4PuzzleQuality.kt" \
+            labs/ws09f_f_quality/QualityStress.kt \
+            -include-runtime -d "$RUNNER_TEMP/ws09f-f-quality.jar"
+          timeout 240s java -Xmx256m -jar "$RUNNER_TEMP/ws09f-f-quality.jar" \
+            core/src/test/resources/ws09f_e_v4_provisional_tiers.txt \
+            | tee /tmp/ws09f-f-quality.txt
+          grep -F 'PASS: 1800 measurable giant-board quality reports' /tmp/ws09f-f-quality.txt
+          {
+            echo '### V4 provisional spatial/direction/variety baseline (NOT editorially approved)'
+            echo '```'
+            cat /tmp/ws09f-f-quality.txt
+            echo '```'
+            echo 'This is objective source-level evidence, NOT guaranteed fun, Android performance or production V4 approval.'
+          } >> "$GITHUB_STEP_SUMMARY"
