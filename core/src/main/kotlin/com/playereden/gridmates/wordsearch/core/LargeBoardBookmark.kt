@@ -43,7 +43,7 @@ data class LargeBoardBookmark(
 
         private fun valid(id: String?, zoom: Float?, x: Float?, y: Float?): Boolean =
             !id.isNullOrBlank() && id.length <= MAX_ID_LENGTH &&
-                id.none { it.isISOControl() } &&
+                id.none { it.code < 32 || it.code == 127 } &&
                 zoom != null && zoom.isFinite() && zoom in 1f..LargeBoardViewport.MAX_ZOOM &&
                 x != null && x.isFinite() && x in 0f..1f &&
                 y != null && y.isFinite() && y in 0f..1f
