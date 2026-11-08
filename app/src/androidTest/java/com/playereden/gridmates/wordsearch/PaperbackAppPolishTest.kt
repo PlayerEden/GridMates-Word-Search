@@ -18,7 +18,8 @@ class PaperbackAppPolishTest {
     @Test fun homeShowsDistinctPlayModesAndCurrentProgress() {
         compose.onNodeWithText("Word Search").assertExists()
         compose.onNodeWithText("Good puzzles. Good company.").assertExists()
-        compose.onNodeWithText("01 · YOUR CURRENT PUZZLE").assertExists()
+        compose.onNodeWithText("01 · SOLO").assertExists()
+        compose.onNodeWithText("New puzzle").assertExists()
         compose.onNodeWithText("02 · A LITTLE EVERY DAY").assertExists()
         compose.onNodeWithText("03 · TOGETHER IS BETTER").assertExists()
         compose.onNodeWithContentDescription("Open Nearby co-op").assertExists()

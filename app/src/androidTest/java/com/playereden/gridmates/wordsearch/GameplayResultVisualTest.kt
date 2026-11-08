@@ -2,6 +2,7 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import org.junit.Assert.assertTrue
@@ -39,9 +40,11 @@ class GameplayResultVisualTest {
         try {
             val store = SoloStore(context, name)
             val puzzle = SoloProgressRules.puzzle(store.profile.active)
+            var newRouteOpened = false
             rule.setContent {
                 GridMatesTheme {
-                    WordSearchScreen(store = store, onBack = {}, onRecords = {})
+                    WordSearchScreen(store = store, onBack = {}, onRecords = {},
+                        onNewPuzzle = { newRouteOpened = true })
                 }
             }
             rule.onNodeWithText("Words to find", substring = true).assertExists()
@@ -66,6 +69,8 @@ class GameplayResultVisualTest {
             rule.onNodeWithText("Unassisted solve", substring = true).assertExists()
             rule.waitForIdle()
             screenshot("ws05g-results.png")
+            rule.onNodeWithText("Play another puzzle").performClick()
+            assertTrue("The result action should route to pre-game setup", newRouteOpened)
             assertTrue(store.profile.results.any { it.puzzleId == puzzle.id })
         } finally {
             for (suffix in listOf("", ".bak", ".new")) {

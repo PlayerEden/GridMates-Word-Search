@@ -42,6 +42,13 @@ import java.nio.charset.StandardCharsets
  *
  * Malformed existing data is preserved, NEVER silently reset/overwritten.
  */
+/** Persistent choice defaults only: progress is still stored in the atomic profile. */
+internal data class SoloSetupPreset(
+    val theme: WordTheme,
+    val board: PuzzleBoardSize,
+    val challenge: PuzzleChallenge
+)
+
 internal class SoloStore(
     context: Context,
     saveName: String = "gridmates_wordsearch_solo_v1.json"
@@ -65,6 +72,38 @@ internal class SoloStore(
     fun updateSoundPreference(enabled: Boolean) {
         soundEnabled = enabled
         feedbackPrefs.edit().putBoolean("sound", enabled).apply()
+    }
+
+    // Remember the last successful New Solo configuration across app launches
+    // and compatible APK updates. Preferences are nonessential: full puzzle
+    // state and progress remain in the portable schema-5 JSON backup.
+    private val soloSetupPrefs = context.getSharedPreferences(
+        saveName + "_solo_setup", Context.MODE_PRIVATE
+    )
+
+    /** Invalid or legacy values fall back to known, supported book presets. */
+    fun soloSetupPreset(): SoloSetupPreset {
+        val active = profile.active
+        val theme = soloSetupPrefs.getString("theme", null)
+            ?.let { saved -> WordTheme.entries.firstOrNull { it.name == saved } }
+            ?: active.theme
+        val board = soloSetupPrefs.getString("board", null)
+            ?.let { saved -> PuzzleBoardSize.bookPresets.firstOrNull {
+                it.name == saved
+            } }
+            ?: active.boardSize?.takeIf { it in PuzzleBoardSize.bookPresets }
+            ?: PuzzleBoardSize.BOOK_CLASSIC
+        val challenge = soloSetupPrefs.getString("challenge", null)
+            ?.let { saved -> PuzzleChallenge.entries.firstOrNull {
+                it.name == saved
+            } }
+            ?: active.challenge
+            ?: when (active.difficulty) {
+                WordDifficulty.EASY -> PuzzleChallenge.RELAXED
+                WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
+                WordDifficulty.HARD -> PuzzleChallenge.EXPERT
+            }
+        return SoloSetupPreset(theme, board, challenge)
     }
 
     private val fontPrefs = context.getSharedPreferences(
@@ -576,7 +615,13 @@ internal class SoloStore(
             warning = "My Puzzles is full. Remove a paused puzzle to start another."
             return false
         }
-        return commitSession(updated)
+        if (!commitSession(updated)) return false
+        soloSetupPrefs.edit()
+            .putString("theme", theme.name)
+            .putString("board", board.name)
+            .putString("challenge", challenge.name)
+            .apply()
+        return true
     }
 
     fun newPuzzle(): Boolean {

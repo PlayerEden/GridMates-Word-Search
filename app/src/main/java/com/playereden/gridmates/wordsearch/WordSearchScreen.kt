@@ -104,7 +104,9 @@ internal fun WordSearchScreen(
     store: SoloStore,
     daily: Boolean = false,
     onBack: () -> Unit,
-    onRecords: () -> Unit
+    onRecords: () -> Unit,
+    /** A route to separate pre-game setup; never changes a puzzle in-game. */
+    onNewPuzzle: (() -> Unit)? = null
 ) {
     val dailyEntry = if (daily) store.selectedDaily else null
     val run = if (daily) dailyEntry?.run else store.profile.active
@@ -130,28 +132,10 @@ internal fun WordSearchScreen(
     var status by remember(puzzle.id) {
         mutableStateOf(PuzzleModeHelp.opening(puzzle.size))
     }
-    var changeOpen by rememberSaveable { mutableStateOf(false) }
     var feelOpen by rememberSaveable { mutableStateOf(false) }
     var cluesOpen by rememberSaveable { mutableStateOf(false) }
-    var newPuzzleOpen by rememberSaveable { mutableStateOf(false) }
     var optionsOpen by rememberSaveable { mutableStateOf(false) }
     var reviewingCompletedBoard by remember(puzzle.id) { mutableStateOf(false) }
-    var pendingTheme by rememberSaveable { mutableStateOf(theme.name) }
-    var pendingBoard by rememberSaveable {
-        mutableStateOf(
-            run.boardSize?.takeIf { it in PuzzleBoardSize.bookPresets }?.name
-                ?: PuzzleBoardSize.BOOK_CLASSIC.name
-        )
-    }
-    var pendingChallenge by rememberSaveable {
-        mutableStateOf(
-            (run.challenge ?: when(difficulty) {
-                WordDifficulty.EASY -> PuzzleChallenge.RELAXED
-                WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
-                WordDifficulty.HARD -> PuzzleChallenge.EXPERT
-            }).name
-        )
-    }
     val hapticsEnabled = store.hapticsEnabled
     val soundEnabled = store.soundEnabled
     val haptics = LocalHapticFeedback.current
@@ -169,67 +153,6 @@ internal fun WordSearchScreen(
             delay(2200L)
             status = "Keep going — the next word is waiting."
         }
-    }
-
-    fun startNew() {
-        if (store.newPuzzle()) newPuzzleOpen = false
-    }
-
-    if (changeOpen && !daily) {
-        AlertDialog(
-            onDismissRequest = { changeOpen = false },
-            title = { Text("Choose a puzzle") },
-            text = {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
-                    Text("Theme", style = MaterialTheme.typography.titleSmall, color = Forest)
-                    WordTheme.entries.forEach { item ->
-                        Row(Modifier.fillMaxWidth().clickable { pendingTheme = item.name },
-                            verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(selected = pendingTheme == item.name,
-                                onClick = { pendingTheme = item.name })
-                            Text(item.label)
-                        }
-                    }
-                    Text("Board size", style = MaterialTheme.typography.titleSmall, color = Forest)
-                    PuzzleBoardSize.bookPresets.forEach { item ->
-                        Row(Modifier.fillMaxWidth().clickable { pendingBoard = item.name },
-                            verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(selected = pendingBoard == item.name,
-                                onClick = { pendingBoard = item.name })
-                            Text("${item.label} · ${item.cells}×${item.cells} · ${item.targets} words")
-                        }
-                    }
-                    Text("Pinch to zoom a large board, or use Fit to see every letter.",
-                        style = MaterialTheme.typography.bodySmall, color = Muted)
-                    Text("Challenge", style = MaterialTheme.typography.titleSmall, color = Forest)
-                    PuzzleChallenge.entries.forEach { item ->
-                        Row(Modifier.fillMaxWidth().clickable { pendingChallenge = item.name },
-                            verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(selected = pendingChallenge == item.name,
-                                onClick = { pendingChallenge = item.name })
-                            Column {
-                                Text(item.label)
-                                Text(item.description, color = Muted,
-                                    style = MaterialTheme.typography.bodySmall)
-                            }
-                        }
-                    }
-                    Text("Board size sets the space and number of words. Challenge changes " +
-                        "the directions and word mix. Your unfinished Solo board stays in My Puzzles.",
-                        style = MaterialTheme.typography.bodySmall, color = Muted)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (store.chooseV2(WordTheme.valueOf(pendingTheme),
-                            PuzzleBoardSize.valueOf(pendingBoard),
-                            PuzzleChallenge.valueOf(pendingChallenge))) {
-                        changeOpen = false
-                    }
-                }) { Text("Start puzzle") }
-            },
-            dismissButton = { TextButton(onClick = { changeOpen = false }) { Text("Cancel") } }
-        )
     }
 
     if (feelOpen) {
@@ -255,17 +178,6 @@ internal fun WordSearchScreen(
                 }
             },
             confirmButton = { TextButton(onClick = { feelOpen = false }) { Text("Done") } }
-        )
-    }
-
-    if (newPuzzleOpen && !daily) {
-        AlertDialog(
-            onDismissRequest = { newPuzzleOpen = false },
-            title = { Text("Start another puzzle?") },
-            text = { Text("Your unfinished puzzle will be saved in My Puzzles. " +
-                "Completed results stay in Records.") },
-            confirmButton = { TextButton(onClick = { startNew() }) { Text("New puzzle") } },
-            dismissButton = { TextButton(onClick = { newPuzzleOpen = false }) { Text("Keep playing") } }
         )
     }
 
@@ -338,25 +250,13 @@ internal fun WordSearchScreen(
                     TextButton(onClick = { optionsOpen = true }) { Text("Options") }
                     DropdownMenu(expanded = optionsOpen,
                         onDismissRequest = { optionsOpen = false }) {
-                        if (!daily) {
-                            DropdownMenuItem(text = { Text("Customize puzzle") },
-                                onClick = {
-                                    optionsOpen = false
-                                    pendingTheme = theme.name
-                                    pendingBoard = run.boardSize?.takeIf {
-                                        it in PuzzleBoardSize.bookPresets
-                                    }?.name ?: PuzzleBoardSize.BOOK_CLASSIC.name
-                                    pendingChallenge = (run.challenge ?: when (difficulty) {
-                                        WordDifficulty.EASY -> PuzzleChallenge.RELAXED
-                                        WordDifficulty.MEDIUM -> PuzzleChallenge.CLASSIC
-                                        WordDifficulty.HARD -> PuzzleChallenge.EXPERT
-                                    }).name
-                                    changeOpen = true
-                                })
+                        if (!daily && onNewPuzzle != null) {
+                            // Return to pre-game setup without replacing the
+                            // current saved board until Start is confirmed.
                             DropdownMenuItem(text = { Text("New puzzle") },
                                 onClick = {
                                     optionsOpen = false
-                                    newPuzzleOpen = true
+                                    onNewPuzzle()
                                 })
                         }
                         if (usedHintSteps > 0) {
@@ -448,7 +348,7 @@ internal fun WordSearchScreen(
                     onReview = { reviewingCompletedBoard = true },
                     onRecords = { store.flush(); onRecords() },
                     onHome = { store.flush(); onBack() },
-                    onAnother = if (daily) null else { { startNew() } },
+                    onAnother = if (daily) null else onNewPuzzle,
                     modifier = Modifier.weight(1f).fillMaxWidth()
                 )
             } else if (landscape) {
