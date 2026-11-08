@@ -1,0 +1,51 @@
+name: WS-12A/B Generated Book Cover Concepts & Asset Approval Guard
+
+# Preview-only. No external Adobe edit or Android assets are claimed by this workflow.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws12a-b-pilot-cover-concepts-and-review-qa-2026-11-08
+    paths:
+      - 'design/asset-pipeline/**'
+      - 'tools/asset_pipeline/**'
+      - '.github/workflows/ws12a-b-asset-guard.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws12ab-concept-guard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  asset-quality-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Reject fake approvals and verify three pilot book concepts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/asset_pipeline/validate.py --repo-root . | tee /tmp/ws12-asset-audit.txt
+          grep -F '"pilot_concepts": 3' /tmp/ws12-asset-audit.txt
+          grep -F '"production_approved_assets": 0' /tmp/ws12-asset-audit.txt
+          grep -F '"adobe_refinements": 0' /tmp/ws12-asset-audit.txt
+          grep -F '"binary_sources_verified": false' /tmp/ws12-asset-audit.txt
+      - name: Test approval evidence, file integrity, license and path safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_*.py' -v
+          {
+            echo '### WS-12A/B concept and approval guard'
+            echo 'Eight stdlib unit tests must pass. The three pilot image concepts are **unapproved and still in the conversation delivery bundle**, not GitHub binary assets.'
+            echo 'No Adobe edit has run and no Android artwork, old saves, signing, generator, or content IDs were changed.'
+            echo '```'
+            cat /tmp/ws12-asset-audit.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
