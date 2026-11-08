@@ -21,32 +21,22 @@ from ws09f_c_generator_lab import (
 GOLDENS = {
     ("GARDEN", 40, "relaxed"): "3020258c728a961d",
     ("GARDEN", 40, "classic"): "9660dc0a60856d52",
-    ("GARDEN", 40, "expert"): "929b49629a36548a",
+    ("GARDEN", 40, "expert"): "48dfdcd9f55c3f21",
     ("GARDEN", 50, "relaxed"): "95f01ff630292b15",
     ("GARDEN", 50, "classic"): "a881eb7516395d89",
-    ("GARDEN", 50, "expert"): "0d5c97224b7e4098",
+    ("GARDEN", 50, "expert"): "9d13d3fa21f46913",
     ("SPACE", 40, "relaxed"): "2b415a6bab2ab88d",
     ("SPACE", 40, "classic"): "5d2a5129693ffa2a",
     ("SPACE", 40, "expert"): "93ec7e85aa3d3882",
     ("SPACE", 50, "relaxed"): "7d4bdcef0c91de59",
-    ("SPACE", 50, "classic"): "e4c6f5bd4aff25af",
+    ("SPACE", 50, "classic"): "a55cc39198fa8e08",
     ("SPACE", 50, "expert"): "a4afd89186aef648",
     ("WOODLAND", 40, "relaxed"): "9f3c9f4f50a851d3",
     ("WOODLAND", 40, "classic"): "b88a00bcab3287b6",
     ("WOODLAND", 40, "expert"): "0284349592418af1",
     ("WOODLAND", 50, "relaxed"): "f2c144747dc4891e",
-    ("WOODLAND", 50, "classic"): "6a07bc0552048b00",
+    ("WOODLAND", 50, "classic"): "e4adcd7098fa926c",
     ("WOODLAND", 50, "expert"): "23f7afb3a92c1cd8",
-}
-
-
-# These v1 digests were legitimately deterministic, but had empty Map
-# sectors. Replaced golden digests must be pinned after full matrix QA.
-REJECTED_SPARSE_V1 = {
-    ("GARDEN", 40, "expert"),
-    ("GARDEN", 50, "expert"),
-    ("SPACE", 50, "classic"),
-    ("WOODLAND", 50, "classic"),
 }
 
 
@@ -70,14 +60,9 @@ class V4ResearchGeneratorTests(unittest.TestCase):
         for (theme, size, mode), digest in GOLDENS.items():
             with self.subTest(theme=theme, size=size, mode=mode):
                 puzzle = generate(theme, size, mode, 11, self.pools[theme])
-                # Four v1 research goldens revealed filler-only Map
-                # regions. The v2 rejection rule deliberately re-seeds
-                # those specific cases; record their replacement digest
-                # from the full CI matrix, then pin the revised literals.
-                if (theme, size, mode) in REJECTED_SPARSE_V1:
-                    self.assertNotEqual(digest, puzzle.digest())
-                else:
-                    self.assertEqual(digest, puzzle.digest())
+                # V2 research goldens deliberately exclude filler-only
+                # Map regions; all 18 fixture hashes are now pinned.
+                self.assertEqual(digest, puzzle.digest())
                 verify_puzzle(puzzle, size, mode)
                 self.assertGreater(puzzle.crossing_words(), 0)
 

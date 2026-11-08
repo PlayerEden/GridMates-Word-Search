@@ -1,0 +1,27 @@
+# WS-09F-C — Python giant-board generator laboratory (research QA)
+
+**Date:** November 8, 2026. **Lab code:** [draft PR #78](https://github.com/PlayerEden/GridMates-Word-Search/pull/78). **Parent:** fully source-verified v0.9.3 / code47 WS-09F-B [PR #73](https://github.com/PlayerEden/GridMates-Word-Search/pull/73). This is **not a build of the Android app** and does not release new Solo sizes.
+
+## Source-matched evidence
+- [Passing candidate audit and 54-grid proof #42470166959](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42470166959).
+- [Passing expanded 180-grid / 6 regression checks #42470452752](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42470452752).
+- [Passing 180-grid / 7 regression checks with **no empty 10×10 Map regions** #42470754417](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42470754417), executable source SHA `02a1c567f76f656170adbc57f5ebc804b2afb01f`. This run temporarily used explicit exceptions for **four superseded sparse v1 research golden digests**, whose replacement digests were recorded from its full matrix. The follow-up commit pins all 18 revised golden digests; verify its own workflow run before considering the final checksum freeze accepted.
+
+The Python-only CI uses the standard library and runs without Android, Gradle or network build dependencies. The auditor pins the **exact frozen V3 Git blob** (`6c64d1bc7478ce47be7c761252c04c7a696bee64`); it neither edits V3 vocabulary nor introduces V4 board selection into game code.
+
+## Experimental scope and observations
+
+- **3 themes** (Woodland, Space, Garden) × **2 board sizes** (continuous 40×40 at an **unapproved 70 targets**, continuous 50×50 at an **unapproved 105 targets**) × **3 direction modes** × **10 deterministic seeds** = **180 complete grids**.
+- Every grid in source-matched run #42470754417 placed its target count, reconstructed its own saved solution paths, had exactly **one eight-direction occurrence of each target**, and covered each 10×10 Map region with **at least one real target-path cell** (not mere filler). Runs were **bounded to 24 attempts**; maximum observed was **8**. Execution in Python CI took **31.12 seconds** for the matrix. This is **not** an Android FPS or Kotlin execution benchmark.
+- Independent regression checks detect repeated words, noncontiguous paths, wrong directions, malformed/insufficient candidate sets, artificial duplicate occurrences, seed instability, and filler-only Map sections. Version-2 lab digests deliberately differ for four layouts whose first seed had a filler-only region.
+- Existing V3 source: **81 / 81 / 79** unique words; conservative substring-safe pools **81 / 76 / 76** (Woodland / Space / Garden). Experimental *unreviewed* additions lead to combined substring-safe pools **194 / 185 / 174** respectively.
+- Modes currently reproduce V3's placement **directions only**. **Important limitation:** the provisional V4 candidate words have **no editorial familiarity/advanced tiers**; Relaxed therefore currently draws from the whole research pool, including hard words. **Do not claim this respects a finished Relaxed difficulty**, and do not ship these as the game's dictionary.
+- The stronger no-empty-region gate is **necessary but not sufficient**. Worst experimental layouts still have sections with **just one target-path cell**; before shipping, require measurable *region density and spread*, appropriate word lengths/difficulty, playable match duration and real-owner testing.
+
+## Next work, release blockers, and source safety
+
+1. **Editorial pass:** review spelling, natural language quality, factual/theme fit and accessibility of all candidate words, mark `familiar` vs `advanced`, and demand adequate **per-challenge** headroom. V3 familiar tiers currently total 66 Woodland, 67 Space and 65 Garden; selecting 105 target words for Relaxed would require at least **39/38/40 additional familiar entries**, *before any margin*. Word counts likely need to vary by challenge after real playtests.
+2. **Generator-quality balance:** compare number of unique words/cells touching each 10×10 region, length distribution, directional variety, overlap, and target locations; ensure empty or near-empty sectors are not tedious detours. Add seed stress, golden boards, bounded failure cases and performance budgets.
+3. **Versioned Kotlin V4 engine-only branch:** stable `wordsearch:v4` IDs, isolated content packs and RNG; **never modify v1/v2/v3 dictionaries, their seeds, old puzzle IDs, ordinals, golden tests or saved format**. No user-facing 40/50 mode until verified.
+4. **Physical performance:** measure p50/p95 frame time, jank, memory and gestures on 25/30 first, then prototype 40/50 screen; test portrait/landscape, narrow screens, 200% font and long sessions. Python test seconds are not FPS data.
+5. **Upgrade/release safety:** existing v0.9.4/code48 viewport-save [draft PR #74](https://github.com/PlayerEden/GridMates-Word-Search/pull/74) remains **UNVERIFIED** because Gradle and Kotlin downloads returned HTTP 504. Last truly Android-tested executable remains **v0.9.3/code47**, 111/111 tests, exact-signer in-place upgrade and rollback [receipt](WS09F_B_BUILD_QA_2026-11-08.md). Older family APK signer/version, independently restorable backup and real two-phone Co-op [#53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53) remain open. No merges, production signer changes, Play release or destructive reinstall.
