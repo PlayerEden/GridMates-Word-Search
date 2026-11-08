@@ -88,6 +88,10 @@ class BookPageGameplayScreenAndroidTest {
             // Reuses the same zoom/precise gesture primitive as ordinary Solo.
             compose.onNodeWithContentDescription("Select a word without dragging")
                 .assertExists()
+            // A book exposes all targets in one scrollable list, instead of
+            // showing only two targets plus a six-page word-list pager.
+            compose.onNodeWithText("○ " + puzzle.targets.last().word).assertExists()
+            compose.onNodeWithText("Page 1 of 6").assertDoesNotExist()
             assertEquals(1, sessions.session("woodland-volume-one", "woodland-page-one")
                 ?.foundIds?.size)
         } finally { clear(name, complete) }

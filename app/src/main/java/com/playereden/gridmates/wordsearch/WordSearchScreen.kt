@@ -1,6 +1,7 @@
 package com.playereden.gridmates.wordsearch
 
 import android.view.SoundEffectConstants
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -529,7 +530,9 @@ internal fun WordList(
     found: Set<String>,
     daily: Boolean,
     modifier: Modifier = Modifier,
-    onShowResults: (() -> Unit)? = null
+    onShowResults: (() -> Unit)? = null,
+    /** Book mode: keep all target words in one scrollable list, not 6 tiny pages. */
+    scrollAll: Boolean = false
 ) {
     var remainingOnly by remember(puzzle.id) { mutableStateOf(false) }
     var page by remember(puzzle.id, remainingOnly) { mutableStateOf(0) }
@@ -570,13 +573,22 @@ internal fun WordList(
             val reservedControls = if (giantWordList) 88.dp else 40.dp
             val rowsPerPage = ((maxHeight - reservedControls) / rowBudget)
                 .toInt().coerceIn(1, 5)
-            val perPage = columns * rowsPerPage
+            val perPage = if (scrollAll) targets.size.coerceAtLeast(1)
+                else columns * rowsPerPage
             val pageCount = ((targets.size + perPage - 1) / perPage).coerceAtLeast(1)
             val visiblePage = page.coerceIn(0, pageCount - 1)
             val visibleTargets = targets.drop(visiblePage * perPage).take(perPage)
             val visibleRange = PaperbackWordIndex.visibleRange(targets.size, visiblePage, perPage)
-            Column(Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            // In book mode keep the real word list in a scrollable region below
+            // the board, instead of an awkward 2-words-per-page pager.
+            // Solo/Daily retains its established paging and golden UX.
+            val listScroll = remember(puzzle.id, remainingOnly) { ScrollState(0) }
+            Column(
+                Modifier.fillMaxSize().then(
+                    if (scrollAll) Modifier.verticalScroll(listScroll) else Modifier
+                ),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 if (giantWordList) {
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,

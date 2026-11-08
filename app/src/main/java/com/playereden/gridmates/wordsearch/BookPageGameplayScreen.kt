@@ -236,7 +236,7 @@ internal fun BookPageGameplayScreen(
                     color = Muted, style = MaterialTheme.typography.labelMedium
                 )
             }
-            Text(book.title + " · Page " + (
+            Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
                 catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
                 color = Forest, fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge)
@@ -304,7 +304,7 @@ internal fun BookPageGameplayScreen(
                             choose, onStep = {}, boardFontId = boardFontId)
                     }
                     WordList(board, wordsFound, daily = false,
-                        modifier = Modifier.weight(1f).fillMaxHeight())
+                        modifier = Modifier.weight(1f).fillMaxHeight(), scrollAll = true)
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -312,7 +312,7 @@ internal fun BookPageGameplayScreen(
                         choose, onStep = {}, boardFontId = boardFontId)
                 }
                 WordList(board, wordsFound, daily = false,
-                    modifier = Modifier.fillMaxWidth().weight(1f))
+                    modifier = Modifier.fillMaxWidth().weight(1f), scrollAll = true)
             }
         }
     }
