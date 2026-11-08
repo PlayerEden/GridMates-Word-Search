@@ -8,6 +8,8 @@ on:
       - feature/ws09f-c3-giant-generator-stress-2026-11-08
     paths:
       - 'labs/ws09f_c_kotlin/**'
+      - 'design/marathon/v4_editorial_triage_proposal.json'
+      - 'tools/ws09f_c_editorial_supply_report.py'
       - 'tools/ws09f_c_kotlin_fixture_audit.py'
       - '.github/workflows/ws09f-c3-kotlin-stress.yml'
 
@@ -26,6 +28,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify test-only vocabulary against frozen V3 + unapproved V4 draft
         run: python3 tools/ws09f_c_kotlin_fixture_audit.py
+      - name: Audit proposed gentle-mode word eligibility and editorial review queue
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/ws09f_c_editorial_supply_report.py | tee /tmp/ws09fc-editorial.txt
+          {
+            echo '### Editorial supply proposal (NOT approved content)'
+            echo '```'
+            cat /tmp/ws09fc-editorial.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Require a preinstalled JDK Kotlin compiler (never download Gradle)
         shell: bash
         run: |
