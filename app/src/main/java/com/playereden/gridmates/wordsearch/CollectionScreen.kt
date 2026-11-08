@@ -170,7 +170,7 @@ internal fun CollectionScreen(store: SoloStore) {
             PaperEyebrow("Player profile")
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                PortraitBadge(equippedId, equippedName, 60)
+                PortraitBadge(equippedId, equippedName, 48)
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(profile.identity.displayName, color = Forest,
                         style = MaterialTheme.typography.titleLarge,
@@ -180,39 +180,13 @@ internal fun CollectionScreen(store: SoloStore) {
                         style = MaterialTheme.typography.bodyMedium)
                 }
             }
-            Text(completed.toString() + " completed puzzles · " +
-                profile.completions + " Solo · " + profile.dailyCompletions + " Daily",
-                color = Muted, style = MaterialTheme.typography.bodySmall)
             OutlinedButton(onClick = {
                 draftName = profile.identity.displayName
                 showNameDialog = true
             }, modifier = Modifier.fillMaxWidth()) { Text("Edit display name") }
         }
 
-        PaperPanel(Modifier.fillMaxWidth()) {
-            PaperEyebrow("Collection progress")
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(portraits.count { it.unlocked }.toString() + " of " +
-                        portraits.size + " portraits", color = Forest,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold)
-                    Text(achievements.count { it.unlocked }.toString() + " of " +
-                        achievements.size + " achievements earned",
-                        color = Muted, style = MaterialTheme.typography.bodySmall)
-                }
-            }
-            PaperProgress(portraits.count { it.unlocked }, portraits.size)
-            Text(
-                if (nextPortrait == null) "You have earned every Woodland portrait."
-                else "Next portrait: " + nextPortrait.label + " · " +
-                    (nextPortrait.requiredCompletions - completed).coerceAtLeast(0) +
-                    " more completed " + (if (nextPortrait.requiredCompletions - completed == 1)
-                        "puzzle" else "puzzles") + " to unlock.",
-                color = Muted, style = MaterialTheme.typography.bodySmall
-            )
-        }
+
 
     }
 
@@ -301,6 +275,33 @@ internal fun CollectionScreen(store: SoloStore) {
         Text("Unlocks depend on completed Solo and Daily puzzles. " +
             "No random purchases, streak deadlines or paid portraits.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
+
+        // History/progress is still available, but after the actual gallery.
+        // The portrait pager and equip choices come first on a phone.
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow("Collection progress")
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(portraits.count { it.unlocked }.toString() + " of " +
+                        portraits.size + " portraits", color = Forest,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold)
+                    Text(achievements.count { it.unlocked }.toString() + " of " +
+                        achievements.size + " achievements earned",
+                        color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+            PaperProgress(portraits.count { it.unlocked }, portraits.size)
+            Text(
+                if (nextPortrait == null) "You have earned every Woodland portrait."
+                else "Next portrait: " + nextPortrait.label + " · " +
+                    (nextPortrait.requiredCompletions - completed).coerceAtLeast(0) +
+                    " more completed " + (if (nextPortrait.requiredCompletions - completed == 1)
+                        "puzzle" else "puzzles") + " to unlock.",
+                color = Muted, style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }
 
