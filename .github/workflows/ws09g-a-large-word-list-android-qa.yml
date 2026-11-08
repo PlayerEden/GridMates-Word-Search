@@ -4,6 +4,8 @@ name: WS-09G-A Future 105-word A-Z Index Android QA
 # v0.9.4 remains the previously verified QA build; this branch is NOT a release.
 # v0.9.3 source-matched APK and signer pinned by SHA-256.
 # New instrumentation tests A–Z navigation and Remaining on a 300dp screen.
+# Retry the full gate after correcting misplaced Compose assertion imports;
+# never narrow the requested 117-case instrumentation count.
 # Keep previous 114 tests; add 3 new tests and the historical code47->48
 # install-over gate. Do not distribute any branch APK from this research workflow.
 # Trigger only on this workflow file or manual dispatch to conserve Actions minutes.
