@@ -31,9 +31,28 @@ import java.util.Date
 internal fun SoloRecordsScreen(profile: SoloProfile) {
     Text("Your puzzle journal", color = Forest,
         style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-    Text("Your completed Solo puzzles are saved privately on this device.",
+    Text("Your puzzle and match history stays on this device.",
         color = Muted, style = MaterialTheme.typography.bodyMedium)
 
+    var journalTab by rememberSaveable { mutableStateOf("Solo") }
+    var soloPage by rememberSaveable { mutableIntStateOf(0) }
+    var racePage by rememberSaveable { mutableIntStateOf(0) }
+    var duelPage by rememberSaveable { mutableIntStateOf(0) }
+
+    Text("Browse your results", color = Forest,
+        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf("Solo", "Race", "Duel").forEach { section ->
+            FilterChip(selected = journalTab == section,
+                onClick = { journalTab = section },
+                label = { Text(section) })
+        }
+    }
+    // Only the Solo tab needs Solo and Daily summary cards; putting them
+    // above Race/Duel makes the selected match history inaccessible without
+    // scrolling past unrelated statistics on compact screens.
+    if (journalTab == "Solo") {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         MetricCard("Completed", profile.completions.toString(), Modifier.weight(1f))
         MetricCard("Words found", profile.totalWords.toString(), Modifier.weight(1f))
@@ -51,21 +70,8 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
         }
     }
 
-    var journalTab by rememberSaveable { mutableStateOf("Solo") }
-    var soloPage by rememberSaveable { mutableIntStateOf(0) }
-    var racePage by rememberSaveable { mutableIntStateOf(0) }
-    var duelPage by rememberSaveable { mutableIntStateOf(0) }
-
-    Text("Browse your results", color = Forest,
-        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf("Solo", "Race", "Duel").forEach { section ->
-            FilterChip(selected = journalTab == section,
-                onClick = { journalTab = section },
-                label = { Text(section) })
-        }
     }
+
     // Each category has its own remembered page. No journal is silently
     // truncated at 12/15/25 entries and no stored result is deleted.
     if (journalTab == "Race") {
