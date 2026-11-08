@@ -65,6 +65,24 @@ def main() -> None:
               f"planning_goal={goal} gap_to_goal={gap}")
         if gap:
             needs_additions.append((theme, gap))
+    # Validate NEXT-corpus proposals without including them in any generator.
+    # Existing seed goldens must remain byte-for-byte stable.
+    space = proposal["themes"]["SPACE"].get("possible_friendly_additions_for_review", [])
+    assert isinstance(space, list) and len(space) >= 4
+    existing = list(fixture["SPACE"])
+    new_answers = []
+    for item in space:
+        assert item["editor_status"] == "NOT_REVIEWED_NOT_IN_GENERATOR_FIXTURE"
+        answer = item["answer"]
+        display = item["display"]
+        assert isinstance(answer, str) and answer.isalpha() and answer.isupper()
+        assert 5 <= len(answer) <= 16
+        assert isinstance(display, str) and len(display) >= 5
+        assert all(not (answer in old or old in answer)
+                   for old in existing + new_answers), "Proposed Space term conflicts with existing word"
+        new_answers.append(answer)
+    print(f"SPACE optional future friendly concepts={len(new_answers)}; "
+          "all passed substring precheck but are NOT approved or generated")
     if needs_additions:
         print("EDITORIAL_WORK_REMAINS: need additional reviewed, accessible candidate words:")
         for theme, gap in needs_additions:
