@@ -50,7 +50,7 @@ assert old["pausedSolo"][1]["found"] == ["BUTTERFLY"]
 assert old["pausedSolo"][1]["hints"] == {"LAVENDER": 1}
 assert old["identity"]["name"] == "WS09A2 Progress Tester"
 assert len(old["races"]) == len(old["duels"]) == 1
-print("PASS: actual v0.9.4 app read/flushed active/paused Solo and Daily content.")
+print("PASS: actual v0.9.3 app read/flushed active/paused Solo and Daily content.")
 PY
 
 adb install -r "$NEW" | tee /tmp/ws09f-b2-update.log
