@@ -43,9 +43,16 @@ class LargeBoardBookmarkUiAndroidTest {
         assertEquals(1f, recorded?.zoom ?: -1f, 0.0001f)
         assertEquals(puzzle.id, recorded?.puzzleId)
         compose.onNodeWithContentDescription("Open board region map").performClick()
+        // These are dropdown menu choices, not always-present buttons. Open
+        // the current row and column selectors before choosing a new section.
+        // Mirror the already-green LargeBoardRegionNavigationAndroidTest path.
+        compose.onNodeWithText("Board map").assertExists()
+        compose.onNodeWithText("Row A").performClick()
         compose.onNodeWithText("Row C").performClick()
+        compose.onNodeWithText("Column 1").performClick()
         compose.onNodeWithText("Column 3").performClick()
         compose.onNodeWithText("Jump to section").performClick()
+        compose.onNodeWithText("Board map").assertDoesNotExist()
         compose.onNodeWithText("3.0×", substring = true).assertExists()
         compose.waitForIdle()
         assertEquals(3f, recorded?.zoom ?: -1f, 0.0001f)
