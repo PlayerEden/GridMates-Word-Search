@@ -1,10 +1,29 @@
 # GridMates: Word Search — Development Roadmap
 
 **Baseline:** November 5, 2026  
-**State (November 7, 2026):** **WS-07F Records UI v0.8.2 automated PASS, 92/92 API35** and real same-QA-signer v0.8.1→v0.8.2 saved-data install-over; [source-matched receipt](WS07F_RECORDS_BUILD_QA_2026-11-07.md), [draft PR #60](https://github.com/PlayerEden/GridMates-Word-Search/pull/60). **Original WS-07F durability/performance and WS-07G beta readiness gates still open.** Physical two-phone P0 deferred. Nothing merged to `main` or published.
+**State (November 7, 2026):** Latest source-matched verified QA candidate **WS-07I v0.8.5/code39, 94/94 API35 tests PASS**, stable test-signer v0.8.4→v0.8.5 upgrade preserved Solo/Daily/identity/Race/Duel; [draft PR #63](https://github.com/PlayerEden/GridMates-Word-Search/pull/63), [full emulator evidence](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42438847935), exact verified checkpoint `b3cd0ccd6ad09c1f610bb44cea597da7df091b38`. **New WS-09 foundation expansion is staged ahead of pre-existing WS-08 beta/release gates.** Physical two-phone P0 [#53](https://github.com/PlayerEden/GridMates-Word-Search/issues/53) remains open/deferred; no merges or publication.
 
 **Master specification:** [MASTER_GAME_DESIGN.md](MASTER_GAME_DESIGN.md)  
 **Quick handoff:** [START_HERE.md](START_HERE.md)
+
+## Active next arc — WS-09 foundation and 100×100 Marathon planning (November 7, 2026)
+
+**[Full WS-09 game-design decisions, source-code compatibility audit, workstream breakdown, QA matrix and migration protocol](WS09_FOUNDATIONS_GAMEPLAY_SAVE_MARATHON_2026-11-07.md).** The owner provided actual v0.8.5 visual screenshots and explicitly requested rebuilding the foundation before further visual expansion. Existing WS-08 **beta/release readiness** is NOT renamed or claimed complete; WS-09 is intentionally completed first.
+
+| ID | Priority/status | Outcome | Acceptance |
+| --- | --- | --- | --- |
+| **WS-09A** | **P0 — NEXT** | Freeze historical v1/v2 puzzle layouts and protect older QA APK/backup migrations, notably a family tester's unknown older app | Old partial found words, hints, elapsed time and exact grid/target placements survive upgrade + restore; incompatible signing never triggers blind uninstall |
+| **WS-09B** | **P0 — PLANNED** | Multiple unfinished Solo games and reliable session library (schema/DB decision after audit) | Three simultaneous saves resume after process death/update/backup; no silent replacement |
+| **WS-09C** | **P1 — PLANNED** | Simple pre-game mode/theme/size/challenge selection; Home Continue vs New | Setup occurs before gameplay; recent choices retained; Daily/Nearby remain clear |
+| **WS-09D** | **P0 UX — PLANNED** | Square zero-radius grid, no clipped corner cells, responsive ~16–20dp book-style side margins and precise viewport controls | Corner words fully visible/selectable; 320dp/large text/portrait/landscape; owner visual pass |
+| **WS-09E** | **P1 — PLANNED** | Add versioned 25×25 and 30×30 generator with expanded reviewed content | All seeds findable/unique; old board golden fixtures unchanged |
+| **WS-09F** | **P2 LAB — FUTURE** | Scale continuous board to 40, 50, 75 then eventually **100×100** with overview/region navigation | Measured smooth drawing/selection/generation and safe long-session resume on physical device |
+| **WS-09G** | **P1 — PLANNED** | Compact Portraits/Fonts/Achievements, Records, Home and Settings refinement | Better space efficiency without reducing tap targets or legibility |
+| **WS-09H** | **P0 QA — PLANNED** | Integrated historical installs and backup, responsive/performance test, owner solo APK acceptance | Evidence-backed exact-source checkpoint; old-progress preservation; no false two-phone pass |
+
+**Immediate first development slice:** WS-09A1 **compatibility fixtures and tests only**, with no v1/v2 generator modifications, no new save schema, no release signing and no changes to either installed phone. Keep small draft PRs and pin exact green source. Physical Co-op P0 remains a separate blocker.
+
+---
 
 ## How to use this roadmap
 
