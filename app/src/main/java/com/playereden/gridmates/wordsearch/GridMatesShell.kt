@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
@@ -118,8 +119,11 @@ private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
 @Composable
 internal fun GridMatesShell(
     soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel,
-    qaBookshelf: QaBookshelfRuntime
+    qaBookshelf: QaBookshelfRuntime? = null
 ) {
+    val context = LocalContext.current
+    val defaultQaRuntime = remember(context) { QaBookshelfRuntime(context) }
+    val qa = qaBookshelf ?: defaultQaRuntime
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     var soloSetupReturnPage by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     fun openSoloSetup(origin: Page) {
@@ -185,13 +189,13 @@ internal fun GridMatesShell(
                     pageName = Page.PLAY.name
                 })
             }
-        } else if (page == Page.BOOKS_QA && qaBookshelf.enabled &&
-            qaBookshelf.progressStore != null && qaBookshelf.sessionStore != null) {
+        } else if (page == Page.BOOKS_QA && qa.enabled &&
+            qa.progressStore != null && qa.sessionStore != null) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 BookLibraryFlow(
-                    catalog = qaBookshelf.catalog,
-                    progressStore = qaBookshelf.progressStore,
-                    sessionStore = qaBookshelf.sessionStore,
+                    catalog = qa.catalog,
+                    progressStore = qa.progressStore,
+                    sessionStore = qa.sessionStore,
                     boardFontId = soloStore.effectiveBoardFontId,
                     onExit = { pageName = Page.PLAY.name }
                 )
@@ -226,7 +230,7 @@ internal fun GridMatesShell(
                     onNewSolo = { openSoloSetup(Page.PLAY) },
                     onDaily = { pageName = Page.DAILY.name },
                     onNearby = { pageName = Page.NEARBY.name },
-                    onQaBooks = if (qaBookshelf.enabled) {
+                    onQaBooks = if (qa.enabled) {
                         { pageName = Page.BOOKS_QA.name }
                     } else null)
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
