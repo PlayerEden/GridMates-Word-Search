@@ -46,8 +46,10 @@ class CollectionGalleryPagingAndroidTest {
                 .performScrollTo().assertIsDisplayed()
 
             compose.onNodeWithText("Achievements").performScrollTo().performClick()
-            compose.onNodeWithTag("achievements-next").performScrollTo()
-                .assertIsEnabled().performClick()
+            // The pager should be directly visible below the achievements
+            // introduction, not buried beneath four long cards.
+            compose.onNodeWithTag("achievements-next")
+                .assertIsDisplayed().assertIsEnabled().performClick()
             compose.onNodeWithText("Page 2 of", substring = true)
                 .performScrollTo().assertIsDisplayed()
             compose.onNodeWithText("Fonts").performScrollTo().performClick()
