@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import re
 from pathlib import Path
 
 SOURCE = Path("core/src/main/kotlin/com/playereden/gridmates/wordsearch/core/WordSearchV3.kt")
+CANDIDATES = Path("design/marathon/v4_candidate_additions.json")
 # Frozen baseline observed in the source-verified WS-09F-B code47 checkpoint.
 EXPECTED_TIERS = {
     "WOODLAND": (28, 38, 15),
@@ -77,9 +79,55 @@ def audit(source: str) -> dict[str, dict]:
     return report
 
 
+def git_blob_sha1(raw: bytes) -> str:
+    # The exact GitHub V3 blob SHA is a source-compatibility gate, not a
+    # claim that v4 is part of the v3 executable.
+    header = f"blob {len(raw)}\\0".encode("ascii")
+    return hashlib.sha1(header + raw).hexdigest()
+
+
+def audit_draft_candidates(source: str, raw_source: bytes, manifest: dict) -> dict:
+    if manifest.get("status") != "EDITORIAL_REVIEW_REQUIRED_NOT_FOR_APP_GENERATION":
+        raise ValueError("A research manifest must not be presented as approved content")
+    if manifest.get("source_v3_blob_sha") != git_blob_sha1(raw_source):
+        raise ValueError("The v4 candidate manifest does not match the frozen v3 blob")
+    themes = manifest.get("themes")
+    if not isinstance(themes, dict) or set(themes) != set(EXPECTED_TIERS):
+        raise ValueError("Missing or extra theme in candidate manifest")
+    report = {}
+    for theme, tiers in extract_packs(source).items():
+        frozen = [word for tier in tiers for word in tier]
+        entry = themes[theme]
+        additions = entry.get("unclassified_candidates") if isinstance(entry, dict) else None
+        if not isinstance(additions, list) or not additions:
+            raise ValueError(f"{theme}: missing candidate list")
+        seen = list(frozen)
+        for word in additions:
+            if not isinstance(word, str) or not re.fullmatch(r"[A-Z]{5,16}", word):
+                raise ValueError(f"{theme}: invalid candidate {word!r}")
+            conflict = next((old for old in seen
+                             if old == word or old in word or word in old), None)
+            if conflict:
+                raise ValueError(f"{theme}: candidate {word} conflicts with {conflict}")
+            seen.append(word)
+        safe = substring_safe_pool(seen)
+        result = {
+            "frozen_unique": len(frozen),
+            "unreviewed_additions": len(additions),
+            "combined_unique": len(seen),
+            "conservative_substring_safe": len(safe),
+            "50x50_headroom": len(safe) - EXPERIMENT_TARGETS["50x50"],
+        }
+        if result["conservative_substring_safe"] < 160:
+            raise ValueError(f"{theme}: not yet enough draft candidates for research")
+        report[theme] = result
+    return report
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, default=SOURCE)
+    parser.add_argument("--candidates", type=Path, default=CANDIDATES)
     args = parser.parse_args()
     raw = args.source.read_bytes()
     report = audit(raw.decode("utf-8"))
@@ -93,8 +141,16 @@ def main() -> None:
             label = "SHORTAGE" if result["gap"] else "NOMINAL SUPPLY ONLY"
             print(f"  {size}: {label}, target={result['target']}, "
                   f"headroom={result['supply_headroom']}, gap={result['gap']}")
-    print("No placement/uniqueness/FPS/real-device acceptance inferred.")
-    print("ACTION: version 4 needs separately curated larger theme-specific packs.")
+    draft = json.loads(args.candidates.read_text(encoding="utf-8"))
+    results = audit_draft_candidates(raw.decode("utf-8"), raw, draft)
+    print("UNAPPROVED VERSION-4 RESEARCH CANDIDATES (NOT AN APP DICTIONARY)")
+    for theme, stats in results.items():
+        print(f"  {theme}: new={stats['unreviewed_additions']}, "
+              f"combined={stats['combined_unique']}, "
+              f"substring-safe={stats['conservative_substring_safe']}, "
+              f"50x50 nominal headroom={stats['50x50_headroom']}")
+    print("Candidates require semantic, spelling, familiarity-tier and gameplay review.")
+    print("No generator placement, distinct hidden occurrences, FPS or device proof inferred.")
 
 
 if __name__ == "__main__":
