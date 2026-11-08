@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "system_id": "gridmates-ws.paperback-illustrated.v1",
+  "status": "PROTOTYPE_STYLE_NOT_APPROVED_FOR_ANDROID",
+  "decision": "Quiet illustrated paperback, Set B layout geometry simplified, not ornate Set A renders",
+  "based_on_live_app_source": {
+    "branch": "feature/ws09f-f-spatial-and-variation-audit-2026-11-08",
+    "file": "app/src/main/java/com/playereden/gridmates/wordsearch/GridMatesTheme.kt",
+    "card_file": "app/src/main/java/com/playereden/gridmates/wordsearch/PaperbackUi.kt",
+    "note": "Actual Compose source uses cream/paper, forest, ink, gold, serif titles, sans-serif body. No game code modified by this prototype."
+  },
+  "brand": {
+    "cream": "#F4F3EB",
+    "paper": "#FFFDF8",
+    "forest": "#214F3F",
+    "ink": "#263D36",
+    "gold": "#8A6729",
+    "muted": "#55665C",
+    "rule": "#DFE0D6"
+  },
+  "cover": {
+    "width_px": 1200,
+    "height_px": 1600,
+    "corner_radius_px": 48,
+    "spine_width_px": 86,
+    "safe_inset_px": 104,
+    "art_window": {
+      "x": 170,
+      "y": 400,
+      "width": 870,
+      "height": 745
+    },
+    "text_is_native_ui": true,
+    "title_zone": {
+      "y_start": 125,
+      "y_end": 350
+    },
+    "subtitle_zone": {
+      "y_start": 1200,
+      "y_end": 1470
+    },
+    "reserved_physical_cover_ratio": "3:4",
+    "rendered_words_baked_into_art": false
+  },
+  "style_rules": {
+    "primary_shape_count_max": 18,
+    "palette_unique_colors_max": 8,
+    "illustration_subject_count": 1,
+    "use_full_generated_cover_as_runtime_resource": false,
+    "no_ornate_gold_frames": true,
+    "no_3d_embossed_or_fake_leather": true,
+    "no_trademark_symbols_without_clearance": true,
+    "no_text_in_decorative_art": true,
+    "all_book_ui_text_rendered_in_app": true,
+    "reuse_same_composition_for_each_theme": true,
+    "vector_native_fallback_for_missing_art": true
+  },
+  "themes": [
+    {
+      "id": "woodland",
+      "label": "Woodland",
+      "volume": "I",
+      "motif": "pine-grove",
+      "accent": "#365D48",
+      "accent_light": "#E4EDDF",
+      "accent_dark": "#244A38",
+      "highlight": "#9EAA83",
+      "mark": "trees"
+    },
+    {
+      "id": "space",
+      "label": "Space",
+      "volume": "I",
+      "motif": "orbit",
+      "accent": "#34536B",
+      "accent_light": "#E5EDF2",
+      "accent_dark": "#253F55",
+      "highlight": "#9EB6C5",
+      "mark": "planet"
+    },
+    {
+      "id": "garden",
+      "label": "Garden",
+      "volume": "I",
+      "motif": "flower-stem",
+      "accent": "#755C48",
+      "accent_light": "#F2EADF",
+      "accent_dark": "#53412F",
+      "highlight": "#B6A981",
+      "mark": "flower"
+    }
+  ],
+  "future_theme_recipe": {
+    "required": [
+      "id",
+      "label",
+      "motif",
+      "accent",
+      "accent_light",
+      "accent_dark",
+      "highlight",
+      "mark"
+    ],
+    "new_motif_requires_visual_qa": true,
+    "no_new_layout_geometry_for_new_theme": true,
+    "extensible_to": "bookshelf cards, chapter badges, collection emblems, bookmark tabs; never word-selection controls"
+  }
+}
