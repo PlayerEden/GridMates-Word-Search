@@ -81,6 +81,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BoardViewportTransform
 import com.playereden.gridmates.wordsearch.core.LargeBoardViewport
+import com.playereden.gridmates.wordsearch.core.LargeBoardBookmark
 import com.playereden.gridmates.wordsearch.core.BoardRenderWindow
 import com.playereden.gridmates.wordsearch.core.PaperbackPageLayout
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
@@ -370,6 +371,8 @@ internal fun WordSearchScreen(
                         verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         ZoomableWordGrid(puzzle, found, hintPaths,
                             boardViewport, select, onStep, boardFontId,
+                            bookmark = if (daily) null else run.viewportBookmark,
+                            onBookmark = { if (!daily) store.saveLargeBoardBookmark(it) },
                             onModeChanged = { moving ->
                                 status = PuzzleModeHelp.selected(moving)
                             })
@@ -384,6 +387,8 @@ internal fun WordSearchScreen(
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     ZoomableWordGrid(puzzle, found, hintPaths,
                         boardViewport, select, onStep, boardFontId,
+                        bookmark = if (daily) null else run.viewportBookmark,
+                        onBookmark = { if (!daily) store.saveLargeBoardBookmark(it) },
                         onModeChanged = { moving ->
                             status = PuzzleModeHelp.selected(moving)
                         })
@@ -628,7 +633,9 @@ internal fun ZoomableWordGrid(
     boardFontId: String,
     partnerFoundIds: Set<String> = emptySet(),
     onModeChanged: (Boolean) -> Unit = {},
-    boardLookId: String = "classic"
+    boardLookId: String = "classic",
+    bookmark: LargeBoardBookmark? = null,
+    onBookmark: (LargeBoardBookmark) -> Unit = {}
 ) {
     // Allocate a truly square board using the height actually available AFTER
     // the toolbar. A requested 320dp square previously got squeezed to a shorter
@@ -646,7 +653,15 @@ internal fun ZoomableWordGrid(
             mutableStateOf(BoardViewportTransform(1f))
         }
         var largeTransform by remember(puzzle.id, sidePx) {
-            mutableStateOf(LargeBoardViewport())
+            mutableStateOf(bookmark?.restoreFor(puzzle.id, sidePx)
+                ?: LargeBoardViewport())
+        }
+        // Commit only at the end of a gesture or on a deliberate zoom/map
+        // action. Never write to disk for every finger-motion frame.
+        fun rememberView() {
+            if (largeBoard) onBookmark(
+                LargeBoardBookmark.capture(puzzle.id, largeTransform, sidePx)
+            )
         }
         var regionOpen by remember(puzzle.id) { mutableStateOf(false) }
         val currentZoom = if (largeBoard) largeTransform.zoom else transform.zoom
@@ -671,6 +686,7 @@ internal fun ZoomableWordGrid(
                     if (largeBoard) {
                         largeTransform = largeTransform.zoomed(
                             largeTransform.zoom - 0.75f, sidePx)
+                        rememberView()
                     } else {
                         transform = transform.zoomed(transform.zoom - 0.25f, sidePx)
                     }
@@ -679,8 +695,10 @@ internal fun ZoomableWordGrid(
                         contentDescription = "Zoom out"
                     }) { Text("−", style = MaterialTheme.typography.titleMedium) }
                 IconButton(onClick = {
-                    if (largeBoard) largeTransform = LargeBoardViewport()
-                    else transform = BoardViewportTransform(1f)
+                    if (largeBoard) {
+                        largeTransform = LargeBoardViewport()
+                        rememberView()
+                    } else transform = BoardViewportTransform(1f)
                 }, modifier = Modifier.size(48.dp).semantics {
                     contentDescription = "Fit entire puzzle board"
                 }) { Text("Fit") }
@@ -688,6 +706,7 @@ internal fun ZoomableWordGrid(
                     if (largeBoard) {
                         largeTransform = largeTransform.zoomed(
                             largeTransform.zoom + 0.75f, sidePx)
+                        rememberView()
                     } else {
                         transform = transform.zoomed(transform.zoom + 0.25f, sidePx)
                     }
@@ -747,6 +766,7 @@ internal fun ZoomableWordGrid(
                                 event.changes.forEach { it.consume() }
                             }
                         } while (event.changes.any { it.pressed })
+                        if (sawMulti && largeBoard) rememberView()
                         multiTouch = false
                     }
                 }
@@ -782,6 +802,7 @@ internal fun ZoomableWordGrid(
                 onJumpToRegion = { rowRegion, colRegion ->
                     largeTransform = largeTransform.jumpToRegion(
                         rowRegion, colRegion, puzzle.size, sidePx)
+                    rememberView()
                     regionOpen = false
                 },
                 onDismiss = { regionOpen = false }
