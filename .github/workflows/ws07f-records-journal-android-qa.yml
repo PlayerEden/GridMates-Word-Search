@@ -1,4 +1,6 @@
 name: WS-07F Records Journal Navigation Android Emulator QA
+# Re-run: first full 92-test QA revealed an offscreen Race heading at 360dp.
+# Now the tabs precede Solo-only cards and UI uses the actual scrolling shell.
 
 # Source-matched emulator QA is opt-in/branch-scoped to conserve Actions minutes.
 # It executes full Co-op, Race, Duel, Solo/Daily and save regression tests.
