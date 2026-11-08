@@ -14,6 +14,7 @@ import com.playereden.gridmates.wordsearch.core.PuzzleChallenge
 import com.playereden.gridmates.wordsearch.core.WoodlandCollection
 import com.playereden.gridmates.wordsearch.core.ClaimStatus
 import com.playereden.gridmates.wordsearch.core.GridPoint
+import com.playereden.gridmates.wordsearch.core.LargeBoardBookmark
 import com.playereden.gridmates.wordsearch.core.SoloProfile
 import com.playereden.gridmates.wordsearch.core.RaceResult
 import com.playereden.gridmates.wordsearch.core.RaceJournalRules
@@ -303,18 +304,32 @@ internal class SoloStore(
         require(!source.has("found") || found != null) { "Malformed found-word progress" }
         val hints = source.optJSONObject("hints")
         require(!source.has("hints") || hints != null) { "Malformed hint progress" }
-        return SoloRun(
-        theme = WordTheme.valueOf(source.getString("theme")),
-        difficulty = WordDifficulty.valueOf(source.getString("difficulty")),
-        seed = source.getLong("seed"),
-        foundIds = found.strings().toSet(),
-        hints = hints.toIntMap(),
-        elapsedSeconds = source.optLong("seconds", 0L),
-        boardSize = source.optString("board", "").takeIf { it.isNotBlank() }
-            ?.let { PuzzleBoardSize.valueOf(it) },
-        challenge = source.optString("challenge", "").takeIf { it.isNotBlank() }
-            ?.let { PuzzleChallenge.valueOf(it) }
-    )
+        val run = SoloRun(
+            theme = WordTheme.valueOf(source.getString("theme")),
+            difficulty = WordDifficulty.valueOf(source.getString("difficulty")),
+            seed = source.getLong("seed"),
+            foundIds = found.strings().toSet(),
+            hints = hints.toIntMap(),
+            elapsedSeconds = source.optLong("seconds", 0L),
+            boardSize = source.optString("board", "").takeIf { it.isNotBlank() }
+                ?.let { PuzzleBoardSize.valueOf(it) },
+            challenge = source.optString("challenge", "").takeIf { it.isNotBlank() }
+                ?.let { PuzzleChallenge.valueOf(it) }
+        )
+        // "viewport" is purely optional presentation state, including in old
+        // schema-5 saves and manual backups. Never reject or overwrite a valid
+        // found-word profile because zoom metadata is missing or malformed.
+        val view = source.optJSONObject("viewport")
+        val bookmark = view?.let {
+            LargeBoardBookmark.fromFieldsOrNull(
+                it.optString("puzzleId", ""),
+                it.optDouble("zoom", Double.NaN).toFloat(),
+                it.optDouble("centerX", Double.NaN).toFloat(),
+                it.optDouble("centerY", Double.NaN).toFloat()
+            )
+        }?.takeIf { it.puzzleId == run.puzzleId &&
+            run.boardSize in PuzzleBoardSize.largePresets }
+        return run.copy(viewportBookmark = bookmark)
     }
 
     private fun JSONArray?.strings(): List<String> {
@@ -340,6 +355,16 @@ internal class SoloStore(
             .put("hints", JSONObject(run.hints))
         run.boardSize?.let { data.put("board", it.name) }
         run.challenge?.let { data.put("challenge", it.name) }
+        run.viewportBookmark?.takeIf {
+            run.boardSize in PuzzleBoardSize.largePresets &&
+                it.puzzleId == run.puzzleId
+        }?.let { bookmark ->
+            data.put("viewport", JSONObject()
+                .put("puzzleId", bookmark.puzzleId)
+                .put("zoom", bookmark.zoom.toDouble())
+                .put("centerX", bookmark.centerX.toDouble())
+                .put("centerY", bookmark.centerY.toDouble()))
+        }
         return data
     }
 
@@ -643,6 +668,28 @@ internal class SoloStore(
             WordDifficulty.HARD -> PuzzleChallenge.EXPERT
         }
         return chooseSolo(current.theme, board, challenge)
+    }
+
+    /**
+     * Persist only the optional view location for the CURRENT large Solo game.
+     * The AtomicFile profile and manual backup own the same metadata, so
+     * switching among 24 paused games does not swap or discard another view.
+     * Never allow a stale gesture or a Nearby/Daily view to mutate Solo data.
+     */
+    fun saveLargeBoardBookmark(bookmark: LargeBoardBookmark): Boolean {
+        if (blocked) return false
+        val old = profile
+        val run = old.active
+        if (run.boardSize !in PuzzleBoardSize.largePresets ||
+            run.puzzleId != bookmark.puzzleId) return false
+        if (run.viewportBookmark == bookmark) return true
+        profile = old.copy(active = run.copy(viewportBookmark = bookmark))
+        flush()
+        if (warning != null) {
+            profile = old
+            return false
+        }
+        return true
     }
 
     /** Selected archived entry becomes active; previous unfinished active is retained. */
