@@ -70,6 +70,13 @@ class DeterministicPaperbackTests(unittest.TestCase):
         self.assertIn("Georgia",html)
         self.assertNotIn("®,",html)
 
+    def test_narrow_phone_preview_is_one_column_and_volume_clears_rule(self):
+        render(TOKENS,self.root/"small")
+        html=(self.root/"small/index.html").read_text()
+        self.assertIn("@media(max-width:420px)",html)
+        self.assertIn(".shelf{grid-template-columns:1fr",html)
+        self.assertIn(".volume{position:absolute;left:15%;right:7%;bottom:12%",html)
+
     def test_adding_a_new_theme_does_not_modify_older_cover_bytes(self):
         original=render(TOKENS,self.root/"base")
         altered=copy.deepcopy(self.source)
