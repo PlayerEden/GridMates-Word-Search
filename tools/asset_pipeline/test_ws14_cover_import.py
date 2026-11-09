@@ -59,6 +59,18 @@ class CoverImportTests(unittest.TestCase):
         self.assertEqual(art["source"]["rights_status"], "PENDING_REVIEW")
         self.assertTrue((self.root / "app/src/debug/assets/ws14/books/woodland.png").is_file())
 
+    def test_real_spine_integrates_only_as_debug_qa(self):
+        self.export.write_bytes(make_png(96, 512))
+        art = self.run_import(kind="spine")
+        self.assertEqual("BOOK_WOODLAND_SPINE_V1", art["asset_id"])
+        self.assertEqual("spine-ornament-art", art["purpose"])
+        self.assertEqual("QA_INTEGRATED", art["status"])
+        self.assertTrue((self.root / "app/src/debug/assets/ws14/spines/woodland.png").is_file())
+
+    def test_bad_spine_proportions_denied(self):
+        with self.assertRaisesRegex(ValueError, "spine must be narrow"):
+            self.run_import(kind="spine")
+
     def test_mismatched_hash_does_not_write(self):
         with self.assertRaisesRegex(ValueError, "SHA-256"):
             self.run_import(export_sha="0" * 64)

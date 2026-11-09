@@ -89,14 +89,16 @@ jobs:
           assert qa.is_file() and releases, "Missing debug or release APK"
           expected={}
           for art in data["assets"]:
-              if art["purpose"] != "front-cover-art":
+              if art["purpose"] not in ("front-cover-art", "spine-ornament-art"):
                   continue
               assert art["status"] in ("QA_INTEGRATED","GENERATED_UNREVIEWED"), "Artwork review state must remain non-release"
               for item in art["exports"]:
                   if item["android_source_set"] == "debug":
                       src=pathlib.Path(item["path"])
-                      assert src.is_file() and src.as_posix().startswith("app/src/debug/assets/ws14/books/")
-                      expected["assets/ws14/books/"+src.name]=item["sha256"]
+                      assert src.is_file() and src.as_posix().startswith("app/src/debug/assets/ws14/")
+                      folder = "books" if art["purpose"] == "front-cover-art" else "spines"
+                      assert src.parent.name == folder, "Unexpected folder for WS-14 sprite"
+                      expected["assets/ws14/"+folder+"/"+src.name]=item["sha256"]
           with zipfile.ZipFile(qa) as apk:
               actual={p for p in apk.namelist() if p.startswith("assets/ws14/")}
               assert actual == set(expected), ("Missing or unexpected WS-14 QA sprites",actual,expected)
@@ -104,7 +106,7 @@ jobs:
                   assert hashlib.sha256(apk.read(name)).hexdigest()==digest, name
           with zipfile.ZipFile(releases[0]) as apk:
               assert not [p for p in apk.namelist() if p.startswith("assets/ws14/")], "WS-14 QA ART LEAKED INTO RELEASE"
-          print("WS-14 book covers verified:", len(expected), "debug-only; zero in release")
+          print("WS-14 cover/spine sprites verified:", len(expected), "debug-only; zero in release")
           PY
       - name: Verify each exact-source A/B SVG and PNG inside QA and zero in release
         shell: bash

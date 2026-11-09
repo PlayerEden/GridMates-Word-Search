@@ -32,3 +32,23 @@ python3 tools/asset_pipeline/import_ws14_cover.py \
 6. Do not release or auto-merge while Android CI or physical device QA is pending. **v56 is the known verified fallback.**
 
 **No source images were smuggled in from thumbnail links, no puzzle content was added, and no save schema was modified.**
+
+## WS-14B4 — Matching spine sprites and memory safety (Nov 9, 2026)
+
+- The importer now also supports `--kind spine`. The spine must be **independently illustrated**, not an automated warped/cropped text-bearing book cover. Required QA PNG export: 64–1024px wide, 300–4096px high, narrow vertical aspect ratio 0.06–0.40. The existing cover default stays `--kind cover`.
+- Spine files are written only to `app/src/debug/assets/ws14/spines/{theme}.png`, with separate IDs `BOOK_{THEME}_SPINE_V1` and purpose `spine-ornament-art`. All validations/hash receipts and pending rights constraints remain.
+- `BookArt.kt` resolves approved-direction original spine assets only for QA **B**, falling back to WS-12 for any missing spine. A always uses the real old study.
+- Cover/spine bitmaps are sampled to at most about **512×768px decoded**, reducing memory on lower-end Android devices without changing full master quality. Original 12 Woodland portrait bytes and save state remain untouched.
+- Debug/release APK inspection includes **both** front covers and separate spine sprites. No imported artwork enters release.
+- Example spine import command (pass actual SHA-256 values from the verified files, not placeholders as evidence):
+
+```bash
+python3 tools/asset_pipeline/import_ws14_cover.py \
+  --kind spine --theme woodland \
+  --master design/visual-system/masters/woodland-spine-original.png \
+  --export design/visual-system/exports/woodland-spine.png \
+  --master-sha ACTUAL_SHA256 --export-sha ACTUAL_SHA256 \
+  --provenance "Original independently edited artwork; rights review pending"
+```
+
+**IMPORTANT:** The three source image masters and actual spine illustration art have NOT been acquired by this change; the registry must stay empty until real original bytes and hash receipts are available.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Import owner-preferred original art into QA only with exact SHA receipts.
 
-Requires local original master and 3:4 PNG export. Never downloads previews,
+Requires local original master and separately cropped cover/spine PNG export. Never downloads previews,
 creates images, approves commercial rights or writes release assets.
 """
 from __future__ import annotations
@@ -15,6 +15,7 @@ import struct
 import zlib
 
 THEMES = ("woodland", "space", "garden")
+KINDS = ("cover", "spine")
 SHA = re.compile(r"^[0-9a-f]{64}$")
 PNG = b"\x89PNG\r\n\x1a\n"
 
@@ -43,7 +44,7 @@ def checked_hash(path: Path, expected: str) -> str:
     return expected
 
 
-def png_size(path: Path) -> tuple[int, int, bool]:
+def png_size(path: Path, kind: str = "cover") -> tuple[int, int, bool]:
     image = path.read_bytes()
     if not image.startswith(PNG):
         raise ValueError("export must be a real PNG image")
@@ -71,35 +72,47 @@ def png_size(path: Path) -> tuple[int, int, bool]:
     if not seen_end or dimensions is None or position != len(image):
         raise ValueError("incomplete PNG structure")
     width, height = dimensions
-    if width < 300 or height < 400 or width > 4096 or height > 4096:
-        raise ValueError("export pixel dimensions outside book cover limits")
-    if abs(width / height - .75) > .025:
-        raise ValueError("cover must be near 3:4 portrait ratio")
+    if kind == "cover":
+        if width < 300 or height < 400 or width > 4096 or height > 4096:
+            raise ValueError("export pixel dimensions outside book cover limits")
+        if abs(width / height - .75) > .025:
+            raise ValueError("cover must be near 3:4 portrait ratio")
+    elif kind == "spine":
+        if width < 64 or height < 300 or width > 1024 or height > 4096:
+            raise ValueError("export pixel dimensions outside book spine limits")
+        if not .06 <= width / height <= .40:
+            raise ValueError("spine must be narrow portrait artwork")
+    else:
+        raise ValueError("unsupported book asset kind")
     return width, height, alpha
 
 
 def prepare(root: Path, theme: str, master_rel: str, export_rel: str,
-            master_sha: str, export_sha: str, provenance: str) -> dict:
+            master_sha: str, export_sha: str, provenance: str,
+            kind: str = "cover") -> dict:
     if theme not in THEMES:
         raise ValueError("unsupported book theme")
+    if kind not in KINDS:
+        raise ValueError("unsupported book asset kind")
     if not provenance.strip() or len(provenance.strip()) < 12:
         raise ValueError("specific original file provenance/rights review note required")
     master = checked_path(root, master_rel, "design/visual-system/masters")
     export = checked_path(root, export_rel, "design/visual-system/exports")
     checked_hash(master, master_sha)
     checked_hash(export, export_sha)
-    width, height, alpha = png_size(export)
+    width, height, alpha = png_size(export, kind)
     manifest = root / "design/visual-system/ws14-art-register.json"
     doc = json.loads(manifest.read_text(encoding="utf-8"))
     if doc.get("schema_version") != 1 or doc.get("visual_system") != "gridmates-word-search-cozy-paperback":
         raise ValueError("unexpected registry schema")
-    identifier = f"BOOK_{theme.upper()}_COVER_V1"
+    identifier = f"BOOK_{theme.upper()}_{kind.upper()}_V1"
     if any(entry.get("asset_id") == identifier for entry in doc["assets"]):
         raise ValueError("asset ID already registered: no silent replacement")
-    destination_rel = f"app/src/debug/assets/ws14/books/{theme}.png"
+    folder = "books" if kind == "cover" else "spines"
+    destination_rel = f"app/src/debug/assets/ws14/{folder}/{theme}.png"
     destination = root / destination_rel
     if destination.exists():
-        raise ValueError("QA cover already exists; no silent replacement")
+        raise ValueError("QA artwork already exists; no silent replacement")
     import sys
     sys.path.insert(0, str(root / "tools/asset_pipeline"))
     from validate_ws14_assets import verify_registry
@@ -110,7 +123,8 @@ def prepare(root: Path, theme: str, master_rel: str, export_rel: str,
         destination.unlink(missing_ok=True)
         raise ValueError("copied export checksum mismatch")
     entry = {
-        "asset_id": identifier, "family": theme, "purpose": "front-cover-art",
+        "asset_id": identifier, "family": theme,
+        "purpose": "front-cover-art" if kind == "cover" else "spine-ornament-art",
         "status": "QA_INTEGRATED",
         "source": {"path": master_rel, "sha256": master_sha,
                    "rights_status": "PENDING_REVIEW", "provenance_note": provenance.strip()},
@@ -134,6 +148,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--theme", choices=THEMES, required=True)
+    parser.add_argument("--kind", choices=KINDS, default="cover",
+                        help="cover (3:4 art) or separate narrow spine art")
     parser.add_argument("--master", required=True)
     parser.add_argument("--export", required=True)
     parser.add_argument("--master-sha", required=True)
@@ -141,7 +157,7 @@ def main():
     parser.add_argument("--provenance", required=True)
     args = parser.parse_args()
     result = prepare(args.root, args.theme, args.master, args.export,
-                     args.master_sha, args.export_sha, args.provenance)
+                     args.master_sha, args.export_sha, args.provenance, kind=args.kind)
     print("QA only (not owner/release approved):", result["asset_id"])
 
 
