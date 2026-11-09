@@ -1,6 +1,9 @@
 # WS-14 — GridMates: Word Search, Full-App Visual Identity and UI Modernization
 
-**Planning checkpoint: November 8, 2026. Status: design specification, NOT implemented or production-approved.**
+**Planning checkpoint: November 8, 2026. Original roadmap remains a design reference; some WS-14 features have since been implemented in QA, not approved for release.**
+
+> **Current executable UI roadmap (November 9):** [WS-14H — Compact Page Header, Light-Bulb Hint and Theme Paper](WS14H_COMPACT_GAMEPLAY_HEADER_AND_THEME_ROADMAP_2026-11-09.md). Owner wants a bulb-only Hint beside the title, no permanent instruction filler, per-book subtle page tint, clean word grid, and *separate* later unlockable board looks. Layout acceptance → matching three-theme sprite kit → cohesive GridMates-wide assets. Read [latest journal](DEVELOPMENT_JOURNAL.md) for actual CI and device status.
+
 
 ## North-star reference
 

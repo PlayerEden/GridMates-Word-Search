@@ -60,6 +60,8 @@ All three must use the **same composition box, contour strength, light direction
 - Release art rights and trademark checks are independent of CI. Keep **GridMates** plain; do not use ® while unregistered.
 - Asset master and exports: versioned, binary originals, checksums, source/usage records, automated decode + resolution/alpha + APK presence/isolation checks. Follow [art pipeline](ASSET_CREATION_GITHUB_INTEGRATION_PLAYBOOK.md) and [shared GridMates identity](GRIDMATES_SHARED_VISUAL_IDENTITY_AND_MOTION_2026-11-09.md).
 
+> **Superseding gameplay-header decision (Nov 9):** The owner chose a **light-bulb icon only**, not a large Hint button or hint pill. Remove the passive trace-instruction sentence and apply gentle per-book page paper tint while leaving the board untouched. See [WS-14H compact gameplay roadmap](WS14H_COMPACT_GAMEPLAY_HEADER_AND_THEME_ROADMAP_2026-11-09.md). The three newly illustrated accents remain dependent on phone approval of the header layout and a successful dense-board word claim.
+
 ## Sequence from here — one small pass at a time
 
 1. **Now (WS-14F):** owner device-check from [standard Android QA #42650786851](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42650786851) / [Art QA #42650786752](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42650786752), both **SUCCESS** on source `8fd7ff8056bb5ce224b040a9d5f90eb096c1ad0b`. Standard artifact [#13690146702](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42650786851/artifacts/13690146702) has the QA APK ZIP; **device acceptance is still OPEN**.

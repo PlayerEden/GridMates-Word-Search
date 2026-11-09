@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathJoin
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
@@ -48,7 +48,7 @@ internal fun BookPageHintButton(
                 cubicTo(w * 0.77f, h * 0.51f, w * 0.66f, h * 0.57f, w * 0.64f, h * 0.64f)
             }
             val weight = 1.8.dp.toPx()
-            drawPath(bulb, ink, style = Stroke(weight, cap = StrokeCap.Round, join = PathJoin.Round))
+            drawPath(bulb, ink, style = Stroke(weight, cap = StrokeCap.Round, join = StrokeJoin.Round))
             drawLine(ink, Offset(w * 0.36f, h * 0.69f), Offset(w * 0.64f, h * 0.69f),
                 strokeWidth = weight, cap = StrokeCap.Round)
             drawLine(ink, Offset(w * 0.39f, h * 0.79f), Offset(w * 0.61f, h * 0.79f),
