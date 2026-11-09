@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.playereden.gridmates.wordsearch.core.BookBoardDigest
@@ -87,8 +88,8 @@ class Ws14IRealTwentyCellWordTraceAndroidTest {
             // Real finger trace at grid cell centers in *local* bounds of the
             // actual zoomable grid node; board starts fitted at scale 1.
             compose.onNodeWithTag("word-grid-touch-area").performTouchInput {
-                val cellX = size.width.toFloat() / board.size
-                val cellY = size.height.toFloat() / board.size
+                val cellX = width.toFloat() / board.size
+                val cellY = height.toFloat() / board.size
                 swipe(
                     start = Offset((start.col + 0.5f) * cellX, (start.row + 0.5f) * cellY),
                     end = Offset((end.col + 0.5f) * cellX, (end.row + 0.5f) * cellY),
