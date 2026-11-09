@@ -1,6 +1,12 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14D_SWIPE_BROWSER_ANDROID_QA_RECEIPT.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **new swipe-browser QA remains untested on phone**. Subsequent passes must append the journal as a standing rule.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14D_OWNER_PHONE_VISUAL_REVIEW.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **new swipe-browser QA remains untested on phone**. Subsequent passes must append the journal as a standing rule.
+
+## Newest WS-14D on-phone visual feedback (Nov 9)
+
+The owner has now installed and screenshot the **new swipe-library QA APK** and reacted **"Oh yeah that's pretty sick."** [Current owner feedback journal](devlog/2026-11-09_WS14D_OWNER_PHONE_VISUAL_REVIEW.md) records real Woodland/Space selected-book views, Space book details, and rendered 12×12/20×20 Space puzzle pages. This is an encouraging physical UI review of the horizontal book direction, **not** an explicit production/release sign-off or proof of finger-swipe, puzzle completion, save migration, or accessibility testing. Prior handoff statements saying the swipe library was never tested on phone are superseded by this checkpoint.
+
+**Next bounded code pass:** polish repeated QA detail text and chapter/page card action wrapping; check 20×20 tracing/zoom ergonomics without rewriting the puzzle engine. Keep illustrated covers and the Classic shelves rollback. No extra sprite generation or unrelated cross-app redesign until the next gameplay review.
 
 ## WS-14D latest executable checkpoint — Android QA passed
 
