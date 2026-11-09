@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BookCatalog
@@ -40,6 +42,21 @@ import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.WordSearchPuzzle
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
 import kotlinx.coroutines.delay
+
+/**
+ * WS-14G QA layout specimen: use the existing theme's miniature emblem
+ * without changing word-grid touch geometry, page content or save data.
+ * When accessibility text is enlarged or width is tight, native text wins.
+ * Completed and bookmarked pages already have a themed status illustration.
+ */
+internal fun shouldShowBookPageHeaderEmblem(
+    qaArtworkEnabled: Boolean,
+    completed: Boolean,
+    bookmarked: Boolean,
+    viewportWidthDp: Float,
+    fontScale: Float
+): Boolean = qaArtworkEnabled && !completed && !bookmarked &&
+    viewportWidthDp >= 320f && fontScale < 1.5f
 
 /**
  * WS-11D2B — a real book-page playing screen, independent of SoloStore.
@@ -250,6 +267,17 @@ internal fun BookPageGameplayScreen(
                 } else if (showPrototypeArt && bookmarked) {
                     BookArt(book.theme, BookArtKind.BOOKMARK, Modifier.width(17.dp).height(49.dp),
                         fieldNotes = fieldNotesArt)
+                } else if (shouldShowBookPageHeaderEmblem(
+                        showPrototypeArt, committed, bookmarked,
+                        maxWidth.value, LocalDensity.current.fontScale
+                    )) {
+                    // Source-backed WS-12 emblem, matched by book.theme.
+                    // This is a QA art-slot test, NOT a new generated sprite.
+                    BookArt(
+                        book.theme, BookArtKind.EMBLEM,
+                        Modifier.size(32.dp).testTag("ws14g-book-page-theme-emblem"),
+                        fieldNotes = fieldNotesArt
+                    )
                 }
                 Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
                     catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
