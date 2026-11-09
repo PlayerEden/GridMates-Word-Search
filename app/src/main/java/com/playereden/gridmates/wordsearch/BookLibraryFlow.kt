@@ -40,7 +40,9 @@ internal fun BookLibraryFlow(
     var update by remember(catalog) { mutableIntStateOf(0) }
     var feedback by remember(catalog) { mutableStateOf<String?>(null) }
     // QA-only in-memory style choice: does NOT affect book progress or saves.
-    var fieldNotesArt by remember(catalog) { mutableStateOf(false) }
+    // The owner's current preference is the more detailed Study B, while
+    // keeping Study A available as an immediate, lossless visual rollback.
+    var fieldNotesArt by remember(catalog) { mutableStateOf(showPrototypeArt) }
 
     val unavailable = progressStore.blocked || sessionStore.blocked
     val snapshot = remember(update, pageId, bookId) { progressStore.progress }
