@@ -1,5 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,7 +8,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.TextButton
@@ -40,8 +43,10 @@ internal fun SoloRecordsScreen(profile: SoloProfile) {
     var racePage by rememberSaveable { mutableIntStateOf(0) }
     var duelPage by rememberSaveable { mutableIntStateOf(0) }
 
-    Text("Browse your results", color = Forest,
-        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+    Ws15SectionHeading(
+        glyph = Ws15SectionGlyph.JOURNAL,
+        title = "Browse your results"
+    )
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("Solo", "Race", "Duel").forEach { section ->
@@ -259,7 +264,11 @@ private fun JournalPages(count: Int, page: Int, pageSize: Int, onPage: (Int) -> 
 
 @Composable
 private fun MetricCard(label: String, amount: String, modifier: Modifier = Modifier) {
-    Card(modifier) {
+    Card(modifier,
+        colors = CardDefaults.cardColors(containerColor = Paper),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, StorybookTokens.panelBorder)
+    ) {
         Column(Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Text(amount, style = MaterialTheme.typography.titleLarge,

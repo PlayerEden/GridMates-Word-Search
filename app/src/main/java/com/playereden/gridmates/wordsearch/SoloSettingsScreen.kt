@@ -132,10 +132,11 @@ internal fun SoloSettingsScreen(
     )
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("Keep your progress")
-        Text("Backup & restore", color = Forest,
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.titleLarge)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.BACKUP,
+            title = "Backup & restore",
+            subtitle = "Keep your progress"
+        )
         Text("Puzzles save automatically. Export a backup before uninstalling, " +
             "clearing app storage, or switching phones. Uninstalling removes " +
             "your locally saved progress.",
@@ -175,22 +176,18 @@ internal fun SoloSettingsScreen(
             "and profile/collections. Restore asks before replacing progress. " +
             "Older backups without a Duel journal restore with zero Duel results.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
-        Text("Export saves a file to a location you choose. Restore asks before " +
-            "replacing your current Word Search progress.",
-            color = Muted, style = MaterialTheme.typography.bodySmall)
-        Text("QA update note: v0.5.8 and earlier used a different debug signer. " +
-            "Export a backup first, then uninstall the old QA app, install " +
-            "v0.5.9, and Restore backup. From v0.5.9 onward, install newer " +
-            "QA APKs over the existing app to keep its data. Do not clear " +
-            "storage or uninstall without a verified backup.",
+        Text("Before reinstalling, export a backup and verify the file. " +
+            "If Android reports a signing conflict, uninstalling removes " +
+            "the local save. Restore your backup after reinstalling.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("Puzzle feel")
-        Text("Gameplay preferences", color = Forest,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.PREFERENCES,
+            title = "Gameplay preferences",
+            subtitle = "Puzzle feel"
+        )
         Text("Adjust sound and gentle vibrations while playing: " +
             "open a puzzle, choose Options, then Feedback settings. " +
             "Your preferences remain on this device.",
@@ -207,10 +204,10 @@ internal fun SoloSettingsScreen(
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("About")
-        Text("About Word Search", color = Forest,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.JOURNAL,
+            title = "About Word Search"
+        )
         Text("Good puzzles. Good company.", color = Muted)
         Text("Play Solo or Daily without a connection. Nearby games use the " +
             "same Wi-Fi and share your display name with a partner. " +
@@ -226,10 +223,11 @@ internal fun SoloSettingsScreen(
         // Keep developer art review accessible without occupying the Play menu.
         // QA-only app builds provide this route; regular builds do not.
         PaperPanel(Modifier.fillMaxWidth()) {
-            PaperEyebrow("Preview tools")
-            Text("Artwork comparison", color = Forest,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold)
+            Ws15SectionHeading(
+                glyph = Ws15SectionGlyph.ARTWORK,
+                title = "Artwork comparison",
+                subtitle = "Preview tools"
+            )
             Text("Review candidate book artwork in this test build.",
                 color = Muted, style = MaterialTheme.typography.bodySmall)
             OutlinedButton(onClick = onPreviewArtwork,

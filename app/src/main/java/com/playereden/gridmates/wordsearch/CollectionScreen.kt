@@ -190,9 +190,11 @@ internal fun CollectionScreen(store: SoloStore) {
     }
 
     if (collectionTab == "Fonts") {
-        Text(fonts.count { it.unlocked }.toString() + " / " +
-            fonts.size + " board fonts unlocked",
-            color = Forest, style = MaterialTheme.typography.titleMedium)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.TYPEFACE, title = "Board fonts",
+            subtitle = fonts.count { it.unlocked }.toString() + " of " +
+                fonts.size + " unlocked"
+        )
         Text("All styles are free. Earn fonts through achievements, then equip " +
             "one to change your puzzle letters. The readable default is always available.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
@@ -217,9 +219,11 @@ internal fun CollectionScreen(store: SoloStore) {
             "Tap License to read the full copyright and redistribution terms.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
     } else if (collectionTab == "Achievements") {
-        Text(achievements.count { it.unlocked }.toString() +
-            " / " + achievements.size + " achievements",
-            color = Forest, style = MaterialTheme.typography.titleMedium)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.AWARD, title = "Achievements",
+            subtitle = achievements.count { it.unlocked }.toString() +
+                " of " + achievements.size + " earned"
+        )
         Text("Achievements reflect your saved Solo and Daily progress.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
         val orderedAchievements = achievements.sortedWith(
@@ -233,9 +237,11 @@ internal fun CollectionScreen(store: SoloStore) {
         orderedAchievements.drop(current * achievementPageSize).take(achievementPageSize)
             .forEach { item -> AchievementCard(item) }
     } else {
-        Text(portraits.count { it.unlocked }.toString() +
-            " / " + portraits.size + " Woodland portraits available",
-            color = Forest, style = MaterialTheme.typography.titleMedium)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.PORTRAIT, title = "Woodland companions",
+            subtitle = portraits.count { it.unlocked }.toString() +
+                " of " + portraits.size + " portraits unlocked"
+        )
         Text(
             if (originalImagesAvailable) {
                 "Choose a Woodland companion. More portraits unlock as you play."
@@ -271,8 +277,7 @@ internal fun CollectionScreen(store: SoloStore) {
                 }
             }
         }
-        Text("Unlocks depend on completed Solo and Daily puzzles. " +
-            "No random purchases, streak deadlines or paid portraits.",
+        Text("New companions unlock through completed Solo and Daily puzzles.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
 
         // History/progress is still available, but after the actual gallery.
