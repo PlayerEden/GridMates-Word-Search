@@ -106,8 +106,10 @@ class Ws14DHorizontalBrowserAndroidTest {
                 }
             }
         }
+        compose.onNodeWithTag("ws15-preview-tools").performClick()
         compose.onNodeWithText("Classic shelves").performClick()
         compose.onNodeWithTag("real-bookcase-screen").assertExists()
+        compose.onNodeWithTag("ws15-preview-tools").performClick()
         compose.onNodeWithText("Try swipe library").performClick()
         compose.onNodeWithTag("ws14d-horizontal-browser").assertExists()
         compose.onNodeWithText("1 of 3 books").assertExists()
