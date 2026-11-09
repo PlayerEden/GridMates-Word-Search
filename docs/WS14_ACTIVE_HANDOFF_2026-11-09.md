@@ -1,6 +1,18 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14J_ART_PRODUCTION_KICKOFF.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14H compact light-bulb layout has now been photographed and positively reviewed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14J2_WOODLAND_QA_HEADER_INTEGRATION.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14H compact light-bulb layout has now been photographed and positively reviewed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
+
+## Newest WS-14J2 implementation — Woodland header wired into QA only (November 9)
+
+**Actual new code (not just planning):** [commit 01c20de](https://github.com/PlayerEden/GridMates-Word-Search/commit/01c20de43f4ee157cf9aa7a5b6cac7ea09d830e3) adds the exact Woodland 128×128 transparent PNG to `app/src/debug/assets/ws14j/page-accents/woodland.png`. `BookPageGameplayScreen.kt` opts into the candidate in the existing 32dp header slot only, gated by the existing font/space/completion rules. `BookArt.kt` decodes it locally with existing WS-12 emblem fallback; Space and Garden remain unchanged. All game state and 20×20 selection logic untouched.
+
+- [WS-14J2 development receipt](devlog/2026-11-09_WS14J2_WOODLAND_QA_HEADER_INTEGRATION.md) documents each changed file, verified blob/hash, exact SHA and open acceptance gates.
+- New Kotlin route guard/unit tests and Python candidate/import checks. Standard workflow requires exact PNG bytes in debug APK; art workflow additionally verifies none in release.
+- **Initial exact-code CI:** [Android QA #42675610221](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42675610221) and [art isolation #42675610184](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42675610184) were queued when observed. Inspect *live results* before claiming pass, sharing a new APK, or proceeding.
+- **Recovery baseline:** WS-14I source `3a3d0bc` and both green workflows; follow-up candidate-source standard Android #42673911715 succeeded, art #42673911820 failed before having job details; no prior art release authorization. Current candidate is `GENERATED_UNREVIEWED`, and no real 20×20 drag/save-reopen test is recorded.
+- **Next exact action:** read final Android/art workflow results at 01c20de; fix failure if present, confirm debug/release APK ZIP checks and source-matched artifact. Then 32dp handset review (with 320dp, enlarged fonts, Space/Garden fallback) before creating siblings. Preserve draft PR #131 and save data.
+
+---
 
 ## Newest WS-14J1 checkpoint — real Woodland transparent source and binary committed (November 9)
 
