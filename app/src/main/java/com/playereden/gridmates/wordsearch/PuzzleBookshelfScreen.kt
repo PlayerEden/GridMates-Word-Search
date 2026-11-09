@@ -248,15 +248,17 @@ internal fun PuzzleBookDetailScreen(
 
     LazyColumn(
         modifier = modifier.testTag("book-detail-list"),
-        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         item(key = "book-heading") {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text("Back to Puzzle Books")
-                }
-                PaperEyebrow("GridMates · Puzzle Book")
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Ws15BackHeader(
+                    title = "Puzzle Books",
+                    subtitle = "Book details",
+                    onBack = onBack,
+                    backLabel = "Back to Puzzle Books"
+                )
                 if (showPrototypeArt && book != null) {
                     // After picking a volume from a shelf it appears as a
                     // large, readable physical object, not a giant text card.
@@ -287,7 +289,7 @@ internal fun PuzzleBookDetailScreen(
                             // stamped repeatedly on the illustrated detail hero.
                             BookArt(book.theme, BookArtKind.EMBLEM,
                                 Modifier.size(40.dp).testTag("book-emblem-" + book.id),
-                                fieldNotes = fieldNotesArt)
+                                fieldNotes = fieldNotesArt, pageAccentCandidate = true)
                         }
                     }
                 } else {
@@ -373,8 +375,9 @@ internal fun PuzzleBookDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             if (showPrototypeArt) {
-                                BookArt(book.theme, BookArtKind.CHAPTER,
-                                    Modifier.size(44.dp).testTag("book-chapter-" + chapter.id), fieldNotes = fieldNotesArt)
+                                BookArt(book.theme, BookArtKind.EMBLEM,
+                                    Modifier.size(36.dp).testTag("book-chapter-" + chapter.id),
+                                    fieldNotes = fieldNotesArt, pageAccentCandidate = true)
                             }
                             Column(Modifier.weight(1f)) {
                                 val chapterDone = chapter.pages.count { it.id in completed }
@@ -413,7 +416,8 @@ internal fun PuzzleBookDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (showPrototypeArt && bookmark == page.id && !isComplete) {
                                 BookArt(book.theme, BookArtKind.BOOKMARK,
-                                    Modifier.width(23.dp).height(66.dp).testTag("book-bookmark-" + page.id), fieldNotes = fieldNotesArt)
+                                    Modifier.width(17.dp).height(48.dp)
+                                        .testTag("book-bookmark-" + page.id), fieldNotes = fieldNotesArt)
                             }
                             if (showPrototypeArt && isComplete) {
                                 BookArt(book.theme, BookArtKind.COMPLETION,
