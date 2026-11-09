@@ -49,6 +49,20 @@ internal fun PuzzleBookshelfScreen(
     onToggleArt: (() -> Unit)? = null
 ) {
     val healthy = isBookStateReadable(catalog, progress)
+    // The approved catalog, save rules and error screens stay identical.
+    // Only the QA visual browse surface becomes an actual physical bookcase.
+    if (showPrototypeArt && healthy && catalog.books.isNotEmpty()) {
+        BookcaseBookshelfScreen(
+            catalog = catalog,
+            progress = progress,
+            onBack = onBack,
+            onOpenBook = onOpenBook,
+            fieldNotesArt = fieldNotesArt,
+            onToggleArt = onToggleArt,
+            modifier = modifier
+        )
+        return
+    }
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 20.dp),
@@ -221,6 +235,49 @@ internal fun PuzzleBookDetailScreen(
                     Text("Back to Puzzle Books")
                 }
                 PaperEyebrow("GridMates · Puzzle Book")
+                if (showPrototypeArt && book != null) {
+                    // After picking a volume from a shelf it appears as a
+                    // large, readable physical object, not a giant text card.
+                    Row(
+                        Modifier.fillMaxWidth().testTag("pulled-book-hero"),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            BookArt(book.theme, BookArtKind.COVER,
+                                Modifier.width(104.dp).height(139.dp)
+                                    .testTag("book-detail-cover-" + book.id),
+                                fieldNotes = fieldNotesArt)
+                            BookArt(book.theme, BookArtKind.SPINE,
+                                Modifier.width(12.dp).height(116.dp),
+                                fieldNotes = fieldNotesArt)
+                        }
+                        Column(Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Text(book.title.removeSuffix(" · TEST BOOK"),
+                                color = Forest,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold)
+                            Text(
+                                "Volume " + book.volume + " · " +
+                                    book.chapters.size + " chapters",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Muted
+                            )
+                            if (book.title.endsWith(" · TEST BOOK")) {
+                                Text("TEST BOOK",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Muted)
+                            }
+                            BookArt(book.theme, BookArtKind.EMBLEM,
+                                Modifier.size(40.dp).testTag("book-emblem-" + book.id),
+                                fieldNotes = fieldNotesArt)
+                        }
+                    }
+                } else {
                 Row(Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically) {
@@ -242,6 +299,7 @@ internal fun PuzzleBookDetailScreen(
                                 color = Muted, style = MaterialTheme.typography.labelMedium)
                         }
                     }
+                }
                 }
             }
         }

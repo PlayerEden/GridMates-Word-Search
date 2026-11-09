@@ -38,11 +38,14 @@ class QaBookArtworkIntegrationAndroidTest {
     @Test fun bookArtworkABTogglePreservesNativeBookNavigationAndBackChoice() {
         compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
         compose.waitForIdle()
+        // Owner-preferred detailed Study B is now the QA opening default.
+        compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
+        compose.onNodeWithText("Show original art (A)").performClick()
+        compose.waitForIdle()
         compose.onNodeWithText("Original study A · Quiet Paperbacks").assertExists()
-        compose.onNodeWithText("Try more illustrated art (B)").performScrollTo().performClick()
+        compose.onNodeWithText("Try more illustrated art (B)").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
-        compose.onNodeWithText("Show original art (A)").assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started · TEST").assertExists()
@@ -64,7 +67,7 @@ class QaBookArtworkIntegrationAndroidTest {
             "Prototype artwork · final illustrations can change"
         ).assertExists()
         compose.onNodeWithText("Woodland").assertExists()
-        compose.onNodeWithText("TEST BOOK · 2 chapters").assertExists()
+        compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started · TEST").assertExists()
