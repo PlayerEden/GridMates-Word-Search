@@ -43,6 +43,12 @@ internal fun BookLibraryFlow(
     // The owner's current preference is the more detailed Study B, while
     // keeping Study A available as an immediate, lossless visual rollback.
     var fieldNotesArt by remember(catalog) { mutableStateOf(showPrototypeArt) }
+    // WS-14D: separate, reversible layout comparison (not the art A/B toggle).
+    // Both choices are QA-only, in-memory; opening a book preserves selection.
+    var horizontalLibrary by remember(catalog) { mutableStateOf(showPrototypeArt) }
+    var focusedBookId by remember(catalog) {
+        mutableStateOf(catalog.books.firstOrNull()?.id)
+    }
 
     val unavailable = progressStore.blocked || sessionStore.blocked
     val snapshot = remember(update, pageId, bookId) { progressStore.progress }
@@ -130,6 +136,12 @@ internal fun BookLibraryFlow(
                 onToggleArt = if (showPrototypeArt) {
                     { fieldNotesArt = !fieldNotesArt }
                 } else null,
+                showHorizontalBrowser = horizontalLibrary,
+                onToggleLayout = if (showPrototypeArt) {
+                    { horizontalLibrary = !horizontalLibrary }
+                } else null,
+                initialFocusedBookId = focusedBookId,
+                onFocusedBookChanged = { focusedBookId = it },
                 onBack = onExit,
                 onOpenBook = { selectedBook ->
                     if (catalog.book(selectedBook) != null) {

@@ -56,6 +56,7 @@ internal fun BookcaseBookshelfScreen(
     onOpenBook: (String) -> Unit,
     fieldNotesArt: Boolean,
     onToggleArt: (() -> Unit)?,
+    onToggleLayout: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier.fillMaxSize().testTag("real-bookcase-screen")) {
@@ -108,6 +109,13 @@ internal fun BookcaseBookshelfScreen(
                         },
                         color = Forest, style = MaterialTheme.typography.labelMedium
                     )
+                    if (onToggleLayout != null) {
+                        TextButton(onClick = onToggleLayout,
+                            modifier = Modifier.heightIn(min = 48.dp)
+                                .testTag("ws14d-try-swipe")) {
+                            Text("Try swipe library")
+                        }
+                    }
                     if (onToggleArt != null) {
                         OutlinedButton(onClick = onToggleArt,
                             modifier = Modifier.heightIn(min = 48.dp)) {

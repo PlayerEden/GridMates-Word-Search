@@ -46,21 +46,41 @@ internal fun PuzzleBookshelfScreen(
     modifier: Modifier = Modifier,
     showPrototypeArt: Boolean = false,
     fieldNotesArt: Boolean = false,
-    onToggleArt: (() -> Unit)? = null
+    onToggleArt: (() -> Unit)? = null,
+    showHorizontalBrowser: Boolean = false,
+    onToggleLayout: (() -> Unit)? = null,
+    initialFocusedBookId: String? = null,
+    onFocusedBookChanged: (String) -> Unit = {}
 ) {
     val healthy = isBookStateReadable(catalog, progress)
     // The approved catalog, save rules and error screens stay identical.
     // Only the QA visual browse surface becomes an actual physical bookcase.
     if (showPrototypeArt && healthy && catalog.books.isNotEmpty()) {
-        BookcaseBookshelfScreen(
-            catalog = catalog,
-            progress = progress,
-            onBack = onBack,
-            onOpenBook = onOpenBook,
-            fieldNotesArt = fieldNotesArt,
-            onToggleArt = onToggleArt,
-            modifier = modifier
-        )
+        if (showHorizontalBrowser) {
+            HorizontalBookBrowserScreen(
+                catalog = catalog,
+                progress = progress,
+                onBack = onBack,
+                onOpenBook = onOpenBook,
+                fieldNotesArt = fieldNotesArt,
+                onToggleArt = onToggleArt,
+                onToggleLayout = onToggleLayout,
+                initialFocusedBookId = initialFocusedBookId,
+                onFocusedBookChanged = onFocusedBookChanged,
+                modifier = modifier
+            )
+        } else {
+            BookcaseBookshelfScreen(
+                catalog = catalog,
+                progress = progress,
+                onBack = onBack,
+                onOpenBook = onOpenBook,
+                fieldNotesArt = fieldNotesArt,
+                onToggleArt = onToggleArt,
+                onToggleLayout = onToggleLayout,
+                modifier = modifier
+            )
+        }
         return
     }
     LazyColumn(
@@ -243,18 +263,12 @@ internal fun PuzzleBookDetailScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalAlignment = Alignment.Bottom
-                        ) {
-                            BookArt(book.theme, BookArtKind.COVER,
-                                Modifier.width(104.dp).height(139.dp)
-                                    .testTag("book-detail-cover-" + book.id),
-                                fieldNotes = fieldNotesArt)
-                            BookArt(book.theme, BookArtKind.SPINE,
-                                Modifier.width(12.dp).height(116.dp),
-                                fieldNotes = fieldNotesArt)
-                        }
+                        // One coherent book silhouette: cover already has a
+                        // left binding; never draw a separate tiny spine.
+                        BookArt(book.theme, BookArtKind.COVER,
+                            Modifier.width(112.dp).height(150.dp)
+                                .testTag("book-detail-cover-" + book.id),
+                            fieldNotes = fieldNotesArt)
                         Column(Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Text(book.title.removeSuffix(" · TEST BOOK"),
