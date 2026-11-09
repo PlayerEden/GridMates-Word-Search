@@ -75,6 +75,10 @@ jobs:
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14j_page_accent.py' -v
       - name: Install pinned build-only SVG renderer (no Android runtime dependency)
         run: python3 -m pip install --disable-pip-version-check --user CairoSVG==2.8.2
+      - name: Render three original WS-14K2 theme motifs into debug-only Android assets
+        run: |
+          python3 tools/asset_pipeline/render_ws14k2_gameplay_motifs.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14k2_gameplay_motifs.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -190,6 +194,8 @@ jobs:
               assert not any(n.startswith('assets/ws14j/') for n in apk.namelist()), 'WS-14J candidate leaked to release'
           print('PASS WS-14J: exact Woodland PNG in QA, zero WS-14J bytes in release')
           PY
+      - name: Verify all three WS-14K2 motifs in QA and none in release
+        run: python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release-unsigned.apk
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
