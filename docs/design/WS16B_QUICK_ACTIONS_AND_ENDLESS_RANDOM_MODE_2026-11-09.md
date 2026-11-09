@@ -76,3 +76,5 @@ Current relevant source files: Ws16HomeScreen.kt, Ws15VisualKit.kt, SoloSetupScr
 **Action art:** Change formerly named Random Play asset to **Quick Play**; shuffled letter tiles visual stays. The button label should be full native "Quick Play". Custom Play can use the existing Solo grid illustration or new sliders/pencil icon, not a separate giant illustrated card.
 
 **Implementation status:** Player-facing naming and selection overlay are approved for WS-17 design only; no new Android APK is produced by a design-doc change.
+
+**Final label correction (owner):** The player-facing mode name is **Custom**, not **Custom Play**. Use just `Custom` on the Home action, mode title, and navigation; its functionality remains the existing configurable Solo mode. `Quick Play` stays unchanged. Do not rename internal classes, persisted IDs, or save files merely for cosmetic naming.
