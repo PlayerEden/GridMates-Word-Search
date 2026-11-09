@@ -38,15 +38,15 @@ class SoloPreGameNavigationAndroidTest {
                     }
                 }
             }
-            rule.onNodeWithText("New puzzle").assertIsDisplayed().performClick()
+            rule.onNodeWithText("Custom").performScrollTo().assertIsDisplayed().performClick()
             rule.onNodeWithText("Start puzzle").assertIsDisplayed()
             assertEquals(original, store.profile.active)
             assertTrue(store.profile.pausedSolo.isEmpty())
             rule.onNodeWithText("Cancel").performClick()
             assertEquals(original, store.profile.active)
-            rule.onNodeWithText("Continue Solo").assertIsDisplayed()
+            rule.onNodeWithText("Continue").assertIsDisplayed()
 
-            rule.onNodeWithText("New puzzle").performClick()
+            rule.onNodeWithText("Custom").performScrollTo().performClick()
             rule.onNodeWithText("Woodland").performClick()
             rule.onNodeWithText("Outer Space").performClick()
             rule.onNodeWithText("Standard · 15×15 · 16 words").performClick()
@@ -82,7 +82,7 @@ class SoloPreGameNavigationAndroidTest {
                     }
                 }
             }
-            rule.onNodeWithText("My Puzzles").performClick()
+            rule.onNodeWithText("My Puzzles").performScrollTo().performClick()
             rule.onNodeWithText("New Solo").performClick()
             rule.onNodeWithText("New puzzle").assertIsDisplayed()
             assertEquals(before, store.profile)
