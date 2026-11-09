@@ -83,7 +83,10 @@ class BookPageGameplayScreenAndroidTest {
                 }
             }
             compose.waitForIdle()
-            compose.onNodeWithText("Woodland Volume I · Page 1").assertExists()
+            compose.onNodeWithText("Woodland Volume I").assertExists()
+            compose.onNodeWithText("Page 1").assertExists()
+            compose.onNodeWithContentDescription("Back to book").assertExists()
+            compose.onNodeWithText("Trace words", substring = true).assertDoesNotExist()
             compose.onNodeWithText("1 of 12 words found", substring = true).assertExists()
             // Reuses the same zoom/precise gesture primitive as ordinary Solo.
             compose.onNodeWithContentDescription("Select a word without dragging")

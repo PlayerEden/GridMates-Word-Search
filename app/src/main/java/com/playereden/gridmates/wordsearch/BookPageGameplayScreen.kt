@@ -226,6 +226,16 @@ internal fun BookPageGameplayScreen(
             it.id !in wordsFound && (active?.hints?.get(it.id) ?: 0) >= 3
         }.map { it.positions }
 
+    // Clear low-priority tap feedback instead of letting it occupy a
+    // permanent row above the puzzle. Save failures and hints remain visible.
+    LaunchedEffect(status) {
+        if (status == "Try selecting a word from the list." ||
+            status.startsWith("✓ ")) {
+            delay(2400L)
+            status = ""
+        }
+    }
+
     val next = if (committed) {
         runCatching {
             BookProgressRules.continuePage(catalog, progressStore.progress, bookId)
@@ -251,49 +261,50 @@ internal fun BookPageGameplayScreen(
         }
         val choose: (GridPoint, GridPoint) -> Unit = { start, end -> select(start, end) }
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            // WS-14K1 first real-phone refinement: one control row instead
+            // of a separate back/save row and an oversized book title row.
+            // Native labels remain accessible; no art or gesture hot-spots.
             Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text("Back to book")
-                }
-                Text(
-                    if (practice) "Practice · unsaved" else
-                        if (committed) "Completed page" else "Progress saved on device",
-                    color = Muted, style = MaterialTheme.typography.labelMedium
-                )
-            }
-            Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically) {
+                BookPageBackButton(onBack = onBack)
                 val bookmarked = pageId ==
                     progressStore.progress.volumes[bookId]?.bookmarkedPageId
-                if (showPrototypeArt && committed) {
-                    BookArt(book.theme, BookArtKind.COMPLETION, Modifier.width(39.dp).height(39.dp),
+                val showSmallArt = showPrototypeArt && !enlarged && contentWidthDp >= 320f
+                if (showSmallArt && committed) {
+                    BookArt(book.theme, BookArtKind.COMPLETION, Modifier.size(26.dp),
                         fieldNotes = fieldNotesArt)
-                } else if (showPrototypeArt && bookmarked) {
-                    BookArt(book.theme, BookArtKind.BOOKMARK, Modifier.width(17.dp).height(49.dp),
-                        fieldNotes = fieldNotesArt)
+                } else if (showSmallArt && bookmarked) {
+                    BookArt(book.theme, BookArtKind.BOOKMARK,
+                        Modifier.width(12.dp).height(30.dp), fieldNotes = fieldNotesArt)
                 } else if (shouldShowBookPageHeaderEmblem(
                         showPrototypeArt, committed, bookmarked,
                         contentWidthDp, LocalDensity.current.fontScale
                     )) {
-                    // Source-backed WS-12 emblem, matched by book.theme.
-                    // This is a QA art-slot test, NOT a new generated sprite.
+                    // QA Woodland sprite; Space/Garden keep matching WS-12 fallback.
                     BookArt(
                         book.theme, BookArtKind.EMBLEM,
-                        Modifier.size(32.dp).testTag("ws14g-book-page-theme-emblem"),
+                        Modifier.size(26.dp).testTag("ws14g-book-page-theme-emblem"),
                         fieldNotes = fieldNotesArt,
                         pageAccentCandidate = true
                     )
                 }
-                Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
-                    catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
-                    color = Forest, fontWeight = FontWeight.Bold,
-                    style = if (enlarged) MaterialTheme.typography.titleMedium
-                        else MaterialTheme.typography.titleLarge,
-                    maxLines = 2, overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f))
+                Column(Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                    Text(book.title.removeSuffix(" · TEST BOOK"),
+                        color = Forest, fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    val pageNumber = catalog.pages(bookId).indexOfFirst {
+                        it.id == pageId
+                    } + 1
+                    Text("Page $pageNumber" + when {
+                        practice -> " · Practice (unsaved)"
+                        committed -> " · Completed"
+                        else -> ""
+                    }, color = Muted, style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
                 if (!practice && !committed) {
                     // Icon-only hint, with a full 48dp touch target and an
                     // accessibility description. Same durable hint policy.
@@ -361,14 +372,16 @@ internal fun BookPageGameplayScreen(
             // hint, claim, error or mode change.
             if (status.isNotBlank()) {
                 Text(status, style = MaterialTheme.typography.bodyMedium,
-                    color = Forest, maxLines = if (enlarged) 3 else 2)
+                    color = Forest, maxLines = if (enlarged) 3 else 2,
+                    modifier = Modifier.testTag("ws14k-page-feedback"))
             }
             if (landscape) {
                 Row(Modifier.fillMaxWidth().weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(Modifier.width(viewport), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         ZoomableWordGrid(board, wordsFound, hintPaths, viewport,
-                            choose, onStep = {}, boardFontId = boardFontId)
+                            choose, onStep = {}, boardFontId = boardFontId,
+                            compactControls = true)
                     }
                     WordList(board, wordsFound, daily = false,
                         modifier = Modifier.weight(1f).fillMaxHeight(), scrollAll = true)
@@ -376,7 +389,8 @@ internal fun BookPageGameplayScreen(
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     ZoomableWordGrid(board, wordsFound, hintPaths, viewport,
-                        choose, onStep = {}, boardFontId = boardFontId)
+                        choose, onStep = {}, boardFontId = boardFontId,
+                            compactControls = true)
                 }
                 WordList(board, wordsFound, daily = false,
                     modifier = Modifier.fillMaxWidth().weight(1f), scrollAll = true)

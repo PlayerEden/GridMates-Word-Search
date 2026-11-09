@@ -731,7 +731,9 @@ internal fun ZoomableWordGrid(
     onModeChanged: (Boolean) -> Unit = {},
     boardLookId: String = "classic",
     bookmark: LargeBoardBookmark? = null,
-    onBookmark: (LargeBoardBookmark) -> Unit = {}
+    onBookmark: (LargeBoardBookmark) -> Unit = {},
+    /** Compact printed-book pages don't need an always-visible gesture tutorial. */
+    compactControls: Boolean = false
 ) {
     // Allocate a truly square board using the height actually available AFTER
     // the toolbar. A requested 320dp square previously got squeezed to a shorter
@@ -768,10 +770,16 @@ internal fun ZoomableWordGrid(
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
-                Text(gridZoomInstruction(puzzle.size),
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Muted, maxLines = 2)
+                if (compactControls) {
+                    // Keep the toolbar's 48dp controls; no wrapped copy above
+                    // book puzzles that squeezes the board/word list.
+                    androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+                } else {
+                    Text(gridZoomInstruction(puzzle.size),
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Muted, maxLines = 2)
+                }
                 TextButton(
                     onClick = { preciseOpen = true },
                     modifier = Modifier.semantics {
