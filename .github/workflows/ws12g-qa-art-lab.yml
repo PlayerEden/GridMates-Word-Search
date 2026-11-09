@@ -75,8 +75,37 @@ jobs:
         run: |
           python3 tools/asset_pipeline/validate_ws14_assets.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_asset_registry.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_cover_import.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
+      - name: Verify WS-14 actual original cover exports and debug/release asset isolation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, zipfile
+          data=json.loads(pathlib.Path("design/visual-system/ws14-art-register.json").read_text())
+          qa=pathlib.Path("app/build/outputs/apk/debug/app-debug.apk")
+          releases=list(pathlib.Path("app/build/outputs/apk/release").glob("*.apk"))
+          assert qa.is_file() and releases, "Missing debug or release APK"
+          expected={}
+          for art in data["assets"]:
+              if art["purpose"] != "front-cover-art":
+                  continue
+              assert art["status"] in ("QA_INTEGRATED","GENERATED_UNREVIEWED"), "Artwork review state must remain non-release"
+              for item in art["exports"]:
+                  if item["android_source_set"] == "debug":
+                      src=pathlib.Path(item["path"])
+                      assert src.is_file() and src.as_posix().startswith("app/src/debug/assets/ws14/books/")
+                      expected["assets/ws14/books/"+src.name]=item["sha256"]
+          with zipfile.ZipFile(qa) as apk:
+              actual={p for p in apk.namelist() if p.startswith("assets/ws14/")}
+              assert actual == set(expected), ("Missing or unexpected WS-14 QA sprites",actual,expected)
+              for name,digest in expected.items():
+                  assert hashlib.sha256(apk.read(name)).hexdigest()==digest, name
+          with zipfile.ZipFile(releases[0]) as apk:
+              assert not [p for p in apk.namelist() if p.startswith("assets/ws14/")], "WS-14 QA ART LEAKED INTO RELEASE"
+          print("WS-14 book covers verified:", len(expected), "debug-only; zero in release")
+          PY
       - name: Verify each exact-source A/B SVG and PNG inside QA and zero in release
         shell: bash
         run: |
