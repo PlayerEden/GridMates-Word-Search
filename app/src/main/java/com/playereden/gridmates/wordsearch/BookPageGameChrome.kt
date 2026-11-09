@@ -91,13 +91,13 @@ internal fun BookPageCompactFilterButton(remainingOnly: Boolean, onClick: () -> 
 /** Transient overlay; consumes no reserved vertical space in the book page. */
 @Composable
 internal fun BookPageNoticeOverlay(message: String, modifier: Modifier = Modifier) {
-    Surface(modifier = modifier.fillMaxWidth().padding(horizontal = 6.dp)
+    Surface(modifier = modifier.widthIn(max = 420.dp).padding(horizontal = 6.dp)
         .semantics { liveRegion = LiveRegionMode.Polite }
         .testTag("ws14k2-notice-overlay"),
-        color = Paper, shadowElevation = 6.dp,
+        color = Paper, shadowElevation = 4.dp,
         shape = RoundedCornerShape(12.dp)) {
-        Text(message, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            color = Forest, style = MaterialTheme.typography.bodyMedium, maxLines = 4)
+        Text(message, modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
+            color = Forest, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
     }
 }
 

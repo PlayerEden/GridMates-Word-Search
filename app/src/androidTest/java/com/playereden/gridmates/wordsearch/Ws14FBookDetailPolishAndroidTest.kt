@@ -57,7 +57,7 @@ class Ws14FBookDetailPolishAndroidTest {
                 }
             }
         }
-        compose.onNodeWithText("Reading progress").assertExists()
+        compose.onNodeWithText("Book progress").assertExists()
         compose.onNodeWithText("Getting Started").assertExists()
         compose.onNodeWithText("Getting Started · TEST").assertDoesNotExist()
         compose.onNodeWithText("TEST BOOK").assertDoesNotExist()

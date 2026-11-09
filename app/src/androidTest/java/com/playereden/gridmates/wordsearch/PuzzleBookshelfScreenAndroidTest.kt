@@ -103,7 +103,7 @@ class PuzzleBookshelfScreenAndroidTest {
             }
         }
         compose.onNodeWithText("The Trees").assertExists()
-        compose.onNodeWithText("Start reading").assertExists().performClick()
+        compose.onNodeWithText("Start solving").assertExists().performClick()
         compose.runOnIdle { assertEquals(second.id, selected) }
         compose.onNodeWithText("Bookmark saved").assertExists()
     }
@@ -123,7 +123,7 @@ class PuzzleBookshelfScreenAndroidTest {
             }
         }
         compose.onNodeWithText("Book complete · You can revisit any page.").assertExists()
-        compose.onNodeWithText("Start reading").assertDoesNotExist()
+        compose.onNodeWithText("Start solving").assertDoesNotExist()
         compose.onNodeWithText("Bookmark page 1").assertDoesNotExist()
         compose.onNodeWithText("Replay page 1").assertExists().performClick()
         compose.runOnIdle { assertEquals(first.id, selected) }
@@ -136,7 +136,7 @@ class PuzzleBookshelfScreenAndroidTest {
             }
         }
         compose.onNodeWithText("Book pages will be playable after content approval.").assertExists()
-        compose.onNodeWithText("Start reading").assertDoesNotExist()
+        compose.onNodeWithText("Start solving").assertDoesNotExist()
         compose.onNodeWithText("Play page 1").assertDoesNotExist()
     }
 

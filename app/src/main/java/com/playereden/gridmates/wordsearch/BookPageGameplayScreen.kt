@@ -62,6 +62,12 @@ internal fun shouldShowBookPageHeaderEmblem(
 ): Boolean = qaArtworkEnabled && !completed && !bookmarked &&
     viewportWidthDp >= 320f && fontScale < 1.5f
 
+/** Record meaningful hints and finds, not ordinary missed letter traces. */
+internal fun shouldRememberBookPageNotice(message: String): Boolean =
+    message.isNotBlank() &&
+        message != "No matching word in that selection." &&
+        message != "You've already found that word."
+
 /**
  * WS-11D2B — a real book-page playing screen, independent of SoloStore.
  *
@@ -203,7 +209,7 @@ internal fun BookPageGameplayScreen(
             ClaimStatus.ALREADY_FOUND -> status = "You've already found that word."
             ClaimStatus.INVALID -> status = if (sessionStore.warning != null)
                 "The selection could not be saved. Your earlier progress was preserved."
-                else "Try selecting a word from the list."
+                else "No matching word in that selection."
         }
     }
 
@@ -235,12 +241,18 @@ internal fun BookPageGameplayScreen(
     LaunchedEffect(status) {
         val message = status
         if (message.isNotBlank()) {
-            if (noticeHistory.firstOrNull() != message) {
+            if (shouldRememberBookPageNotice(message) &&
+                noticeHistory.firstOrNull() != message) {
                 noticeHistory.add(0, message)
                 if (noticeHistory.size > 30) noticeHistory.removeAt(noticeHistory.lastIndex)
             }
-            delay(if (message.startsWith("Hint:") || message.contains("could not") ||
-                message.contains("recovery")) 6500L else 3500L)
+            delay(when {
+                message == "No matching word in that selection." -> 1200L
+                message.startsWith("Hint:") -> 4000L
+                message.contains("could not", ignoreCase = true) ||
+                    message.contains("recovery", ignoreCase = true) -> 6500L
+                else -> 2600L
+            })
             if (status == message) status = ""
         }
     }
@@ -277,28 +289,8 @@ internal fun BookPageGameplayScreen(
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 BookPageBackButton(onBack = onBack)
-                val bookmarked = pageId ==
-                    progressStore.progress.volumes[bookId]?.bookmarkedPageId
-                // Keep all three 48dp actions usable at small widths.
-                val showSmallArt = showPrototypeArt && !enlarged && contentWidthDp >= 400f
-                if (showSmallArt && committed) {
-                    BookArt(book.theme, BookArtKind.COMPLETION, Modifier.size(26.dp),
-                        fieldNotes = fieldNotesArt)
-                } else if (showSmallArt && bookmarked) {
-                    BookArt(book.theme, BookArtKind.BOOKMARK,
-                        Modifier.width(12.dp).height(30.dp), fieldNotes = fieldNotesArt)
-                } else if (shouldShowBookPageHeaderEmblem(
-                        showPrototypeArt, committed, bookmarked,
-                        contentWidthDp, LocalDensity.current.fontScale
-                    )) {
-                    // QA Woodland sprite; Space/Garden keep matching WS-12 fallback.
-                    BookArt(
-                        book.theme, BookArtKind.EMBLEM,
-                        Modifier.size(26.dp).testTag("ws14g-book-page-theme-emblem"),
-                        fieldNotes = fieldNotesArt,
-                        pageAccentCandidate = true
-                    )
-                }
+                // Keep the theme illustration at the word list, not in the
+                // crowded title row. Real handset review showed "Woodl...".
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(1.dp)) {
                     Text(book.title.removeSuffix(" · TEST BOOK"),
@@ -413,7 +405,7 @@ internal fun BookPageGameplayScreen(
         // Overlays paint ABOVE gameplay without taking any board/list height.
         if (status.isNotBlank()) {
             BookPageNoticeOverlay(message = status,
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = 57.dp))
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp))
         }
         if (noticeHistoryOpen) {
             BookPageNoticeHistoryDialog(notices = noticeHistory.toList(),

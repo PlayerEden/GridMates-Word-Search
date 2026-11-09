@@ -29,7 +29,7 @@ class QaBookshelfLauncherAndroidTest {
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started").assertExists()
-        compose.onNodeWithText("Start reading").assertExists()
+        compose.onNodeWithText("Start solving").assertExists()
         compose.onNodeWithTag("ws15-back").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Puzzle Books").assertExists()

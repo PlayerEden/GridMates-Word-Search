@@ -332,7 +332,7 @@ internal fun PuzzleBookDetailScreen(
             item(key = "book-progress") {
                 PaperPanel(Modifier.fillMaxWidth()) {
                     Text(
-                        if (showPrototypeArt) "Reading progress"
+                        if (showPrototypeArt) "Book progress"
                         else book.theme.label + " · Volume " + book.volume,
                         color = Muted, style = MaterialTheme.typography.bodyMedium
                     )
@@ -357,7 +357,7 @@ internal fun PuzzleBookDetailScreen(
                             onClick = { onPlayPage(bookId, next.id) },
                             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                         ) {
-                            Text(if (completed.isEmpty()) "Start reading" else "Continue reading")
+                            Text(if (completed.isEmpty()) "Start solving" else "Continue solving")
                         }
                     } else {
                         Text("Book pages will be playable after content approval.",
