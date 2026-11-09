@@ -30,6 +30,16 @@
 
 ---
 
+## NEXT: WS-16E — modular illustrated Home asset kit, shelf FIRST (approved concept)
+
+**Owner design decision (Nov 9):** The rich painted parchment Home concept with an ornate storybook walnut shelf is the visual target. Reusable UI templates are a first-class requirement: **neutral shared GridMates frames and menu components; Word Search-owned decorative shelf, book accents and thematic icon subjects; native editable text on top of art;** do not flatten the mockup into one bitmap. Existing content, profile, save and all click behavior stays working. We may adjust the layout or scale after actual asset integration, but first remove whitespace before shrinking featured covers.
+
+**Completed production planning document:** [WS-16E Mod UI Asset Kit v1](design/WS16E_MODULAR_GRIDMATES_UI_ASSET_PRODUCTION_PLAN_V1_2026-11-09.md), commit [6fcd63fd](https://github.com/PlayerEden/GridMates-Word-Search/commit/6fcd63fd2c4f53c71535a4c2ce8035ce4bda3901). **This is a specification and checklist, NOT a completed asset implementation, owner APK or release-approved art.** The existing latest verified WS-16D owner QA ZIP remains [#13717909916](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42719067784/artifacts/13717909916), gameplay source `47aa0f10`, both Android and art/release-isolation green.
+
+**FIRST actual development batch:** source independent clean-alpha walnut shelf parts (top surface, repeatable center face, left/right carved endcaps, center leaf medallion, soft contact shadow). Integrate StorybookShelf into `Ws16BookCoverPager.kt` replacing old 13dp Canvas shelf, preserving 218dp cover art, 234dp pager, focus/side-peek one-tap routes and release/QA separation. No heavy extra 100dp shelf panel. Follow with modular parchment medium/feature/panel/pill/dialog frames and icon slots, then icon and decoration passes. All changing labels/figures stay native. First QA should compare 320/360/393/411dp and large fonts; one substantial verified APK, not a patch per ornament. Keep PR #131 DRAFT.
+
+---
+
 ## CURRENT: WS-16D Collection Home entry beside Full Shelf — themed gallery next
 
 **Owner's November 9 phone review:** WS-16C Home without bottom footer looks good. Owner wants Collection promoted from buried Profile page to a dedicated main destination, and eventually a true visual unlock gallery with one album per book theme plus basic general rewards. See [WS-16D design](design/WS16D_COLLECTION_HOME_SHORTCUT_AND_THEMED_GALLERY_ROADMAP_2026-11-09.md) and [actual code/devlog](devlog/2026-11-09_WS16D_COLLECTION_HOME_AND_THEMED_GALLERY_DIRECTION.md).
