@@ -16,6 +16,14 @@ class Ws14CoverSelectionAndroidTest {
             ws14QaCoverPath(WordTheme.GARDEN, BookArtKind.COVER))
     }
 
+    @Test fun originalStudyAAlwaysRemainsTrueComparison() {
+        for (theme in WordTheme.entries) {
+            assertNull(preferredWs14QaCoverPath(theme, BookArtKind.COVER, false))
+            assertEquals(ws14QaCoverPath(theme, BookArtKind.COVER),
+                preferredWs14QaCoverPath(theme, BookArtKind.COVER, true))
+        }
+    }
+
     @Test fun otherArtworkKindsUseExistingStudyPathUntilIndividuallyApproved() {
         for (theme in WordTheme.entries) {
             for (kind in BookArtKind.entries.filter { it != BookArtKind.COVER }) {

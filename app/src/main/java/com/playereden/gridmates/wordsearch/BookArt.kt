@@ -57,6 +57,11 @@ internal fun ws14QaCoverPath(theme: WordTheme, kind: BookArtKind): String? {
     return "ws14/books/$themeSlug.png"
 }
 
+/** The A/B switch always keeps Study A genuine, even after importing WS-14. */
+internal fun preferredWs14QaCoverPath(
+    theme: WordTheme, kind: BookArtKind, fieldNotes: Boolean
+): String? = if (fieldNotes) ws14QaCoverPath(theme, kind) else null
+
 @Composable
 internal fun BookArt(
     theme: WordTheme,
@@ -66,7 +71,7 @@ internal fun BookArt(
 ) {
     val context = LocalContext.current
     val existingStudyPath = bookArtPath(theme, kind, fieldNotes) ?: return
-    val preferredNewPath = ws14QaCoverPath(theme, kind)
+    val preferredNewPath = preferredWs14QaCoverPath(theme, kind, fieldNotes)
     val bitmap = remember(context, existingStudyPath, preferredNewPath) {
         listOfNotNull(preferredNewPath, existingStudyPath)
             .firstNotNullOfOrNull { path ->

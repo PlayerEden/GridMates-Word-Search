@@ -21,6 +21,10 @@ import org.junit.Test
 class QaBookArtworkIntegrationAndroidTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
+    private fun ws14CoverPresent(): Boolean =
+        InstrumentationRegistry.getInstrumentation().targetContext.assets
+            .list("ws14/books").orEmpty().isNotEmpty()
+
     @Test fun allSixKindsForEachThemeDecodeLocallyWithoutNetwork() {
         val assets = InstrumentationRegistry.getInstrumentation().targetContext.assets
         for (theme in listOf(WordTheme.WOODLAND, WordTheme.SPACE, WordTheme.GARDEN)) {
@@ -36,16 +40,23 @@ class QaBookArtworkIntegrationAndroidTest {
     }
 
     @Test fun bookArtworkABTogglePreservesNativeBookNavigationAndBackChoice() {
+        val newCover = ws14CoverPresent()
+        val illustratedLabel = if (newCover)
+            "WS-14 covers · Field Notes supporting art"
+        else "Illustrated study B · Field Notes"
+        val illustratedButton = if (newCover)
+            "Try WS-14 covers (B)"
+        else "Try more illustrated art (B)"
         compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
         compose.waitForIdle()
         // Owner-preferred detailed Study B is now the QA opening default.
-        compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
+        compose.onNodeWithText(illustratedLabel).assertExists()
         compose.onNodeWithText("Show original art (A)").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Original study A · Quiet Paperbacks").assertExists()
-        compose.onNodeWithText("Try more illustrated art (B)").performClick()
+        compose.onNodeWithText(illustratedButton).performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
+        compose.onNodeWithText(illustratedLabel).assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started · TEST").assertExists()
@@ -53,18 +64,20 @@ class QaBookArtworkIntegrationAndroidTest {
         compose.waitForIdle()
         // A user can compare styles without creating a new puzzle or
         // resetting the BookLibraryStore bookmark/progress files.
-        compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
+        compose.onNodeWithText(illustratedLabel).assertExists()
         compose.onNodeWithText("Show original art (A)").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Original study A · Quiet Paperbacks").assertExists()
     }
 
     @Test fun actualBookshelfUsesSourceArtButKeepsNativePlayActions() {
+        val newCover = ws14CoverPresent()
         compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Puzzle Books").assertExists()
         compose.onNodeWithText(
-            "Prototype artwork · final illustrations can change"
+            if (newCover) "Illustrated cover preview · release review pending"
+            else "Prototype artwork · final illustrations can change"
         ).assertExists()
         compose.onNodeWithText("Woodland").assertExists()
         compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
