@@ -20,3 +20,13 @@ See docs/design/WS16D_COLLECTION_HOME_SHORTCUT_AND_THEMED_GALLERY_ROADMAP_2026-1
 ## QA gate, rollback
 Both workflows must complete **SUCCESS** on exact gameplay source 47aa0f10b34186cd7eea6c2160ea7c476627108e (Android unit tests/lint/instrumentation source compilation and art/release isolation). Physically verify Home has Full Shelf + Collection side by side, Collection opens directly, Back returns Home, Profile still opens it, no bottom bar, no book cover shrink, Quick Play remains a truthful non-clickable QA preview, Custom/Daily/Together still work. With no published books in release, Collection must stay available.
 Last dual-green fallback is WS-16C owner QA ZIP https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42717003929/artifacts/13717803408 (APK sha256 42bebe4ddcfef4056d25ddb562f1ef2abab2df857dd0bef8d5437bf97a9a4bbc). Keep PR draft/unmerged.
+
+## Exact-source CI verification and owner APK (final)
+
+**Both workflows completed SUCCESS** for code/art SHA `47aa0f10b34186cd7eea6c2160ea7c476627108e`.
+- [Android #42719067784](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42719067784) passed unit tests, lint, instrumentation test **source compilation** and built the debug QA APK. Instrumentation source compile is not physical-device interaction execution.
+- [Art/release #42719067846](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42719067846) passed debug/release compilation and verified approved art isolation: 6 QA-only book cover/spine sprites absent from release; 18 originals + 18 alternatives and 36 native exports verified; 3 original theme motifs hash checked and release isolated.
+- Owner [WS-16D QA ZIP artifact #13717909916](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42719067784/artifacts/13717909916) contains `app-debug.apk`. Artifact original workflow title contains Woodland but code is the full WS-16D app. ZIP length 13,955,062 bytes reported by GitHub.
+- **APK SHA-256:** `39dc1d519517cf6d64077079bcffbaf294e3a1b26e3dab87893875aca5bbe210`. **ZIP SHA-256:** `106108bce43c4bd4d5f436cae63f42c75cace94d9c137c5c2374daa865f2841e`.
+- Package `com.playereden.gridmates.wordsearch.qa`, versionCode 57, versionName 0.9.13-visual-kit-foundation-qa. Same version code as preceding QA: backup progress before any uninstall for a signing mismatch.
+- User-on-phone acceptance for WS-16D still **pending**. PR #131 stays DRAFT/unmerged. Previously verified rollback WS-16C remains available.
