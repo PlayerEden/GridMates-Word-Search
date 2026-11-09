@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PlayerEden/GridMates-Word-Search/design/visual-system/ws14-asset-manifest.schema.json",
+  "title": "GridMates Word Search — versioned production art registry",
+  "description": "Asset entries are added ONLY when actual files exist. Do not manufacture sources, hashes, licenses or approvals. Exact review status gates Android release use.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "visual_system",
+    "assets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "visual_system": {
+      "const": "gridmates-word-search-cozy-paperback"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "rights_status"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "rights_status": {
+          "enum": [
+            "UNKNOWN",
+            "PENDING_REVIEW",
+            "DOCUMENTED"
+          ]
+        },
+        "rights_notes": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "prompt_reference": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "string"
+        },
+        "created_date": {
+          "type": "string"
+        },
+        "edit_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "export": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "format",
+        "pixel_width",
+        "pixel_height",
+        "android_source_set",
+        "alpha"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "format": {
+          "enum": [
+            "png",
+            "webp",
+            "xml-vector",
+            "9-patch-png"
+          ]
+        },
+        "pixel_width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pixel_height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "android_source_set": {
+          "enum": [
+            "debug",
+            "release"
+          ]
+        },
+        "alpha": {
+          "type": "boolean"
+        },
+        "safe_crop_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewed_by",
+        "reviewed_date",
+        "approval_reference"
+      ],
+      "properties": {
+        "reviewed_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_date": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approval_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "comments": {
+          "type": "string"
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset_id",
+        "family",
+        "purpose",
+        "status"
+      ],
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{4,95}$"
+        },
+        "family": {
+          "type": "string",
+          "minLength": 2
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 2
+        },
+        "theme": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PLANNED",
+            "GENERATED_UNREVIEWED",
+            "QA_INTEGRATED",
+            "OWNER_APPROVED",
+            "RELEASE_APPROVED"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "exports": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/export"
+          }
+        },
+        "owner_review": {
+          "$ref": "#/$defs/review"
+        },
+        "rollback_asset_id": {
+          "type": "string"
+        },
+        "usage_screens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "QA_INTEGRATED",
+                  "OWNER_APPROVED",
+                  "RELEASE_APPROVED"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "source",
+              "exports"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "OWNER_APPROVED",
+                  "RELEASE_APPROVED"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "owner_review"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
