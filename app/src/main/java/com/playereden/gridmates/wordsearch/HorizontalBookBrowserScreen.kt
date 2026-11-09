@@ -93,7 +93,9 @@ internal fun HorizontalBookBrowserScreen(
 
     var previewToolsOpen by remember { mutableStateOf(false) }
 
-    BoxWithConstraints(modifier.fillMaxSize().testTag("ws14d-horizontal-browser")) {
+    // WS-16 extracted page-width calculations into Ws16BookCoverPager.
+    // This outer frame no longer consumes BoxWithConstraints scope.
+    Box(modifier.fillMaxSize().testTag("ws14d-horizontal-browser")) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
