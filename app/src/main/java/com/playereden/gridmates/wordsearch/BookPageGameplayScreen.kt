@@ -299,7 +299,17 @@ internal fun BookPageGameplayScreen(
                     BookPageHintButton(enabled = canEdit, onClick = {
                         val hint = sessionStore.hint(bookId, pageId)
                         if (hint == null) {
-                            status = "No hints available. Keep looking!"
+                            val saved = sessionStore.session(bookId, pageId)
+                            val allRevealed = board.targets
+                                .filterNot { it.id in saved?.foundIds.orEmpty() }
+                                .all { (saved?.hints?.get(it.id) ?: 0) >= 3 }
+                            status = when {
+                                sessionStore.warning != null || sessionStore.blocked ->
+                                    "Hint could not be saved. Your earlier progress is safe."
+                                allRevealed ->
+                                    "All remaining words have full hints. Follow the highlights."
+                                else -> "Hint unavailable right now. Try reopening this page."
+                            }
                         } else {
                             revision++
                             val step = sessionStore.session(bookId, pageId)
