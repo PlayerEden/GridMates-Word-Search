@@ -22,6 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -61,19 +64,7 @@ internal fun BookcaseBookshelfScreen(
 ) {
     BoxWithConstraints(modifier.fillMaxSize().testTag("real-bookcase-screen")) {
         val fontScale = LocalDensity.current.fontScale
-        // Truthful QA labeling when individually reviewed source artwork is
-        // imported: B can show a new cover; A always shows the old study.
-        val context = LocalContext.current
-        val hasImportedCover = remember(context, catalog.books) {
-            val existing = runCatching {
-                context.assets.list("ws14/books").orEmpty().toSet()
-            }.getOrDefault(emptySet())
-            catalog.books.any { book ->
-                val file = ws14QaCoverPath(book.theme, BookArtKind.COVER)
-                    ?.substringAfterLast('/')
-                file != null && file in existing
-            }
-        }
+        var previewToolsOpen by remember { mutableStateOf(false) }
         val columns = when {
             maxWidth < 310.dp || fontScale >= 1.65f -> 1
             maxWidth >= 700.dp && fontScale <= 1.25f -> 3
@@ -87,46 +78,15 @@ internal fun BookcaseBookshelfScreen(
             verticalArrangement = Arrangement.spacedBy(17.dp)
         ) {
             item(key = "bookshelf-title") {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                        Text("Back to Play")
-                    }
-                    StorybookHeading(
-                        eyebrow = "GridMates · Puzzle Library",
-                        title = "Puzzle Books",
-                        subtitle = "Your bookshelf · Choose a book to open."
-                    )
-                    Text(
-                        if (hasImportedCover) "Illustrated cover preview · release review pending"
-                        else "Prototype artwork · final illustrations can change",
-                        color = Muted, style = MaterialTheme.typography.labelSmall
-                    )
-                    Text(
-                        when {
-                            !fieldNotesArt -> "Original study A · Quiet Paperbacks"
-                            hasImportedCover -> "WS-14 covers · Field Notes supporting art"
-                            else -> "Illustrated study B · Field Notes"
-                        },
-                        color = Forest, style = MaterialTheme.typography.labelMedium
-                    )
-                    if (onToggleLayout != null) {
-                        TextButton(onClick = onToggleLayout,
-                            modifier = Modifier.heightIn(min = 48.dp)
-                                .testTag("ws14d-try-swipe")) {
-                            Text("Try swipe library")
-                        }
-                    }
-                    if (onToggleArt != null) {
-                        OutlinedButton(onClick = onToggleArt,
-                            modifier = Modifier.heightIn(min = 48.dp)) {
-                            Text(when {
-                                fieldNotesArt -> "Show original art (A)"
-                                hasImportedCover -> "Try WS-14 covers (B)"
-                                else -> "Try more illustrated art (B)"
-                            })
-                        }
-                    }
-                }
+                Ws15BackHeader(
+                    title = "Puzzle Books",
+                    subtitle = "Your bookshelf",
+                    onBack = onBack,
+                    backLabel = "Back to Play",
+                    onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
+                        { previewToolsOpen = true }
+                    } else null
+                )
             }
             itemsIndexed(rows, key = { _, row -> "shelf:" + row.first().id }) { index, row ->
                 BookcaseShelfRow(index, row, columns, catalog, progress,
@@ -142,6 +102,15 @@ internal fun BookcaseBookshelfScreen(
                     textAlign = TextAlign.Center
                 )
             }
+        }
+        if (previewToolsOpen) {
+            Ws15LibraryPreviewDialog(
+                fieldNotesArt = fieldNotesArt,
+                onToggleArt = onToggleArt,
+                onToggleLayout = onToggleLayout,
+                onDismiss = { previewToolsOpen = false },
+                layoutActionLabel = "Try swipe library"
+            )
         }
     }
 }
