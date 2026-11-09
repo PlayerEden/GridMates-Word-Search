@@ -56,3 +56,10 @@ The screenshots are visual QA evidence, not published in this public repo (devic
 - In the 12×12 and 20×20 pages, full book title should be visible in usual phone portrait mode and theme motifs should still show near the word list. Confirm puzzle tools, pinch/precise select, notice history and saved progress remain functional.
 - Check Collection Portraits/Fonts/Achievements, Records and Settings for cohesive small native symbol headings, at ordinary and enlarged font if feasible. Verify backup export remains accessible.
 - Record issues by user-visible behavior, not by aesthetic guesses; refine together in a meaningful WS-15 Pass 3 only if needed. Keep PR #131 draft/unmerged until owner acceptance.
+
+## First source CI outcome + focused correction
+
+- [Android #42691135246](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42691135246) for source `359f27f` **FAILED** at `:app:compileDebugAndroidTestKotlin` because `QaBookshelfLauncherAndroidTest.kt:21` newly called `onNodeWithContentDescription` without importing its Compose UI test extension. The exact job log identifies **only this test import issue**; it does not prove gameplay failure.
+- [Art/debug-release #42691135427](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42691135427) at `359f27f` **SUCCEEDED**. The three original theme source/export hashes, app builds and release art isolation remained intact.
+- **Exact focused correction:** [`6d7e53e2c6b7f51b16f517f802505bc5c6635768`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6d7e53e2c6b7f51b16f517f802505bc5c6635768) adds only `import androidx.compose.ui.test.onNodeWithContentDescription` to the changed Android UI test.
+- Corrected same-source workflows: [Android #42692044545](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044545) and [Art #42692044285](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044285), **in progress** at observation. No new APK or dual-green claim until both finish successfully. No user saves, word selection or UI appearance modified in the fix.
