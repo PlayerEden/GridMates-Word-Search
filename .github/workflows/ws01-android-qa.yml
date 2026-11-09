@@ -59,6 +59,12 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
           python3 scripts/import_font_library.py --source _approved_fonts
+      - name: Import hash-pinned WS-14 cover and spine PNGs for this QA APK
+        if: ${{ hashFiles('design/visual-system/masters/ws14-generated-asset-sheet-original.png') != '' }}
+        run: |
+          python3 -m pip install --disable-pip-version-check --user Pillow==12.3.0
+          python3 tools/asset_pipeline/import_ws14_candidate_sheet.py
+          python3 tools/asset_pipeline/validate_ws14_assets.py
       - name: Install pinned build-only SVG renderer (no Android runtime dependency)
         run: python3 -m pip install --disable-pip-version-check --user CairoSVG==2.8.2
       - uses: actions/setup-java@v5
@@ -104,6 +110,30 @@ jobs:
             }
           done
           sha256sum "$APK"
+      - name: Verify illustrated QA APK contains all six source-matched sprites
+        if: ${{ hashFiles('design/visual-system/masters/ws14-generated-asset-sheet-original.png') != '' }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          manifest = json.loads(Path('design/visual-system/ws14-art-register.json').read_text())
+          expected = {}
+          for asset in manifest['assets']:
+              for export in asset['exports']:
+                  if export['android_source_set'] != 'debug':
+                      continue
+                  source = Path(export['path'])
+                  assert source.is_file(), source
+                  entry = 'assets/' + str(source).removeprefix('app/src/debug/assets/')
+                  expected[entry] = export['sha256']
+          assert len(expected) == 6, ('Not all six book sprites registered', expected)
+          with zipfile.ZipFile('app/build/outputs/apk/debug/app-debug.apk') as z:
+              actual = {name for name in z.namelist() if name.startswith('assets/ws14/')}
+              assert actual == set(expected), ('Unexpected/missing QA sprites', actual, expected)
+              for name, digest in expected.items():
+                  assert hashlib.sha256(z.read(name)).hexdigest() == digest, name
+          print('WS-14D standard QA APK: six original-image-derived sprites packaged with exact hashes')
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: GridMates-WordSearch-Woodland-Verified-QA

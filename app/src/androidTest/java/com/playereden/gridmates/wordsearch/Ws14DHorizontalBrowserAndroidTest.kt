@@ -83,12 +83,12 @@ class Ws14DHorizontalBrowserAndroidTest {
         compose.waitForIdle()
         compose.onNodeWithText("2 of 3 books").assertExists()
         compose.onNodeWithTag("ws14d-selected-name").assertExists()
-        compose.onNodeWithTag("ws14d-open-selected").performClick()
+        compose.onNodeWithTag("ws14d-open-selected").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(books[1].id, opened) }
         compose.onNodeWithTag("ws14d-prev").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("1 of 3 books").assertExists()
-        compose.onNodeWithTag("ws14d-open-selected").performClick()
+        compose.onNodeWithTag("ws14d-open-selected").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(books[0].id, opened) }
     }
 

@@ -38,6 +38,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -101,6 +102,10 @@ internal fun HorizontalBookBrowserScreen(
 
     BoxWithConstraints(modifier.fillMaxSize().testTag("ws14d-horizontal-browser")) {
         val availableWidth = maxWidth - 36.dp
+        // At narrow widths or accessibility text scale, stack the two
+        // QA comparison actions so neither can clip into its neighbor.
+        val stackedReviewActions = availableWidth < 300.dp ||
+            LocalDensity.current.fontScale >= 1.4f
         val coverPageWidth = (availableWidth * 0.59f).coerceIn(136.dp, 186.dp)
         val sidePeek = ((availableWidth - coverPageWidth) / 2).coerceAtLeast(0.dp)
 
@@ -130,27 +135,12 @@ internal fun HorizontalBookBrowserScreen(
                         else "Illustrated study B · Field Notes",
                         color = Forest, style = MaterialTheme.typography.labelMedium
                     )
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (onToggleLayout != null) {
-                            TextButton(onClick = onToggleLayout,
-                                modifier = Modifier.heightIn(min = 48.dp)
-                                    .testTag("ws14d-classic-layout")) {
-                                Text("Classic shelves")
-                            }
-                        }
-                        if (onToggleArt != null) {
-                            TextButton(onClick = onToggleArt,
-                                modifier = Modifier.heightIn(min = 48.dp)
-                                    .testTag("ws14d-art-toggle")) {
-                                Text(if (fieldNotesArt) "Original art (A)"
-                                     else "Illustrated art (B)")
-                            }
-                        }
-                    }
+                    LibraryReviewControls(
+                        stacked = stackedReviewActions,
+                        fieldNotesArt = fieldNotesArt,
+                        onToggleLayout = onToggleLayout,
+                        onToggleArt = onToggleArt
+                    )
                 }
             }
 
@@ -291,6 +281,42 @@ internal fun HorizontalBookBrowserScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+/** Keeps QA comparison controls legible at 320dp / 200% font scale. */
+@Composable
+private fun LibraryReviewControls(
+    stacked: Boolean,
+    fieldNotesArt: Boolean,
+    onToggleLayout: (() -> Unit)?,
+    onToggleArt: (() -> Unit)?
+) {
+    val controls: @Composable () -> Unit = {
+        val sizeModifier = if (stacked) Modifier.fillMaxWidth() else Modifier
+        if (onToggleLayout != null) {
+            TextButton(onClick = onToggleLayout,
+                modifier = sizeModifier.heightIn(min = 48.dp)
+                    .testTag("ws14d-classic-layout")) {
+                Text("Classic shelves")
+            }
+        }
+        if (onToggleArt != null) {
+            TextButton(onClick = onToggleArt,
+                modifier = sizeModifier.heightIn(min = 48.dp)
+                    .testTag("ws14d-art-toggle")) {
+                Text(if (fieldNotesArt) "Original art (A)" else "Illustrated art (B)")
+            }
+        }
+    }
+    if (stacked) {
+        Column(Modifier.fillMaxWidth()) { controls() }
+    } else {
+        Row(Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            controls()
         }
     }
 }
