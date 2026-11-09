@@ -11,10 +11,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import com.playereden.gridmates.wordsearch.core.WordTheme
 
 /**
- * WS-12I — presentation only: the ACTUAL same-source WS-12F illustrations.
+ * WS-12I / WS-14B2 — presentation only: locally bundled, verified illustrations.
  *
  * Draws small, pre-rasterized local PNGs from debug assets, never WebViews in
- * scrolling book lists. All six symbols have explicit stable paths. The whole
+ * scrolling book lists. Prefer imported WS-14 originals when present;
+ * missing WS-14 art falls back to the existing WS-12 source-backed QA studies. All six symbols have explicit stable paths. The whole
  * feature is gated by showPrototypeArt in the book flow; the release package
  * includes no ws12/raster assets and remains native text-only.
  *
@@ -42,6 +43,20 @@ internal fun bookArtPath(
     return dir + kind.directory + "/" + slug + ".png"
 }
 
+/**
+ * WS-14B: exact paths accepted only from the approved-direction art importer.
+ * Never fetch remote art at runtime, never replace any of the 12 portraits.
+ */
+internal fun ws14QaCoverPath(theme: WordTheme, kind: BookArtKind): String? {
+    if (kind != BookArtKind.COVER) return null
+    val themeSlug = when (theme) {
+        WordTheme.WOODLAND -> "woodland"
+        WordTheme.SPACE -> "space"
+        WordTheme.GARDEN -> "garden"
+    }
+    return "ws14/books/$themeSlug.png"
+}
+
 @Composable
 internal fun BookArt(
     theme: WordTheme,
@@ -50,11 +65,15 @@ internal fun BookArt(
     fieldNotes: Boolean = false
 ) {
     val context = LocalContext.current
-    val path = bookArtPath(theme, kind, fieldNotes) ?: return
-    val bitmap = remember(context, path) {
-        runCatching {
-            context.assets.open(path).use { BitmapFactory.decodeStream(it) }
-        }.getOrNull()
+    val existingStudyPath = bookArtPath(theme, kind, fieldNotes) ?: return
+    val preferredNewPath = ws14QaCoverPath(theme, kind)
+    val bitmap = remember(context, existingStudyPath, preferredNewPath) {
+        listOfNotNull(preferredNewPath, existingStudyPath)
+            .firstNotNullOfOrNull { path ->
+                runCatching {
+                    context.assets.open(path).use { BitmapFactory.decodeStream(it) }
+                }.getOrNull()
+            }
     } ?: return
 
     Image(
