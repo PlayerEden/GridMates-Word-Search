@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.graphics.Color
+import com.playereden.gridmates.wordsearch.core.WordTheme
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -93,9 +96,8 @@ internal fun BookPageGameplayScreen(
     var initialized by remember(catalog, bookId, pageId) { mutableStateOf(false) }
     var error by remember(catalog, bookId, pageId) { mutableStateOf<String?>(null) }
     var revision by remember(catalog, bookId, pageId) { mutableIntStateOf(0) }
-    var status by remember(catalog, bookId, pageId) {
-        mutableStateOf("Trace the words on your puzzle page.")
-    }
+    // Do not reserve screen height for a generic instruction. Show only meaningful feedback.
+    var status by remember(catalog, bookId, pageId) { mutableStateOf("") }
     var practice by remember(catalog, bookId, pageId) { mutableStateOf(false) }
     var practiceFound by remember(catalog, bookId, pageId) { mutableStateOf(emptySet<String>()) }
 
@@ -231,8 +233,13 @@ internal fun BookPageGameplayScreen(
     } else null
 
     BoxWithConstraints(
-        Modifier.fillMaxSize().background(Cream).padding(horizontal = 12.dp, vertical = 6.dp)
+        Modifier.fillMaxSize()
+            .background(if (showPrototypeArt) bookPageThemePaperTint(book.theme) else Cream)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
+        // Resolve once in this BoxWithConstraints scope: nested Row scopes cannot
+        // access the implicit maxWidth receiver (previous WS-14G compile error).
+        val contentWidthDp = maxWidth.value
         val landscape = maxWidth > maxHeight * 1.2f
         val enlarged = LocalDensity.current.fontScale >= 1.5f
         val viewport = if (landscape) {
@@ -269,7 +276,7 @@ internal fun BookPageGameplayScreen(
                         fieldNotes = fieldNotesArt)
                 } else if (shouldShowBookPageHeaderEmblem(
                         showPrototypeArt, committed, bookmarked,
-                        maxWidth.value, LocalDensity.current.fontScale
+                        contentWidthDp, LocalDensity.current.fontScale
                     )) {
                     // Source-backed WS-12 emblem, matched by book.theme.
                     // This is a QA art-slot test, NOT a new generated sprite.
@@ -282,20 +289,14 @@ internal fun BookPageGameplayScreen(
                 Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
                     catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
                     color = Forest, fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = if (enlarged) MaterialTheme.typography.titleMedium
+                        else MaterialTheme.typography.titleLarge,
+                    maxLines = 2, overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f))
-            }
-            Text(
-                wordsFound.size.toString() + " of " + board.targets.size +
-                    " words found · " +
-                    ((active?.elapsedSeconds ?: 0L) / 60L).toString() + "m " +
-                    ((active?.elapsedSeconds ?: 0L) % 60L).toString() + "s",
-                color = Ink, style = MaterialTheme.typography.bodyMedium
-            )
-            PaperProgress(wordsFound.size, board.targets.size)
-            if (!practice && !committed) {
-                OutlinedButton(
-                    onClick = {
+                if (!practice && !committed) {
+                    // Icon-only hint, with a full 48dp touch target and an
+                    // accessibility description. Same durable hint policy.
+                    BookPageHintButton(enabled = canEdit, onClick = {
                         val hint = sessionStore.hint(bookId, pageId)
                         if (hint == null) {
                             status = "No hints available. Keep looking!"
@@ -310,11 +311,17 @@ internal fun BookPageGameplayScreen(
                                 else -> "Hint: " + hint.word + " is highlighted on the grid."
                             }
                         }
-                    },
-                    enabled = canEdit,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                ) { Text("Hint") }
+                    })
+                }
             }
+            Text(
+                wordsFound.size.toString() + " of " + board.targets.size +
+                    " words found · " +
+                    ((active?.elapsedSeconds ?: 0L) / 60L).toString() + "m " +
+                    ((active?.elapsedSeconds ?: 0L) % 60L).toString() + "s",
+                color = Ink, style = MaterialTheme.typography.bodyMedium
+            )
+            PaperProgress(wordsFound.size, board.targets.size)
             if (committed && !practice) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
@@ -339,8 +346,12 @@ internal fun BookPageGameplayScreen(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                 ) { Text("Finish practice") }
             }
-            Text(status, style = MaterialTheme.typography.bodyMedium,
-                color = Forest, maxLines = if (enlarged) 3 else 2)
+            // An instruction is not a status; show feedback only after a real
+            // hint, claim, error or mode change.
+            if (status.isNotBlank()) {
+                Text(status, style = MaterialTheme.typography.bodyMedium,
+                    color = Forest, maxLines = if (enlarged) 3 else 2)
+            }
             if (landscape) {
                 Row(Modifier.fillMaxWidth().weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
