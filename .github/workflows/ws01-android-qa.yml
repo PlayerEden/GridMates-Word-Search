@@ -11,6 +11,7 @@ on:
       - 'gradle.properties'
       - 'scripts/**'
       - 'design/woodland/**'
+      - 'tools/ci/**'
       - '.github/workflows/ws01-android-qa.yml'
       - 'design/font-library-approved-b5.json'
 
@@ -71,9 +72,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Install SHA-256 pinned Gradle 8.11.1 from official distribution
+        run: bash tools/ci/install_pinned_gradle.sh
+      # Cache/validate Gradle without re-provisioning an HTTP-504-prone distribution.
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.11.1'
+      - name: Verify active Gradle is pinned
+        run: gradle --version | grep -F 'Gradle 8.11.1'
       - name: Install pinned Android platform and build tools
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"

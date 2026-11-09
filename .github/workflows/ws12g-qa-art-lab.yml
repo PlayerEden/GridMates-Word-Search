@@ -13,6 +13,7 @@ on:
       - 'tools/asset_pipeline/**'
       - 'design/asset-pipeline/**'
       - 'design/visual-system/**'
+      - 'tools/ci/**'
       - '.github/workflows/ws12g-qa-art-lab.yml'
   pull_request:
     paths:
@@ -76,9 +77,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Install SHA-256 pinned Gradle 8.11.1 from official distribution
+        run: bash tools/ci/install_pinned_gradle.sh
+      # Cache/validate Gradle without re-provisioning an HTTP-504-prone distribution.
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.11.1'
+      - name: Verify active Gradle is pinned
+        run: gradle --version | grep -F 'Gradle 8.11.1'
       - name: Guard exact original artwork SHA and optional illustrated study source
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
