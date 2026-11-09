@@ -16,11 +16,21 @@ class Ws16CarouselHomeAndroidTest {
     @Test fun sharedBrandAndHeaderNavigateToWorkingLocalDestinations() {
         compose.onNodeWithTag("ws16-home-header").assertExists()
         compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithText("Player profile").assertExists()
+        compose.onNodeWithTag("ws16c-profile-collection").performClick()
         compose.onNodeWithText("Your Collection").assertExists()
-        compose.onNodeWithContentDescription("Open Play").performClick()
+        compose.onNodeWithContentDescription("Back to Profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-records").performClick()
+        compose.onNodeWithText("Your puzzle journal").assertExists()
+        compose.onNodeWithContentDescription("Back to Profile").performClick()
+        compose.onNodeWithContentDescription("Back to Home").performClick()
+        compose.onNodeWithTag("ws16-home-header").assertExists()
+        compose.onNodeWithContentDescription("Open Play").assertDoesNotExist()
         compose.onNodeWithContentDescription("Open menu").performClick()
         compose.onNodeWithText("Settings & backup").performClick()
         compose.onNodeWithText("Settings & backup").assertExists()
+        compose.onNodeWithContentDescription("Back to Home").performClick()
+        compose.onNodeWithTag("ws16-home-header").assertExists()
     }
 
     @Test fun focusedCoverDirectlyEntersPageAndBackReturnsHome() {
