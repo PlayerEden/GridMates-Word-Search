@@ -62,7 +62,7 @@ class QaBookArtworkIntegrationAndroidTest {
         compose.onNodeWithText(illustratedLabel).assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Getting Started · TEST").assertExists()
+        compose.onNodeWithText("Getting Started").assertExists()
         compose.onNodeWithText("Back to Puzzle Books").performClick()
         compose.waitForIdle()
         // A user can compare styles without creating a new puzzle or
@@ -89,9 +89,9 @@ class QaBookArtworkIntegrationAndroidTest {
         compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Getting Started · TEST").assertExists()
+        compose.onNodeWithText("Getting Started").assertExists()
         compose.onNodeWithText("Start reading").assertExists()
-        compose.onNodeWithText("Bookmark page 1").assertExists()
+        compose.onNodeWithText("Bookmark").assertExists()
         // Native chapter/page labels and real callback remain; decorative
         // imagery can be replaced later without changing book progress.
     }

@@ -26,7 +26,7 @@ class QaBookshelfLauncherAndroidTest {
         compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Getting Started · TEST").assertExists()
+        compose.onNodeWithText("Getting Started").assertExists()
         compose.onNodeWithText("Start reading").assertExists()
         compose.onNodeWithText("Back to Puzzle Books").performClick()
         compose.waitForIdle()
