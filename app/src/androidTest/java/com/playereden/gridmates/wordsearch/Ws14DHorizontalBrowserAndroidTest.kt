@@ -42,16 +42,16 @@ class Ws14DHorizontalBrowserAndroidTest {
     private fun fixture(theme: WordTheme, name: String, seed: Long): PuzzleBook {
         val slug = name.lowercase()
         val page = BookPage(
-            id = "$" + "{slug}-page-one",
-            puzzleId = "wordsearch:v2:en:$" + "{theme.name}:BOOK_SHORT:CLASSIC:$" + "seed",
+            id = slug + "-page-one",
+            puzzleId = "wordsearch:v2:en:" + theme.name + ":BOOK_SHORT:CLASSIC:" + seed,
             generatorVersion = 2, lexiconVersion = "fixture-en-v1",
             boardSize = PuzzleBoardSize.BOOK_SHORT, challenge = PuzzleChallenge.CLASSIC,
             seed = seed, boardSha256 = "a".repeat(64)
         )
         return PuzzleBook(
-            id = "$" + "{slug}-volume-one", title = name + " · TEST BOOK",
+            id = slug + "-volume-one", title = name + " · TEST BOOK",
             volume = 1, theme = theme,
-            chapters = listOf(BookChapter("$" + "{slug}-chapter", "Getting Started", listOf(page)))
+            chapters = listOf(BookChapter(slug + "-chapter", "Getting Started", listOf(page)))
         )
     }
 
