@@ -125,11 +125,11 @@ internal fun SoloSettingsScreen(
         )
     }
 
-    PaperEyebrow("Your app & saved progress")
-    Text("Settings & backup", color = Forest, fontWeight = FontWeight.Bold,
-        style = MaterialTheme.typography.headlineMedium)
-    Text("Your Solo, Daily, nearby results and collections are stored on this device.",
-        color = Muted, style = MaterialTheme.typography.bodyMedium)
+    StorybookHeading(
+        eyebrow = "GridMates · Settings",
+        title = "Settings & backup",
+        subtitle = "Your progress stays on this device"
+    )
 
     PaperPanel(Modifier.fillMaxWidth()) {
         PaperEyebrow("Keep your progress")
