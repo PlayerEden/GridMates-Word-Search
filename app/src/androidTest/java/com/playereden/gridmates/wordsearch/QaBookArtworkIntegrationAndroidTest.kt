@@ -49,6 +49,9 @@ class QaBookArtworkIntegrationAndroidTest {
         else "Try more illustrated art (B)"
         compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
         compose.waitForIdle()
+        // This regression verifies the old bookcase with both artwork studies.
+        compose.onNodeWithText("Classic shelves").performClick()
+        compose.waitForIdle()
         // Owner-preferred detailed Study B is now the QA opening default.
         compose.onNodeWithText(illustratedLabel).assertExists()
         compose.onNodeWithText("Show original art (A)").performClick()
@@ -73,6 +76,9 @@ class QaBookArtworkIntegrationAndroidTest {
     @Test fun actualBookshelfUsesSourceArtButKeepsNativePlayActions() {
         val newCover = ws14CoverPresent()
         compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
+        compose.waitForIdle()
+        // This regression verifies the old bookcase with both artwork studies.
+        compose.onNodeWithText("Classic shelves").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Puzzle Books").assertExists()
         compose.onNodeWithText(

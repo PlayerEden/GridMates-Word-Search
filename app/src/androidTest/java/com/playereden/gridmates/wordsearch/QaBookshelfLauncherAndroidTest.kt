@@ -20,6 +20,8 @@ class QaBookshelfLauncherAndroidTest {
         compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Puzzle Books").assertExists()
+        // Preserve the old A/B bookcase regression path as an explicit option.
+        compose.onNodeWithText("Classic shelves").performClick()
         compose.onNodeWithText("Woodland").assertExists()
         compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
