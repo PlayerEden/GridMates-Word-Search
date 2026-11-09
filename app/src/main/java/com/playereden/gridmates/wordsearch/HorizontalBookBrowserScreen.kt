@@ -94,10 +94,6 @@ internal fun HorizontalBookBrowserScreen(
     var previewToolsOpen by remember { mutableStateOf(false) }
 
     BoxWithConstraints(modifier.fillMaxSize().testTag("ws14d-horizontal-browser")) {
-        val availableWidth = maxWidth - 36.dp
-        val coverPageWidth = (availableWidth * 0.59f).coerceIn(136.dp, 186.dp)
-        val sidePeek = ((availableWidth - coverPageWidth) / 2).coerceAtLeast(0.dp)
-
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
@@ -116,67 +112,15 @@ internal fun HorizontalBookBrowserScreen(
             }
 
             item(key = "ws14d-books") {
-                Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                    HorizontalPager(
-                        state = pagerState,
-                        pageSize = PageSize.Fixed(coverPageWidth),
-                        contentPadding = PaddingValues(horizontal = sidePeek),
-                        pageSpacing = 10.dp,
-                        key = { index -> books[index].id },
-                        modifier = Modifier.fillMaxWidth().height(234.dp)
-                            .testTag("ws14d-cover-pager")
-                    ) { page ->
-                        val book = books[page]
-                        val focused = pagerState.currentPage == page
-                        // Native touch feedback, no continuous idle animation.
-                        // Compose observes the system's animator duration scale.
-                        val lift by animateFloatAsState(
-                            targetValue = if (focused) 1.025f else 0.92f,
-                            animationSpec = tween(durationMillis = 220),
-                            label = "ws14d-book-focus"
-                        )
-                        Box(
-                            Modifier.fillMaxSize()
-                                .graphicsLayer { scaleX = lift; scaleY = lift }
-                                .semantics { contentDescription = "Select " +
-                                    book.title.removeSuffix(" · TEST BOOK") }
-                                .clickable(role = Role.Button) {
-                                    if (page != pagerState.currentPage) {
-                                        scope.launch { pagerState.animateScrollToPage(page) }
-                                    }
-                                }
-                                .testTag("ws14d-cover-" + book.id),
-                            contentAlignment = Alignment.BottomCenter
-                        ) {
-                            BookArt(
-                                theme = book.theme, kind = BookArtKind.COVER,
-                                modifier = Modifier.width(coverPageWidth - 8.dp)
-                                    .height(218.dp),
-                                fieldNotes = fieldNotesArt
-                            )
-                        }
+                Ws16BookCoverPager(
+                    books = books,
+                    pagerState = pagerState,
+                    fieldNotesArt = fieldNotesArt,
+                    onCoverTap = { page, focused ->
+                        if (focused) onOpenBook(books[page].id)
+                        else scope.launch { pagerState.animateScrollToPage(page) }
                     }
-                    // Light physical shelf accent, subordinate to the actual art.
-                    Canvas(
-                        Modifier.fillMaxWidth().height(13.dp)
-                            .testTag("ws14d-shelf-edge")
-                    ) {
-                        drawRoundRect(
-                            brush = Brush.verticalGradient(listOf(
-                                Color(0xFFE2CFAC), Color(0xFFAE906C),
-                                Color(0xFF8E7354)
-                            )),
-                            cornerRadius = CornerRadius(3.dp.toPx()),
-                            size = Size(size.width, size.height)
-                        )
-                        drawLine(
-                            Color(0xFFF6E9CE),
-                            Offset(5.dp.toPx(), 2.dp.toPx()),
-                            Offset(size.width - 5.dp.toPx(), 2.dp.toPx()),
-                            strokeWidth = 1.dp.toPx()
-                        )
-                    }
-                }
+                )
             }
 
             item(key = "ws14d-navigation") {
