@@ -42,6 +42,8 @@ class ThreeFamilyReviewTests(unittest.TestCase):
                 self.assertIn(kind + "/" + t + ".svg", html)
         self.assertIn("max-width:420px", html)
         self.assertIn("Unapproved concept preview", html)
+        self.assertIn("<h1>Library artwork</h1>", html)
+        self.assertNotIn(">Open book<", html)
         self.assertIn("all labels and progress", html.lower())
         self.assertFalse((self.root / "first/_original_books").exists())
 
