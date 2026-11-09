@@ -42,7 +42,8 @@ class QaBookArtworkIntegrationAndroidTest {
         compose.onNodeWithText(
             "Prototype artwork · final illustrations can change"
         ).assertExists()
-        compose.onNodeWithText("Woodland · TEST BOOK").assertExists()
+        compose.onNodeWithText("Woodland").assertExists()
+        compose.onNodeWithText("TEST BOOK · 2 chapters").assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started · TEST").assertExists()
