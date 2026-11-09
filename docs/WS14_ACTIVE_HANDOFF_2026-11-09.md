@@ -2,6 +2,12 @@
 
 **Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14C_APK_LINK_AND_PERSISTENT_JOURNAL.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. On-phone testing has **not** been confirmed. Subsequent passes must append the journal as a standing rule.
 
+## Newest WS-14D owner screenshot review — November 9, 2026
+
+**The owner HAS now installed/opened the illustrated QA app and supplied five real phone screenshots** of Play, Puzzle Books and Woodland detail; bookmark feedback showed "Bookmark saved for this book." They liked the book family but asked for a more grounded, restrained app-wide treatment, noted that detached tiny spines beside the cover look strange, and favored horizontal swipe for browseable collections over long vertical shelves. This is **physical visual/interaction evidence** but **not** a full saved-game, two-phone or release QA pass.
+
+**Read the latest dated pass:** [WS-14D screenshot review and next-step development log](devlog/2026-11-09_WS14D_FIRST_PHONE_VISUAL_REVIEW_AND_LIBRARY_DIRECTION.md). **Proposed concept:** [Grounded library & horizontal browser plan](WS14D_GROUNDED_LIBRARY_AND_HORIZONTAL_BROWSER_DESIGN_2026-11-09.md). Next is **one QA-only alternate horizontal book browser using the current covers**, with attached-looking binding, visible non-swipe navigation and a focused Open/Continue CTA. Keep old layout for comparison; avoid generating another asset batch first. **The original A/B art toggle is not the same as the proposed layout A/B experiment.** No UI implementation or new Android APK was made in this design pass.
+
 ## Latest WS-14C playable artwork acceptance checkpoint (Nov 9, 2026)
 
 A **real downloadable illustrated QA APK** has been extracted from the successful WS-14 Art Lab workflow #42576785170 and SHA-256 checked against exact source commit 00d2a36: \`8a6c45ab4f879d3f7c6d5c5ba5c010b3b6d72ce2c32c8b4ebf34792506c45e0a\` (14,152,866 bytes). It has **3 Woodland/Space/Garden cover PNGs and 3 spine PNGs** inside \`assets/ws14/\`. We have not yet received physical-device results from the owner.
