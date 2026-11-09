@@ -191,12 +191,13 @@ internal fun Ws16HomeScreen(
             text = {
                 Column(Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    val options = listOf(
+                    val options = listOfNotNull(
                         "Settings & backup" to onSettings,
                         "How to play" to onHelp,
                         "Records" to onRecords,
                         "My Puzzles" to onMyPuzzles,
-                        "Full shelf" to onFullShelf,
+                        if (catalog != null && bookProgress != null &&
+                            books.isNotEmpty()) "Full shelf" to onFullShelf else null,
                         "New Solo" to onNewSolo
                     )
                     options.forEach { (label, action) ->
