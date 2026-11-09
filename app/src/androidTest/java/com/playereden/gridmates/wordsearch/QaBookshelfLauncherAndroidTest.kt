@@ -22,9 +22,8 @@ class QaBookshelfLauncherAndroidTest {
         compose.onNodeWithTag("ws16-full-shelf").performScrollTo().performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Puzzle Books").assertExists()
-        // Preserve the old A/B bookcase regression path as an explicit option.
-        compose.onNodeWithTag("ws15-preview-tools").performClick()
-        compose.onNodeWithText("Classic shelves").performClick()
+        // WS-16: Full Shelf is the actual multi-book bookcase by default.
+        // Swipe comparison remains reachable through preview options.
         compose.onNodeWithText("Woodland").assertExists()
         compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
         compose.onAllNodesWithText("Open book")[0].performClick()
