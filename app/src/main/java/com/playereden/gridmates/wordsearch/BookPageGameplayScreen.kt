@@ -61,7 +61,8 @@ internal fun BookPageGameplayScreen(
     progressStore: BookLibraryStore,
     boardFontId: String,
     onBack: () -> Unit,
-    onNextPage: ((bookId: String, pageId: String) -> Unit)? = null
+    onNextPage: ((bookId: String, pageId: String) -> Unit)? = null,
+    showPrototypeArt: Boolean = false
 ) {
     BackHandler(onBack = onBack)
     val book = catalog.book(bookId)
@@ -236,10 +237,22 @@ internal fun BookPageGameplayScreen(
                     color = Muted, style = MaterialTheme.typography.labelMedium
                 )
             }
-            Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
-                catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
-                color = Forest, fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleLarge)
+            Row(Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                val bookmarked = pageId ==
+                    progressStore.progress.volumes[bookId]?.bookmarkedPageId
+                if (showPrototypeArt && committed) {
+                    BookArt(book.theme, BookArtKind.COMPLETION, Modifier.width(39.dp).height(39.dp))
+                } else if (showPrototypeArt && bookmarked) {
+                    BookArt(book.theme, BookArtKind.BOOKMARK, Modifier.width(17.dp).height(49.dp))
+                }
+                Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
+                    catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
+                    color = Forest, fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f))
+            }
             Text(
                 wordsFound.size.toString() + " of " + board.targets.size +
                     " words found · " +
