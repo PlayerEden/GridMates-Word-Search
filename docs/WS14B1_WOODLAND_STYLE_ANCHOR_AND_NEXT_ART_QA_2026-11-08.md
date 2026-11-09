@@ -1,7 +1,7 @@
 # WS-14B1 — Woodland Illustration Style Anchor and Coordinated Asset Production
 
 **Date:** November 8–9, 2026 (owner conversation).  
-**State:** Owner likes first Woodland *visual direction*. **Concept/style preference only — not reviewed production sprite, not Android QA, not release art approval.**  
+**State:** Owner likes all three *visual directions* — Woodland, Space, and Garden. **Concept/style preference only — not reviewed production sprite, not Android QA, not release art approval.**  
 **Build/fallback:** Based on WS-14A1 source PR #130 (head b18ecc1); v56 remains verified fallback; v57 standard Android QA failed due to external HTTP 504 dependency downloads, while isolated art/debug/release build passed. Do not merge or distribute v57 as fully cleared.
 
 ## Selected direction
@@ -38,7 +38,7 @@ Use the Owl scene as a **preferred style anchor** while deriving compatible Spac
 
 ## Next implementation checkpoints
 
-1. Render matching Space/Garden concepts using the first Owl generation as the visual reference. Owner compares side-by-side at cover thumbnail size before family/style lock.
+1. **Completed as concepts:** generate Woodland, Space and Garden matching 3:4 imagery and obtain positive owner feedback on each. Next, compare their exact source images at 100–140dp thumbnail size and check lettering/artifacts/style consistency before treating the family as production-locked.
 2. Acquire full-resolution source originals and produce isolated Android-ready exports; never import watermarked thumbnails. Record prompt/provenance/format/alpha/crop, SHA-256 and rights status.
 3. Register source-backed candidates as `GENERATED_UNREVIEWED`, only advance when valid evidence exists. Keep debug/release isolation validators green.
 4. Stage a new **stacked draft PR**, separate from main, with exact assets, native Compose integration and 320dp/360dp/large-font visual tests; then run Gradle CI on exact head when dependency service works.
@@ -50,3 +50,14 @@ Use the Owl scene as a **preferred style anchor** while deriving compatible Spac
 - No image generation on the player phone. No accidental art in release.
 - Prefer native interactive UI; art never contains dynamic game state. New asset previews are optional and behind QA gating.
 - Do not retry flaky Gradle downloads repeatedly and burn Actions minutes. Record environmental failure separately from source failures.
+
+## Three-book concept preference checkpoint (November 8–9, 2026)
+
+The owner gave positive feedback on **all three independently generated illustration concepts**:
+- **Woodland** — “I like it” (owl scene). OpenArt generation `4ijWEmShE4FEPh2z10DX`; resource `pEkZaadtQzpp8i08OjU0`.
+- **Space** — “That's good” (ringed-planet sister artwork). OpenArt generation `Nq1AHKvNoH8URouwDfxS`; reference resource `AhHXNaLQ28QL0RZvrSMb`.
+- **Garden** — “That is good too” (flowering arch/butterfly/watering can). OpenArt generation `lXsjAcPhh6rglwCa3UrY`; resource `pmMFJSH3PK9wYn6BabVA`; **1728×2304 JPEG** according to provider metadata. Garden preview is a watermarked thumbnail, *not* a source file: https://cdn.openart.ai/watermarked_images/sUbcfkYEGSc64xfT8Yh2/thumbnail_b2c727a2_1794203409405.webp
+
+**Review interpretation:** Approve these as **coordinated creative directions** suitable for continuing design work; no evidence of approval for final crops, exact Android build, source rights, licensing, or publishing. Do not silently convert positive conversation feedback into `OWNER_APPROVED` or `RELEASE_APPROVED` manifest states. The registry currently has zero verifiable production sources, as intended.
+
+**New practical priority:** source-file acquisition and native asset handoff, **not another round of flat screenshot studies**. Obtain original master files with permitted commercial use (never watermarked previews), verify files/hash/dimensions; generate 3:4/transparent exports and test on actual standing book spines/covers within the existing functioning Compose bookshelf. Keep native, dynamic title and page progress outside bitmap artwork. Follow with four matching independently usable Home vignettes and reusable shelf/collection trim. Keep a draft PR, preserve v56 fallback and do not call an APK QA-cleared until all CI and on-device gates have passed.
