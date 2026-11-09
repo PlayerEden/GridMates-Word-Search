@@ -179,7 +179,7 @@ internal fun PuzzleBookDetailScreen(
         progress.volumes[bookId]?.bookmarkedPageId else null
 
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.testTag("book-detail-list"),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
