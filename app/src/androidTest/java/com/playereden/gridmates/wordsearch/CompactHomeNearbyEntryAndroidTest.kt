@@ -38,9 +38,9 @@ class CompactHomeNearbyEntryAndroidTest {
                 }
             }
             rule.onNodeWithText("Word Search").assertIsDisplayed()
-            rule.onNodeWithText("Continue Solo").assertIsDisplayed()
-            rule.onNodeWithContentDescription("Open Daily").performScrollTo().assertIsDisplayed()
-            rule.onNodeWithContentDescription("Open Together").performScrollTo().assertIsDisplayed()
+            rule.onNodeWithText("Continue").assertIsDisplayed()
+            rule.onNodeWithContentDescription("Open Daily Puzzle").performScrollTo().assertIsDisplayed()
+            rule.onNodeWithContentDescription("Open Together on local Wi-Fi").performScrollTo().assertIsDisplayed()
         } finally {
             rooms.leaveRoom()
             for (suffix in listOf("", ".bak", ".new")) {
