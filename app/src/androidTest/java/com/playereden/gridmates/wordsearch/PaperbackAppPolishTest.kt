@@ -2,44 +2,46 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import org.junit.Rule
 import org.junit.Test
 
-/**
- * Screen reachability, understandable labels and navigation regressions.
- * These checks don't substitute for actual narrow-phone screenshots.
- */
+/** WS-16C: home play, Profile, Menu and settings replace footer navigation. */
 class PaperbackAppPolishTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
-    @Test fun homeShowsDistinctPlayModesAndCurrentProgress() {
-        compose.onNodeWithText("Word Search").assertExists()
-        compose.onNodeWithText("Good puzzles. Good company.").assertExists()
-        compose.onNodeWithText("01 · SOLO").assertExists()
-        compose.onNodeWithText("New puzzle").assertExists()
-        compose.onNodeWithText("02 · A LITTLE EVERY DAY").assertExists()
-        compose.onNodeWithText("03 · TOGETHER IS BETTER").assertExists()
-        compose.onNodeWithContentDescription("Open Nearby co-op").assertExists()
+    @Test fun homeShowsMainPlayModesWithNoPermanentBottomNavigation() {
+        compose.onNodeWithTag("ws16-home-header").assertExists()
+        compose.onNodeWithContentDescription("Open Play").assertDoesNotExist()
+        compose.onNodeWithTag("ws16-home-books").assertExists()
+        compose.onNodeWithTag("ws16-resume-solo").performScrollTo().assertExists()
+        compose.onNodeWithText("Daily Puzzle").assertExists()
+        compose.onNodeWithText("Together").assertExists()
+        compose.onNodeWithText("Custom").performScrollTo().assertExists()
     }
 
-    @Test fun nearbyAndJournalAndSettingsAreReachableWithoutDebugCopy() {
-        compose.onNodeWithContentDescription("Open Nearby co-op")
+    @Test fun nearbyAndJournalAndSettingsRemainReachable() {
+        compose.onNodeWithContentDescription("Open Together on local Wi-Fi")
             .performScrollTo().performClick()
         compose.onNodeWithText("Play Together").assertExists()
         compose.onNodeWithText("← Back to Play").performClick()
-        compose.onNodeWithText("Continue Solo").assertExists()
-        compose.onNodeWithContentDescription("Open Records").performClick()
+        compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-records").performScrollTo().performClick()
         compose.onNodeWithText("Your puzzle journal").assertExists()
-        compose.onNodeWithContentDescription("Open Settings").performClick()
+        compose.onNodeWithContentDescription("Back to Profile").performClick()
+        compose.onNodeWithContentDescription("Back to Home").performClick()
+        compose.onNodeWithContentDescription("Open menu").performClick()
+        compose.onNodeWithText("Settings & backup").performClick()
         compose.onNodeWithText("Settings & backup").assertExists()
         compose.onNodeWithText("About Word Search").assertExists()
     }
 
     @Test fun collectionKeepsProfileAndFontUnlockEntry() {
-        compose.onNodeWithContentDescription("Open Collection").performClick()
+        compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-collection").performScrollTo().performClick()
         compose.onNodeWithText("Your Collection").assertExists()
         compose.onNodeWithText("Fonts").performClick()
         compose.onNodeWithText("board fonts unlocked", substring = true).assertExists()
