@@ -157,7 +157,8 @@ private fun BookcaseShelfRow(
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center, maxLines = 2)
                     if (book.title.endsWith(" · TEST BOOK")) {
-                        Text("TEST BOOK · " + book.chapters.size + " chapters",
+                        Text("TEST BOOK · " + book.chapters.size +
+                                (if (book.chapters.size == 1) " chapter" else " chapters"),
                             style = MaterialTheme.typography.labelSmall,
                             color = Muted, textAlign = TextAlign.Center)
                     }
