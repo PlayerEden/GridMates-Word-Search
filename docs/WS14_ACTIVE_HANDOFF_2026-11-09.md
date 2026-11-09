@@ -4,6 +4,18 @@
 
 **Current exact-source CI note:** Initial Pass 2 Android #42691135246 failed only at Android test-source compilation (missing `onNodeWithContentDescription` import in updated Books test); Art #42691135427 passed. Fixed via [`6d7e53e2`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6d7e53e2c6b7f51b16f517f802505bc5c6635768). Corrected exact-source [Android #42692044545](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044545) / [Art #42692044285](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044285) initially running. No dual-green APK claim until verified.
 
+## VERIFIED: WS-16A new carousel-first Home Android QA — one owner APK (Nov 9)
+
+**Corrected source `d449313f77bc526d6a23fa00e7acfda4051c478a` is DUAL GREEN.** [Android #42704988037](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42704988037) SUCCESS (core/app tests, lint, instrumentation **compilation**, debug assemble) and [art/release #42704987957](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42704987957) SUCCESS (debug/release, original cover/spine/portrait art/three motifs exact hashes and zero unapproved assets in release).
+
+- **ONE owner download:** [WS-16 standard QA ZIP artifact #13713432908](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42704988037/artifacts/13713432908) → extract `app-debug.apk`; actual APK SHA-256 `2367bc0e54d0bc11fba9c05cc704763e73c9ec0d4f8ba63a5ebdf81357105d11`; package `com.playereden.gridmates.wordsearch.qa` versionCode `57`. Preserve local save backup/signing compatibility before uninstall.
+- **Functionality actually integrated:** editable GridMates/Word Search separate SVG mark masters and native Canvas header, Profile/Menu routes, real illustrated reusable swipe pager on Home, one-tap focused book start/resume using existing `BookProgressRules.continuePage`, side-peek tap focus only, physical multi-book Full Shelf for chapters/pages (swipe comparison still in overflow), compact Solo/Daily/Together actions, bottom tabs retained. No player-save schema/word drag/hints/LAN changes.
+- First code `1a6b6425` standard CI failed only `UnusedBoxWithConstraintsScope` lint after pager extraction; fixed in `d449313f`, then passed both workflows. Do not hand out failed intermediate build or call a docs-only commit a new APK.
+- [Complete final source/QA journal](devlog/2026-11-09_WS16A_HOME_BRANDING_CAROUSEL_AND_DIRECT_PLAY.md). PR #131 remains DRAFT. **No WS-16 phone visual/interaction acceptance yet**; current user wants to see real screenshots before another major refactor.
+- **Next exact task:** owner tests that single APK and shares screenshots of 360dp Home, compact header, full book covers, quick actions, Menu and Profile. Explicitly test center cover direct play, side cover focus, progress resume/Back, and full shelf. Use actual observations for WS-16B layout/art refinement.
+
+---
+
 ## CURRENT WS-16A implementation — new Home, two brand marks, real book carousel and direct play (Nov 9)
 
 **Actual game source has now been implemented in draft PR #131; this supersedes the older WS-16 planning-only block below.** Read the [WS-16A source/QA receipt](devlog/2026-11-09_WS16A_HOME_BRANDING_CAROUSEL_AND_DIRECT_PLAY.md) and the [original wireframe/build sheet](design/WS16_HOME_CAROUSEL_FIRST_BUILD_SPEC_2026-11-09.md).
