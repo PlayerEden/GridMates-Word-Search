@@ -32,7 +32,8 @@ internal fun BookLibraryFlow(
     progressStore: BookLibraryStore,
     sessionStore: BookPageSessionStore,
     boardFontId: String,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    showPrototypeArt: Boolean = false
 ) {
     var bookId by remember(catalog) { mutableStateOf<String?>(null) }
     var pageId by remember(catalog) { mutableStateOf<String?>(null) }
@@ -65,6 +66,7 @@ internal fun BookLibraryFlow(
                 sessionStore = sessionStore,
                 progressStore = progressStore,
                 boardFontId = boardFontId,
+                showPrototypeArt = showPrototypeArt,
                 onBack = {
                     pageId = null
                     update++
@@ -107,7 +109,8 @@ internal fun BookLibraryFlow(
                                 ?: "The bookmark couldn't be saved. Your last progress was kept."
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    showPrototypeArt = showPrototypeArt
                 )
             }
         }
@@ -116,6 +119,7 @@ internal fun BookLibraryFlow(
             PuzzleBookshelfScreen(
                 catalog = catalog,
                 progress = snapshot,
+                showPrototypeArt = showPrototypeArt,
                 onBack = onExit,
                 onOpenBook = { selectedBook ->
                     if (catalog.book(selectedBook) != null) {

@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 52
-        versionName = "0.9.8-art-lab-phone-review"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 53
+        versionName = "0.9.9-book-art-integration"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -85,6 +85,17 @@ val generateWs12QaArt by tasks.registering(Exec::class) {
         "--output-dir", "app/src/debug/assets/ws12"
     )
 }
-tasks.matching { it.name == "mergeDebugAssets" }.configureEach {
+// Decode verified SVGs at build time so playable cards use lightweight
+// Compose PNGs, not 18 costly per-card WebViews. This is DEBUG ONLY.
+val rasterizeWs12QaArt by tasks.registering(Exec::class) {
     dependsOn(generateWs12QaArt)
+    workingDir = rootProject.projectDir
+    commandLine(
+        "python3", "tools/asset_pipeline/rasterize_android_qa.py",
+        "--input-dir", "app/src/debug/assets/ws12",
+        "--output-dir", "app/src/debug/assets/ws12/raster"
+    )
+}
+tasks.matching { it.name == "mergeDebugAssets" }.configureEach {
+    dependsOn(rasterizeWs12QaArt)
 }
