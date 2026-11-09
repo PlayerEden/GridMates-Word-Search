@@ -101,25 +101,25 @@ jobs:
                   assert hashlib.sha256(z.read(path)).hexdigest()==meta['sha256']
                   svg='assets/ws12/'+name.replace('.png','.svg')
                   assert hashlib.sha256(z.read(svg)).hexdigest()==meta['source_sha256']
-          # Study B always extends an exact A file. Every generated B sprite
-          # is checked against its separate receipt inside the actual APK.
-          alt=json.loads(z.read('assets/ws12/alt/field-notes/render_sha256.json'))
-          assert alt['art_file_count']==18 and alt['owner_approved'] is False
-          assert alt['source_original_files_unchanged']
-          for name, sha in alt['files'].items():
-              alt_path='assets/ws12/alt/field-notes/'+name
-              a_path='assets/ws12/'+name
-              assert hashlib.sha256(z.read(alt_path)).hexdigest()==sha
-              assert hashlib.sha256(z.read(a_path)).hexdigest()==alt['original_source_hashes'][name]
-              assert z.read(a_path)!=z.read(alt_path)
-          alt_png=json.loads(z.read('assets/ws12/raster_field_notes/manifest.json'))
-          assert alt_png['art_count']==18 and alt_png['owner_approved'] is False
-          for name, meta in alt_png['art'].items():
-              path='assets/ws12/raster_field_notes/'+name
-              assert hashlib.sha256(z.read(path)).hexdigest()==meta['sha256']
-              source='assets/ws12/alt/field-notes/'+name.replace('.png','.svg')
-              assert hashlib.sha256(z.read(source)).hexdigest()==meta['source_sha256']
-          assert z.read('assets/ws12/compare-studies.html').count(b'<article')==6
+              # Study B always extends an exact A file. Every generated B sprite
+              # is checked against its separate receipt inside the actual APK.
+              alt=json.loads(z.read('assets/ws12/alt/field-notes/render_sha256.json'))
+              assert alt['art_file_count']==18 and alt['owner_approved'] is False
+              assert alt['source_original_files_unchanged']
+              for name, sha in alt['files'].items():
+                  alt_path='assets/ws12/alt/field-notes/'+name
+                  a_path='assets/ws12/'+name
+                  assert hashlib.sha256(z.read(alt_path)).hexdigest()==sha
+                  assert hashlib.sha256(z.read(a_path)).hexdigest()==alt['original_source_hashes'][name]
+                  assert z.read(a_path)!=z.read(alt_path)
+              alt_png=json.loads(z.read('assets/ws12/raster_field_notes/manifest.json'))
+              assert alt_png['art_count']==18 and alt_png['owner_approved'] is False
+              for name, meta in alt_png['art'].items():
+                  path='assets/ws12/raster_field_notes/'+name
+                  assert hashlib.sha256(z.read(path)).hexdigest()==meta['sha256']
+                  source='assets/ws12/alt/field-notes/'+name.replace('.png','.svg')
+                  assert hashlib.sha256(z.read(source)).hexdigest()==meta['source_sha256']
+              assert z.read('assets/ws12/compare-studies.html').count(b'<article')==6
           with zipfile.ZipFile(releases[0]) as z:
               assert not [x for x in z.namelist() if x.startswith('assets/ws12/')], 'PROTOTYPE ART LEAKED TO RELEASE'
           print('PASS: 18 original and 18 new alt source SVGs, plus 36 SHA-matched native PNGs in QA; ZERO in release.')
