@@ -58,9 +58,10 @@ internal fun BookLibraryFlow(
     // The owner's current preference is the more detailed Study B, while
     // keeping Study A available as an immediate, lossless visual rollback.
     var fieldNotesArt by remember(catalog) { mutableStateOf(showPrototypeArt) }
-    // WS-14D: separate, reversible layout comparison (not the art A/B toggle).
-    // Both choices are QA-only, in-memory; opening a book preserves selection.
-    var horizontalLibrary by remember(catalog) { mutableStateOf(showPrototypeArt) }
+    // WS-16: Home is the swipe carousel; Full Shelf defaults to the
+    // multi-book physical bookcase instead of duplicating the Home showcase.
+    // Preview options still allow the older swipe view for QA comparison.
+    var horizontalLibrary by remember(catalog) { mutableStateOf(false) }
     var focusedBookId by remember(catalog) {
         mutableStateOf(catalog.books.firstOrNull()?.id)
     }
