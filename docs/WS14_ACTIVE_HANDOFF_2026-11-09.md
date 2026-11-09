@@ -30,6 +30,18 @@
 
 ---
 
+## CURRENT: WS-16C footer removal and functional Profile — exact-source CI in progress
+
+**Owner instruction:** After seeing WS-16B Android screenshots, owner approved eliminating the redundant Play/Records/Collection/Settings bottom navigation. The freed vertical space should expose Quick Play/Custom sooner, without shrinking the illustrated carousel. Keep all destinations functional, using top-right Profile/Menu and reliable Back.
+
+**Actual source at `3d3a6ded4786645637ca46e1f182997e3e153aef`:** `GridMatesShell.kt` removes the footer and obsolete glyph implementation, adds PROFILE page, and tracks Records/Collection return origin. New `Ws16CProfileHub.kt` shows actual on-device player name, portrait (with safe fallback), puzzles/words totals and working Collection, Records and My Puzzles destinations. Records/Collection/Settings get a native visible back header; Profile returns Home; menu-origin records return Home and profile-origin records return Profile. No changes to existing books/Quick Play placeholder/Solo saves/QA art gate. Android test navigation references updated. See [WS-16C devlog](devlog/2026-11-09_WS16C_REMOVE_BOTTOM_NAV_PROFILE_HUB.md).
+
+**CI runs (pending at handoff creation):** [Android #42717003929](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42717003929), [art/release #42717003902](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42717003902) on exact gameplay SHA `3d3a6ded`. Do not claim new APK until both succeed and checksum/artifact inspected. Previous dual-green WS-16B ZIP [#13717317690](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42714316623/artifacts/13717317690) remains rollback. PR #131 DRAFT/unmerged; on-phone owner WS-16C acceptance pending.
+
+**Next:** verify workflows, repair if needed, share single QA ZIP. User test screenshots: Home full/scroll without footer; Profile summary; Profile→Collection/Records→Back; Menu→Settings→Back; book direct entry/back; Daily/Together/Custom; scroll/large-font/Android Back. WS-17 real Quick Play still a separate planned generator.
+
+---
+
 ## CURRENT: WS-16B asset-first action kit implemented — exact CI pending
 
 **Owner request:** actual illustrated buttons and layout, not just another sketch. Completed in code/art at source `0fb918c4b967a5b5bfe888289ca03a771e8ea0ac`; see [WS-16B devlog](devlog/2026-11-09_WS16B_ASSET_FIRST_HOME_ACTIONS_AND_COMPACT_MENU.md). Added four original editable action SVG masters with matching runtime Compose Canvas art; 1.72:1 Daily Puzzle/Together compact action layout, smaller Play page padding, native full labels and accessibility, compact menu, Custom naming, QA-only reserved Quick Play visual slot. Full illustrated book carousel and current saves/routing unchanged. Last owner-approved phone visual baseline is WS-16A.
