@@ -54,3 +54,25 @@ All individual editable masters, documented exports/hashes, QA/release asset gat
 - **Status honesty:** this file is a specification, not proof of working Random Play or compiled APK. Keep PR #131 draft and existing WS-16A verified build available for rollback.
 
 Current relevant source files: Ws16HomeScreen.kt, Ws15VisualKit.kt, SoloSetupScreen.kt, SoloProgress.kt, WordSearchV2.kt, WordSearchV3.kt, BookCatalog.kt.
+
+
+## 2026-11-09 owner follow-up — player-facing naming and Quick Play setup (supersedes earlier labels)
+
+**Approved direction:** Rename current selectable solo mode **Custom Play** because it already lets the player choose theme, board size and challenge. Rename proposed new endless mixed-vocabulary mode **Quick Play** (not "Random Play" or "Endless" on the home UI). This is a design decision; rename/route and new generator are **not implemented** by this note.
+
+**Home:** Quick Play gets its own prominent original shuffled-letter-tile button beneath Daily Puzzle + Together; Custom Play and My Puzzles remain accessible, and current Solo resumes become **Continue** or **Continue Custom** when clearly the existing custom puzzle. Do not lose resume or ongoing solo save history during the name change.
+
+**Quick Play interaction:** Home → Quick Play opens a compact native size-selector overlay with three large choices:
+- Small: 12×12, 12 targets (existing BOOK_SHORT dimensions)
+- Medium: 15×15, 16 targets (BOOK_CLASSIC; initial selection)
+- Large: 20×20, 24 targets (BOOK_BIG)
+
+Tap a size and press **Start Puzzle**. This is 2–3 taps depending on the control implementation; user values simplicity, so prefer each size choice to **directly start** its board if the extra Start button feels unnecessary during testing. Keep **Medium** preselected whenever using a separate Start action. No theme or difficulty picker in Quick Play: internally use a balanced Classic challenge across a curated mixed-theme + independent general vocabulary. UI may remember last size, but never force a tutorial/setup dialog. After completing a board, **Play Another** immediately generates a fresh puzzle at the same size; optional Change Size reopens selector.
+
+**Custom Play:** preserve all current Solo Setup choices and gameplay; only rename UI labels where appropriate, not serialized puzzle IDs or content versioning. Avoid displaying "Solo" and "Custom" in a confusing mixed fashion; underlying internal class and file names may stay for backward compatibility.
+
+**Technical / QA:** Versioned separate generator for mixed words (the user specifically wants randomly generated boards, not random book pages), works offline and with no approved book content, seed/lexicon save identity stable; preserve current V1/V2/V3 generated output and save semantics, and compare different Quick Play boards for quality and reproducible restart. Book play, Daily, Together unaffected. Avoid "Play Another" overwriting unfinished boards silently; save/abandon should be explicit or supported by existing paused-puzzle library.
+
+**Action art:** Change formerly named Random Play asset to **Quick Play**; shuffled letter tiles visual stays. The button label should be full native "Quick Play". Custom Play can use the existing Solo grid illustration or new sliders/pencil icon, not a separate giant illustrated card.
+
+**Implementation status:** Player-facing naming and selection overlay are approved for WS-17 design only; no new Android APK is produced by a design-doc change.
