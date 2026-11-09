@@ -1,0 +1,82 @@
+name: WS-12F Six-Piece Art Families and Visual Review Pack
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ws12f-three-theme-spines-and-visual-review-2026-11-08
+    paths:
+      - 'design/asset-pipeline/**'
+      - 'tools/asset_pipeline/**'
+      - '.github/workflows/ws12f-family-art-review.yml'
+  pull_request:
+    paths:
+      - 'design/asset-pipeline/**'
+      - 'tools/asset_pipeline/**'
+      - '.github/workflows/ws12f-family-art-review.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ws12f-art-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  family-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run existing art integrity and new spine/family tests
+        run: |
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_*.py' -v
+          python3 tools/asset_pipeline/validate.py --repo-root .
+          python3 tools/asset_pipeline/validate_production_queue.py --repo-root .
+      - name: Build all six pieces of three matching books and HTML contact sheet
+        run: |
+          python3 tools/asset_pipeline/render_family_review.py \
+            --tokens design/asset-pipeline/paperback-v1-tokens.json \
+            --output-dir /tmp/gridmates-ws12f-review
+      - name: Rasterize actual SVG art into reviewable phone PNG previews
+        run: |
+          python3 -m pip install --disable-pip-version-check Pillow==11.3.0 CairoSVG==2.8.2
+          python3 tools/asset_pipeline/render_review_png.py \
+            --input-dir /tmp/gridmates-ws12f-review \
+            --output-dir /tmp/gridmates-ws12f-review
+      - name: Verify visual export and assert no art was silently approved
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, hashlib
+          root=Path('/tmp/gridmates-ws12f-review')
+          receipt=json.loads((root/'render_sha256.json').read_text())
+          assert receipt['art_file_count']==18
+          assert receipt['theme_count']==3
+          assert receipt['existing_cover_hashes_unchanged']
+          assert receipt['existing_companion_hashes_unchanged']
+          assert not receipt['owner_approved'] and not receipt['android_resources_modified']
+          for relative, sha in receipt['files'].items():
+              assert hashlib.sha256((root/relative).read_bytes()).hexdigest()==sha
+          assert (root/'WS12F-three-book-art-contact-sheet.png').stat().st_size>10000
+          assert (root/'WS12F-phone-width-art-preview.png').stat().st_size>10000
+          print('PASS: 18 actual SVG sprites, unchanged original art, 2 visible PNG reviews; NOT APPROVED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WS12F-THREE-THEMES-18-SPRITES-FAMILY-REVIEW-PROTOTYPE
+          path: /tmp/gridmates-ws12f-review/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Document exact scope
+        run: |
+          {
+            echo '### WS-12F first art production pack'
+            echo 'Three complete Woodland / Space / Garden art families: 18 SVG pieces, including 3 newly derived spines, one native-text HTML family review and two PNG comparison sheets.'
+            echo 'Original existing cover/emblem/chapter/bookmark/seal hashes untouched.'
+            echo 'Pure design preview, NOT approved artwork, no Android resource packaging and no change to playable QA APK.'
+            echo 'Next: human look/feel review, then a separate opt-in QA-only Android art preview.'
+          } >> "$GITHUB_STEP_SUMMARY"

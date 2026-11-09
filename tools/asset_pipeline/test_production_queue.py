@@ -24,6 +24,7 @@ class ProductionQueueTests(unittest.TestCase):
             "docs/WS12_AI_ASSET_PRODUCTION_PLAYBOOK.md",
             "tools/asset_pipeline/render_paperback.py",
             "tools/asset_pipeline/render_paperback_accents.py",
+            "tools/asset_pipeline/render_family_review.py",
         ]
         for relative in files:
             path = self.root / relative
@@ -48,8 +49,8 @@ class ProductionQueueTests(unittest.TestCase):
         self.assertEqual(report["book_families"], 3)
         self.assertEqual(report["asset_slots"], 18)
         self.assertEqual(report["collections"], 7)
-        self.assertEqual(report["slot_statuses"]["prototype"], 15)
-        self.assertEqual(report["slot_statuses"]["planned"], 3)
+        self.assertEqual(report["slot_statuses"]["prototype"], 18)
+        self.assertEqual(report["slot_statuses"]["planned"], 0)
         self.assertEqual(report["slot_statuses"]["approved"], 0)
         self.assertEqual(report["status"], "QUEUE_ONLY_NO_OWNER_APPROVAL")
 
