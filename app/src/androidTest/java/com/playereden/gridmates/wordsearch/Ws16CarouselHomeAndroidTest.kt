@@ -35,6 +35,7 @@ class Ws16CarouselHomeAndroidTest {
 
     @Test fun focusedCoverDirectlyEntersPageAndBackReturnsHome() {
         compose.onNodeWithTag("ws16-home-books").assertExists()
+        compose.onNodeWithTag("ws16e-storybook-shelf").assertExists()
         compose.onNodeWithContentDescription("Play Woodland", substring = true)
             .performClick()
         compose.waitForIdle()

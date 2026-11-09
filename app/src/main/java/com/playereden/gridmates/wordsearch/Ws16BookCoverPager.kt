@@ -2,7 +2,6 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -14,16 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -86,19 +79,10 @@ internal fun Ws16BookCoverPager(
                         fieldNotes = fieldNotesArt)
                 }
             }
-            Canvas(Modifier.fillMaxWidth().height(13.dp)
-                .testTag("ws14d-shelf-edge")) {
-                drawRoundRect(
-                    brush = Brush.verticalGradient(listOf(
-                        Color(0xFFE2CFAC), Color(0xFFAE906C), Color(0xFF8E7354))),
-                    cornerRadius = CornerRadius(3.dp.toPx()),
-                    size = Size(size.width, size.height)
-                )
-                drawLine(Color(0xFFF6E9CE),
-                    Offset(5.dp.toPx(), 2.dp.toPx()),
-                    Offset(size.width - 5.dp.toPx(), 2.dp.toPx()),
-                    strokeWidth = 1.dp.toPx())
-            }
+            // WS-16E: layered, modular illustrated wood. The cover pager itself
+            // and all focus/direct-play gestures are deliberately unchanged.
+            Ws16EStorybookShelf()
+
         }
     }
 }
