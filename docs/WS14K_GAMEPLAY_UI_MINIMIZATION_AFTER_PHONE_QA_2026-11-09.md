@@ -1,3 +1,15 @@
+## Update — owner phone screenshots received; WS-14K1 first small pass implemented (November 9)
+
+**This document started as a deferred plan; the owner has now supplied six real handset screenshots.** See [the evidence-backed WS-14K1 review and change receipt](devlog/2026-11-09_WS14K1_OWNER_SCREENSHOTS_AND_COMPACT_BOOK_HEADER.md). First small UI source code is committed as [794f096e](https://github.com/PlayerEden/GridMates-Word-Search/commit/794f096e387e7d7b65b4de170e41480ec5e5d448): one-row Back/title/Page/Hint header, reduced bookmark decoration, per-book hidden instructional zoom copy, temporary invalid-tap feedback. Solo/Daily and gameplay/save logic were left unchanged.
+
+**Initial WS-14K1 build status:** Android [#42679021745](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42679021745) and art/release-isolation [#42679021766](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42679021766) started on that code; inspect their live conclusions before claiming a new APK. Latest previously dual-green **WS-14J2** remains [APK artifact #13699334694](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42675610221/artifacts/13699334694).
+
+**Screenshot priorities:** The normal Woodland page was *bookmarked*, so it showed bookmark artwork rather than the new standalone fern asset. The 12×12 grid fills the phone width, but top rows crowd the word list; reclaiming header height primarily increases visible word-list space. Screenshot status `Try selecting a word from the list.` is an invalid claim message, *not proof that word tracing is broken*. There is still no explicit 20×20 drag, five-hint, and saved-reopen report.
+
+**Next user-facing validation:** Compare a new WS-14K1 phone screenshot, check tactile word select/zoom, and decide on the next small adjustment. Do not prematurely remove real utility controls, add fake settings actions, replace graphics without review, or collapse the whole library and Solo flows into an untested redesign.
+
+---
+
 # WS-14K — Compact Gameplay UI and Icon Kit (after handset screenshots)
 
 **State: DESIGN BACKLOG / DO NOT IMPLEMENT BEFORE PHONE REVIEW.** Recorded November 9, 2026 from owner preference for a compact, icon-driven book-page UI. It is deliberately postponed until the owner installs the exact WS-14J2 QA build and shares real screenshots. This is not approval of a mockup or a request to replace the whole existing interface.
