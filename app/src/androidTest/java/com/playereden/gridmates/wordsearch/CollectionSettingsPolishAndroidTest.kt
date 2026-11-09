@@ -33,7 +33,8 @@ class CollectionSettingsPolishAndroidTest {
     }
 
     @Test fun profileAndEarnedCollectionsUseRealLabelsAndReadableCards() {
-        compose.onNodeWithContentDescription("Open Collection").performClick()
+        compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-collection").performScrollTo().performClick()
         compose.onNodeWithText("Your Collection").assertExists()
         compose.onNodeWithText("Edit display name").assertExists()
         compose.onNodeWithText("COLLECTION PROGRESS").assertExists()
@@ -55,12 +56,16 @@ class CollectionSettingsPolishAndroidTest {
     }
 
     @Test fun switchingFromDeepCollectionScrollStartsSettingsAtTop() {
-        compose.onNodeWithContentDescription("Open Collection").performClick()
+        compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-collection").performScrollTo().performClick()
         compose.onNodeWithText("Achievements").performScrollTo().performClick()
         compose.onNodeWithTag("achievements-next").performScrollTo()
             .assertIsEnabled().performClick()
         compose.onNodeWithText("Three Chapters").performScrollTo().assertExists()
-        compose.onNodeWithContentDescription("Open Settings").performClick()
+        compose.onNodeWithContentDescription("Back to Profile").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Back to Home").performClick()
+        compose.onNodeWithContentDescription("Open menu").performClick()
+        compose.onNodeWithText("Settings & backup").performClick()
         compose.onNodeWithText("Settings & backup").assertIsDisplayed()
         compose.onNodeWithText("Export backup").assertExists()
         compose.onNodeWithText("Restore backup").assertExists()
@@ -69,7 +74,8 @@ class CollectionSettingsPolishAndroidTest {
     }
 
     @Test fun renameDialogMakesNearbyPrivacyExplicitAndIsCancellable() {
-        compose.onNodeWithContentDescription("Open Collection").performClick()
+        compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-collection").performScrollTo().performClick()
         compose.onNodeWithText("Edit display name").performClick()
         compose.onNodeWithText("Your local profile").assertExists()
         compose.onNodeWithText("shown to a partner", substring = true).assertExists()
