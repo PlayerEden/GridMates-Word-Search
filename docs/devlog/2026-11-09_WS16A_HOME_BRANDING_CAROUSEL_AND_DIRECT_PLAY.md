@@ -62,3 +62,17 @@ Continue from the approved WS-16 [top-to-bottom Home build sheet](../design/WS16
 - No user phone acceptance of the newly built Home, logos, direct-play, restored focus, 320dp header or Full Shelf yet. Keep PR #131 DRAFT and unmerged until owner screenshot/interaction review. No claim of production approval for logos or curated books.
 
 **Next one action:** owner installs the single source-verified WS-16 test APK, screenshots Home normal/scroll (including book carousel, Daily/Together actions, Profile/Menu) and tests centered vs side book taps, direct progress resume, Back to Home and Full Shelf chapter/page flow. Use these observations for the next cohesive visual refinement batch; do not build one-off icon APKs.
+
+## Owner handset screenshots and immediate review — November 9, 2026
+
+**Evidence reported in conversation:** Owner installed the WS-16A QA APK and posted five actual Android screenshots showing Home with Woodland focused, Home with Space focused (book indicator changing from "1 of 3" to "2 of 3"), the Full Shelf with Woodland/Space/Garden test books, a vertically scrolled Home view, and the working Word Search menu dialog. Owner response: **"Hell yeah"**. The illustrated carousel-first Home layout is **positively received visually**. Screenshots confirm those screens render on this phone; they do **not** independently prove centered-cover play, save continuity, swipe vs tap gesture discrimination, Back behavior or real multi-phone gameplay.
+
+**What looks especially good:** big illustrative book covers, side-cover peeks, family/game branding stack, separation of Full Shelf and carousel, accessible Solo/Daily/Together surfaces. The selected cover and positions visibly change between screenshots.
+
+**Focused WS-16B polish backlog from screenshots (priority ordered):**
+1. **Fix home button truncation**: right-hand quick action shows "Toget..." rather than "Together". Use a responsive width/stack or icon-label arrangement that keeps the complete action name visible at the owner's actual resolution; assert this in narrow width and enlarged font QA.
+2. **Compact menu modal**: currently a tall, sparse sheet with six widely spaced center-aligned items and a distant Close action. Keep every real navigation destination and touch target; reduce unused air, improve scanability, and align with the paperback look.
+3. **Full Shelf art/geometry**: book covers are attractive, but separate tiny spine sprites beside each already-bound cover look detached and redundant. The second shelf has a lonely Garden book with large empty right space. Improve the shelf arrangement and spine treatment without removing chapter/page progress or converting it back into the carousel.
+4. **Optional secondary spacing polish**: balance "Full shelf" control and Continue Solo with the shelf above, but preserve the large covers as the main draw; do not introduce decorations before functional spacing is right.
+
+**Validation still requested:** tap currently focused cover to direct-play; side-peek tap should only focus; Back returns Home; Full Shelf chapter and page entry; Solo/Daily/Together; save/reopen; 320dp/1.5x font; 20×20 traces and hint behavior. The owner's visual approval **is not functional completion sign-off or production-art approval**. Keep PR draft, don't merge. Source-verified fallback continues to be WS-16A corrected code \`d449313\` plus the earlier WS-15 Pass 2 rollback. One grouped WS-16B polish APK after implementation, not one APK per issue.
