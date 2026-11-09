@@ -30,6 +30,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -89,23 +91,10 @@ internal fun HorizontalBookBrowserScreen(
         books.getOrNull(pagerState.settledPage)?.let { onFocusedBookChanged(it.id) }
     }
 
-    val context = LocalContext.current
-    val hasNewArtwork = remember(context, books) {
-        val bundled = runCatching {
-            context.assets.list("ws14/books").orEmpty().toSet()
-        }.getOrDefault(emptySet())
-        books.any { book ->
-            ws14QaCoverPath(book.theme, BookArtKind.COVER)
-                ?.substringAfterLast('/') in bundled
-        }
-    }
+    var previewToolsOpen by remember { mutableStateOf(false) }
 
     BoxWithConstraints(modifier.fillMaxSize().testTag("ws14d-horizontal-browser")) {
         val availableWidth = maxWidth - 36.dp
-        // At narrow widths or accessibility text scale, stack the two
-        // QA comparison actions so neither can clip into its neighbor.
-        val stackedReviewActions = availableWidth < 300.dp ||
-            LocalDensity.current.fontScale >= 1.4f
         val coverPageWidth = (availableWidth * 0.59f).coerceIn(136.dp, 186.dp)
         val sidePeek = ((availableWidth - coverPageWidth) / 2).coerceAtLeast(0.dp)
 
@@ -115,33 +104,15 @@ internal fun HorizontalBookBrowserScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item(key = "ws14d-title") {
-                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                        Text("Back to Play")
-                    }
-                    StorybookHeading(
-                        eyebrow = "GridMates · Puzzle Library",
-                        title = "Puzzle Books",
-                        subtitle = "Choose a book · Swipe or use the arrows."
-                    )
-                    Text(
-                        if (hasNewArtwork) "Illustrated cover preview · release review pending"
-                        else "Prototype artwork · final illustrations can change",
-                        color = Muted, style = MaterialTheme.typography.labelSmall
-                    )
-                    Text(
-                        if (!fieldNotesArt) "Original study A · Quiet Paperbacks"
-                        else if (hasNewArtwork) "WS-14 covers · Field Notes supporting art"
-                        else "Illustrated study B · Field Notes",
-                        color = Forest, style = MaterialTheme.typography.labelMedium
-                    )
-                    LibraryReviewControls(
-                        stacked = stackedReviewActions,
-                        fieldNotesArt = fieldNotesArt,
-                        onToggleLayout = onToggleLayout,
-                        onToggleArt = onToggleArt
-                    )
-                }
+                Ws15BackHeader(
+                    title = "Puzzle Books",
+                    subtitle = "Swipe to explore",
+                    onBack = onBack,
+                    backLabel = "Back to Play",
+                    onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
+                        { previewToolsOpen = true }
+                    } else null
+                )
             }
 
             item(key = "ws14d-books") {
@@ -281,6 +252,14 @@ internal fun HorizontalBookBrowserScreen(
                     }
                 }
             }
+        }
+        if (previewToolsOpen) {
+            Ws15LibraryPreviewDialog(
+                fieldNotesArt = fieldNotesArt,
+                onToggleArt = onToggleArt,
+                onToggleLayout = onToggleLayout,
+                onDismiss = { previewToolsOpen = false }
+            )
         }
     }
 }
