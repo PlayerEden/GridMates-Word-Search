@@ -351,63 +351,36 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
         }
     }
 
-    PaperPanel(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                PaperEyebrow("02 · A little every day")
-                Text("Daily puzzle", style = MaterialTheme.typography.titleSmall,
-                    color = Forest, fontWeight = FontWeight.SemiBold, maxLines = 2)
-            }
-            Button(onClick = onDaily) { Text("Open Daily", maxLines = 1) }
-        }
-    }
+    StorybookQuickEntry(
+        eyebrow = "02 · A little every day",
+        title = "Daily puzzle",
+        actionLabel = "Open Daily",
+        onAction = onDaily
+    )
 
-    PaperPanel(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                PaperEyebrow("03 · Together is better")
-                Text("Same Wi-Fi", style = MaterialTheme.typography.titleSmall,
-                    color = Forest, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            }
-            Button(onClick = onNearby, modifier = Modifier.semantics {
-                contentDescription = "Open Nearby co-op"
-            }) {
-                Text("Play Together", maxLines = 2)
-            }
-        }
-    }
+    StorybookQuickEntry(
+        eyebrow = "03 · Together is better",
+        title = "Same Wi-Fi",
+        actionLabel = "Play Together",
+        actionDescription = "Open Nearby co-op",
+        onAction = onNearby
+    )
 
     if (onQaBooks != null) {
-        PaperPanel(Modifier.fillMaxWidth()) {
-            PaperEyebrow("04 · DEVELOPMENT PREVIEW · NOT FINAL CONTENT")
-            Text("Puzzle Books — TEST ONLY", color = Forest,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold)
-            Text("Try Woodland, Space and Garden test books. " +
-                "Your ordinary Solo and Daily games are separate.",
-                color = Muted, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onQaBooks,
-                modifier = Modifier.fillMaxWidth().height(48.dp)) {
-                Text("Test Puzzle Books")
-            }
-        }
+        StorybookQuickEntry(
+            eyebrow = "04 · Puzzle library · QA only",
+            title = "Puzzle Books",
+            actionLabel = "Test Puzzle Books",
+            onAction = onQaBooks
+        )
     }
 
+    // Keep art/debug tools findable but away from the first-fold real game
+    // launcher. They should not read like a fourth major play mode.
     if (onArtLab != null) {
-        PaperPanel(Modifier.fillMaxWidth()) {
-            PaperEyebrow("05 · ART STUDY · NOT FINAL ARTWORK")
-            Text("Library Art Lab — TEST ONLY", color = Forest,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold)
-            Text("Compare Woodland, Space and Garden book covers, spines, " +
-                "emblems, chapter markers and rewards. Original books remain unchanged.",
-                color = Muted, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onArtLab,
-                modifier = Modifier.fillMaxWidth().height(48.dp)) {
-                Text("View Library Artwork")
-            }
+        TextButton(onClick = onArtLab,
+            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text("View Library Artwork")
         }
     }
 

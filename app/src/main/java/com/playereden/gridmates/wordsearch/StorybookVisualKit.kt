@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -23,8 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -174,6 +178,65 @@ internal fun StorybookModeCard(
                     .testTag("storybook-mode-action")
             ) {
                 Text(actionLabel)
+            }
+        }
+    }
+}
+
+/**
+ * WS-14C: short, consistently styled launcher for Daily, Nearby and Books.
+ *
+ * Uses actual native buttons, text and state. Unlike a flattened illustration,
+ * this adapts to 320dp phones and 200% font scale without clipped actions.
+ * Optional individual artwork is decorative and never replaces the CTA.
+ */
+@Composable
+internal fun StorybookQuickEntry(
+    eyebrow: String,
+    title: String,
+    actionLabel: String,
+    onAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    actionDescription: String? = null,
+    @DrawableRes artResource: Int? = null
+) {
+    BoxWithConstraints(modifier.fillMaxWidth().testTag("storybook-quick-entry")) {
+        val stacked = maxWidth < 325.dp || LocalDensity.current.fontScale >= 1.5f
+        val buttonModifier = Modifier.heightIn(min = StorybookTokens.touchTarget)
+            .then(if (stacked) Modifier.fillMaxWidth() else Modifier)
+            .then(if (actionDescription.isNullOrBlank()) Modifier else
+                Modifier.semantics { contentDescription = actionDescription })
+        StorybookFrame(Modifier.fillMaxWidth()) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (artResource != null) {
+                    StorybookIllustration(
+                        resourceId = artResource,
+                        modifier = Modifier.size(StorybookTokens.illustratedCardArt)
+                            .testTag("storybook-quick-art")
+                    )
+                }
+                Column(Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    PaperEyebrow(eyebrow)
+                    Text(title, style = MaterialTheme.typography.titleSmall,
+                        color = Forest, fontWeight = FontWeight.SemiBold)
+                }
+                if (!stacked) {
+                    Button(onClick = onAction, modifier = buttonModifier
+                        .testTag("storybook-quick-action")) {
+                        Text(actionLabel, maxLines = 2)
+                    }
+                }
+            }
+            if (stacked) {
+                Button(onClick = onAction, modifier = buttonModifier
+                    .testTag("storybook-quick-action")) {
+                    Text(actionLabel)
+                }
             }
         }
     }
