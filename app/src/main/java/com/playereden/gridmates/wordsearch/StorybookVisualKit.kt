@@ -201,7 +201,9 @@ internal fun StorybookQuickEntry(
     @DrawableRes artResource: Int? = null
 ) {
     BoxWithConstraints(modifier.fillMaxWidth().testTag("storybook-quick-entry")) {
-        val stacked = maxWidth < 325.dp || LocalDensity.current.fontScale >= 1.5f
+        // Home content is 324dp wide on a 360dp phone after screen gutters.
+        // Keep its actions inline there to preserve first-fold Nearby access.
+        val stacked = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.5f
         val buttonModifier = Modifier.heightIn(min = StorybookTokens.touchTarget)
             .then(if (stacked) Modifier.fillMaxWidth() else Modifier)
             .then(if (actionDescription.isNullOrBlank()) Modifier else
