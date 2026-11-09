@@ -33,3 +33,10 @@
 
 ## Next exact action
 Evaluate this **actual committed asset** as a QA-only header candidate beside `Book · Page N` while retaining the existing emblem fallback; add pixel/source checks and ensure the new asset is absent from release. Verify exact Android and art CI, then compare the 32dp icon on a phone. If the style is accepted, make Space and Garden siblings using this same icon grammar; otherwise revise into V2 without overwriting this original.
+
+## GitHub Actions follow-up (checked after asset/test commits)
+- [Android QA #42673911715](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42673911715) on exact source `f7f547dd1d8bc5f4628cbe854f641fcb13adbbd4` was still **in progress** when inspected; **no green conclusion claimed**.
+- [Art/release-isolation #42673911820](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42673911820) at that same SHA reported **failure**. Its GitHub Actions jobs API returned zero job records, so the underlying failure cause is **not verified**; do not invent a Kotlin, asset, Gradle or quota diagnosis from this status.
+- Earlier art-only and source-commit PR-triggered workflows ([#42673585874](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42673585874), [#42673586292](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42673586292), [#42673763881](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42673763881) and [#42673763829](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42673763829)) also show failure without job-level evidence.
+- Local independent checks **passed**: both source/PNG actual SHA-256 values, PNG 128×128, 0–255 alpha, bbox (13,10,113,123), transparent top-left and 4868 nonzero-alpha pixels. This is **not Android CI**.
+- As a result, the prior green 6564f91/WS-14I build remains the verified Android fallback. Do not start new app or release-art integration on an assumed green source.
