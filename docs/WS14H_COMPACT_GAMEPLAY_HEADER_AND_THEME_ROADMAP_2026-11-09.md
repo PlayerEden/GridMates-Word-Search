@@ -38,6 +38,10 @@
 
 **Remaining P0 gates:** the user saw “No hints available” at 0/24 on 20×20; core enforces 4 hint steps for this size and the UI currently conflates quota expiration with persistence/blocked states. Verify first hint on a fresh page, distinguish failure reasons before changing policy, and prove a saved 20×20 word claim/zoom. Space/Garden tint and accessibility/landscape are not yet owner-reviewed. No new art/production layout lock based on positive screenshots alone.
 
+## WS-14J kickoff — cohesive in-game accents after owner layout endorsement
+
+Owner wishes to move on from WS-14I to a small art-first pass. [WS-14J three-theme asset contract](WS14J_COMPACT_PAGE_ACCENT_ART_KIT_2026-11-09.md) is now the active next visual stage: produce one transparent Woodland style-anchor motif, then matching Space/Garden versions with actual source/image hashes, QA-only integration and device review. No giant collection or book-cover redesign. User's latest general “seems good” is not an explicit completion of the unresolved physical Hint/20×20 drag/save test; preserve it as open smoke QA rather than blocking basic art work.
+
 ## WS-14I functional hardening — completed source, phone acceptance pending
 
 The WS-14H2 device screenshot exposed an old 4-tap total hint budget on 20×20. [WS-14I source-matched build receipt](docs/devlog/2026-11-09_WS14I_HINT_RELIABILITY_AND_20X20_TRACE_TEST_RECEIPT.md) now records **Android #42664221672 SUCCESS** and **Art QA #42664221664 SUCCESS** at code `3a3d0bc`. Hints now permit **three progressive steps per unfound word** (still bounded, persisted in unchanged GMWS v1, no free word claims); failure copy is specific. A new Compose test **compiles** 20×20 drag and store reopen behavior but still needs actual emulator/owner execution. [QA artifact #13696490440](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42664221672/artifacts/13696490440).

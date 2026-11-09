@@ -1,6 +1,15 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14I_HINT_RELIABILITY_AND_20X20_TRACE_TEST_RECEIPT.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14H compact light-bulb layout has now been photographed and positively reviewed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14J_ART_PRODUCTION_KICKOFF.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14H compact light-bulb layout has now been photographed and positively reviewed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
+
+## Current work phase — WS-14J three-theme page-accent art (Nov 9)
+
+**Owner says:** "Seems good. Let's move on." Treat this as consent to **start the next visual/art phase** and positive general design feedback; it is **not specific evidence** that the new five-tap Hint / 20×20 drag and save-reopen checklist was completed.
+
+- [New WS-14J art-kit plan](WS14J_COMPACT_PAGE_ACCENT_ART_KIT_2026-11-09.md) and [current pass log](devlog/2026-11-09_WS14J_ART_PRODUCTION_KICKOFF.md).
+- Three cohesive compact transparent motifs: Woodland fern/oak sprig+tiny mushroom, Space ringed planet/stars, Garden blossom/leaves. Same silhouette/light/padding, match printed book feel; never on letter grid. Existing theme emblems and bulb/header remain fallback. Board-skin unlockables separate.
+- **No standalone new sprite PNG has been committed yet** and no new APK was built for this docs-only stage. Do not treat chat visual mockups as assets or infer their labels are QA evidence. First executable next action: create an actual transparent Woodland V1 master, transfer true binary, compute real hash and pixel checks, then build matching two siblings through QA-only pipeline.
+- Latest tested **code** source SHA `3a3d0bcdde21de12a5d132c8ad85cc6b00997270`; Android #42664221672 and art #42664221664 green, APK artifact #13696490440. Preserve old owner-reviewed fallback and draft PR #131; avoid reinstall/data loss.
 
 ## Latest WS-14I verified source — Hint now works beyond four taps (November 9)
 
