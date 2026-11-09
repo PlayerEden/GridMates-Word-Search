@@ -60,6 +60,11 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
           python3 scripts/import_font_library.py --source _approved_fonts
+      - name: Import six QA sprites from the hash-pinned original sheet
+        if: ${{ hashFiles('design/visual-system/masters/ws14-generated-asset-sheet-original.png') != '' }}
+        run: |
+          python3 -m pip install --disable-pip-version-check --user Pillow==12.3.0
+          python3 tools/asset_pipeline/import_ws14_candidate_sheet.py
       - name: Check WS-14 real-art registry integrity and approval gates
         run: |
           python3 tools/asset_pipeline/validate_ws14_assets.py
