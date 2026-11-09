@@ -21,3 +21,15 @@ Keep draft PR unmerged until owner confirms on-phone navigation and layout.
 
 ## Next
 If exact CI fails, diagnose and fix. Then give one verified WS-16C APK ZIP and checksum to owner. After phone screenshots, tune book/quick-action proportions only if the freed footer space proves insufficient; separate WS-17 mixed-vocabulary Quick Play remains unimplemented.
+
+## Final exact-source CI / handoff receipt
+
+**Both exact-source pipelines finished SUCCESS on source SHA 3d3a6ded4786645637ca46e1f182997e3e153aef** (subsequent [skip ci] docs commits are not new Android builds).
+
+- [Android QA run #42717003929](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42717003929): **SUCCESS** — unit tests, lint, instrumentation test source compiled, debug APK assembled. Android instrumentation source compilation is **not actual physical-device execution**.
+- [Art + debug/release isolation #42717003902](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42717003902): **SUCCESS** — six QA-only book cover/spine sprites absent from release; verified 18 original + 18 alt portraits and 36 native PNGs; theme motif checks passed; no debug artwork leak.
+- **Owner test artifact:** [WS-16C Android ZIP #13717803408](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42717003929/artifacts/13717803408), contains `app-debug.apk`. Historic GitHub ZIP name still mentions Woodland but actual code is complete WS-16C.
+- **APK SHA-256:** `42bebe4ddcfef4056d25ddb562f1ef2abab2df857dd0bef8d5437bf97a9a4bbc`.
+- **Artifact ZIP SHA-256:** `d66292a29d196587ab008872eed303bcf588d9fbe590bf320ebb7cb5bbabfebf`.
+- App package `com.playereden.gridmates.wordsearch.qa`, versionCode `57`, versionName `0.9.13-visual-kit-foundation-qa`. VersionCode same as prior QA; don't assume automatic update/signing compatibility. Backup/export saves before any uninstall or signing-conflict fix.
+- **Owner phone review still pending for WS-16C.** Keep PR #131 DRAFT/unmerged and old WS-16B artifact as fallback. Do not claim new branding or book pages production-approved.
