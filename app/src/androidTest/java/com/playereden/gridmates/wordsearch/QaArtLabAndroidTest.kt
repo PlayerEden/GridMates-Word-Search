@@ -27,6 +27,9 @@ class QaArtLabAndroidTest {
         assertTrue(page.contains("Space"))
         assertTrue(page.contains("Garden"))
         assertTrue(page.contains("Unapproved concept preview"))
+        assertTrue(page.contains("<h1>Library artwork</h1>"))
+        // An Art Lab proof must not simulate a tappable "Open book" button.
+        assertFalse(page.contains(">Open book<"))
         assertTrue("All book labels must be native HTML, not SVG pixels",
             page.contains("<h2>Woodland</h2>"))
         assertEquals(3, assets.list("ws12/spines")?.count { it.endsWith(".svg") })

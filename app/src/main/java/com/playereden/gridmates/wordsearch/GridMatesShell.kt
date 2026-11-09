@@ -207,7 +207,10 @@ internal fun GridMatesShell(
                 Text("Test books are unavailable in this build.")
             }
         } else if (page == Page.ART_LAB && qa.enabled) {
-            QaArtLabScreen(onBack = { pageName = Page.PLAY.name })
+            // Keep the Art Lab below the status bar and above system navigation.
+            Box(Modifier.fillMaxSize().padding(contentPadding)) {
+                QaArtLabScreen(onBack = { pageName = Page.PLAY.name })
+            }
         } else if (page == Page.PUZZLE || page == Page.DAILY_PUZZLE) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 WordSearchScreen(

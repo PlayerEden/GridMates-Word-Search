@@ -48,7 +48,7 @@ internal fun QaArtLabScreen(onBack: () -> Unit) {
     ) {
         TextButton(
             onClick = onBack,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+            modifier = Modifier.padding(start = 8.dp).heightIn(min = 48.dp)
         ) { Text("Back to Play") }
         if (!packaged) {
             Text("Art Lab preview not packaged in this APK.",

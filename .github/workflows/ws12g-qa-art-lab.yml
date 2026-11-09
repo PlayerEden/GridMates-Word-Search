@@ -92,7 +92,7 @@ jobs:
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
-          name: GRIDMATES-WS12G-ART-LAB-ANDROID-V51-QA-ONLY
+          name: GRIDMATES-WS12H-ART-LAB-ANDROID-V52-QA-ONLY
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
@@ -101,7 +101,7 @@ jobs:
           {
             echo '### WS-12G Android source/prototype art preview'
             echo 'Debug APK has exactly 18 verified source-generated SVG art assets; release APK has none.'
-            echo 'QA v51 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'QA v52 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
             echo 'The artwork is unapproved, and Art Lab does NOT replace production book cards or unlocks.'
           } >> "$GITHUB_STEP_SUMMARY"
