@@ -72,6 +72,18 @@ internal fun preferredWs14QaCoverPath(
     theme: WordTheme, kind: BookArtKind, fieldNotes: Boolean
 ): String? = if (fieldNotes) ws14QaBookArtPath(theme, kind) else null
 
+
+/**
+ * WS-14J candidate: ONE tiny botanical page accent, only when explicitly
+ * requested by the book-page header. Missing debug art falls back to WS-12.
+ * Never use this path for other screens, player icons or release assets.
+ */
+internal fun ws14jQaPageAccentPath(
+    theme: WordTheme, kind: BookArtKind, enabledForPageHeader: Boolean
+): String? = if (
+    enabledForPageHeader && kind == BookArtKind.EMBLEM && theme == WordTheme.WOODLAND
+) "ws14j/page-accents/woodland.png" else null
+
 /** Cap bitmap memory before presenting many standing books in a lazy shelf. */
 internal fun bookArtSampleSize(width: Int, height: Int): Int {
     if (width <= 0 || height <= 0) return 1
@@ -98,13 +110,15 @@ internal fun BookArt(
     theme: WordTheme,
     kind: BookArtKind,
     modifier: Modifier = Modifier,
-    fieldNotes: Boolean = false
+    fieldNotes: Boolean = false,
+    pageAccentCandidate: Boolean = false
 ) {
     val context = LocalContext.current
     val existingStudyPath = bookArtPath(theme, kind, fieldNotes) ?: return
     val preferredNewPath = preferredWs14QaCoverPath(theme, kind, fieldNotes)
-    val bitmap = remember(context, existingStudyPath, preferredNewPath) {
-        listOfNotNull(preferredNewPath, existingStudyPath)
+    val preferredPageAccent = ws14jQaPageAccentPath(theme, kind, pageAccentCandidate)
+    val bitmap = remember(context, existingStudyPath, preferredNewPath, preferredPageAccent) {
+        listOfNotNull(preferredPageAccent, preferredNewPath, existingStudyPath)
             .firstNotNullOfOrNull { path ->
                 runCatching {
                     decodeBookArt(context, path)

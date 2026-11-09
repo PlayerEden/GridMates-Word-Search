@@ -36,10 +36,11 @@
         113,
         123
       ],
-      "android_debug_integrated": false,
+      "android_debug_integrated": true,
       "android_release_integrated": false,
-      "visual_review": "Creator inspected 24dp/32dp/36dp scale preview; owner approval and handset contrast/large-font QA pending",
-      "fallback": "Existing native WS-12 theme emblem or text"
+      "visual_review": "Candidate source transferred and configured in QA-only Android header; owner still needs exact-build phone review at 32dp; not release-approved",
+      "fallback": "Existing native WS-12 theme emblem or text",
+      "debug_asset_path": "app/src/debug/assets/ws14j/page-accents/woodland.png"
     }
   ]
 }

@@ -26,6 +26,16 @@ class WS14JWoodlandCandidateTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256(file.read_bytes()).hexdigest(), candidate[f"{prefix}_sha256"])
             self.assertEqual(file.stat().st_size, candidate[f"{prefix}_bytes"])
 
+    def test_debug_app_copy_is_exact_export(self):
+        asset = json.loads(MANIFEST.read_text(encoding="utf-8"))["assets"][0]
+        self.assertEqual(asset["debug_asset_path"], "app/src/debug/assets/ws14j/page-accents/woodland.png")
+        local = ROOT / asset["debug_asset_path"]
+        export = ROOT / asset["export_path"]
+        self.assertTrue(local.is_file())
+        self.assertEqual(local.read_bytes(), export.read_bytes())
+        self.assertEqual(hashlib.sha256(local.read_bytes()).hexdigest(), asset["export_sha256"])
+        self.assertFalse(asset["android_release_integrated"])
+
     def test_png_has_real_transparency_and_safe_size(self):
         asset = json.loads(MANIFEST.read_text(encoding="utf-8"))["assets"][0]
         with Image.open(ROOT / asset["export_path"]) as source:

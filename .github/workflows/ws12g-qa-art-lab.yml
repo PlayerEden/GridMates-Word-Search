@@ -71,6 +71,8 @@ jobs:
           python3 tools/asset_pipeline/validate_ws14_assets.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_asset_registry.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_cover_import.py' -v
+      - name: Verify original WS-14J Woodland artwork and debug source copy
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14j_page_accent.py' -v
       - name: Install pinned build-only SVG renderer (no Android runtime dependency)
         run: python3 -m pip install --disable-pip-version-check --user CairoSVG==2.8.2
       - uses: actions/setup-java@v5
@@ -170,6 +172,23 @@ jobs:
           with zipfile.ZipFile(releases[0]) as z:
               assert not [x for x in z.namelist() if x.startswith('assets/ws12/')], 'PROTOTYPE ART LEAKED TO RELEASE'
           print('PASS: 18 original and 18 new alt source SVGs, plus 36 SHA-matched native PNGs in QA; ZERO in release.')
+          PY
+      - name: Assert WS-14J page accent in debug only and absent from release
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, zipfile
+          item=json.loads(Path('design/visual-system/ws14j-page-accent-candidates.json').read_text())['assets'][0]
+          entry='assets/ws14j/page-accents/woodland.png'
+          with zipfile.ZipFile('app/build/outputs/apk/debug/app-debug.apk') as apk:
+              present=[n for n in apk.namelist() if n.startswith('assets/ws14j/')]
+              assert present == [entry], present
+              assert hashlib.sha256(apk.read(entry)).hexdigest() == item['export_sha256']
+          release=list(Path('app/build/outputs/apk/release').glob('*.apk'))
+          assert release, 'No release APK for isolation check'
+          with zipfile.ZipFile(release[0]) as apk:
+              assert not any(n.startswith('assets/ws14j/') for n in apk.namelist()), 'WS-14J candidate leaked to release'
+          print('PASS WS-14J: exact Woodland PNG in QA, zero WS-14J bytes in release')
           PY
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4

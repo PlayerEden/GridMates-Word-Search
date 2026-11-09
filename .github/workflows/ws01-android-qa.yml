@@ -66,6 +66,8 @@ jobs:
           python3 -m pip install --disable-pip-version-check --user Pillow==12.3.0
           python3 tools/asset_pipeline/import_ws14_candidate_sheet.py
           python3 tools/asset_pipeline/validate_ws14_assets.py
+      - name: Verify original WS-14J Woodland artwork and debug source copy
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14j_page_accent.py' -v
       - name: Install pinned build-only SVG renderer (no Android runtime dependency)
         run: python3 -m pip install --disable-pip-version-check --user CairoSVG==2.8.2
       - uses: actions/setup-java@v5
@@ -137,6 +139,20 @@ jobs:
               for name, digest in expected.items():
                   assert hashlib.sha256(z.read(name)).hexdigest() == digest, name
           print('WS-14D standard QA APK: six original-image-derived sprites packaged with exact hashes')
+          PY
+      - name: Verify WS-14J QA accent bytes in debug APK
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, hashlib, zipfile
+          item=json.loads(Path('design/visual-system/ws14j-page-accent-candidates.json').read_text())['assets'][0]
+          name='assets/ws14j/page-accents/woodland.png'
+          assert item['state'] == 'GENERATED_UNREVIEWED' and not item['release_approved']
+          with zipfile.ZipFile('app/build/outputs/apk/debug/app-debug.apk') as apk:
+              matching=[p for p in apk.namelist() if p.startswith('assets/ws14j/')]
+              assert matching == [name], matching
+              assert hashlib.sha256(apk.read(name)).hexdigest() == item['export_sha256']
+          print('QA-only Woodland page accent packed with source-matched hash')
           PY
       - uses: actions/upload-artifact@v4
         with:

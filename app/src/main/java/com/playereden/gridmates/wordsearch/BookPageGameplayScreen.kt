@@ -283,7 +283,8 @@ internal fun BookPageGameplayScreen(
                     BookArt(
                         book.theme, BookArtKind.EMBLEM,
                         Modifier.size(32.dp).testTag("ws14g-book-page-theme-emblem"),
-                        fieldNotes = fieldNotesArt
+                        fieldNotes = fieldNotesArt,
+                        pageAccentCandidate = true
                     )
                 }
                 Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
