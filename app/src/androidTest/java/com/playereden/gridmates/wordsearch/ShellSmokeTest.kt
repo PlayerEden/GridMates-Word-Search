@@ -21,7 +21,7 @@ class ShellSmokeTest {
         compose.onNodeWithText("Words to find", substring = true).assertExists()
         compose.onNodeWithText("Hint (", substring = true).assertExists()
         compose.onNodeWithText("Home").performClick()
-        compose.onNodeWithText("Continue Solo").assertExists()
+        compose.onNodeWithText("Continue").assertExists()
         compose.onNodeWithTag("ws16-resume-solo").performScrollTo().performClick()
         compose.onNodeWithText("Options").performClick()
         compose.onNodeWithText("Customize puzzle").assertDoesNotExist()
