@@ -1,6 +1,12 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14D_OWNER_PHONE_VISUAL_REVIEW.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **new swipe-browser QA remains untested on phone**. Subsequent passes must append the journal as a standing rule.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14F_BOOK_DETAIL_AND_DENSE_GRID_POLISH.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **new swipe-browser QA remains untested on phone**. Subsequent passes must append the journal as a standing rule.
+
+## WS-14F current development pass — November 9, 2026
+
+[WS-14F source and test pass log](devlog/2026-11-09_WS14F_BOOK_DETAIL_AND_DENSE_GRID_POLISH.md). On draft PR #131, source feature `f8c66e`, test follow-up `201695250cf9cb1578d5e318e73ebd41e8f78469`: compact QA book-detail chapter/status text and native Play/Bookmark actions with full accessible page descriptions; for 20×20 boards, clearer zoom guidance and 0.5× zoom tap (12×12/15×15 stay 0.25×). **No puzzle generation, word tracing, saves, book IDs, LAN or image originals changed.**
+
+**Latest exact-source checks are PENDING at creation:** [standard Android QA #42650533366](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42650533366) and [art/release isolation #42650533373](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42650533373). Inspect actual live results before offering a WS-14F APK. Preceding source `3df9ecd` passed both workflows (#42646324240 and #42646324645); it does NOT verify WS-14F. **Physical owner 20×20 finger-trace and save/reopen QA still needed**. Keep earlier WS-14D illustration APK and v56 rollback.
 
 ## Newest WS-14D on-phone visual feedback (Nov 9)
 
