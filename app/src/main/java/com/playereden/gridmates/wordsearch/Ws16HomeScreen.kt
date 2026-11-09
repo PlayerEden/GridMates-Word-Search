@@ -156,7 +156,9 @@ internal fun Ws16HomeScreen(
         }
     }
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-        if (maxWidth < 328.dp) {
+        // At 360dp phones content width is ~324dp: keep two quick actions
+        // side-by-side. At 320dp or enlarged layouts, stack them instead.
+        if (maxWidth < 300.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Ws16ActionButton("Daily", Ws15ModeGlyph.DAILY, onDaily,
                     Modifier.fillMaxWidth())
