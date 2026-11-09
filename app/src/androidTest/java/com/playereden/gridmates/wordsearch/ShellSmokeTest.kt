@@ -3,6 +3,8 @@ package com.playereden.gridmates.wordsearch
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
@@ -15,12 +17,12 @@ class ShellSmokeTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun soloBoardOpensAndCurrentOptionsAreDiscoverable() {
-        compose.onNodeWithText("Continue Solo").performClick()
+        compose.onNodeWithTag("ws16-resume-solo").performScrollTo().performClick()
         compose.onNodeWithText("Words to find", substring = true).assertExists()
         compose.onNodeWithText("Hint (", substring = true).assertExists()
         compose.onNodeWithText("Home").performClick()
         compose.onNodeWithText("Continue Solo").assertExists()
-        compose.onNodeWithText("Continue Solo").performClick()
+        compose.onNodeWithTag("ws16-resume-solo").performScrollTo().performClick()
         compose.onNodeWithText("Options").performClick()
         compose.onNodeWithText("Customize puzzle").assertDoesNotExist()
         compose.onNodeWithText("New puzzle").assertExists()
@@ -33,7 +35,7 @@ class ShellSmokeTest {
 
     @Test fun collectionTabContainsRealWoodlandProfilesNotPrototypeCopy() {
         compose.onNodeWithText("Word Search").assertExists()
-        compose.onNodeWithText("Good puzzles. Good company.").assertExists()
+        compose.onNodeWithTag("ws16-home-header").assertExists()
         compose.onNodeWithContentDescription("Open Collection").performClick()
         compose.onNodeWithText("Your Collection").assertExists()
         compose.onNodeWithText("Portraits").assertExists()

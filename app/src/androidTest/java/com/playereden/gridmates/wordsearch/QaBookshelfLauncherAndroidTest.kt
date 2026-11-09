@@ -19,7 +19,7 @@ class QaBookshelfLauncherAndroidTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun homeHasClearlyLabeledTestBookLauncherAndCanOpenAnActualVolume() {
-        compose.onNodeWithContentDescription("Explore books").performScrollTo().performClick()
+        compose.onNodeWithTag("ws16-full-shelf").performScrollTo().performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Puzzle Books").assertExists()
         // Preserve the old A/B bookcase regression path as an explicit option.

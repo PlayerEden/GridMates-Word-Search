@@ -8,6 +8,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
@@ -23,7 +24,7 @@ import java.io.File
 class CompactHomeNearbyEntryAndroidTest {
     @get:Rule val rule = createComposeRule()
 
-    @Test fun primaryHomeActionsAreVisibleBeforeAnyScrollAt360By720() {
+    @Test fun homeQuickActionsRemainReachableAt360By720() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val filename = "ws07b_home_" + System.nanoTime() + ".json"
         val rooms = NearbyRoomViewModel()
@@ -38,8 +39,8 @@ class CompactHomeNearbyEntryAndroidTest {
             }
             rule.onNodeWithText("Word Search").assertIsDisplayed()
             rule.onNodeWithText("Continue Solo").assertIsDisplayed()
-            rule.onNodeWithContentDescription("Open Daily").assertIsDisplayed()
-            rule.onNodeWithContentDescription("Open Nearby co-op").assertIsDisplayed()
+            rule.onNodeWithContentDescription("Open Daily").performScrollTo().assertIsDisplayed()
+            rule.onNodeWithContentDescription("Open Together").performScrollTo().assertIsDisplayed()
         } finally {
             rooms.leaveRoom()
             for (suffix in listOf("", ".bak", ".new")) {

@@ -78,8 +78,7 @@ internal fun Ws16BookCoverPager(
                         .clickable(role = Role.Button) {
                             onCoverTap(page, focused)
                         }
-                        .testTag("ws14d-cover-" + book.id)
-                        .testTag("ws16-cover-" + book.id),
+                        .testTag("ws14d-cover-" + book.id),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     BookArt(book.theme, BookArtKind.COVER,
