@@ -15,7 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -36,6 +40,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun QaArtLabScreen(onBack: () -> Unit) {
     BackHandler(onBack = onBack)
+    var showingWs14 by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val packaged = remember(context) {
         runCatching {
@@ -50,7 +55,15 @@ internal fun QaArtLabScreen(onBack: () -> Unit) {
             onClick = onBack,
             modifier = Modifier.padding(start = 8.dp).heightIn(min = 48.dp)
         ) { Text("Back to Play") }
-        if (!packaged) {
+        TextButton(
+            onClick = { showingWs14 = !showingWs14 },
+            modifier = Modifier.padding(start = 8.dp).heightIn(min = 48.dp)
+        ) {
+            Text(if (showingWs14) "Back to WS-12 lab" else "Review WS-14 assets")
+        }
+        if (showingWs14) {
+            QaWs14ArtworkReview()
+        } else if (!packaged) {
             Text("Art Lab preview not packaged in this APK.",
                 color = Forest,
                 style = MaterialTheme.typography.titleMedium,

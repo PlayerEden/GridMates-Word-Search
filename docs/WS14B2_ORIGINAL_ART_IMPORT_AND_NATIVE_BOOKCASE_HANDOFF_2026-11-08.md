@@ -52,3 +52,9 @@ python3 tools/asset_pipeline/import_ws14_cover.py \
 ```
 
 **IMPORTANT:** The three source image masters and actual spine illustration art have NOT been acquired by this change; the registry must stay empty until real original bytes and hash receipts are available.
+
+## WS-14C — Native owner-review artwork sheet
+
+The QA-only Art Lab now has a **Review WS-14 assets** switch. It presents Woodland, Space and Garden side by side as **Study A original** versus **Study B illustrated**, including independent covers and narrow spines at small phone scale. The Android asset manager reports the actual count of shipped files (0 to 6), and each theme explicitly says when an original file is absent. Study B falls back to existing art, so a missing file cannot be mistaken for an imported illustration.
+
+This native comparison is offline, doesn't display fake approval buttons, doesn't modify puzzle content/saves, and stays inaccessible from production. An instrumentation test covers navigating in/out and checks no non-existent art is falsely reported. Use it for owner review when the actual unwatermarked originals are imported; **it does not replace commercial rights and source hash checks**.
