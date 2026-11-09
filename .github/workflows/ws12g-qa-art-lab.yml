@@ -6,6 +6,7 @@ on:
     branches:
       - feature/ws12g-qa-art-lab-android-v51-2026-11-08
       - feature/ws12j-owner-book-navigation-and-compact-pages-v54-2026-11-08
+      - feature/ws12k-cohesive-illustrated-book-variants-qa-v55-2026-11-08
     paths:
       - 'app/**'
       - 'tools/asset_pipeline/**'
@@ -65,9 +66,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Compile Android DEBUG with 18 art pieces and RELEASE without them
+      - name: Guard exact original artwork SHA and optional illustrated study source
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
+      - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
-      - name: Verify exactly 18 offline SVG art assets in debug and zero in release
+      - name: Verify each exact-source A/B SVG and PNG inside QA and zero in release
         shell: bash
         run: |
           python3 - <<'PY'
@@ -83,7 +86,7 @@ jobs:
           releases=list(pathlib.Path('app/build/outputs/apk/release').glob('*.apk'))
           assert debug.is_file() and releases, 'Missing debug or release APK'
           with zipfile.ZipFile(debug) as z:
-              art=[x for x in z.namelist() if x.startswith('assets/ws12/') and x.endswith('.svg')]
+              art=[x for x in z.namelist() if x.startswith('assets/ws12/') and x.endswith('.svg') and '/alt/' not in x]
               assert len(art)==18, (len(art),art)
               assert 'assets/ws12/review.html' in z.namelist()
               assert 'assets/ws12/render_sha256.json' in z.namelist()
@@ -98,23 +101,42 @@ jobs:
                   assert hashlib.sha256(z.read(path)).hexdigest()==meta['sha256']
                   svg='assets/ws12/'+name.replace('.png','.svg')
                   assert hashlib.sha256(z.read(svg)).hexdigest()==meta['source_sha256']
+          # Study B always extends an exact A file. Every generated B sprite
+          # is checked against its separate receipt inside the actual APK.
+          alt=json.loads(z.read('assets/ws12/alt/field-notes/render_sha256.json'))
+          assert alt['art_file_count']==18 and alt['owner_approved'] is False
+          assert alt['source_original_files_unchanged']
+          for name, sha in alt['files'].items():
+              alt_path='assets/ws12/alt/field-notes/'+name
+              a_path='assets/ws12/'+name
+              assert hashlib.sha256(z.read(alt_path)).hexdigest()==sha
+              assert hashlib.sha256(z.read(a_path)).hexdigest()==alt['original_source_hashes'][name]
+              assert z.read(a_path)!=z.read(alt_path)
+          alt_png=json.loads(z.read('assets/ws12/raster_field_notes/manifest.json'))
+          assert alt_png['art_count']==18 and alt_png['owner_approved'] is False
+          for name, meta in alt_png['art'].items():
+              path='assets/ws12/raster_field_notes/'+name
+              assert hashlib.sha256(z.read(path)).hexdigest()==meta['sha256']
+              source='assets/ws12/alt/field-notes/'+name.replace('.png','.svg')
+              assert hashlib.sha256(z.read(source)).hexdigest()==meta['source_sha256']
+          assert z.read('assets/ws12/compare-studies.html').count(b'<article')==6
           with zipfile.ZipFile(releases[0]) as z:
               assert not [x for x in z.namelist() if x.startswith('assets/ws12/')], 'PROTOTYPE ART LEAKED TO RELEASE'
-          print('PASS: 18 original SVGs + 18 source-matched native PNGs in QA, ZERO in release; save formats unchanged.')
+          print('PASS: 18 original and 18 new alt source SVGs, plus 36 SHA-matched native PNGs in QA; ZERO in release.')
           PY
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
-          name: GRIDMATES-WS12J-BOOKSHELF-UX-ANDROID-V54-QA-ONLY
+          name: GRIDMATES-WS12K-ART-A-B-STUDY-ANDROID-V55-QA-ONLY
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
       - name: Clarify source and execution limits
         run: |
           {
-            echo '### WS-12G Android source/prototype art preview'
-            echo 'Debug APK has exactly 18 SVG sources and 18 native PNG assets; release APK has none.'
-            echo 'QA v54 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo '### WS-12K two complete book-art studies · original vs Field Notes'
+            echo 'Debug APK has 18 original + 18 illustrated SVG art and 36 matched native PNG images; release has none.'
+            echo 'QA v55 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
             echo 'The artwork is unapproved; QA prototype art is already integrated into book cards and does not affect save/unlock logic.'
           } >> "$GITHUB_STEP_SUMMARY"
