@@ -198,7 +198,8 @@ internal fun StorybookQuickEntry(
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
     actionDescription: String? = null,
-    @DrawableRes artResource: Int? = null
+    @DrawableRes artResource: Int? = null,
+    modeGlyph: Ws15ModeGlyph? = null
 ) {
     BoxWithConstraints(modifier.fillMaxWidth().testTag("storybook-quick-entry")) {
         // Home content is 324dp wide on a 360dp phone after screen gutters.
@@ -220,6 +221,8 @@ internal fun StorybookQuickEntry(
                         modifier = Modifier.size(StorybookTokens.illustratedCardArt)
                             .testTag("storybook-quick-art")
                     )
+                } else if (modeGlyph != null) {
+                    Ws15ModeEmblem(modeGlyph, Modifier.testTag("ws15-quick-mode-icon"))
                 }
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(3.dp)) {
