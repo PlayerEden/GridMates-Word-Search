@@ -126,6 +126,8 @@ internal fun GridMatesShell(
     val defaultQaRuntime = remember(context) { QaBookshelfRuntime(context) }
     val qa = qaBookshelf ?: defaultQaRuntime
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
+    var homeFocusedBookId by rememberSaveable { mutableStateOf<String?>(null) }
+    var homeBookIntent by rememberSaveable { mutableStateOf<String?>(null) }
     var soloSetupReturnPage by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     fun openSoloSetup(origin: Page) {
         if (origin == Page.PUZZLE) soloStore.flush()
@@ -201,8 +203,12 @@ internal fun GridMatesShell(
                         progressStore = progressStore,
                         sessionStore = sessionStore,
                         boardFontId = soloStore.effectiveBoardFontId,
-                        onExit = { pageName = Page.PLAY.name },
-                        showPrototypeArt = qa.enabled
+                        onExit = {
+                            homeBookIntent = null
+                            pageName = Page.PLAY.name
+                        },
+                        showPrototypeArt = qa.enabled,
+                        initialBookId = homeBookIntent
                     )
                 }
             } else {
@@ -236,16 +242,41 @@ internal fun GridMatesShell(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             when (page) {
-                Page.PLAY -> HomeScreen(soloStore,
-                    onHelp = { pageName = Page.HELP.name },
-                    onSolo = { pageName = Page.PUZZLE.name },
-                    onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
-                    onNewSolo = { openSoloSetup(Page.PLAY) },
-                    onDaily = { pageName = Page.DAILY.name },
-                    onNearby = { pageName = Page.NEARBY.name },
-                    onQaBooks = if (qa.enabled) {
-                        { pageName = Page.BOOKS_QA.name }
-                    } else null)
+                Page.PLAY -> {
+                    val booksAvailable = qa.enabled &&
+                        qa.progressStore != null && qa.sessionStore != null &&
+                        qa.progressStore?.blocked == false &&
+                        qa.sessionStore?.blocked == false
+                    Ws16HomeScreen(
+                        store = soloStore,
+                        catalog = if (booksAvailable) qa.catalog else null,
+                        bookProgress = if (booksAvailable) qa.progressStore?.progress else null,
+                        initialFocusedBookId = homeFocusedBookId,
+                        onFocusedBookChanged = { homeFocusedBookId = it },
+                        onPlayBook = { book ->
+                            if (booksAvailable && qa.catalog.book(book) != null) {
+                                homeFocusedBookId = book
+                                homeBookIntent = book
+                                pageName = Page.BOOKS_QA.name
+                            }
+                        },
+                        onFullShelf = {
+                            if (booksAvailable) {
+                                homeBookIntent = null
+                                pageName = Page.BOOKS_QA.name
+                            }
+                        },
+                        onProfile = { pageName = Page.COLLECTION.name },
+                        onSettings = { pageName = Page.SETTINGS.name },
+                        onRecords = { pageName = Page.RECORDS.name },
+                        onHelp = { pageName = Page.HELP.name },
+                        onSolo = { pageName = Page.PUZZLE.name },
+                        onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
+                        onNewSolo = { openSoloSetup(Page.PLAY) },
+                        onDaily = { pageName = Page.DAILY.name },
+                        onNearby = { pageName = Page.NEARBY.name }
+                    )
+                }
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
                     onBack = { pageName = Page.PLAY.name },
                     onNewSolo = { openSoloSetup(Page.MY_PUZZLES) },
