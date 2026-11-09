@@ -1,5 +1,7 @@
 # GridMates: Word Search
 
+> **WS-14 artwork pipeline and current new-chat handoff (Nov 9, 2026):** [Reproducible PNG creation → GitHub binary upload → Android import/playtest guide](docs/ASSET_CREATION_GITHUB_INTEGRATION_PLAYBOOK.md) · [Active WS-14 new-chat checkpoint](docs/WS14_ACTIVE_HANDOFF_2026-11-09.md). Six real book covers/spines were imported into the debug APK and verified absent from release on [art-workflow run #42576785170](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170); [Android QA #42576785096](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785096) also passed. **Owner physical-device art review and release rights are still pending.** Older milestones below are historical, not the current WS-14 handoff.
+
 *Good puzzles. Good company.*
 
 GridMates: Word Search is a standalone, offline-first native Android word-search game in the GridMates puzzle family. It emphasizes comfortable, paperback-inspired puzzles and easy nearby play with someone on the same Wi-Fi.
