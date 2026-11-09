@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -113,15 +115,19 @@ private fun BookListCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 BookArt(book.theme, BookArtKind.COVER,
-                    Modifier.width(76.dp).height(102.dp))
+                    Modifier.width(102.dp).height(136.dp))
                 BookArt(book.theme, BookArtKind.SPINE,
-                    Modifier.width(13.dp).height(80.dp))
+                    Modifier.width(16.dp).height(104.dp))
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(book.title, color = Forest, fontWeight = FontWeight.Bold,
+                    Text(book.title.removeSuffix(" · TEST BOOK"),
+                        color = Forest, fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge)
-                    Text(book.theme.label + " · " + book.chapters.size +
-                        (if (book.chapters.size == 1) " chapter" else " chapters"),
+                    Text(if (book.title.endsWith(" · TEST BOOK"))
+                            "TEST BOOK · " + book.chapters.size +
+                                (if (book.chapters.size == 1) " chapter" else " chapters")
+                        else book.theme.label + " · " + book.chapters.size +
+                            (if (book.chapters.size == 1) " chapter" else " chapters"),
                         color = Muted, style = MaterialTheme.typography.bodyMedium)
                     Text(completed.toString() + " of " + total + " pages completed",
                         color = Ink, style = MaterialTheme.typography.bodyMedium)
@@ -188,9 +194,20 @@ internal fun PuzzleBookDetailScreen(
                     if (showPrototypeArt && book != null) {
                         BookArt(book.theme, BookArtKind.EMBLEM, Modifier.size(52.dp))
                     }
-                    Text(book?.title ?: "Book unavailable",
-                        color = Forest, style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            if (showPrototypeArt)
+                                book?.title?.removeSuffix(" · TEST BOOK")
+                                    ?: "Book unavailable"
+                            else book?.title ?: "Book unavailable",
+                            color = Forest, style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (showPrototypeArt && book?.title?.endsWith(" · TEST BOOK") == true) {
+                            Text("TEST BOOK · Volume " + book.volume,
+                                color = Muted, style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
                 }
             }
         }
@@ -262,7 +279,9 @@ internal fun PuzzleBookDetailScreen(
                     }
                 }
                 items(chapter.pages, key = { "page:" + it.id }) { page ->
-                    val ordinal = chapter.pages.indexOfFirst { it.id == page.id } + 1
+                    // Use book-wide page numbers. Chapter 2 must not restart
+                    // at "Page 1" while Chapter 1's Page 1 also exists.
+                    val ordinal = pages.indexOfFirst { it.id == page.id } + 1
                     val isComplete = page.id in completed
                     val isCurrent = page.id == next?.id
                     PaperPanel(Modifier.fillMaxWidth()) {
