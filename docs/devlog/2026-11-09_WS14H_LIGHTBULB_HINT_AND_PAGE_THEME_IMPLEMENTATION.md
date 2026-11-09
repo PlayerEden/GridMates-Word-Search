@@ -1,6 +1,6 @@
 # 2026-11-09 — WS-14H: bulb Hint, compact puzzle chrome and theme paper
 
-**State:** SOURCE IMPLEMENTED; new source-matched Android CI needs verification. NO owner phone review or new asset generation claimed. See the [full WS-14H milestone roadmap](../WS14H_COMPACT_GAMEPLAY_HEADER_AND_THEME_ROADMAP_2026-11-09.md).
+**State:** SOURCE IMPLEMENTED and **source-matched Android + art CI PASSED** on commit `7856282`. Physical owner phone review still pending. NO new asset generation claimed. See [verified APK build receipt](2026-11-09_WS14H_GREEN_ANDROID_ART_QA_AND_PHONE_HANDOFF.md). See the [full WS-14H milestone roadmap](../WS14H_COMPACT_GAMEPLAY_HEADER_AND_THEME_ROADMAP_2026-11-09.md).
 
 ## Who / what / where / why
 

@@ -2,6 +2,12 @@
 
 **Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14H_LIGHTBULB_HINT_AND_PAGE_THEME_IMPLEMENTATION.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14F detail and puzzle layout have now been photographed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
 
+## Latest verified checkpoint — WS-14H Android QA GREEN, owner handset check next
+
+**Source `7856282d07cc440a4365132b8854f13a6fd57d1c`** compiled successfully in both [standard Android #42658174525](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42658174525) and [art/release isolation #42658174462](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42658174462). [QA artifact #13693073000](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42658174525/artifacts/13693073000) is ZIP containing `app-debug.apk`; exact APK SHA-256 `410716124b8c4ef35b2a934c097faf49aab51efb5a6fa425ff438c995220cac8`. Package `com.playereden.gridmates.wordsearch.qa`, versionCode 57. All six WS-14 original-derived cover/spine assets in QA debug and absent from release. [Full verified receipt and physical test checklist](devlog/2026-11-09_WS14H_GREEN_ANDROID_ART_QA_AND_PHONE_HANDOFF.md).
+
+**Next immediate action:** user tests the compact bulb-only Hint and actual word-tracing on 20×20, +/- zoom/Fit, back/reopen save, page-theme tints at phone scale. No owner acceptance/production merge or new asset family yet. Prior older handoff text claiming this exact code's CI is pending is superseded by this successful build.
+
 ## WS-14H — current compact gameplay UI implementation
 
 **Start here:** [Full WS-14H implementation roadmap](WS14H_COMPACT_GAMEPLAY_HEADER_AND_THEME_ROADMAP_2026-11-09.md) and [dated implementation/CI journal](devlog/2026-11-09_WS14H_LIGHTBULB_HINT_AND_PAGE_THEME_IMPLEMENTATION.md).
