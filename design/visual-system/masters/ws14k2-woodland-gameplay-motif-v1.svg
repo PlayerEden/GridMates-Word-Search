@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs><linearGradient id="a" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#D7DEA4"/><stop offset=".5" stop-color="#819B6C"/><stop offset="1" stop-color="#385D48"/></linearGradient>
+<linearGradient id="b" x1="0" y1=".1" x2="1" y2="1"><stop stop-color="#F8D6A0"/><stop offset=".5" stop-color="#D38A59"/><stop offset="1" stop-color="#9B4D38"/></linearGradient></defs>
+
+<!-- botanical book-page emblem: fern, oak leaf, mushroom and acorn -->
+<g fill="none" stroke="#6C6B4B" stroke-linecap="round"><path d="M53 214 C99 169 130 121 139 48" stroke-width="9"/><path d="M77 193 C116 184 154 164 177 129" stroke-width="6"/></g>
+<g stroke="#345843" stroke-width="5" stroke-linejoin="round" fill="url(#a)">
+<path d="M104 158 C70 141 51 119 52 99 Q86 108 116 147 Z"/>
+<path d="M119 129 C160 110 179 86 181 70 C148 75 127 99 119 129 Z"/>
+<path d="M126 108 C98 94 82 74 82 56 Q112 66 132 101 Z"/>
+<path d="M135 85 C162 70 172 52 178 36 Q151 43 137 73 Z"/>
+<path d="M98 178 C60 172 38 149 36 126 Q73 130 105 165 Z"/>
+</g>
+<path d="M169 141 C155 131 150 115 159 105 C155 90 172 82 181 93 C192 78 210 88 205 102 C223 103 222 122 207 129 C208 145 191 149 182 142 Q175 151 169 141 Z" fill="url(#a)" stroke="#345843" stroke-width="5"/>
+<path d="M172 135 L196 103 M185 122 L178 104 M190 115 L207 114" fill="none" stroke="#E5E1B0" stroke-width="3" stroke-linecap="round"/>
+<path d="M151 188 Q151 173 158 165 L173 164 Q178 174 176 192 Q164 204 151 193 Z" fill="#E5D4AD" stroke="#7C654F" stroke-width="4"/>
+<path d="M131 167 Q136 142 158 139 Q182 138 196 166 Q170 183 131 167 Z" fill="url(#b)" stroke="#85503B" stroke-width="5"/>
+<g fill="#F6E5B5"><ellipse cx="151" cy="158" rx="6" ry="5"/><ellipse cx="175" cy="159" rx="8" ry="5"/></g>
+<path d="M191 175 Q211 158 216 178 Q217 193 205 205 Q189 199 191 175 Z" fill="#C09A63" stroke="#6D5E45" stroke-width="5"/>
+<path d="M191 177 Q203 162 219 176 L218 184 L190 183 Z" fill="#80764F" stroke="#3E6048" stroke-width="4"/>
+<path d="M50 221 Q95 226 121 210" stroke="#77936B" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

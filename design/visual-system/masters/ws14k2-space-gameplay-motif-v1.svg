@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs>
+<linearGradient id="planet" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#F5DC9F"/><stop offset=".42" stop-color="#C99C72"/><stop offset=".8" stop-color="#937B9D"/><stop offset="1" stop-color="#3B5B83"/></linearGradient>
+<linearGradient id="ring" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#C7C6AD"/><stop offset=".4" stop-color="#F5D88E"/><stop offset="1" stop-color="#9E7990"/></linearGradient>
+</defs>
+<!-- tilted hand-inked ringed planet -->
+<g transform="rotate(-24 131 125)">
+<ellipse cx="130" cy="129" rx="107" ry="33" fill="none" stroke="#304E6D" stroke-width="12"/>
+<ellipse cx="130" cy="129" rx="107" ry="33" fill="none" stroke="url(#ring)" stroke-width="7"/>
+<circle cx="130" cy="129" r="72" fill="url(#planet)" stroke="#304B69" stroke-width="7"/>
+<path d="M67 111 Q122 135 191 105 M67 142 Q127 159 188 139 M100 183 Q154 177 174 163" fill="none" stroke="#EED6A1" stroke-width="9" stroke-opacity=".65"/>
+<path d="M24 129 Q132 83 231 129" fill="none" stroke="#304E6D" stroke-width="11"/>
+<path d="M24 129 Q132 85 231 129" fill="none" stroke="#E8C885" stroke-width="7"/>
+</g>
+<g stroke="#E6BD77" stroke-width="5" stroke-linecap="round" fill="none">
+<path d="M43 40 V77 M24 58 H62 M32 47 L53 68 M32 68 L53 47"/>
+<path d="M217 48 V77 M203 62 H232"/>
+</g>
+<g fill="#F4DEB1"><circle cx="39" cy="192" r="5"/><circle cx="211" cy="206" r="4"/><circle cx="101" cy="33" r="3"/></g>
+<path d="M198 182 Q194 167 207 154 Q210 169 222 173 Q210 178 198 182 Z" fill="#8FB4C0" stroke="#324C6E" stroke-width="4"/>
+</svg>

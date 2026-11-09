@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs><linearGradient id="petal" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#F9DEAC"/><stop offset=".53" stop-color="#E9AE72"/><stop offset="1" stop-color="#C37D6A"/></linearGradient>
+<linearGradient id="leaf" x1=".2" y1="0" x2=".8" y2="1"><stop stop-color="#B4D096"/><stop offset="1" stop-color="#527E5D"/></linearGradient></defs>
+<!-- watercolor garden blossom with leaf sprig and small butterfly -->
+<path d="M111 219 Q113 164 137 123" fill="none" stroke="#4B7952" stroke-width="9" stroke-linecap="round"/>
+<path d="M114 182 Q76 160 56 178 Q85 216 114 194 Z" fill="url(#leaf)" stroke="#3E654C" stroke-width="5"/>
+<path d="M125 161 Q153 149 176 169 Q147 187 119 182 Z" fill="url(#leaf)" stroke="#3E654C" stroke-width="5"/>
+<path d="M76 160 Q103 167 111 188 M169 170 Q141 169 124 179" fill="none" stroke="#DDE2A6" stroke-width="3"/>
+<g fill="url(#petal)" stroke="#9B694F" stroke-width="4" stroke-linejoin="round">
+<path d="M137 117 Q111 89 120 59 Q145 56 154 99 Z"/>
+<path d="M137 117 Q153 77 183 69 Q199 90 158 118 Z"/>
+<path d="M147 122 Q184 103 209 123 Q201 144 163 138 Z"/>
+<path d="M145 131 Q177 154 164 183 Q142 179 135 150 Z"/>
+<path d="M132 130 Q119 168 94 170 Q80 149 111 123 Z"/>
+<path d="M120 121 Q80 121 73 99 Q92 78 132 108 Z"/>
+</g>
+<circle cx="138" cy="124" r="26" fill="#8C6B4D" stroke="#4E5741" stroke-width="5"/>
+<circle cx="138" cy="124" r="18" fill="#BD9658"/>
+<g fill="#F8D594"><circle cx="132" cy="114" r="3"/><circle cx="142" cy="117" r="3"/><circle cx="129" cy="128" r="3"/><circle cx="144" cy="133" r="3"/><circle cx="136" cy="142" r="3"/></g>
+<g stroke="#745C49" stroke-width="4" stroke-linejoin="round">
+<path d="M51 55 Q24 26 26 58 Q24 80 50 82 Q39 100 57 108 Q76 103 69 77 Z" fill="#EAA36E"/>
+<path d="M51 55 Q82 26 88 49 Q99 70 70 80 Q88 97 69 106 Q56 103 51 82 Z" fill="#E8C28E"/>
+<path d="M53 56 Q52 85 58 106" fill="none" stroke="#3F584C" stroke-width="5"/>
+</g>
+<path d="M50 54 L39 36 M55 53 L66 34" fill="none" stroke="#635642" stroke-width="3" stroke-linecap="round"/>
+<path d="M77 222 Q139 231 182 210" stroke="#709366" stroke-width="7" fill="none" stroke-linecap="round"/>
+</svg>
