@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - feature/ws12g-qa-art-lab-android-v51-2026-11-08
+      - feature/ws12j-owner-book-navigation-and-compact-pages-v54-2026-11-08
     paths:
       - 'app/**'
       - 'tools/asset_pipeline/**'
@@ -104,7 +105,7 @@ jobs:
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
-          name: GRIDMATES-WS12I-BOOK-ART-INTEGRATED-ANDROID-V53-QA-ONLY
+          name: GRIDMATES-WS12J-BOOKSHELF-UX-ANDROID-V54-QA-ONLY
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
@@ -113,7 +114,7 @@ jobs:
           {
             echo '### WS-12G Android source/prototype art preview'
             echo 'Debug APK has exactly 18 SVG sources and 18 native PNG assets; release APK has none.'
-            echo 'QA v53 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'QA v54 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
-            echo 'The artwork is unapproved, and Art Lab does NOT replace production book cards or unlocks.'
+            echo 'The artwork is unapproved; QA prototype art is already integrated into book cards and does not affect save/unlock logic.'
           } >> "$GITHUB_STEP_SUMMARY"

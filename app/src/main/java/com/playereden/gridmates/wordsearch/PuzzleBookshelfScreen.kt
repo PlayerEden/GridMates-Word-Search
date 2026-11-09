@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -113,15 +117,19 @@ private fun BookListCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 BookArt(book.theme, BookArtKind.COVER,
-                    Modifier.width(76.dp).height(102.dp))
+                    Modifier.width(102.dp).height(136.dp).testTag("book-cover-" + book.id))
                 BookArt(book.theme, BookArtKind.SPINE,
-                    Modifier.width(13.dp).height(80.dp))
+                    Modifier.width(16.dp).height(104.dp).testTag("book-spine-" + book.id))
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(book.title, color = Forest, fontWeight = FontWeight.Bold,
+                    Text(book.title.removeSuffix(" · TEST BOOK"),
+                        color = Forest, fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge)
-                    Text(book.theme.label + " · " + book.chapters.size +
-                        (if (book.chapters.size == 1) " chapter" else " chapters"),
+                    Text(if (book.title.endsWith(" · TEST BOOK"))
+                            "TEST BOOK · " + book.chapters.size +
+                                (if (book.chapters.size == 1) " chapter" else " chapters")
+                        else book.theme.label + " · " + book.chapters.size +
+                            (if (book.chapters.size == 1) " chapter" else " chapters"),
                         color = Muted, style = MaterialTheme.typography.bodyMedium)
                     Text(completed.toString() + " of " + total + " pages completed",
                         color = Ink, style = MaterialTheme.typography.bodyMedium)
@@ -137,10 +145,22 @@ private fun BookListCard(
                 color = Ink, style = MaterialTheme.typography.bodyMedium)
         }
         PaperProgress(completed, total)
-        Button(onClick = onOpen,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-            Text(if (completed == total) "Read again" else if (completed > 0)
-                "Continue book" else "Open book")
+        // The book thumbnail is the focal point; the native action remains
+        // prominent but need not be a full-width block in every shelf card.
+        if (showPrototypeArt) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Button(onClick = onOpen,
+                    modifier = Modifier.widthIn(min = 160.dp).heightIn(min = 48.dp)) {
+                    Text(if (completed == total) "Read again" else if (completed > 0)
+                        "Continue book" else "Open book")
+                }
+            }
+        } else {
+            Button(onClick = onOpen,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text(if (completed == total) "Read again" else if (completed > 0)
+                    "Continue book" else "Open book")
+            }
         }
     }
 }
@@ -172,7 +192,7 @@ internal fun PuzzleBookDetailScreen(
         progress.volumes[bookId]?.bookmarkedPageId else null
 
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.testTag("book-detail-list"),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -186,11 +206,23 @@ internal fun PuzzleBookDetailScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     if (showPrototypeArt && book != null) {
-                        BookArt(book.theme, BookArtKind.EMBLEM, Modifier.size(52.dp))
+                        BookArt(book.theme, BookArtKind.EMBLEM,
+                            Modifier.size(52.dp).testTag("book-emblem-" + book.id))
                     }
-                    Text(book?.title ?: "Book unavailable",
-                        color = Forest, style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            if (showPrototypeArt)
+                                book?.title?.removeSuffix(" · TEST BOOK")
+                                    ?: "Book unavailable"
+                            else book?.title ?: "Book unavailable",
+                            color = Forest, style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (showPrototypeArt && book?.title?.endsWith(" · TEST BOOK") == true) {
+                            Text("TEST BOOK · Volume " + book.volume,
+                                color = Muted, style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
                 }
             }
         }
@@ -214,7 +246,8 @@ internal fun PuzzleBookDetailScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (showPrototypeArt && pages.isNotEmpty() &&
                             completed.size == pages.size) {
-                            BookArt(book.theme, BookArtKind.COMPLETION, Modifier.size(48.dp))
+                            BookArt(book.theme, BookArtKind.COMPLETION,
+                                Modifier.size(48.dp).testTag("book-volume-complete-" + book.id))
                         }
                         Text(completed.size.toString() + " of " + pages.size +
                             " pages completed",
@@ -247,7 +280,8 @@ internal fun PuzzleBookDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             if (showPrototypeArt) {
-                                BookArt(book.theme, BookArtKind.CHAPTER, Modifier.size(44.dp))
+                                BookArt(book.theme, BookArtKind.CHAPTER,
+                                    Modifier.size(44.dp).testTag("book-chapter-" + chapter.id))
                             }
                             Column {
                                 PaperEyebrow("Chapter " + (index + 1))
@@ -262,7 +296,9 @@ internal fun PuzzleBookDetailScreen(
                     }
                 }
                 items(chapter.pages, key = { "page:" + it.id }) { page ->
-                    val ordinal = chapter.pages.indexOfFirst { it.id == page.id } + 1
+                    // Use book-wide page numbers. Chapter 2 must not restart
+                    // at "Page 1" while Chapter 1's Page 1 also exists.
+                    val ordinal = pages.indexOfFirst { it.id == page.id } + 1
                     val isComplete = page.id in completed
                     val isCurrent = page.id == next?.id
                     PaperPanel(Modifier.fillMaxWidth()) {
@@ -271,11 +307,11 @@ internal fun PuzzleBookDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (showPrototypeArt && bookmark == page.id && !isComplete) {
                                 BookArt(book.theme, BookArtKind.BOOKMARK,
-                                    Modifier.width(23.dp).height(66.dp))
+                                    Modifier.width(23.dp).height(66.dp).testTag("book-bookmark-" + page.id))
                             }
                             if (showPrototypeArt && isComplete) {
                                 BookArt(book.theme, BookArtKind.COMPLETION,
-                                    Modifier.size(43.dp))
+                                    Modifier.size(43.dp).testTag("book-page-complete-" + page.id))
                             }
                             Column(Modifier.weight(1f)) {
                                 Text("Page " + ordinal +
@@ -290,20 +326,63 @@ internal fun PuzzleBookDetailScreen(
                                     style = MaterialTheme.typography.bodyMedium)
                             }
                         }
-                        if (onPlayPage != null) {
-                            Button(onClick = { onPlayPage(bookId, page.id) },
-                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                                Text(if (isComplete) "Replay page $ordinal" else "Play page $ordinal")
+                        // On a normal phone the two page actions share a row,
+                        // avoiding a long pair of oversized buttons on every page.
+                        // Stack again for 320dp and/or enlarged system text.
+                        if (showPrototypeArt && !isComplete &&
+                            onPlayPage != null && onBookmarkPage != null) {
+                            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                                val compactRow = maxWidth >= 270.dp &&
+                                    LocalDensity.current.fontScale <= 1.25f
+                                if (compactRow) {
+                                    Row(Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Button(
+                                            onClick = { onPlayPage(bookId, page.id) },
+                                            modifier = Modifier.weight(0.44f).heightIn(min = 48.dp)
+                                        ) { Text("Play page $ordinal") }
+                                        OutlinedButton(
+                                            onClick = { onBookmarkPage(bookId, page.id) },
+                                            enabled = bookmark != page.id,
+                                            modifier = Modifier.weight(0.56f).heightIn(min = 48.dp)
+                                        ) {
+                                            Text(if (bookmark == page.id) "Bookmark saved"
+                                                else "Bookmark page $ordinal")
+                                        }
+                                    }
+                                } else {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Button(onClick = { onPlayPage(bookId, page.id) },
+                                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                                        ) { Text("Play page $ordinal") }
+                                        OutlinedButton(
+                                            onClick = { onBookmarkPage(bookId, page.id) },
+                                            enabled = bookmark != page.id,
+                                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                                        ) {
+                                            Text(if (bookmark == page.id) "Bookmark saved"
+                                                else "Bookmark page $ordinal")
+                                        }
+                                    }
+                                }
                             }
-                        }
-                        if (!isComplete && onBookmarkPage != null) {
-                            OutlinedButton(
-                                onClick = { onBookmarkPage(bookId, page.id) },
-                                enabled = bookmark != page.id,
-                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                            ) {
-                                Text(if (bookmark == page.id) "Bookmark saved"
-                                    else "Bookmark page $ordinal")
+                        } else {
+                            if (onPlayPage != null) {
+                                Button(onClick = { onPlayPage(bookId, page.id) },
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                    Text(if (isComplete) "Replay page $ordinal"
+                                        else "Play page $ordinal")
+                                }
+                            }
+                            if (!isComplete && onBookmarkPage != null) {
+                                OutlinedButton(
+                                    onClick = { onBookmarkPage(bookId, page.id) },
+                                    enabled = bookmark != page.id,
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                                ) {
+                                    Text(if (bookmark == page.id) "Bookmark saved"
+                                        else "Bookmark page $ordinal")
+                                }
                             }
                         }
                     }
