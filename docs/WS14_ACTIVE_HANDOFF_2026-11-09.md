@@ -1,6 +1,14 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14E_GRIDMATES_IDENTITY_AND_MOTION_DESIGN.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. On-phone testing has **not** been confirmed. Subsequent passes must append the journal as a standing rule.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14D_HORIZONTAL_BOOKSHELF_IMPLEMENTATION.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **new swipe-browser QA remains untested on phone**. Subsequent passes must append the journal as a standing rule.
+
+## Current WS-14D implementation (newest executable checkpoint)
+
+**Native swipe library CODED, not yet device-approved.** Read [WS-14D implementation pass log](devlog/2026-11-09_WS14D_HORIZONTAL_BOOKSHELF_IMPLEMENTATION.md). Source `8bbb911948dd7561d9b4e2add658ec7ae39302d3` adds a horizontal Native Compose pager over the *existing cover sprites*, previous/next arrows, one focused Open/Continue CTA, 220ms subtle selection scale, and **Classic shelves** rollback. The book detail hero no longer shows a detached spine. `BookLibraryFlow` retains chosen layout and book selection only in memory; no changes to save files, book IDs, page catalog or portrait collections.
+
+The standard Android QA workflow now conditionally imports the six WS-14 original-derived PNGs and verifies them in the APK, making it a second source of a useful illustrated test build. **Do not assert latest APK QA success until exact-head CI finishes**; earlier separate art QA [#42582505308](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42582505308) failed downloading Gradle 8.11.1 (HTTP 504), not source compilation.
+
+**Next:** verify exact-head CI, obtain the **actual illustrated QA APK artifact**, then collect owner screenshots comparing Swipe vs Classic. Retain v56 as earlier safe rollback; no release merge. Avoid generating new art until layout feedback.
 
 ## Newest WS-14E brand/shared-assets/motion design — November 9, 2026
 
