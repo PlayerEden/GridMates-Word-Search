@@ -60,6 +60,11 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
           python3 scripts/import_font_library.py --source _approved_fonts
+      - name: Check WS-14 real-art registry integrity and approval gates
+        run: |
+          python3 tools/asset_pipeline/validate_ws14_assets.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_asset_registry.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_cover_import.py' -v
       - name: Install pinned build-only SVG renderer (no Android runtime dependency)
         run: python3 -m pip install --disable-pip-version-check --user CairoSVG==2.8.2
       - uses: actions/setup-java@v5
@@ -71,11 +76,6 @@ jobs:
           gradle-version: '8.11.1'
       - name: Guard exact original artwork SHA and optional illustrated study source
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
-      - name: Check WS-14 real-art registry integrity and approval gates
-        run: |
-          python3 tools/asset_pipeline/validate_ws14_assets.py
-          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_asset_registry.py' -v
-          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_cover_import.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
       - name: Verify WS-14 actual original cover exports and debug/release asset isolation
