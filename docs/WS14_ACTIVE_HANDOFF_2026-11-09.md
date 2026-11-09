@@ -1,6 +1,14 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14G_LAYOUT_LOCK_AND_THEME_ACCENTS_DESIGN.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14F polish has not yet been phone-reviewed**. Subsequent passes must append the journal as a standing rule.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14F_PHONE_REVIEW_AND_WS14G_EMBLEM_SPECIMEN.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14F detail and puzzle layout have now been photographed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
+
+## Current WS-14G live implementation — existing header emblem specimen
+
+Five owner screenshots now show WS-14F illustrated browser, **clean Space detail with short Play/Bookmark labels**, Space 12×12 and Woodland 20×20 puzzle pages. This is **visual phone QA**, not evidence of word selection, puzzle completion or zoom success. [New dated review and implementation pass](devlog/2026-11-09_WS14F_PHONE_REVIEW_AND_WS14G_EMBLEM_SPECIMEN.md).
+
+**Source commit `dd2fb8a2b72236a0b9a731b560c0d38d9043e1d7`:** QA-only existing `BookArtKind.EMBLEM` added beside the native book-page header title, derived from real book.theme. At 320dp+ and normal text it shows a 32dp Woodland/Space/Garden emblem; at enlarged text, smaller width, completion or bookmarked state, existing native text/status artwork takes precedence. Pure guard tests added. **No new sprite images, gameplay save logic, book IDs, word-selection code or release art changed.** Exact source CI and actual owner device review are still pending.
+
+Next: verify new workflows and APK from code, then review the three page-header emblems on phone. Compare with the untouched version before generating the versioned three small accent assets. **Retain swipe library; do not lock full layout until dense-grid word tracing and orientation/font QA.**
 
 ## WS-14G new direction — lock layout, then thematic in-game accents (November 9)
 
