@@ -40,3 +40,9 @@
 ## Next exact action
 
 Check both WS-14K1 workflow conclusions for the **same source SHA**; repair any Kotlin/compiler/test failure, confirm debug and zero-release-art package checks, record actual APK checksum and give owner a link to a reproducible QA artifact. Then owner can compare new 12×12 and 20×20 gameplay screenshots and report whether actual word tracing/hint/save worked. **After those results**, decide if more vertical space and icon controls are warranted, especially word-list/header layout, and separately tidy the library/main menu QA text. Preserve 48dp accessible targets and the existing responsive board. No full UI rewrite.
+
+## First CI failure and corrected exact-source retry
+
+The first Android QA attempt [#42679021745](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42679021745) on source `794f096e` **FAILED** specifically during `:app:compileDebugAndroidTestKotlin` because the new `Ws14KCompactBackButtonAndroidTest.kt` contained an unsupported `androidx.compose.ui.test.assertExists` import. The actual Compose node's `.assertExists()` API is available without that import; this is a test-source mistake, not evidence of a gameplay failure. The error is visible in the workflow job log and was corrected in [source commit 212b900b](https://github.com/PlayerEden/GridMates-Word-Search/commit/212b900b593921afe965c32d5b59cbe327b08186), which **only removes that import**.
+
+**Exact corrected source:** `212b900b593921afe965c32d5b59cbe327b08186`. [Standard Android #42679630809](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42679630809) and [Art/release #42679630526](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42679630526) were still **in progress** when checked. Do not use the failed first build as a release or claim this retry is green before checking. Continue preserving WS-14J2 `01c20de` as the prior dual-green rollback.
