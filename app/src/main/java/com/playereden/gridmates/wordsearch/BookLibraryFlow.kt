@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BookCatalog
+import com.playereden.gridmates.wordsearch.core.BookProgressRules
 
 /**
  * WS-11D2B: actual internal route from Library -> Book -> Page -> Book.
@@ -33,10 +34,24 @@ internal fun BookLibraryFlow(
     sessionStore: BookPageSessionStore,
     boardFontId: String,
     onExit: () -> Unit,
-    showPrototypeArt: Boolean = false
+    showPrototypeArt: Boolean = false,
+    /** Home may send an existing catalog book straight into the next safe page. */
+    initialBookId: String? = null
 ) {
-    var bookId by remember(catalog) { mutableStateOf<String?>(null) }
-    var pageId by remember(catalog) { mutableStateOf<String?>(null) }
+    val initialBook = initialBookId?.takeIf { catalog.book(it) != null }
+    val directFromHome = initialBook != null
+    // Reuse published book and local progress validation; a fully solved book
+    // enters details for replay/page choice instead of silently resetting.
+    val initialPage = remember(catalog, initialBook, progressStore) {
+        initialBook?.takeUnless { progressStore.blocked || sessionStore.blocked }
+            ?.let { book ->
+                runCatching {
+                    BookProgressRules.continuePage(catalog, progressStore.progress, book)
+                }.getOrNull()?.id
+            }
+    }
+    var bookId by remember(catalog, initialBook) { mutableStateOf(initialBook) }
+    var pageId by remember(catalog, initialBook) { mutableStateOf(initialPage) }
     var update by remember(catalog) { mutableIntStateOf(0) }
     var feedback by remember(catalog) { mutableStateOf<String?>(null) }
     // QA-only in-memory style choice: does NOT affect book progress or saves.
@@ -79,8 +94,11 @@ internal fun BookLibraryFlow(
                 showPrototypeArt = showPrototypeArt,
                 fieldNotesArt = fieldNotesArt,
                 onBack = {
-                    pageId = null
-                    update++
+                    if (directFromHome) onExit()
+                    else {
+                        pageId = null
+                        update++
+                    }
                 },
                 onNextPage = { nextBook, nextPage ->
                     if (nextBook == activeBook &&
@@ -92,7 +110,9 @@ internal fun BookLibraryFlow(
             )
         }
         bookId != null -> {
-            BackHandler { bookId = null }
+            BackHandler {
+                if (directFromHome) onExit() else bookId = null
+            }
             val currentBook = requireNotNull(bookId)
             Column(Modifier.fillMaxSize()) {
                 if (feedback != null) {
@@ -102,7 +122,10 @@ internal fun BookLibraryFlow(
                     catalog = catalog,
                     progress = snapshot,
                     bookId = currentBook,
-                    onBack = { bookId = null; feedback = null },
+                    onBack = {
+                        if (directFromHome) onExit()
+                        else { bookId = null; feedback = null }
+                    },
                     onPlayPage = { selectedBook, selectedPage ->
                         if (selectedBook == currentBook &&
                             catalog.page(selectedBook, selectedPage) != null) {
