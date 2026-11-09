@@ -30,6 +30,16 @@
 
 ---
 
+## NEXT: WS-16B action assets + WS-17 endless Random Play design
+
+**Owner feedback after installing actual WS-16A QA (Nov 9):** Carousel-first Home visually approved ("Hell yeah"); five screenshots confirm Woodland/Space focus, bookshelf and menu render. Together button truncates to "Toget..." and menu is too spacious; separate book spines look detached and Garden alone wastes shelf space. Do not infer that direct book gameplay or save/resume has been tested from screenshots.
+
+**New user decision:** [WS-16B asymmetric button + endless Random Play design](design/WS16B_QUICK_ACTIONS_AND_ENDLESS_RANDOM_MODE_2026-11-09.md). Keep Daily Puzzle as a wider, *fully labeled* illustrated calendar action, and Together as a smaller **two-silhouette original asset** button with accessible spoken label. Not all buttons must be equal width. **Reserve a dedicated Random Play shortcut** beneath them: a genuinely generated puzzle from a *mixed* approved vocabulary (books/themes + independent general word pool), not a random saved book/page and not merely current one-theme Solo. After completion, "Play Another" generates a new board.
+
+**Technical guardrails:** Core existing V1/V2/V3 Solo seeded generators are theme-bound and their dictionaries/IDs must remain frozen for legacy saves. New Random should be versioned separately and saved/replayed deterministically; work entirely offline and with zero approved production book pages. Do not enable a dead Random button. WS-16B UI polish and WS-17 generator can be grouped or separate milestones; one meaningful APK with verified Android+art gates before owner review. PR #131 stays draft, previous WS-16A verified rollback remains valid.
+
+---
+
 ## NEXT: WS-16 carousel-first Home (design approved, not implemented)
 
 **Owner-directed direction from November 9 conversation:** move the working illustrated swipeable Woodland/Space/Garden books to the main Play screen, under a compact stacked **shared GridMates family logo + separate Word Search title**. Right header actions: Profile and Menu. The focused cover becomes a **one-tap Start/Resume** action, with side cover taps only changing focus; secondary Full Shelf is for selecting a particular book/chapter/page. Under books: compact illustrated Continue Solo, Daily, Together; existing Play/Records/Collection/Settings tabs temporarily preserved. Do not add an unnecessary online account or third permanent leaderboard control.
