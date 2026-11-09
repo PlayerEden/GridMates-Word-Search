@@ -8,8 +8,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.platform.app.InstrumentationRegistry
 import com.playereden.gridmates.wordsearch.core.WordTheme
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -28,8 +26,9 @@ class QaBookArtworkIntegrationAndroidTest {
         for (theme in listOf(WordTheme.WOODLAND, WordTheme.SPACE, WordTheme.GARDEN)) {
             for (kind in BookArtKind.entries) {
                 val path = requireNotNull(bookArtPath(theme, kind))
-                val image = assets.open(path).use { BitmapFactory.decodeStream(it) }
-                assertNotNull("Couldn't decode " + path, image)
+                val image = requireNotNull(assets.open(path).use { BitmapFactory.decodeStream(it) }) {
+                    "Couldn\'t decode " + path
+                }
                 assertTrue("Width missing: " + path, image.width >= 35)
                 assertTrue("Height missing: " + path, image.height >= 35)
             }
