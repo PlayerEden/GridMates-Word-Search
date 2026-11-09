@@ -75,12 +75,11 @@ internal fun BookcaseBookshelfScreen(
                     TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
                         Text("Back to Play")
                     }
-                    PaperEyebrow("GRIDMATES · PUZZLE LIBRARY")
-                    Text("Puzzle Books", color = Forest,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold)
-                    Text("Your bookshelf · Choose a book to open.", color = Muted,
-                        style = MaterialTheme.typography.bodyMedium)
+                    StorybookHeading(
+                        eyebrow = "GridMates · Puzzle Library",
+                        title = "Puzzle Books",
+                        subtitle = "Your bookshelf · Choose a book to open."
+                    )
                     Text("Prototype artwork · final illustrations can change",
                         color = Muted, style = MaterialTheme.typography.labelSmall)
                     Text(if (fieldNotesArt) "Illustrated study B · Field Notes"

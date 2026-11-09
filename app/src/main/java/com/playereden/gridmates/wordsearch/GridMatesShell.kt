@@ -306,12 +306,11 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     // stack of oversized explanation cards. Keep the paperback colors and
     // hierarchy while making Solo, Daily, and Nearby visible at first glance.
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-        PaperEyebrow("GridMates · Puzzle Library")
-        Text("Word Search", color = Forest,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold)
-        Text("Good puzzles. Good company.", color = Muted,
-            style = MaterialTheme.typography.bodyMedium)
+        StorybookHeading(
+            eyebrow = "GridMates · Puzzle Library",
+            title = "Word Search",
+            subtitle = "Good puzzles. Good company."
+        )
         Text("Welcome, " + name, color = Ink,
             style = MaterialTheme.typography.labelMedium,
             maxLines = 1, overflow = TextOverflow.Ellipsis)

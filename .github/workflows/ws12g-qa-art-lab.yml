@@ -12,12 +12,14 @@ on:
       - 'app/**'
       - 'tools/asset_pipeline/**'
       - 'design/asset-pipeline/**'
+      - 'design/visual-system/**'
       - '.github/workflows/ws12g-qa-art-lab.yml'
   pull_request:
     paths:
       - 'app/**'
       - 'tools/asset_pipeline/**'
       - 'design/asset-pipeline/**'
+      - 'design/visual-system/**'
       - '.github/workflows/ws12g-qa-art-lab.yml'
 
 permissions:
@@ -69,6 +71,10 @@ jobs:
           gradle-version: '8.11.1'
       - name: Guard exact original artwork SHA and optional illustrated study source
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
+      - name: Check WS-14 real-art registry integrity and approval gates
+        run: |
+          python3 tools/asset_pipeline/validate_ws14_assets.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_asset_registry.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
       - name: Verify each exact-source A/B SVG and PNG inside QA and zero in release
@@ -128,16 +134,16 @@ jobs:
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
-          name: GRIDMATES-WS13A-REAL-BOOKSHELF-ANDROID-V56-QA-ONLY
+          name: GRIDMATES-WS14A-VISUAL-KIT-ANDROID-V57-QA-ONLY
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
       - name: Clarify source and execution limits
         run: |
           {
-            echo '### WS-13A real standing-book bookshelf · original vs Field Notes'
+            echo '### WS-14A unified native visual components · unapproved art remains isolated'
             echo 'Debug APK has 18 original + 18 illustrated SVG art and 36 matched native PNG images; release has none.'
-            echo 'QA v56 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'QA v57 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
             echo 'The artwork is unapproved; QA prototype art is already integrated into book cards and does not affect save/unlock logic.'
           } >> "$GITHUB_STEP_SUMMARY"

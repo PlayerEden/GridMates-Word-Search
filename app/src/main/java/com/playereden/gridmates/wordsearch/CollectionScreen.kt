@@ -145,12 +145,11 @@ internal fun CollectionScreen(store: SoloStore) {
         )
     }
 
-    PaperEyebrow("Your profile & rewards")
-    Text("Your Collection", color = Forest,
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.Bold)
-    Text("Collect more portraits and fonts as you finish puzzles. Everything is free.",
-        color = Muted, style = MaterialTheme.typography.bodyMedium)
+    StorybookHeading(
+        eyebrow = "Your profile & rewards",
+        title = "Your Collection",
+        subtitle = "Collect more portraits and fonts as you finish puzzles. Everything is free."
+    )
 
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
