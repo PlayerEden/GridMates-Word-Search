@@ -238,8 +238,8 @@ internal fun GridMatesShell(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .verticalScroll(pageScroll)
-                .padding(horizontal = 18.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 18.dp, vertical = if (page == Page.PLAY) 12.dp else 20.dp),
+            verticalArrangement = Arrangement.spacedBy(if (page == Page.PLAY) 10.dp else 16.dp)
         ) {
             when (page) {
                 Page.PLAY -> {
@@ -274,7 +274,8 @@ internal fun GridMatesShell(
                         onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
                         onNewSolo = { openSoloSetup(Page.PLAY) },
                         onDaily = { pageName = Page.DAILY.name },
-                        onNearby = { pageName = Page.NEARBY.name }
+                        onNearby = { pageName = Page.NEARBY.name },
+                        showQuickPlayPreview = qa.enabled
                     )
                 }
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
