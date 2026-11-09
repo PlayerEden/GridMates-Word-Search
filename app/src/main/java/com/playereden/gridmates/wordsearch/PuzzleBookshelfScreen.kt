@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.ui.platform.LocalDensity
@@ -144,10 +145,22 @@ private fun BookListCard(
                 color = Ink, style = MaterialTheme.typography.bodyMedium)
         }
         PaperProgress(completed, total)
-        Button(onClick = onOpen,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-            Text(if (completed == total) "Read again" else if (completed > 0)
-                "Continue book" else "Open book")
+        // The book thumbnail is the focal point; the native action remains
+        // prominent but need not be a full-width block in every shelf card.
+        if (showPrototypeArt) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Button(onClick = onOpen,
+                    modifier = Modifier.widthIn(min = 160.dp).heightIn(min = 48.dp)) {
+                    Text(if (completed == total) "Read again" else if (completed > 0)
+                        "Continue book" else "Open book")
+                }
+            }
+        } else {
+            Button(onClick = onOpen,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text(if (completed == total) "Read again" else if (completed > 0)
+                    "Continue book" else "Open book")
+            }
         }
     }
 }
