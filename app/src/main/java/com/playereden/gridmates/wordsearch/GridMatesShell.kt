@@ -22,8 +22,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,7 +33,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,66 +52,9 @@ import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
 
 private enum class Page(val label: String) {
-    PLAY("Play"), BOOKS_QA("Books QA"), ART_LAB("Art Lab"), RECORDS("Records"), COLLECTION("Collection"),
+    PLAY("Play"), PROFILE("Profile"), BOOKS_QA("Books QA"), ART_LAB("Art Lab"), RECORDS("Records"), COLLECTION("Collection"),
     SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle"),
     MY_PUZZLES("My Puzzles"), SOLO_SETUP("New Puzzle")
-}
-
-@Composable
-private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
-    val ink = if (selected) Forest else Muted
-    Canvas(Modifier.size(22.dp)) {
-        val w = size.width
-        val h = size.height
-        val stroke = 2.dp.toPx()
-        when (page) {
-            Page.PLAY -> {
-                val roof = Path().apply {
-                    moveTo(w * 0.12f, h * 0.46f)
-                    lineTo(w * 0.50f, h * 0.14f)
-                    lineTo(w * 0.88f, h * 0.46f)
-                }
-                drawPath(roof, ink, style = Stroke(width = stroke,
-                    cap = StrokeCap.Round, join = StrokeJoin.Round))
-                drawRect(ink, topLeft = Offset(w * 0.24f, h * 0.46f),
-                    size = Size(w * 0.52f, h * 0.40f),
-                    style = Stroke(width = stroke))
-            }
-            Page.RECORDS -> {
-                for (i in 0..2) {
-                    val barHeight = h * (0.25f + i * 0.20f)
-                    drawRoundRect(ink,
-                        topLeft = Offset(w * (0.13f + i * 0.27f), h * 0.89f - barHeight),
-                        size = Size(w * 0.16f, barHeight),
-                        cornerRadius = CornerRadius(stroke * 0.5f))
-                }
-            }
-            Page.COLLECTION -> {
-                for (row in 0..1) for (col in 0..1) {
-                    drawRoundRect(ink,
-                        topLeft = Offset(w * (0.16f + col * 0.39f),
-                            h * (0.16f + row * 0.39f)),
-                        size = Size(w * 0.28f, h * 0.28f),
-                        cornerRadius = CornerRadius(stroke),
-                        style = Stroke(width = stroke))
-                }
-            }
-            Page.SETTINGS -> {
-                drawCircle(ink, radius = w * 0.29f, style = Stroke(width = stroke))
-                drawCircle(ink, radius = w * 0.11f)
-                for (i in 0..7) {
-                    val angle = i * Math.PI / 4.0
-                    val dx = kotlin.math.cos(angle).toFloat()
-                    val dy = kotlin.math.sin(angle).toFloat()
-                    drawLine(ink,
-                        Offset(w * 0.5f + dx * w * 0.33f, h * 0.5f + dy * h * 0.33f),
-                        Offset(w * 0.5f + dx * w * 0.44f, h * 0.5f + dy * h * 0.44f),
-                        strokeWidth = stroke, cap = StrokeCap.Round)
-                }
-            }
-            else -> Unit
-        }
-    }
 }
 
 @Composable
@@ -129,14 +69,14 @@ internal fun GridMatesShell(
     var homeFocusedBookId by rememberSaveable { mutableStateOf<String?>(null) }
     var homeBookIntent by rememberSaveable { mutableStateOf<String?>(null) }
     var soloSetupReturnPage by rememberSaveable { mutableStateOf(Page.PLAY.name) }
+    // Profile-origin sections should return to Profile; Menu-origin sections to Home.
+    var sectionReturnPageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     fun openSoloSetup(origin: Page) {
         if (origin == Page.PUZZLE) soloStore.flush()
         soloSetupReturnPage = origin.name
         pageName = Page.SOLO_SETUP.name
     }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
-    val compactNavigation = LocalConfiguration.current.screenWidthDp < 360 ||
-        LocalDensity.current.fontScale >= 1.5f
     // A new page must start from its top, not inherit the previous tab's
     // scroll offset and appear mysteriously halfway down.
     val pageScroll = remember(page) { ScrollState(0) }
@@ -149,42 +89,13 @@ internal fun GridMatesShell(
         pageName = when (page) {
             Page.DAILY_PUZZLE -> Page.DAILY.name
             Page.SOLO_SETUP -> soloSetupReturnPage
+            Page.COLLECTION, Page.RECORDS -> sectionReturnPageName
             else -> Page.PLAY.name
         }
     }
 
-    Scaffold(
-        containerColor = Cream,
-        bottomBar = {
-            if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE &&
-                page != Page.NEARBY && page != Page.SOLO_SETUP &&
-                page != Page.BOOKS_QA && page != Page.ART_LAB) NavigationBar(containerColor = Paper) {
-                Page.entries.filter {
-                    it == Page.PLAY || it == Page.RECORDS ||
-                        it == Page.COLLECTION || it == Page.SETTINGS
-                }.forEach { item ->
-                    NavigationBarItem(
-                        modifier = Modifier.semantics {
-                            contentDescription = "Open " + item.label
-                        },
-                        selected = item == page,
-                        onClick = { pageName = item.name },
-                        icon = { GridMatesNavGlyph(item, item == page) },
-                        label = {
-                            val shortLabel = when (item) {
-                                Page.RECORDS -> "Stats"
-                                Page.COLLECTION -> "Items"
-                                Page.SETTINGS -> "Setup"
-                                else -> "Play"
-                            }
-                            Text(if (compactNavigation) shortLabel else item.label,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                    )
-                }
-            }
-        }
-    ) { contentPadding ->
+    // WS-16C: Profile/Menu own the secondary destinations. No duplicate footer.
+    Scaffold(containerColor = Cream) { contentPadding ->
         if (page == Page.NEARBY) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 NearbyCoopScreen(soloStore, nearbyRooms, onBack = {
@@ -228,7 +139,10 @@ internal fun GridMatesShell(
                         pageName = if (page == Page.DAILY_PUZZLE)
                             Page.DAILY.name else Page.PLAY.name
                     },
-                    onRecords = { pageName = Page.RECORDS.name },
+                    onRecords = {
+                        sectionReturnPageName = Page.PLAY.name
+                        pageName = Page.RECORDS.name
+                    },
                     onNewPuzzle = if (page == Page.DAILY_PUZZLE) null
                         else { { openSoloSetup(Page.PUZZLE) } }
                 )
@@ -241,7 +155,31 @@ internal fun GridMatesShell(
                 .padding(horizontal = 18.dp, vertical = if (page == Page.PLAY) 12.dp else 20.dp),
             verticalArrangement = Arrangement.spacedBy(if (page == Page.PLAY) 10.dp else 16.dp)
         ) {
+            if (page == Page.RECORDS || page == Page.COLLECTION ||
+                page == Page.SETTINGS) {
+                val target = if (page == Page.RECORDS || page == Page.COLLECTION)
+                    sectionReturnPageName else Page.PLAY.name
+                Ws15BackHeader(
+                    title = page.label,
+                    onBack = { pageName = target },
+                    backLabel = if (target == Page.PROFILE.name)
+                        "Back to Profile" else "Back to Home"
+                )
+            }
             when (page) {
+                Page.PROFILE -> Ws16CProfileHub(
+                    store = soloStore,
+                    onHome = { pageName = Page.PLAY.name },
+                    onCollection = {
+                        sectionReturnPageName = Page.PROFILE.name
+                        pageName = Page.COLLECTION.name
+                    },
+                    onRecords = {
+                        sectionReturnPageName = Page.PROFILE.name
+                        pageName = Page.RECORDS.name
+                    },
+                    onMyPuzzles = { pageName = Page.MY_PUZZLES.name }
+                )
                 Page.PLAY -> {
                     val booksAvailable = qa.enabled &&
                         qa.progressStore != null && qa.sessionStore != null &&
@@ -266,9 +204,12 @@ internal fun GridMatesShell(
                                 pageName = Page.BOOKS_QA.name
                             }
                         },
-                        onProfile = { pageName = Page.COLLECTION.name },
+                        onProfile = { pageName = Page.PROFILE.name },
                         onSettings = { pageName = Page.SETTINGS.name },
-                        onRecords = { pageName = Page.RECORDS.name },
+                        onRecords = {
+                            sectionReturnPageName = Page.PLAY.name
+                            pageName = Page.RECORDS.name
+                        },
                         onHelp = { pageName = Page.HELP.name },
                         onSolo = { pageName = Page.PUZZLE.name },
                         onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
