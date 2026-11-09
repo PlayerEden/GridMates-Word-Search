@@ -23,3 +23,14 @@ Last verified owner baseline before this pass: WS-16A QA artifact https://github
 
 ## Next
 Address build failures if any, capture exact-source dual-green receipt, then owner handset screenshot test. Only afterward revisit potentially shrinking covers and improving Full Shelf spine arrangements. 
+
+## Final verified Android/art receipt — same exact gameplay source
+
+**Both CI workflows completed SUCCESS for gameplay/art source SHA 0fb918c4b967a5b5bfe888289ca03a771e8ea0ac.** Later documentation-only [skip ci] commits do not create a new APK.
+
+- Standard Android QA: https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42714316623 **SUCCESS**. Core/app unit tests, lint, Android instrumentation test-source compile, and assembleDebug succeeded. **Android test source compilation is NOT handset/emulator execution.**
+- Artwork and debug/release isolation: https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42714317153 **SUCCESS**. Six WS-14 book cover/spine assets exist only in QA; zero in release. The existing 18+18 portrait sources and 36 matched native PNGs passed. Three original WS-14K2 theme motifs hash-verified and excluded from release.
+- Verified owner QA artifact ZIP: https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42714316623/artifacts/13717317690 containing app-debug.apk. ZIP artifact ID **13717317690**, 13,939,960 bytes (GitHub reported). Its historic artifact title still mentions Woodland but the compiled APK is full **WS-16B Word Search**.
+- **APK SHA-256**: 6e4ff68635727ec3a60a5a0f88ab4c1207cc26c13e75918b5614361ff5bd3f39. **Artifact ZIP SHA-256**: 085caea25d6e594f10eaf47dd55824b29426fd745910962c0c63d57056a9da8d.
+- QA package is com.playereden.gridmates.wordsearch.qa, versionCode **57**, versionName 0.9.13-visual-kit-foundation-qa. VersionCode is unchanged from previous QA so do not assume an automatic upgrade; signing/uninstall may remove saves. Export/backup before uninstall or signing conflicts.
+- Actual phone acceptance still **pending**. Owner has approved visual WS-16A, not yet WS-16B action sizes, text, scroll or new 2-person silhouette. PR #131 remains DRAFT/unmerged.
