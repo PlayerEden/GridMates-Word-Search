@@ -2,6 +2,23 @@
 
 **Start here for a new game-dev chat.** This is a snapshot, not a replacement for inspecting live GitHub.
 
+## Latest WS-14C playable artwork acceptance checkpoint (Nov 9, 2026)
+
+A **real downloadable illustrated QA APK** has been extracted from the successful WS-14 Art Lab workflow #42576785170 and SHA-256 checked against exact source commit 00d2a36: \`8a6c45ab4f879d3f7c6d5c5ba5c010b3b6d72ce2c32c8b4ebf34792506c45e0a\` (14,152,866 bytes). It has **3 Woodland/Space/Garden cover PNGs and 3 spine PNGs** inside \`assets/ws14/\`. We have not yet received physical-device results from the owner.
+
+**Read the actionable playtest guide first:** [WS-14C illustrated Android APK review and decision checklist](WS14C_ILLUSTRATED_APK_PHONE_REVIEW_2026-11-09.md). The exact artwork QA artifact (expiring) is [here](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327). This is the **artwork workflow APK**, not the standard Android QA artifact.
+
+**Test routes:**
+- Play → **Test Puzzle Books** → Study B illustrated covers/spines; toggle **Show original art (A)** / **Try WS-14 covers (B)** and open an actual book/page.
+- Play → **View Library Artwork** → **Review WS-14 assets**; should report **6 of 6** imported QA cover/spine sprites.
+- Check Collection/portraits, Solo/Daily/Nearby and save preservation; the new art does **not** yet decorate all Home/Collection screens.
+
+**Known questions:** book title lettering is baked into the candidate illustration and may clash with the native book labels; determine readability, scale, style coherence, visual density and desired further assets from genuine on-phone screenshots. **Do not generate another art family before this review.** Keep V1 immutable and make revisions as separate asset versions.
+
+**Release status:** not owner-approved, not on-phone verified, not merged to main; v56 remains known physical fallback. GitHub source/doc branch can be ahead of the exact successful APK commit from non-binary documentation changes.
+
+---
+
 ## Current Word Search state verified from GitHub
 
 **Repository:** https://github.com/PlayerEden/GridMates-Word-Search
