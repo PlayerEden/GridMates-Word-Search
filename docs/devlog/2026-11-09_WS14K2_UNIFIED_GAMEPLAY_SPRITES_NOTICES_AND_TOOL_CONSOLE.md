@@ -56,3 +56,19 @@ The owner supplied six actual phone screenshots (see [WS-14K1](2026-11-09_WS14K1
 ## Next single action
 
 Check **both final CI conclusions**, inspect failed job-level logs if needed, fix and rerun until exact source green. Then extract successful artifact receipt (actual QA package metadata, APK hash, artifact ID) and supply **one unified Android QA build** for owner to inspect. The next phone review should compare the now-visible actual Woodland/Space/Garden motifs, notification history/overlay, popup tools and word-list/board clearance—plus explicit 20×20 tracing, repeated hint behavior and save reopen. Keep PR draft, preserve rollback/saves, and do not expand art into production before visual acceptance.
+
+## Final exact-source CI result and APK delivery receipt — November 9
+
+**Both workflows successfully completed on gameplay source `ba596f98c09d0ebe58c2bdd64f56fa9946dcbc85`.** Subsequent documentation-only commits do not represent new Android code or a new APK.
+
+- **Android QA [#42682621963](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42682621963): SUCCESS.** Core/app tests, lint, Android instrumentation **source compilation** (not device execution), Android debug assemble, package identity and SHA, previous WS-14 artwork requirements and **all three new motif PNGs byte-for-byte matched the generated manifest inside the actual debug APK**.
+- **Art and release-isolation [#42682622439](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42682622439): SUCCESS.** Actual debug and release APKs compiled; independent themed images regenerated from source; new WS-14K2 3-sprite manifest checked; all three transparent PNGs present only in debug, **zero WS-14K2 files in release**, and prior WS-14J isolation also passed.
+- PNG export byte sizes printed independently by both workflows: Woodland **25,480 bytes**, Space **25,752 bytes**, Garden **22,959 bytes**; matching per-theme SHA-256 manifest checks passed. These are actual rendered originals, not a concept screenshot or future promise.
+- **Owner install ZIP artifact:** [#13703662259](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42682621963/artifacts/13703662259) from standard Android run; artifact name `GridMates-WordSearch-Woodland-Verified-QA`; ZIP includes `app-debug.apk`, not a direct raw APK link.
+- **Actual debug APK SHA-256 from Android CI log:** `30bcd610b3a7ca3576cd2cbebf6bc78166f6fcf8aa4ae68a29ce9cbf9a651d63`.
+- **ZIP artifact SHA-256 from log:** `03033c3745106ba70626f360bf95f66ff98a8cefaee20d46cb3ba17c938649c4`.
+- **Package/version:** `com.playereden.gridmates.wordsearch.qa`, versionCode **57**, versionName `0.9.13-visual-kit-foundation-qa`. Same versionCode as recent QA builds; don't claim a higher version number. Same package identity is checked, but a device signing conflict can still occur across builds; advise export/backup before any uninstall.
+- Separate [art-lab artifact #13703237997](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42682622439/artifacts/13703237997) also exists, but **one standard Android artifact** above should be the primary owner download to avoid installing different archives by mistake.
+- **Owner acceptance not yet established:** screenshots of three themed gameplay pages, hint overlay history and tools dialog, actual 20×20 word tracing and hint use, save/reopen. QA-only artwork still needs visual review; PR #131 remains draft.
+
+**Next action:** owner installs the single consolidated WS-14K2 test, sends Woodland/Space/Garden in-game and popup/screenshots/observations. Refine based on concrete problems, not another round of one-icon preview builds.
