@@ -204,6 +204,10 @@ internal fun GridMatesShell(
                                 pageName = Page.BOOKS_QA.name
                             }
                         },
+                        onCollection = {
+                            sectionReturnPageName = Page.PLAY.name
+                            pageName = Page.COLLECTION.name
+                        },
                         onProfile = { pageName = Page.PROFILE.name },
                         onSettings = { pageName = Page.SETTINGS.name },
                         onRecords = {
