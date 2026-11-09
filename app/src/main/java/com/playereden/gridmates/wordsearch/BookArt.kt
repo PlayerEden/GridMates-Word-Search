@@ -30,23 +30,27 @@ internal enum class BookArtKind(val directory: String) {
     COMPLETION("seals")
 }
 
-internal fun bookArtPath(theme: WordTheme, kind: BookArtKind): String? {
+internal fun bookArtPath(
+    theme: WordTheme, kind: BookArtKind, fieldNotes: Boolean = false
+): String? {
     val slug = when (theme) {
         WordTheme.WOODLAND -> "woodland"
         WordTheme.SPACE -> "space"
         WordTheme.GARDEN -> "garden"
     }
-    return "ws12/raster/" + kind.directory + "/" + slug + ".png"
+    val dir = if (fieldNotes) "ws12/raster_field_notes/" else "ws12/raster/"
+    return dir + kind.directory + "/" + slug + ".png"
 }
 
 @Composable
 internal fun BookArt(
     theme: WordTheme,
     kind: BookArtKind,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fieldNotes: Boolean = false
 ) {
     val context = LocalContext.current
-    val path = bookArtPath(theme, kind) ?: return
+    val path = bookArtPath(theme, kind, fieldNotes) ?: return
     val bitmap = remember(context, path) {
         runCatching {
             context.assets.open(path).use { BitmapFactory.decodeStream(it) }
