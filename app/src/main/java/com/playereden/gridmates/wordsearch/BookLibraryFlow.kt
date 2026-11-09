@@ -39,6 +39,8 @@ internal fun BookLibraryFlow(
     var pageId by remember(catalog) { mutableStateOf<String?>(null) }
     var update by remember(catalog) { mutableIntStateOf(0) }
     var feedback by remember(catalog) { mutableStateOf<String?>(null) }
+    // QA-only in-memory style choice: does NOT affect book progress or saves.
+    var fieldNotesArt by remember(catalog) { mutableStateOf(false) }
 
     val unavailable = progressStore.blocked || sessionStore.blocked
     val snapshot = remember(update, pageId, bookId) { progressStore.progress }
@@ -67,6 +69,7 @@ internal fun BookLibraryFlow(
                 progressStore = progressStore,
                 boardFontId = boardFontId,
                 showPrototypeArt = showPrototypeArt,
+                fieldNotesArt = fieldNotesArt,
                 onBack = {
                     pageId = null
                     update++
@@ -110,7 +113,8 @@ internal fun BookLibraryFlow(
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    showPrototypeArt = showPrototypeArt
+                    showPrototypeArt = showPrototypeArt,
+                    fieldNotesArt = fieldNotesArt
                 )
             }
         }
@@ -120,6 +124,10 @@ internal fun BookLibraryFlow(
                 catalog = catalog,
                 progress = snapshot,
                 showPrototypeArt = showPrototypeArt,
+                fieldNotesArt = fieldNotesArt,
+                onToggleArt = if (showPrototypeArt) {
+                    { fieldNotesArt = !fieldNotesArt }
+                } else null,
                 onBack = onExit,
                 onOpenBook = { selectedBook ->
                     if (catalog.book(selectedBook) != null) {
