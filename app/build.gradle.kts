@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 53
-        versionName = "0.9.9-book-art-integration"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 54
+        versionName = "0.9.10-bookshelf-navigation"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
