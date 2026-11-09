@@ -84,6 +84,23 @@ internal fun ws14jQaPageAccentPath(
     enabledForPageHeader && kind == BookArtKind.EMBLEM && theme == WordTheme.WOODLAND
 ) "ws14j/page-accents/woodland.png" else null
 
+/**
+ * WS-14K2 real three-theme original art. All PNGs are generated into debug
+ * assets at build time from separate Git-tracked SVG masters. The release build
+ * never contains this unapproved art; WS-14J/WS-12 remain available fallback.
+ */
+internal fun ws14k2QaGameMotifPath(
+    theme: WordTheme, kind: BookArtKind, enabledForPageHeader: Boolean
+): String? {
+    if (!enabledForPageHeader || kind != BookArtKind.EMBLEM) return null
+    val themeName = when (theme) {
+        WordTheme.WOODLAND -> "woodland"
+        WordTheme.SPACE -> "space"
+        WordTheme.GARDEN -> "garden"
+    }
+    return "ws14k2/motifs/$themeName.png"
+}
+
 /** Cap bitmap memory before presenting many standing books in a lazy shelf. */
 internal fun bookArtSampleSize(width: Int, height: Int): Int {
     if (width <= 0 || height <= 0) return 1
@@ -117,8 +134,11 @@ internal fun BookArt(
     val existingStudyPath = bookArtPath(theme, kind, fieldNotes) ?: return
     val preferredNewPath = preferredWs14QaCoverPath(theme, kind, fieldNotes)
     val preferredPageAccent = ws14jQaPageAccentPath(theme, kind, pageAccentCandidate)
-    val bitmap = remember(context, existingStudyPath, preferredNewPath, preferredPageAccent) {
-        listOfNotNull(preferredPageAccent, preferredNewPath, existingStudyPath)
+    val preferredThreeThemes = ws14k2QaGameMotifPath(theme, kind, pageAccentCandidate)
+    val bitmap = remember(context, existingStudyPath, preferredNewPath,
+        preferredPageAccent, preferredThreeThemes) {
+        listOfNotNull(preferredThreeThemes, preferredPageAccent,
+            preferredNewPath, existingStudyPath)
             .firstNotNullOfOrNull { path ->
                 runCatching {
                     decodeBookArt(context, path)
