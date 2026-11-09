@@ -30,3 +30,11 @@ Last dual-green fallback is WS-16C owner QA ZIP https://github.com/PlayerEden/Gr
 - **APK SHA-256:** `39dc1d519517cf6d64077079bcffbaf294e3a1b26e3dab87893875aca5bbe210`. **ZIP SHA-256:** `106108bce43c4bd4d5f436cae63f42c75cace94d9c137c5c2374daa865f2841e`.
 - Package `com.playereden.gridmates.wordsearch.qa`, versionCode 57, versionName 0.9.13-visual-kit-foundation-qa. Same version code as preceding QA: backup progress before any uninstall for a signing mismatch.
 - User-on-phone acceptance for WS-16D still **pending**. PR #131 stays DRAFT/unmerged. Previously verified rollback WS-16C remains available.
+
+## Owner WS-16D handset screenshot feedback (November 9, 2026)
+
+The owner supplied two actual Android phone screenshots: Home at initial scroll showing a large Woodland cover with adjacent Space peek, one shared shelf, the **Full shelf / Collection** original illustrated shortcuts arranged 50/50, Continue, Daily Puzzle, Together and the entire QA-only Quick Play coming-soon row; and Home scrolled lower showing **Custom** and **My Puzzles** without the former footer. No navigation-tab bar is present.
+
+**What visual evidence supports:** the Collection entry looks readable and naturally integrated beside Full Shelf at this device width; both show full labels with no clipping; the book cover remains large; Quick Play can be seen before scrolling and Custom/My Puzzles remain reachable after scrolling. The user supplied screenshots but did **not** separately report tapping Collection, restoring progression, accessibility interaction or Back behavior; don't claim functional acceptance based only on still images.
+
+**Focused potential refinements from review (not owner-mandated):** keep book art scale, avoid another Home overhaul, consider shaving excess whitespace above the cover and modestly reducing Continue card height before touching artwork; check whether scrolled-only Custom/My Puzzles discoverability is sufficient for older players. The user's long-term Collection request remains a separate book-specific unlock/gallery roadmap, NOT part of WS-16D.
