@@ -4,6 +4,18 @@
 
 **Current exact-source CI note:** Initial Pass 2 Android #42691135246 failed only at Android test-source compilation (missing `onNodeWithContentDescription` import in updated Books test); Art #42691135427 passed. Fixed via [`6d7e53e2`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6d7e53e2c6b7f51b16f517f802505bc5c6635768). Corrected exact-source [Android #42692044545](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044545) / [Art #42692044285](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044285) initially running. No dual-green APK claim until verified.
 
+## VERIFIED CURRENT: WS-15 Pass 2 consolidated Android QA, owner phone review next (November 9)
+
+**Exact gameplay/source commit `6d7e53e2c6b7f51b16f517f802505bc5c6635768`: dual-green.** Both [Android QA #42692044545](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044545) and [art/release isolation #42692044285](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044285) completed **SUCCESS** on the same source. Later documentation-only `[skip ci]` commits do not create a new APK.
+
+- **Owner test ZIP [#13707642014](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42692044545/artifacts/13707642014)**. Extract `app-debug.apk`. APK SHA-256 `e3da26892db7638ef8c95bbaeb9214076cfc3852286036acde884719221ec8ea`, package `com.playereden.gridmates.wordsearch.qa`, versionCode **57**; same code/version as previous QA and signing compatibility must not be assumed. Preserve/export saves before uninstall/signing conflict.
+- **What the new actual code does:** Home Daily/Together/Books use 48dp accessible arrow controls on narrow phones instead of clipping text against large buttons; native labels remain for enlarged fonts. Gameplay header removes duplicate motif so theme title has room; motif stays beside word list; compact temporary notices now float at bottom (not upper grid), mis-trace messages excluded from history. Book buttons use Book progress / Start solving / Continue solving. Collection/Records/Settings use seven new original vector glyphs in actual section headings; records stat cards share paperback styling; Settings backup guidance condensed but safety maintained.
+- **QA evidence:** full unit/lint/Compose-source build succeeded, exact QA SVG/PNG art hashes verified, release compiled with unapproved WS-14/WS-14J/WS-14K2 art excluded. Source-compiled Android tests are **not physical emulator execution**.
+- **Full date-stamped receipt:** [WS-15 Pass 2 log](devlog/2026-11-09_WS15_PASS2_RESPONSIVE_MENU_AND_SHARED_SECTION_KIT.md). Draft PR #131 remains unmerged; no user phone acceptance for WS-15 Pass 2 yet.
+- **Next:** owner installs one combined QA ZIP, sends optional Home/Books/Gameplay/Collection/Records/Settings screenshots and reports whether action navigation, hint history, 20×20 tracing and save-reopen behave; use findings for next meaningful grouped polish batch. Old Pass 1 fallback [ZIP #13704788048](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42687644991/artifacts/13704788048) remains documented.
+
+---
+
 ## CURRENT: WS-15 Pass 2 source implemented — awaiting exact Android/art QA (November 9)
 
 **Owner approved Pass 2 from five real phone screenshots.** Latest consolidated source `359f27f363169b33ec70132c9b1a7100756e6c73` on draft PR #131. Read [complete WS-15 Pass 2 milestone log](devlog/2026-11-09_WS15_PASS2_RESPONSIVE_MENU_AND_SHARED_SECTION_KIT.md). This is a real app integration, not a conceptual checklist.
