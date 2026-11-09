@@ -23,6 +23,8 @@ The source-file commit was **00d2a36d12c0410a5f04b780ff8c3fe83f69c841**. The she
 
 The same broad method was already proven for **12 Woodland profile portraits**: use immutable PNG assets and SHA-256 checking instead of runtime-generated art or transient image preview links. See **scripts/import_woodland_portraits.py** and **design/woodland/approved-portrait-reference.json**. The portraits are imported from a pinned **PlayerEden/SudokuTogether** commit in CI; do not change their source IDs or replace them while working on book art.
 
+> **Permanent pass logging:** At every artwork/feature pass, including each debug/release build, update the [development journal](DEVELOPMENT_JOURNAL.md) and add a dated [pass entry](devlog/ENTRY_TEMPLATE.md) with exact source→asset→APK evidence and the next task. The old chat need not survive for the next chat to continue.
+
 ## 1 — Start a new chat correctly
 
 1. Open this repository (not SudokuTogether, which is a separate app).

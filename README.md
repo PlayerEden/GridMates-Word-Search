@@ -1,5 +1,7 @@
 # GridMates: Word Search
 
+> **New-chat continuity:** [Development Journal — chronological who/what/why/build records](docs/DEVELOPMENT_JOURNAL.md) · [Latest WS-14C handoff](docs/WS14_ACTIVE_HANDOFF_2026-11-09.md). A dated entry is required for **each development pass and build**. The illustrated APK is available through the [GitHub Actions artwork artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327); download its ZIP and extract `app-debug.apk` when an in-chat file link fails. Physical-device QA remains open.
+
 > **WS-14 artwork pipeline and current new-chat handoff (Nov 9, 2026):** [Reproducible PNG creation → GitHub binary upload → Android import/playtest guide](docs/ASSET_CREATION_GITHUB_INTEGRATION_PLAYBOOK.md) · [Active WS-14 new-chat checkpoint](docs/WS14_ACTIVE_HANDOFF_2026-11-09.md). Six real book covers/spines were imported into the debug APK and verified absent from release on [art-workflow run #42576785170](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170); [Android QA #42576785096](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785096) also passed. **Owner physical-device art review and release rights are still pending.** Older milestones below are historical, not the current WS-14 handoff.
 
 *Good puzzles. Good company.*

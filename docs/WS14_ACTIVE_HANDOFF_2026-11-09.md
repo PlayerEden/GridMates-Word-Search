@@ -1,6 +1,6 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** This is a snapshot, not a replacement for inspecting live GitHub.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14C_APK_LINK_AND_PERSISTENT_JOURNAL.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. On-phone testing has **not** been confirmed. Subsequent passes must append the journal as a standing rule.
 
 ## Latest WS-14C playable artwork acceptance checkpoint (Nov 9, 2026)
 

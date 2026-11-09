@@ -20,6 +20,14 @@ Inspect the live repo HEAD, draft PRs and GitHub Actions first. The WS-14 snapsh
 5. Keep the original 12 Woodland profile icons and unlock/equip IDs intact. Preserve Solo/Daily, Nearby, book catalog/pages and all existing save data.
 6. CI success is different from real handset QA. Keep v56 as the last owner-verified physical fallback until the owner confirms a later one. Do not merge draft stacks or remove app data automatically.
 
+## Required: log EVERY development pass and EVERY APK build
+
+**Before making changes:** read [docs/DEVELOPMENT_JOURNAL.md](docs/DEVELOPMENT_JOURNAL.md), open the most recent dated pass entry, and state what it says we came from, what's already verified, the next objective and the fallback. Confirm live HEAD/CI rather than treating historical hashes as current.
+
+**During / at the end of EACH pass:** create a new dated \`docs/devlog/YYYY-MM-DD_<MILESTONE>_<slug>.md\` entry using [docs/devlog/ENTRY_TEMPLATE.md](docs/devlog/ENTRY_TEMPLATE.md). Cover **who, what, where, why, prior checkpoint, actual changes, decisions, tested commit and workflow result, APK artifact/checksum if a build was made, what failed or is blocked, last safe fallback and next exact action**. A blocked/no-build pass still gets a log. Add its link at the **top** of docs/DEVELOPMENT_JOURNAL.md and update the latest active handoff.
+
+**For every build**, link the actual source commit, Actions run and conclusion, and artifact, or plainly say "build pending/failed" (no false success claims). Never mark a build installed on the user's phone until the owner confirms it. Keep logs in GitHub, not just in chat. Create these documentation changes in the same PR as the feature/build whenever possible, and don't waste CI minutes rebuilding solely for documentation.
+
 ## Before ending any work session
 
 Update **docs/WS14_ACTIVE_HANDOFF_2026-11-09.md** with latest exact PR/head SHA, changed code/assets, artifact/workflow runs and outcome, blocked gates, current verified fallback and one concrete next task. Cite durable repo sources, not promises of future background work. Avoid wasting GitHub Actions minutes by repetitively retrying external Gradle HTTP 504 failures.
