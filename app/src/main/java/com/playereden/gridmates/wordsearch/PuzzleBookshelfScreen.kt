@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -115,9 +116,9 @@ private fun BookListCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 BookArt(book.theme, BookArtKind.COVER,
-                    Modifier.width(102.dp).height(136.dp))
+                    Modifier.width(102.dp).height(136.dp).testTag("book-cover-" + book.id))
                 BookArt(book.theme, BookArtKind.SPINE,
-                    Modifier.width(16.dp).height(104.dp))
+                    Modifier.width(16.dp).height(104.dp).testTag("book-spine-" + book.id))
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(book.title.removeSuffix(" · TEST BOOK"),
@@ -192,7 +193,8 @@ internal fun PuzzleBookDetailScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     if (showPrototypeArt && book != null) {
-                        BookArt(book.theme, BookArtKind.EMBLEM, Modifier.size(52.dp))
+                        BookArt(book.theme, BookArtKind.EMBLEM,
+                            Modifier.size(52.dp).testTag("book-emblem-" + book.id))
                     }
                     Column(Modifier.weight(1f)) {
                         Text(
@@ -231,7 +233,8 @@ internal fun PuzzleBookDetailScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (showPrototypeArt && pages.isNotEmpty() &&
                             completed.size == pages.size) {
-                            BookArt(book.theme, BookArtKind.COMPLETION, Modifier.size(48.dp))
+                            BookArt(book.theme, BookArtKind.COMPLETION,
+                                Modifier.size(48.dp).testTag("book-volume-complete-" + book.id))
                         }
                         Text(completed.size.toString() + " of " + pages.size +
                             " pages completed",
@@ -264,7 +267,8 @@ internal fun PuzzleBookDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             if (showPrototypeArt) {
-                                BookArt(book.theme, BookArtKind.CHAPTER, Modifier.size(44.dp))
+                                BookArt(book.theme, BookArtKind.CHAPTER,
+                                    Modifier.size(44.dp).testTag("book-chapter-" + chapter.id))
                             }
                             Column {
                                 PaperEyebrow("Chapter " + (index + 1))
@@ -290,11 +294,11 @@ internal fun PuzzleBookDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (showPrototypeArt && bookmark == page.id && !isComplete) {
                                 BookArt(book.theme, BookArtKind.BOOKMARK,
-                                    Modifier.width(23.dp).height(66.dp))
+                                    Modifier.width(23.dp).height(66.dp).testTag("book-bookmark-" + page.id))
                             }
                             if (showPrototypeArt && isComplete) {
                                 BookArt(book.theme, BookArtKind.COMPLETION,
-                                    Modifier.size(43.dp))
+                                    Modifier.size(43.dp).testTag("book-page-complete-" + page.id))
                             }
                             Column(Modifier.weight(1f)) {
                                 Text("Page " + ordinal +
