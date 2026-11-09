@@ -2,6 +2,11 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -34,7 +39,8 @@ internal fun PuzzleBookshelfScreen(
     progress: BookLibraryProgress,
     onBack: () -> Unit,
     onOpenBook: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showPrototypeArt: Boolean = false
 ) {
     val healthy = isBookStateReadable(catalog, progress)
     LazyColumn(
@@ -51,6 +57,10 @@ internal fun PuzzleBookshelfScreen(
                 Text("Puzzle Books", color = Forest,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold)
+                if (showPrototypeArt) {
+                    Text("Prototype artwork · final illustrations can change",
+                        color = Muted, style = MaterialTheme.typography.labelMedium)
+                }
                 Text("Find a book, choose a page, and pick up where you left off.",
                     color = Muted, style = MaterialTheme.typography.bodyLarge)
             }
@@ -81,7 +91,8 @@ internal fun PuzzleBookshelfScreen(
                     book = book,
                     completed = BookProgressRules.completedCount(catalog, progress, book.id),
                     total = catalog.pages(book.id).size,
-                    onOpen = { onOpenBook(book.id) }
+                    onOpen = { onOpenBook(book.id) },
+                    showPrototypeArt = showPrototypeArt
                 )
             }
         }
@@ -90,17 +101,41 @@ internal fun PuzzleBookshelfScreen(
 
 @Composable
 private fun BookListCard(
-    book: PuzzleBook, completed: Int, total: Int, onOpen: () -> Unit
+    book: PuzzleBook, completed: Int, total: Int, onOpen: () -> Unit,
+    showPrototypeArt: Boolean = false
 ) {
     PaperPanel(Modifier.fillMaxWidth()) {
         PaperEyebrow("Puzzle Book · Volume " + book.volume)
-        Text(book.title, color = Forest, fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge)
-        Text(book.theme.label + " · " + book.chapters.size +
-            (if (book.chapters.size == 1) " chapter" else " chapters"),
-            color = Muted, style = MaterialTheme.typography.bodyMedium)
-        Text(completed.toString() + " of " + total + " pages completed",
-            color = Ink, style = MaterialTheme.typography.bodyMedium)
+        if (showPrototypeArt) {
+            // The actual source-generated cover AND spine now sit beside the
+            // existing accessible title/status; the Open action stays native.
+            Row(Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                BookArt(book.theme, BookArtKind.COVER,
+                    Modifier.width(76.dp).height(102.dp))
+                BookArt(book.theme, BookArtKind.SPINE,
+                    Modifier.width(13.dp).height(80.dp))
+                Column(Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(book.title, color = Forest, fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge)
+                    Text(book.theme.label + " · " + book.chapters.size +
+                        (if (book.chapters.size == 1) " chapter" else " chapters"),
+                        color = Muted, style = MaterialTheme.typography.bodyMedium)
+                    Text(completed.toString() + " of " + total + " pages completed",
+                        color = Ink, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        } else {
+            Text(book.title, color = Forest, fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge)
+            Text(book.theme.label + " · " + book.chapters.size +
+                (if (book.chapters.size == 1) " chapter" else " chapters"),
+                color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Text(completed.toString() + " of " + total + " pages completed",
+                color = Ink, style = MaterialTheme.typography.bodyMedium)
+        }
         PaperProgress(completed, total)
         Button(onClick = onOpen,
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
@@ -123,7 +158,8 @@ internal fun PuzzleBookDetailScreen(
     onBack: () -> Unit,
     onPlayPage: ((bookId: String, pageId: String) -> Unit)? = null,
     onBookmarkPage: ((bookId: String, pageId: String) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showPrototypeArt: Boolean = false
 ) {
     val healthy = isBookStateReadable(catalog, progress)
     val book = catalog.book(bookId)
@@ -146,9 +182,16 @@ internal fun PuzzleBookDetailScreen(
                     Text("Back to Puzzle Books")
                 }
                 PaperEyebrow("GridMates · Puzzle Book")
-                Text(book?.title ?: "Book unavailable", color = Forest,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold)
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    if (showPrototypeArt && book != null) {
+                        BookArt(book.theme, BookArtKind.EMBLEM, Modifier.size(52.dp))
+                    }
+                    Text(book?.title ?: "Book unavailable",
+                        color = Forest, style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                }
             }
         }
         if (!healthy || book == null) {
@@ -166,8 +209,17 @@ internal fun PuzzleBookDetailScreen(
                 PaperPanel(Modifier.fillMaxWidth()) {
                     Text(book.theme.label + " · Volume " + book.volume,
                         color = Muted, style = MaterialTheme.typography.bodyMedium)
-                    Text(completed.size.toString() + " of " + pages.size + " pages completed",
-                        color = Ink, style = MaterialTheme.typography.bodyMedium)
+                    Row(Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (showPrototypeArt && pages.isNotEmpty() &&
+                            completed.size == pages.size) {
+                            BookArt(book.theme, BookArtKind.COMPLETION, Modifier.size(48.dp))
+                        }
+                        Text(completed.size.toString() + " of " + pages.size +
+                            " pages completed",
+                            color = Ink, style = MaterialTheme.typography.bodyMedium)
+                    }
                     PaperProgress(completed.size, pages.size)
                     if (next == null) {
                         Text("Book complete · You can revisit any page.",
@@ -191,9 +243,19 @@ internal fun PuzzleBookDetailScreen(
                         Modifier.fillMaxWidth().padding(top = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        PaperEyebrow("Chapter " + (index + 1))
-                        Text(chapter.title, style = MaterialTheme.typography.titleLarge,
-                            color = Forest, fontWeight = FontWeight.Bold)
+                        Row(Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically) {
+                            if (showPrototypeArt) {
+                                BookArt(book.theme, BookArtKind.CHAPTER, Modifier.size(44.dp))
+                            }
+                            Column {
+                                PaperEyebrow("Chapter " + (index + 1))
+                                Text(chapter.title,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = Forest, fontWeight = FontWeight.Bold)
+                            }
+                        }
                         Text(chapter.pages.count { it.id in completed }.toString() +
                             " of " + chapter.pages.size + " pages completed",
                             color = Muted, style = MaterialTheme.typography.bodyMedium)
@@ -204,14 +266,30 @@ internal fun PuzzleBookDetailScreen(
                     val isComplete = page.id in completed
                     val isCurrent = page.id == next?.id
                     PaperPanel(Modifier.fillMaxWidth()) {
-                        Text("Page " + ordinal +
-                            if (isComplete) " · Completed" else if (isCurrent)
-                                " · Next page" else " · Not started",
-                            color = Forest, style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold)
-                        Text(page.boardSize.cells.toString() + "×" + page.boardSize.cells +
-                            " · " + page.challenge.label,
-                            color = Muted, style = MaterialTheme.typography.bodyMedium)
+                        Row(Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (showPrototypeArt && bookmark == page.id && !isComplete) {
+                                BookArt(book.theme, BookArtKind.BOOKMARK,
+                                    Modifier.width(23.dp).height(66.dp))
+                            }
+                            if (showPrototypeArt && isComplete) {
+                                BookArt(book.theme, BookArtKind.COMPLETION,
+                                    Modifier.size(43.dp))
+                            }
+                            Column(Modifier.weight(1f)) {
+                                Text("Page " + ordinal +
+                                    if (isComplete) " · Completed" else if (isCurrent)
+                                        " · Next page" else " · Not started",
+                                    color = Forest,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold)
+                                Text(page.boardSize.cells.toString() + "×" +
+                                    page.boardSize.cells + " · " + page.challenge.label,
+                                    color = Muted,
+                                    style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
                         if (onPlayPage != null) {
                             Button(onClick = { onPlayPage(bookId, page.id) },
                                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
