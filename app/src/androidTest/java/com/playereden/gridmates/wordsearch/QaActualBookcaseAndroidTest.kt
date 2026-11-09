@@ -75,7 +75,7 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("book-cover-" + woodland.id).assertExists()
         compose.onNodeWithTag("book-spine-" + woodland.id).assertExists()
         compose.onNodeWithText("Woodland").assertExists()
-        compose.onNodeWithText("TEST BOOK · 1 chapter").assertExists()
+        compose.onAllNodesWithText("TEST BOOK · 1 chapter")[0].assertExists()
         compose.onNodeWithTag("shelf-cover-select-" + woodland.id).performClick()
         compose.runOnIdle { assertEquals(woodland.id, selected) }
         compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
