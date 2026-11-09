@@ -33,3 +33,9 @@ Commit **`8c22f0eed131e335eec49d9a49e67a3ee53cd865`**:
 ## Next action
 
 Read live PR #131 HEAD and the newest Actions workflow results. Fix any **real compilation** issue once the distribution step works. Prefer one passing latest artifact and provide the GitHub Actions ZIP extraction route (ChatGPT sandbox downloads previously produced "Library file not found"). Preserve old v56 and old classic shelf as rollbacks. Record successful artifact path, app identity, checksum and user screenshot feedback as a new journal entry, not just chat prose.
+
+## Follow-up evidence — official endpoints also HTTP 504
+
+On source `073cd2a73f3ded483b5d2092657477bf7991f667`, [standard Android #42583551788](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42583551788) and [Art QA #42583551775](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42583551775) both reached the custom Gradle installer but **both official endpoints still returned HTTP 504**. No Gradle ZIP was downloaded and no Kotlin compilation took place. This confirms a broader distribution-network outage for those runner requests, not source-code correctness.
+
+One bounded alternative is now implemented: after the two official sources fail, attempt `mirrors.aliyun.com` and `mirrors.huaweicloud.com` for the **same Gradle 8.11.1 ZIP**, applying the **unchanged official SHA-256** `f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6` before extraction. Mirrors are transport fallbacks only; no unverified binaries execute. Each endpoint is tried once with strict timeouts; **no looping GitHub Actions retries**. Await a fresh exact-head workflow and record actual result before sending a replacement APK.
