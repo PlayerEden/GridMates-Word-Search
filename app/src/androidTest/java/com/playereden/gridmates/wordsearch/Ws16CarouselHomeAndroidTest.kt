@@ -42,4 +42,15 @@ class Ws16CarouselHomeAndroidTest {
         compose.onNodeWithTag("ws15-back").performClick()
         compose.onNodeWithTag("ws16-resume-solo").performScrollTo().assertExists()
     }
+    @Test fun asymmetricAssetsAndQuickPlayPlaceholderHaveHonestRouting() {
+        compose.onNodeWithTag("ws16-action-daily").performScrollTo().assertExists()
+        compose.onNodeWithText("Daily Puzzle").assertExists()
+        compose.onNodeWithTag("ws16-action-together").performScrollTo().assertExists()
+        compose.onNodeWithText("Together").assertExists()
+        compose.onNodeWithTag("ws16b-quick-play-preview").performScrollTo().assertExists()
+        compose.onNodeWithText("Custom").assertExists()
+        compose.onNodeWithContentDescription("Open menu").performClick()
+        compose.onNodeWithTag("ws16b-compact-menu").assertExists()
+    }
+
 }
