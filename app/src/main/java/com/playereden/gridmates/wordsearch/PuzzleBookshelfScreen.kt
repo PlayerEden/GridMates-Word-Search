@@ -44,7 +44,9 @@ internal fun PuzzleBookshelfScreen(
     onBack: () -> Unit,
     onOpenBook: (String) -> Unit,
     modifier: Modifier = Modifier,
-    showPrototypeArt: Boolean = false
+    showPrototypeArt: Boolean = false,
+    fieldNotesArt: Boolean = false,
+    onToggleArt: (() -> Unit)? = null
 ) {
     val healthy = isBookStateReadable(catalog, progress)
     LazyColumn(
@@ -64,6 +66,20 @@ internal fun PuzzleBookshelfScreen(
                 if (showPrototypeArt) {
                     Text("Prototype artwork · final illustrations can change",
                         color = Muted, style = MaterialTheme.typography.labelMedium)
+                    Text(
+                        if (fieldNotesArt) "Illustrated study B · Field Notes"
+                        else "Original study A · Quiet Paperbacks",
+                        color = Forest, style = MaterialTheme.typography.bodyMedium
+                    )
+                    if (onToggleArt != null) {
+                        OutlinedButton(
+                            onClick = onToggleArt,
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        ) {
+                            Text(if (fieldNotesArt) "Show original art (A)"
+                                else "Try more illustrated art (B)")
+                        }
+                    }
                 }
                 Text("Find a book, choose a page, and pick up where you left off.",
                     color = Muted, style = MaterialTheme.typography.bodyLarge)
@@ -96,7 +112,8 @@ internal fun PuzzleBookshelfScreen(
                     completed = BookProgressRules.completedCount(catalog, progress, book.id),
                     total = catalog.pages(book.id).size,
                     onOpen = { onOpenBook(book.id) },
-                    showPrototypeArt = showPrototypeArt
+                    showPrototypeArt = showPrototypeArt,
+                    fieldNotesArt = fieldNotesArt
                 )
             }
         }
@@ -106,7 +123,8 @@ internal fun PuzzleBookshelfScreen(
 @Composable
 private fun BookListCard(
     book: PuzzleBook, completed: Int, total: Int, onOpen: () -> Unit,
-    showPrototypeArt: Boolean = false
+    showPrototypeArt: Boolean = false,
+    fieldNotesArt: Boolean = false
 ) {
     PaperPanel(Modifier.fillMaxWidth()) {
         PaperEyebrow("Puzzle Book · Volume " + book.volume)
@@ -117,9 +135,9 @@ private fun BookListCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 BookArt(book.theme, BookArtKind.COVER,
-                    Modifier.width(102.dp).height(136.dp).testTag("book-cover-" + book.id))
+                    Modifier.width(102.dp).height(136.dp).testTag("book-cover-" + book.id), fieldNotes = fieldNotesArt)
                 BookArt(book.theme, BookArtKind.SPINE,
-                    Modifier.width(16.dp).height(104.dp).testTag("book-spine-" + book.id))
+                    Modifier.width(16.dp).height(104.dp).testTag("book-spine-" + book.id), fieldNotes = fieldNotesArt)
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(book.title.removeSuffix(" · TEST BOOK"),
@@ -179,7 +197,8 @@ internal fun PuzzleBookDetailScreen(
     onPlayPage: ((bookId: String, pageId: String) -> Unit)? = null,
     onBookmarkPage: ((bookId: String, pageId: String) -> Unit)? = null,
     modifier: Modifier = Modifier,
-    showPrototypeArt: Boolean = false
+    showPrototypeArt: Boolean = false,
+    fieldNotesArt: Boolean = false
 ) {
     val healthy = isBookStateReadable(catalog, progress)
     val book = catalog.book(bookId)
@@ -207,7 +226,7 @@ internal fun PuzzleBookDetailScreen(
                     verticalAlignment = Alignment.CenterVertically) {
                     if (showPrototypeArt && book != null) {
                         BookArt(book.theme, BookArtKind.EMBLEM,
-                            Modifier.size(52.dp).testTag("book-emblem-" + book.id))
+                            Modifier.size(52.dp).testTag("book-emblem-" + book.id), fieldNotes = fieldNotesArt)
                     }
                     Column(Modifier.weight(1f)) {
                         Text(
@@ -247,7 +266,7 @@ internal fun PuzzleBookDetailScreen(
                         if (showPrototypeArt && pages.isNotEmpty() &&
                             completed.size == pages.size) {
                             BookArt(book.theme, BookArtKind.COMPLETION,
-                                Modifier.size(48.dp).testTag("book-volume-complete-" + book.id))
+                                Modifier.size(48.dp).testTag("book-volume-complete-" + book.id), fieldNotes = fieldNotesArt)
                         }
                         Text(completed.size.toString() + " of " + pages.size +
                             " pages completed",
@@ -281,7 +300,7 @@ internal fun PuzzleBookDetailScreen(
                             verticalAlignment = Alignment.CenterVertically) {
                             if (showPrototypeArt) {
                                 BookArt(book.theme, BookArtKind.CHAPTER,
-                                    Modifier.size(44.dp).testTag("book-chapter-" + chapter.id))
+                                    Modifier.size(44.dp).testTag("book-chapter-" + chapter.id), fieldNotes = fieldNotesArt)
                             }
                             Column {
                                 PaperEyebrow("Chapter " + (index + 1))
@@ -307,11 +326,11 @@ internal fun PuzzleBookDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (showPrototypeArt && bookmark == page.id && !isComplete) {
                                 BookArt(book.theme, BookArtKind.BOOKMARK,
-                                    Modifier.width(23.dp).height(66.dp).testTag("book-bookmark-" + page.id))
+                                    Modifier.width(23.dp).height(66.dp).testTag("book-bookmark-" + page.id), fieldNotes = fieldNotesArt)
                             }
                             if (showPrototypeArt && isComplete) {
                                 BookArt(book.theme, BookArtKind.COMPLETION,
-                                    Modifier.size(43.dp).testTag("book-page-complete-" + page.id))
+                                    Modifier.size(43.dp).testTag("book-page-complete-" + page.id), fieldNotes = fieldNotesArt)
                             }
                             Column(Modifier.weight(1f)) {
                                 Text("Page " + ordinal +

@@ -35,6 +35,27 @@ class QaBookArtworkIntegrationAndroidTest {
         }
     }
 
+    @Test fun bookArtworkABTogglePreservesNativeBookNavigationAndBackChoice() {
+        compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Original study A · Quiet Paperbacks").assertExists()
+        compose.onNodeWithText("Try more illustrated art (B)").performScrollTo().performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
+        compose.onNodeWithText("Show original art (A)").assertExists()
+        compose.onAllNodesWithText("Open book")[0].performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Getting Started · TEST").assertExists()
+        compose.onNodeWithText("Back to Puzzle Books").performClick()
+        compose.waitForIdle()
+        // A user can compare styles without creating a new puzzle or
+        // resetting the BookLibraryStore bookmark/progress files.
+        compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
+        compose.onNodeWithText("Show original art (A)").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Original study A · Quiet Paperbacks").assertExists()
+    }
+
     @Test fun actualBookshelfUsesSourceArtButKeepsNativePlayActions() {
         compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
         compose.waitForIdle()

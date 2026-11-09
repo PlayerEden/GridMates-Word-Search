@@ -63,7 +63,8 @@ internal fun BookPageGameplayScreen(
     boardFontId: String,
     onBack: () -> Unit,
     onNextPage: ((bookId: String, pageId: String) -> Unit)? = null,
-    showPrototypeArt: Boolean = false
+    showPrototypeArt: Boolean = false,
+    fieldNotesArt: Boolean = false
 ) {
     BackHandler(onBack = onBack)
     val book = catalog.book(bookId)
@@ -244,9 +245,11 @@ internal fun BookPageGameplayScreen(
                 val bookmarked = pageId ==
                     progressStore.progress.volumes[bookId]?.bookmarkedPageId
                 if (showPrototypeArt && committed) {
-                    BookArt(book.theme, BookArtKind.COMPLETION, Modifier.width(39.dp).height(39.dp))
+                    BookArt(book.theme, BookArtKind.COMPLETION, Modifier.width(39.dp).height(39.dp),
+                        fieldNotes = fieldNotesArt)
                 } else if (showPrototypeArt && bookmarked) {
-                    BookArt(book.theme, BookArtKind.BOOKMARK, Modifier.width(17.dp).height(49.dp))
+                    BookArt(book.theme, BookArtKind.BOOKMARK, Modifier.width(17.dp).height(49.dp),
+                        fieldNotes = fieldNotesArt)
                 }
                 Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
                     catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),

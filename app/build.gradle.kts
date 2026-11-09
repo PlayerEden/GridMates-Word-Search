@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 54
-        versionName = "0.9.10-bookshelf-navigation"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 55
+        versionName = "0.9.11-art-study-ab"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -98,4 +98,33 @@ val rasterizeWs12QaArt by tasks.registering(Exec::class) {
 }
 tasks.matching { it.name == "mergeDebugAssets" }.configureEach {
     dependsOn(rasterizeWs12QaArt)
+}
+
+
+/**
+ * WS-12K — a second, independently hashed experimental illustration style.
+ * The original quiet art and all saved games remain untouched.
+ * No study artwork is included in release.
+ */
+val generateWs12FieldNotes by tasks.registering(Exec::class) {
+    dependsOn(generateWs12QaArt)
+    workingDir = rootProject.projectDir
+    commandLine(
+        "python3", "tools/asset_pipeline/render_field_notes_study.py",
+        "--tokens", "design/asset-pipeline/paperback-v1-tokens.json",
+        "--original-dir", "app/src/debug/assets/ws12",
+        "--output-dir", "app/src/debug/assets/ws12/alt/field-notes"
+    )
+}
+val rasterizeWs12FieldNotes by tasks.registering(Exec::class) {
+    dependsOn(generateWs12FieldNotes)
+    workingDir = rootProject.projectDir
+    commandLine(
+        "python3", "tools/asset_pipeline/rasterize_android_qa.py",
+        "--input-dir", "app/src/debug/assets/ws12/alt/field-notes",
+        "--output-dir", "app/src/debug/assets/ws12/raster_field_notes"
+    )
+}
+tasks.matching { it.name == "mergeDebugAssets" }.configureEach {
+    dependsOn(rasterizeWs12FieldNotes)
 }
