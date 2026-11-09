@@ -44,6 +44,7 @@ internal fun Ws16HomeScreen(
     onFocusedBookChanged: (String) -> Unit,
     onPlayBook: (String) -> Unit,
     onFullShelf: () -> Unit,
+    onCollection: () -> Unit,
     onProfile: () -> Unit,
     onSettings: () -> Unit,
     onRecords: () -> Unit,
@@ -111,12 +112,6 @@ internal fun Ws16HomeScreen(
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().testTag("ws16-selected-book"))
-            TextButton(onClick = onFullShelf,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-                    .heightIn(min = 48.dp).testTag("ws16-full-shelf")) {
-                Ws15ModeEmblem(Ws15ModeGlyph.BOOKS)
-                Text("Full shelf", modifier = Modifier.padding(start = 6.dp))
-            }
         }
     } else {
         // A production build without editorially approved books must never
@@ -129,6 +124,14 @@ internal fun Ws16HomeScreen(
                 color = Muted, style = MaterialTheme.typography.bodyMedium)
         }
     }
+
+    // Puzzle volumes and their unlockable art deserve sibling Home entry points.
+    // Collection remains visible even while production books await approval.
+    Ws16DLibraryShortcuts(
+        fullShelfAvailable = selected != null && catalog != null && bookProgress != null,
+        onFullShelf = onFullShelf,
+        onCollection = onCollection
+    )
 
     PaperPanel(Modifier.fillMaxWidth().testTag("ws16-continue-solo")) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
