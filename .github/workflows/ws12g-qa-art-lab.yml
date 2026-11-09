@@ -7,6 +7,7 @@ on:
       - feature/ws12g-qa-art-lab-android-v51-2026-11-08
       - feature/ws12j-owner-book-navigation-and-compact-pages-v54-2026-11-08
       - feature/ws12k-cohesive-illustrated-book-variants-qa-v55-2026-11-08
+      - feature/ws13a-real-mobile-bookcase-v56-2026-11-08
     paths:
       - 'app/**'
       - 'tools/asset_pipeline/**'
@@ -127,16 +128,16 @@ jobs:
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
-          name: GRIDMATES-WS12K-ART-A-B-STUDY-ANDROID-V55-QA-ONLY
+          name: GRIDMATES-WS13A-REAL-BOOKSHELF-ANDROID-V56-QA-ONLY
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
       - name: Clarify source and execution limits
         run: |
           {
-            echo '### WS-12K two complete book-art studies · original vs Field Notes'
+            echo '### WS-13A real standing-book bookshelf · original vs Field Notes'
             echo 'Debug APK has 18 original + 18 illustrated SVG art and 36 matched native PNG images; release has none.'
-            echo 'QA v55 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'QA v56 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
             echo 'The artwork is unapproved; QA prototype art is already integrated into book cards and does not affect save/unlock logic.'
           } >> "$GITHUB_STEP_SUMMARY"
