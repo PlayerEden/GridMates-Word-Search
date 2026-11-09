@@ -107,6 +107,15 @@ private val PartnerMarker = Color(0xFF91B7DF)
 private val ActiveMarker = Color(0xFFE4B957)
 private val GridRule = Color(0xFFD8DFD2)
 
+/** Make the first zoom tap helpful on dense boards; the puzzle grid
+ * and its word-selection coordinate math stay entirely unchanged. */
+internal fun gridZoomTapIncrement(boardCells: Int): Float =
+    if (boardCells >= 20) 0.5f else 0.25f
+
+internal fun gridZoomInstruction(boardCells: Int): String =
+    if (boardCells >= 20) "Dense board · use + or pinch"
+    else "Trace words · pinch to zoom"
+
 @Composable
 internal fun WordSearchScreen(
     store: SoloStore,
@@ -759,7 +768,7 @@ internal fun ZoomableWordGrid(
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
-                Text("Trace words · pinch to zoom",
+                Text(gridZoomInstruction(puzzle.size),
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.labelSmall,
                     color = Muted, maxLines = 2)
@@ -775,7 +784,8 @@ internal fun ZoomableWordGrid(
                             largeTransform.zoom - 0.75f, sidePx)
                         rememberView()
                     } else {
-                        transform = transform.zoomed(transform.zoom - 0.25f, sidePx)
+                        transform = transform.zoomed(
+                            transform.zoom - gridZoomTapIncrement(puzzle.size), sidePx)
                     }
                 }, enabled = currentZoom > 1f,
                     modifier = Modifier.size(48.dp).semantics {
@@ -795,7 +805,8 @@ internal fun ZoomableWordGrid(
                             largeTransform.zoom + 0.75f, sidePx)
                         rememberView()
                     } else {
-                        transform = transform.zoomed(transform.zoom + 0.25f, sidePx)
+                        transform = transform.zoomed(
+                            transform.zoom + gridZoomTapIncrement(puzzle.size), sidePx)
                     }
                 }, enabled = currentZoom <
                     (if (largeBoard) LargeBoardViewport.MAX_ZOOM else 2.5f),

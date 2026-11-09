@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -281,11 +283,8 @@ internal fun PuzzleBookDetailScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Muted
                             )
-                            if (book.title.endsWith(" · TEST BOOK")) {
-                                Text("TEST BOOK",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Muted)
-                            }
+                            // QA status stays visible at the library entry, not
+                            // stamped repeatedly on the illustrated detail hero.
                             BookArt(book.theme, BookArtKind.EMBLEM,
                                 Modifier.size(40.dp).testTag("book-emblem-" + book.id),
                                 fieldNotes = fieldNotesArt)
@@ -330,8 +329,11 @@ internal fun PuzzleBookDetailScreen(
         } else {
             item(key = "book-progress") {
                 PaperPanel(Modifier.fillMaxWidth()) {
-                    Text(book.theme.label + " · Volume " + book.volume,
-                        color = Muted, style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        if (showPrototypeArt) "Reading progress"
+                        else book.theme.label + " · Volume " + book.volume,
+                        color = Muted, style = MaterialTheme.typography.bodyMedium
+                    )
                     Row(Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -374,16 +376,29 @@ internal fun PuzzleBookDetailScreen(
                                 BookArt(book.theme, BookArtKind.CHAPTER,
                                     Modifier.size(44.dp).testTag("book-chapter-" + chapter.id), fieldNotes = fieldNotesArt)
                             }
-                            Column {
-                                PaperEyebrow("Chapter " + (index + 1))
-                                Text(chapter.title,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = Forest, fontWeight = FontWeight.Bold)
+                            Column(Modifier.weight(1f)) {
+                                val chapterDone = chapter.pages.count { it.id in completed }
+                                PaperEyebrow(
+                                    if (showPrototypeArt)
+                                        "Chapter " + (index + 1) + " · " +
+                                            chapterDone + "/" + chapter.pages.size + " pages"
+                                    else "Chapter " + (index + 1)
+                                )
+                                Text(
+                                    if (showPrototypeArt) chapter.title.removeSuffix(" · TEST")
+                                    else chapter.title,
+                                    style = if (showPrototypeArt)
+                                        MaterialTheme.typography.titleMedium
+                                    else MaterialTheme.typography.titleLarge,
+                                    color = Forest, fontWeight = FontWeight.Bold
+                                )
                             }
                         }
-                        Text(chapter.pages.count { it.id in completed }.toString() +
-                            " of " + chapter.pages.size + " pages completed",
-                            color = Muted, style = MaterialTheme.typography.bodyMedium)
+                        if (!showPrototypeArt) {
+                            Text(chapter.pages.count { it.id in completed }.toString() +
+                                " of " + chapter.pages.size + " pages completed",
+                                color = Muted, style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                 }
                 items(chapter.pages, key = { "page:" + it.id }) { page ->
@@ -431,28 +446,41 @@ internal fun PuzzleBookDetailScreen(
                                         Button(
                                             onClick = { onPlayPage(bookId, page.id) },
                                             modifier = Modifier.weight(0.44f).heightIn(min = 48.dp)
-                                        ) { Text("Play page $ordinal") }
+                                                .semantics { contentDescription = "Play page $ordinal" }
+                                        ) { Text("Play", maxLines = 1) }
                                         OutlinedButton(
                                             onClick = { onBookmarkPage(bookId, page.id) },
                                             enabled = bookmark != page.id,
                                             modifier = Modifier.weight(0.56f).heightIn(min = 48.dp)
+                                                .semantics {
+                                                    contentDescription = if (bookmark == page.id)
+                                                        "Bookmark saved for page $ordinal"
+                                                    else "Bookmark page $ordinal"
+                                                }
                                         ) {
-                                            Text(if (bookmark == page.id) "Bookmark saved"
-                                                else "Bookmark page $ordinal")
+                                            Text(if (bookmark == page.id) "Saved" else "Bookmark",
+                                                maxLines = 1)
                                         }
                                     }
                                 } else {
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        Button(onClick = { onPlayPage(bookId, page.id) },
+                                        Button(
+                                            onClick = { onPlayPage(bookId, page.id) },
                                             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                                        ) { Text("Play page $ordinal") }
+                                                .semantics { contentDescription = "Play page $ordinal" }
+                                        ) { Text("Play", maxLines = 1) }
                                         OutlinedButton(
                                             onClick = { onBookmarkPage(bookId, page.id) },
                                             enabled = bookmark != page.id,
                                             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                                                .semantics {
+                                                    contentDescription = if (bookmark == page.id)
+                                                        "Bookmark saved for page $ordinal"
+                                                    else "Bookmark page $ordinal"
+                                                }
                                         ) {
-                                            Text(if (bookmark == page.id) "Bookmark saved"
-                                                else "Bookmark page $ordinal")
+                                            Text(if (bookmark == page.id) "Saved" else "Bookmark",
+                                                maxLines = 1)
                                         }
                                     }
                                 }
