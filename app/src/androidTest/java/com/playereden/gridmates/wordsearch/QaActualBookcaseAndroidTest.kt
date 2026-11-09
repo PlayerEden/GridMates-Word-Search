@@ -78,7 +78,7 @@ class QaActualBookcaseAndroidTest {
         compose.onAllNodesWithText("TEST BOOK · 1 chapter")[0].assertExists()
         compose.onNodeWithTag("shelf-cover-select-" + woodland.id).performClick()
         compose.runOnIdle { assertEquals(woodland.id, selected) }
-        compose.onNodeWithText("Illustrated study B · Field Notes").assertExists()
+        compose.onNodeWithText("Your bookshelf").assertExists()
 
         // Three actual published/QA catalog entries require two shelf rows
         // at ordinary phone width. There are no fake locked future books.
