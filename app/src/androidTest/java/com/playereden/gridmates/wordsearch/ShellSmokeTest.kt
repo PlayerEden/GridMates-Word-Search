@@ -36,13 +36,15 @@ class ShellSmokeTest {
     @Test fun collectionTabContainsRealWoodlandProfilesNotPrototypeCopy() {
         compose.onNodeWithText("Word Search").assertExists()
         compose.onNodeWithTag("ws16-home-header").assertExists()
-        compose.onNodeWithContentDescription("Open Collection").performClick()
+        compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-collection").performClick()
         compose.onNodeWithText("Your Collection").assertExists()
         compose.onNodeWithText("Portraits").assertExists()
         compose.onNodeWithText("Achievements").assertExists()
     }
     @Test fun fontCollectionTabShowsFreeEarnedAndDefaultStyles() {
-        compose.onNodeWithContentDescription("Open Collection").performClick()
+        compose.onNodeWithContentDescription("Open player profile").performClick()
+        compose.onNodeWithTag("ws16c-profile-collection").performClick()
         compose.onNodeWithText("Fonts").performClick()
         compose.onNodeWithText("board fonts unlocked", substring = true).assertExists()
         compose.onNodeWithText("Readable Print").assertExists()
