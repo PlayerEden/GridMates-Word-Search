@@ -87,16 +87,16 @@ jobs:
               assert 'assets/ws12/review.html' in z.namelist()
               assert 'assets/ws12/render_sha256.json' in z.namelist()
               assert z.read('assets/ws12/review.html').count(b'<h2>')==3
-            pngs=[x for x in z.namelist()
-                  if x.startswith('assets/ws12/raster/') and x.endswith('.png')]
-            assert len(pngs)==18, ('raster artwork missing',len(pngs))
-            raster=json.loads(z.read('assets/ws12/raster/manifest.json'))
-            assert raster['art_count']==18 and raster['owner_approved'] is False
-            for name, meta in raster['art'].items():
-                path='assets/ws12/raster/'+name
-                assert hashlib.sha256(z.read(path)).hexdigest()==meta['sha256']
-                svg='assets/ws12/'+name.replace('.png','.svg')
-                assert hashlib.sha256(z.read(svg)).hexdigest()==meta['source_sha256']
+              pngs=[x for x in z.namelist()
+                    if x.startswith('assets/ws12/raster/') and x.endswith('.png')]
+              assert len(pngs)==18, ('raster artwork missing',len(pngs))
+              raster=json.loads(z.read('assets/ws12/raster/manifest.json'))
+              assert raster['art_count']==18 and raster['owner_approved'] is False
+              for name, meta in raster['art'].items():
+                  path='assets/ws12/raster/'+name
+                  assert hashlib.sha256(z.read(path)).hexdigest()==meta['sha256']
+                  svg='assets/ws12/'+name.replace('.png','.svg')
+                  assert hashlib.sha256(z.read(svg)).hexdigest()==meta['source_sha256']
           with zipfile.ZipFile(releases[0]) as z:
               assert not [x for x in z.namelist() if x.startswith('assets/ws12/')], 'PROTOTYPE ART LEAKED TO RELEASE'
           print('PASS: 18 original SVGs + 18 source-matched native PNGs in QA, ZERO in release; save formats unchanged.')
