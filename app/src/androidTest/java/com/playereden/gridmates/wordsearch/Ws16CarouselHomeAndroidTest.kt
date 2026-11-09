@@ -36,6 +36,9 @@ class Ws16CarouselHomeAndroidTest {
     @Test fun fullShelfAndSoloShortcutAreStillReachable() {
         compose.onNodeWithTag("ws16-full-shelf").performScrollTo().performClick()
         compose.onNodeWithText("Puzzle Books").assertExists()
+        compose.onNodeWithTag("ws15-preview-tools").performClick()
+        compose.onNodeWithText("Try swipe library").assertExists()
+        compose.onNodeWithText("Close").performClick()
         compose.onNodeWithTag("ws15-back").performClick()
         compose.onNodeWithTag("ws16-resume-solo").performScrollTo().assertExists()
     }
