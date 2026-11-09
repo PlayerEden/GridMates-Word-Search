@@ -158,7 +158,8 @@ internal fun Ws15LibraryPreviewDialog(
     fieldNotesArt: Boolean,
     onToggleArt: (() -> Unit)?,
     onToggleLayout: (() -> Unit)?,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    layoutActionLabel: String = "Classic shelves"
 ) {
     AlertDialog(
         onDismissRequest=onDismiss,
@@ -170,7 +171,7 @@ internal fun Ws15LibraryPreviewDialog(
                 if (onToggleLayout != null) {
                     TextButton(onClick={onToggleLayout();onDismiss()},
                         modifier=Modifier.fillMaxWidth().testTag("ws15-classic-layout")) {
-                        Text("Classic shelves")
+                        Text(layoutActionLabel)
                     }
                 }
                 if (onToggleArt != null) {
