@@ -309,20 +309,63 @@ internal fun PuzzleBookDetailScreen(
                                     style = MaterialTheme.typography.bodyMedium)
                             }
                         }
-                        if (onPlayPage != null) {
-                            Button(onClick = { onPlayPage(bookId, page.id) },
-                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                                Text(if (isComplete) "Replay page $ordinal" else "Play page $ordinal")
+                        // On a normal phone the two page actions share a row,
+                        // avoiding a long pair of oversized buttons on every page.
+                        // Stack again for 320dp and/or enlarged system text.
+                        if (showPrototypeArt && !isComplete &&
+                            onPlayPage != null && onBookmarkPage != null) {
+                            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                                val compactRow = maxWidth >= 270.dp &&
+                                    LocalDensity.current.fontScale <= 1.25f
+                                if (compactRow) {
+                                    Row(Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Button(
+                                            onClick = { onPlayPage(bookId, page.id) },
+                                            modifier = Modifier.weight(0.44f).heightIn(min = 48.dp)
+                                        ) { Text("Play page $ordinal") }
+                                        OutlinedButton(
+                                            onClick = { onBookmarkPage(bookId, page.id) },
+                                            enabled = bookmark != page.id,
+                                            modifier = Modifier.weight(0.56f).heightIn(min = 48.dp)
+                                        ) {
+                                            Text(if (bookmark == page.id) "Bookmark saved"
+                                                else "Bookmark page $ordinal")
+                                        }
+                                    }
+                                } else {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Button(onClick = { onPlayPage(bookId, page.id) },
+                                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                                        ) { Text("Play page $ordinal") }
+                                        OutlinedButton(
+                                            onClick = { onBookmarkPage(bookId, page.id) },
+                                            enabled = bookmark != page.id,
+                                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                                        ) {
+                                            Text(if (bookmark == page.id) "Bookmark saved"
+                                                else "Bookmark page $ordinal")
+                                        }
+                                    }
+                                }
                             }
-                        }
-                        if (!isComplete && onBookmarkPage != null) {
-                            OutlinedButton(
-                                onClick = { onBookmarkPage(bookId, page.id) },
-                                enabled = bookmark != page.id,
-                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                            ) {
-                                Text(if (bookmark == page.id) "Bookmark saved"
-                                    else "Bookmark page $ordinal")
+                        } else {
+                            if (onPlayPage != null) {
+                                Button(onClick = { onPlayPage(bookId, page.id) },
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                    Text(if (isComplete) "Replay page $ordinal"
+                                        else "Play page $ordinal")
+                                }
+                            }
+                            if (!isComplete && onBookmarkPage != null) {
+                                OutlinedButton(
+                                    onClick = { onBookmarkPage(bookId, page.id) },
+                                    enabled = bookmark != page.id,
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                                ) {
+                                    Text(if (bookmark == page.id) "Bookmark saved"
+                                        else "Bookmark page $ordinal")
+                                }
                             }
                         }
                     }
