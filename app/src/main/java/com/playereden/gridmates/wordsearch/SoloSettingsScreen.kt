@@ -40,7 +40,10 @@ import com.playereden.gridmates.wordsearch.core.WoodlandCollection
  * broad storage permissions; the player explicitly chooses where data goes.
  */
 @Composable
-internal fun SoloSettingsScreen(store: SoloStore) {
+internal fun SoloSettingsScreen(
+    store: SoloStore,
+    onPreviewArtwork: (() -> Unit)? = null
+) {
     val context = LocalContext.current
     var message by rememberSaveable { mutableStateOf("") }
     var pendingImport by remember { mutableStateOf<SoloProfile?>(null) }
@@ -218,6 +221,22 @@ internal fun SoloSettingsScreen(store: SoloStore) {
                 .versionName
         }.getOrNull().orEmpty().ifEmpty { "Unknown" },
             color = Muted, style = MaterialTheme.typography.labelMedium)
+    }
+    if (onPreviewArtwork != null) {
+        // Keep developer art review accessible without occupying the Play menu.
+        // QA-only app builds provide this route; regular builds do not.
+        PaperPanel(Modifier.fillMaxWidth()) {
+            PaperEyebrow("Preview tools")
+            Text("Artwork comparison", color = Forest,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold)
+            Text("Review candidate book artwork in this test build.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
+            OutlinedButton(onClick = onPreviewArtwork,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text("View artwork previews")
+            }
+        }
     }
     store.warning?.let {
         Text(it, color = Gold, style = MaterialTheme.typography.bodyMedium)
