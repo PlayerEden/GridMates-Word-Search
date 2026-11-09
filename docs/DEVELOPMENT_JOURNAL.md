@@ -4,21 +4,21 @@
 
 **Current workstream:** [WS-14 illustrated paperback UI](WS14_ACTIVE_HANDOFF_2026-11-09.md).  
 **Full asset pipeline:** [Art Creation and GitHub Integration Playbook](ASSET_CREATION_GITHUB_INTEGRATION_PLAYBOOK.md).  
-**Latest build source-matched evidence:** [Android QA #42576785096](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785096) and [6-sprite art QA #42576785170](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170), both **success** on source commit \`00d2a36d12c0410a5f04b780ff8c3fe83f69c841\`. See [APK field test](WS14C_ILLUSTRATED_APK_PHONE_REVIEW_2026-11-09.md).
+**Latest build source-matched evidence:** [Android QA #42576785096](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785096) and [6-sprite art QA #42576785170](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170), both **success** on source commit `00d2a36d12c0410a5f04b780ff8c3fe83f69c841`. See [APK field test](WS14C_ILLUSTRATED_APK_PHONE_REVIEW_2026-11-09.md).
 
 ## Latest development passes (newest first)
 
 | Date (UTC) | Pass | Previous → new state | Outcome | Next |
 | --- | --- | --- | --- | --- |
 | 2026-11-09 | [WS-14C-LOG — APK handoff recovery & persistent journal](devlog/2026-11-09_WS14C_APK_LINK_AND_PERSISTENT_JOURNAL.md) | CI-green illustrated APK → user reports "Library file not found"; process had no unified session log | Verified exact APK bytes locally; identified GitHub-hosted artifact URL; introduced mandatory per-pass journal structure; **on-phone installation not confirmed** | Have owner use GitHub artifact and report installation/screenshots; review six covers/spines before more art |
-| 2026-11-09 | [WS-14B5 — Binary art import & QA evidence](WS14B5_PINNED_SHEET_IMPORT_2026-11-09.md) | Text-only art/import scaffolding → actual 3,129,981-byte PNG source committed and six sprites imported to debug APK | Source \`00d2a36\`; Android QA + art isolation **both passed**; zero WS-14 sprites in release | Owner physical visual/style review; don't confuse candidate replacement art with earlier OpenArt concepts |
+| 2026-11-09 | [WS-14B5 — Binary art import & QA evidence](WS14B5_PINNED_SHEET_IMPORT_2026-11-09.md) | Text-only art/import scaffolding → actual 3,129,981-byte PNG source committed and six sprites imported to debug APK | Source `00d2a36`; Android QA + art isolation **both passed**; zero WS-14 sprites in release | Owner physical visual/style review; don't confuse candidate replacement art with earlier OpenArt concepts |
 | 2026-11-09 | [WS-14C — illustrated phone review plan](WS14C_ILLUSTRATED_APK_PHONE_REVIEW_2026-11-09.md) | Approved creative direction and initial component kit → real A/B preview route and dedicated test APK | Real 3 covers and 3 spines; functional bookshelf and native Art Lab preview; **handset QA pending** | Test A/B in actual Bookshelf, opened page, Collection and Play |
 
 The last two entries summarize earlier work from source-backed docs and runs; they are **not** an invented full history of every previous conversation. Future entries should be added as the work happens.
 
 ## Mandatory development pass protocol
 
-**Create/update a journal entry for every development pass that changes code, assets, tests, UI, plans, or release decisions—even if the pass fails or becomes blocked. Every APK build or test artifact must also get an entry.** Keep this human-readable; concise is fine for a tiny change. Use [the journal template](devlog/ENTRY_TEMPLATE.md) and place an immutable pass file under \`docs/devlog/YYYY-MM-DD_<MILESTONE>_<SHORT_SLUG>.md\`; add a newest-first row here.
+**Create/update a journal entry for every development pass that changes code, assets, tests, UI, plans, or release decisions—even if the pass fails or becomes blocked. Every APK build or test artifact must also get an entry.** Keep this human-readable; concise is fine for a tiny change. Use [the journal template](devlog/ENTRY_TEMPLATE.md) and place an immutable pass file under `docs/devlog/YYYY-MM-DD_<MILESTONE>_<SHORT_SLUG>.md`; add a newest-first row here.
 
 For each pass, record:
 
