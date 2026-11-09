@@ -244,9 +244,6 @@ internal fun GridMatesShell(
                     onNearby = { pageName = Page.NEARBY.name },
                     onQaBooks = if (qa.enabled) {
                         { pageName = Page.BOOKS_QA.name }
-                    } else null,
-                    onArtLab = if (qa.enabled) {
-                        { pageName = Page.ART_LAB.name }
                     } else null)
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
                     onBack = { pageName = Page.PLAY.name },
@@ -267,7 +264,12 @@ internal fun GridMatesShell(
                     onBack = { pageName = Page.PLAY.name })
                 Page.RECORDS -> SoloRecordsScreen(soloStore.profile)
                 Page.COLLECTION -> CollectionScreen(soloStore)
-                Page.SETTINGS -> SoloSettingsScreen(soloStore)
+                Page.SETTINGS -> SoloSettingsScreen(
+                    soloStore,
+                    onPreviewArtwork = if (qa.enabled) {
+                        { pageName = Page.ART_LAB.name }
+                    } else null
+                )
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }
         }
@@ -293,8 +295,7 @@ private fun Heading(eyebrow: String, heading: String) {
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     onMyPuzzles: () -> Unit, onNewSolo: () -> Unit,
     onDaily: () -> Unit, onNearby: () -> Unit,
-    onQaBooks: (() -> Unit)? = null,
-    onArtLab: (() -> Unit)? = null) {
+    onQaBooks: (() -> Unit)? = null) {
     val run = store.profile.active
     val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
     val finished = WordSearchRules.complete(puzzle, run.foundIds)
@@ -325,7 +326,12 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
         Row(Modifier.fillMaxWidth(),
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
-            PaperEyebrow("01 · Solo")
+            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Ws15ModeEmblem(Ws15ModeGlyph.SOLO,
+                    Modifier.testTag("ws15-solo-mode-icon"))
+                PaperEyebrow("01 · Solo")
+            }
             if (!finished) TextButton(onClick = onNewSolo) {
                 Text("New puzzle")
             }
@@ -352,36 +358,30 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     }
 
     StorybookQuickEntry(
-        eyebrow = "02 · A little every day",
+        eyebrow = "02 · Daily",
         title = "Daily puzzle",
         actionLabel = "Open Daily",
-        onAction = onDaily
+        onAction = onDaily,
+        modeGlyph = Ws15ModeGlyph.DAILY
     )
 
     StorybookQuickEntry(
-        eyebrow = "03 · Together is better",
+        eyebrow = "03 · Together",
         title = "Same Wi-Fi",
         actionLabel = "Play Together",
         actionDescription = "Open Nearby co-op",
-        onAction = onNearby
+        onAction = onNearby,
+        modeGlyph = Ws15ModeGlyph.TOGETHER
     )
 
     if (onQaBooks != null) {
         StorybookQuickEntry(
-            eyebrow = "04 · Puzzle library · QA only",
+            eyebrow = "04 · Books",
             title = "Puzzle Books",
-            actionLabel = "Test Puzzle Books",
-            onAction = onQaBooks
+            actionLabel = "Explore books",
+            onAction = onQaBooks,
+            modeGlyph = Ws15ModeGlyph.BOOKS
         )
-    }
-
-    // Keep art/debug tools findable but away from the first-fold real game
-    // launcher. They should not read like a fourth major play mode.
-    if (onArtLab != null) {
-        TextButton(onClick = onArtLab,
-            modifier = Modifier.fillMaxWidth().height(48.dp)) {
-            Text("View Library Artwork")
-        }
     }
 
     TextButton(onClick = onHelp, modifier = Modifier.fillMaxWidth()) {
