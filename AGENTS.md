@@ -11,6 +11,8 @@ This is **GridMates: Word Search**, a separate offline-first Android puzzle game
 
 Inspect the live repo HEAD, draft PRs and GitHub Actions first. The WS-14 snapshot is PR #131 stacked on #130; its exact known successful import/build evidence is commit 00d2a36 with workflows 42576785170 and 42576785096. Future work may supersede those IDs.
 
+**Shared identity and motion:** Read [docs/GRIDMATES_SHARED_VISUAL_IDENTITY_AND_MOTION_2026-11-09.md](docs/GRIDMATES_SHARED_VISUAL_IDENTITY_AND_MOTION_2026-11-09.md) before new art, trademark styling, animations or cross-game reuse. Never add an unverified ® symbol; static and motion states must be clearly distinguished in QA.
+
 ## Artwork integration rules
 
 1. **Build actual game assets, not static concept screenshots.** Preserve original source images, SHA-256 and provenance; derive independent PNG/vector sprites, with native Compose controls/text.

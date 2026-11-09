@@ -1,6 +1,12 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14C_APK_LINK_AND_PERSISTENT_JOURNAL.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. On-phone testing has **not** been confirmed. Subsequent passes must append the journal as a standing rule.
+**Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14E_GRIDMATES_IDENTITY_AND_MOTION_DESIGN.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. On-phone testing has **not** been confirmed. Subsequent passes must append the journal as a standing rule.
+
+## Newest WS-14E brand/shared-assets/motion design — November 9, 2026
+
+Owner notes: **GridMates is not registered**, so do not use **®**. Default to plain **GridMates** (optional ™ when appropriate), check both baked artwork and native UI before any public release. Design a **cohesive GridMates series** with shared materials/typography/asset sourcing and limited compatible sprite reuse between Word Search, Sudoku, Crossword later. Motion should give life subtly: selected-book lift/snap, native transitions, one-shot rewards; blinking owl/moving butterfly needs separately exported sprite layers, unlike the existing flattened PNGs. Avoid perpetual idle effects; honor reduced motion and game input.
+
+**Read [WS-14E development log](devlog/2026-11-09_WS14E_GRIDMATES_IDENTITY_AND_MOTION_DESIGN.md) and [cross-game brand/motion contract](GRIDMATES_SHARED_VISUAL_IDENTITY_AND_MOTION_2026-11-09.md).** This was **design/documentation only**; don't claim animated assets or changed app resources exist. Next coding pass remains WS-14D QA horizontal book browser, with one understated book-selection animation and honest old-layout A/B. Do not modify Sudoku or replace current immutable V1 sprites without separate owner/rights review.
 
 ## Newest WS-14D owner screenshot review — November 9, 2026
 
