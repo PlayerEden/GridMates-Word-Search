@@ -30,6 +30,20 @@
 
 ---
 
+## CURRENT: WS-16D Collection Home entry beside Full Shelf — themed gallery next
+
+**Owner's November 9 phone review:** WS-16C Home without bottom footer looks good. Owner wants Collection promoted from buried Profile page to a dedicated main destination, and eventually a true visual unlock gallery with one album per book theme plus basic general rewards. See [WS-16D design](design/WS16D_COLLECTION_HOME_SHORTCUT_AND_THEMED_GALLERY_ROADMAP_2026-11-09.md) and [actual code/devlog](devlog/2026-11-09_WS16D_COLLECTION_HOME_AND_THEMED_GALLERY_DIRECTION.md).
+
+**Implemented source `47aa0f10b34186cd7eea6c2160ea7c476627108e`:** New original Collection gallery SVG master and native illustrated Gallery/Book Shelf duo in `Ws16DLibraryShortcuts.kt`, paired in one row underneath the book carousel, responsive to small widths and larger fonts, accessible, >=56dp touch targets. `Ws16HomeScreen.kt` now promotes Collection next to existing Full Shelf; `GridMatesShell.kt` routes Home Collection directly to real `CollectionScreen` with Back Home. Existing Profile collection link remains. New Android route test. Production no-book state still exposes Collection but hides unavailable Full Shelf. No rewards or gameplay/saves rewritten.
+
+**Future reward design—not implemented:** Existing 12 Woodland portraits unlock from general Solo/Daily completions; fonts via achievements. Do **not** revoke/relock these to the Woodland book. Instead design book-specific collection albums and NEW stable IDs/rules based on verified published book page/chapter/volume progress. QA prototype books must never grant release rewards. Production BookCatalog currently has zero book records.
+
+**CI source gate started:** [Android #42719067784](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42719067784), [art/release isolation #42719067846](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42719067846) for exact code source `47aa0f10`. No owner APK until both green and checksum verified. Previous verified rollback is WS-16C [owner QA ZIP #13717803408](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42717003929/artifacts/13717803408). PR #131 draft/unmerged.
+
+**Next test:** Home book cover retained, Full Shelf + Collection side by side (or stacked on compact phone), direct collection opens Portraits/Fonts/Achievements, Back returns Home, Profile still links to Collection, no bottom bar, Daily/Together/Custom/Quick Play QA placeholder unaffected. Then move gallery UX/asset catalog into a separate future milestone after owner approval.
+
+---
+
 ## CURRENT: WS-16C footer removal and functional Profile — exact-source CI in progress
 
 **Owner instruction:** After seeing WS-16B Android screenshots, owner approved eliminating the redundant Play/Records/Collection/Settings bottom navigation. The freed vertical space should expose Quick Play/Custom sooner, without shrinking the illustrated carousel. Keep all destinations functional, using top-right Profile/Menu and reliable Back.
