@@ -51,6 +51,7 @@ def spine_svg(theme):
 
 
 def review_html(themes):
+    """Compact art-first phone gallery; deliberately not a fake playable UI."""
     cards = []
     for t in themes:
         theme_id, title = t["id"], html.escape(t["label"])
@@ -70,69 +71,69 @@ def review_html(themes):
         )
         cards.append(
             f'<article class="volume">'
-            f'<div class="eyebrow">GRIDMATES · PUZZLE BOOK · PROTOTYPE</div>'
+            f'<p class="eyebrow">PUZZLE BOOK · ART STUDY</p>'
             f'<h2>{title}</h2>'
-            f'<p class="subtitle">Volume I · coordinated six-piece visual family</p>'
+            f'<p class="subtitle">Volume I · Six matching pieces</p>'
             f'<div class="art">{cells}</div>'
-            f'<div class="card-bottom"><div><strong>{title} Volume I</strong>'
-            f'<p>3 pages · 2 chapters</p></div>'
-            f'<span class="open">Open book</span></div>'
-            f'<p class="label">Visual review only · no real play or progress here</p>'
+            f'<div class="card-bottom"><span>{title} · Volume I</span>'
+            f'<span class="state">Prototype artwork</span></div>'
             '</article>'
         )
     return """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GridMates Word Search · WS-12F Three-Family Art Review</title>
+<title>GridMates Word Search · Three-Family Art Study</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#F4F3EB;color:#263D36;
- font:16px system-ui, sans-serif}main{max-width:1180px;margin:0 auto;padding:24px}
-h1,h2{font-family:Georgia,serif;color:#214F3F;margin:.5rem 0}
-h1{font-size:clamp(26px,4vw,42px)}h2{font-size:26px}
-.lead{max-width:780px;line-height:1.5;color:#55665C}
-.alert{background:#FFFDF8;border-left:5px solid #8A6729;padding:12px 18px;
- line-height:1.5;margin:16px 0 26px}
-.shelf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+*{box-sizing:border-box}
+body{margin:0;background:#F4F3EB;color:#263D36;font:15px/1.38 system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:16px}
+h1,h2{font-family:Georgia,serif;color:#214F3F}
+h1{font-size:clamp(23px,3vw,33px);margin:5px 0 6px}
+h2{font-size:25px;margin:5px 0 3px}
+.eyebrow{color:#55665C;font-size:11px;font-weight:700;letter-spacing:.09em;margin:0}
+.intro{margin:0 0 16px;color:#55665C;max-width:720px}
+.shelf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
 .volume{min-width:0;background:#FFFDF8;border:1px solid #DFE0D6;
- border-radius:18px;padding:18px;box-shadow:0 3px 9px #263d3612}
-.eyebrow{color:#55665C;font-size:11px;font-weight:700;letter-spacing:.11em}
-.subtitle{color:#55665C;font-size:13px;line-height:1.35}
-.art{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;
- align-items:end;margin:16px 0 18px}
+border-radius:18px;padding:16px;box-shadow:0 2px 6px #263d3612}
+.subtitle{color:#55665C;font-size:13px;margin:2px 0}
+.art{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+gap:6px;align-items:end;margin:14px 0}
 figure{margin:0;text-align:center;min-width:0}
 .asset.cover{grid-column:span 3}
 .asset.spine{grid-column:span 1}
 .asset img{width:100%;display:block;max-height:212px;object-fit:contain}
 .asset.cover img{aspect-ratio:3/4}.asset.spine img{height:160px}
-.asset.small img{height:62px}.asset figcaption{font-size:11px;margin-top:4px;color:#55665C}
+.asset.small img{height:62px}
+.asset figcaption{font-size:11px;margin-top:4px;color:#55665C}
 .card-bottom{border-top:1px solid #DFE0D6;padding-top:12px;
- display:flex;gap:10px;justify-content:space-between;align-items:center}
-.card-bottom p{margin:4px 0;color:#55665C;font-size:13px}
-.open{background:#214F3F;color:white;padding:11px;border-radius:8px;
- font-size:13px;white-space:nowrap}
-.label{font-size:11px;color:#55665C;margin-bottom:0}
-footer{font-size:13px;color:#55665C;line-height:1.5;margin:20px 0}
+display:flex;gap:8px;justify-content:space-between;align-items:center;
+color:#263D36;font-size:13px;font-weight:600;flex-wrap:wrap}
+.state{font-size:11px;color:#55665C;font-weight:500}
+.note{margin-top:18px;border-top:1px solid #DFE0D6;padding:12px 2px;
+font-size:13px;color:#55665C;line-height:1.5}
+.note summary{cursor:pointer;color:#214F3F;font-weight:600}
+.note p{max-width:750px}
 @media(max-width:900px){.shelf{grid-template-columns:1fr}
- .volume{max-width:600px;margin:auto;width:100%}.asset img{max-height:270px}
- .asset.cover img{max-height:270px}}
-@media(max-width:420px){main{padding:12px}.shelf{grid-template-columns:1fr}
- .volume{padding:14px}.art{gap:4px}.asset figcaption{font-size:10px}
- .card-bottom{flex-wrap:wrap}}
+.volume{max-width:600px;margin:auto;width:100%}
+.asset img{max-height:245px}.asset.cover img{max-height:245px}}
+@media(max-width:420px){main{padding:12px}
+.shelf{grid-template-columns:1fr;gap:13px}
+.volume{padding:14px}.art{gap:4px;margin:11px 0}
+.asset figcaption{font-size:10px}
+h1{font-size:25px}h2{font-size:24px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body><main>
-<p class="eyebrow">WS-12F · REVIEW PROOF · NOT RELEASE ART</p>
-<h1>One little library. Three different worlds.</h1>
-<p class="lead">These book decorations share the same fixed paperback geometry,
-quiet print-inspired silhouettes, and native paper/ink UI colors. Everything here
-is source-generated from the exact WS-12C/D artwork—no random restyling.</p>
-<div class="alert"><strong>Unapproved concept preview.</strong> These are not
-published book covers or actual Android UI. All labels and progress are editable
-HTML text, not embedded in the art. A real device preview and owner visual review
-are still required before packaging any of these assets.</div>
+<p class="eyebrow">GRIDMATES · WORD SEARCH · ART LAB</p>
+<h1>Library artwork</h1>
+<p class="intro"><strong>Unapproved concept preview.</strong>
+Compare Woodland, Space and Garden together. This is a visual study, not a playable book.</p>
 <section class="shelf">""" + "".join(cards) + """</section>
-<footer>Review as a family: consistent shape, padding, emblem weight, small-size
-clarity and theme recognizability. In the app, decorative artwork will never
-replace native accessible text or buttons. The original Woodland portraits stay
-untouched.</footer>
+<details class="note"><summary>About these artwork prototypes</summary>
+<p>These six-piece book families use one shared paperback geometry, existing
+source-controlled motifs and native paper/ink colors. All labels and progress
+remain editable UI text, not lettering baked into artwork. The illustrations
+do not replace any existing game screens or original Woodland portraits.
+Only an explicit owner review can approve an asset for the finished app.</p>
+</details>
 </main></body></html>
 """
 
