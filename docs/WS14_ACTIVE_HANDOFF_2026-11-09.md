@@ -2,6 +2,18 @@
 
 **Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14J_ART_PRODUCTION_KICKOFF.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14H compact light-bulb layout has now been photographed and positively reviewed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
 
+## Newest WS-14J1 checkpoint — real Woodland transparent source and binary committed (November 9)
+
+**Do not restart art planning or claim an APK was shipped.** The owner asked to continue WS-14J. The first style-anchor art candidate is now *actually in GitHub*:
+- [Real PNG binary](../design/visual-system/exports/ws14j-page-accent-woodland-v1-128.png): 128×128 transparent, 2745 bytes, SHA-256 `747af7c99b76b7ed38c91460409fd9d32a24decd1c1412991d9c364a3f3b331b`. First binary commit [f2d84e7](https://github.com/PlayerEden/GridMates-Word-Search/commit/f2d84e7a1d9e64aa8b8bf55d6428207b305c86c6).
+- [Editable vector source](../design/visual-system/masters/ws14j-page-accent-woodland-v1.svg), 512×512 nominal canvas, SHA-256 `a757ac3a5be430cb3fc2ae2ea32f4e6513baf8887a66dbd2818c76ef5d7fbb80`, committed [441bef1](https://github.com/PlayerEden/GridMates-Word-Search/commit/441bef1d2a0f9e0650be0c5d19b9d971a95b156e).
+- [Candidate manifest](../design/visual-system/ws14j-page-accent-candidates.json) **GENERATED_UNREVIEWED**, `PENDING_REVIEW` rights, no APK integration; [new source-integrity test](../tools/asset_pipeline/test_ws14j_page_accent.py); [full pass log](devlog/2026-11-09_WS14J1_FIRST_WOODLAND_TRANSPARENT_ASSET.md).
+- The source is an original assistant-authored standalone botanical vector; discarded image-generated project boards were never imported. 24/32/36/72dp local previews were inspected.
+- **Exact last code-tested gameplay remains** WS-14I source `3a3d0bcdde21de12a5d132c8ad85cc6b00997270` with successful Android/art runs #42664221672 and #42664221664. Later documentation commits and standalone art have not been declared Android/handset-green. PR #131 remains draft, **v56 remains the stated physical rollback**.
+- **Next single task:** wire this actual local transparent PNG into the QA-only book-header art selector (fallback to existing native emblem/text, no puzzle grid decoration or release image) and verify exact-source Android/art CI and pixel/hash tests before handset approval. Space and Garden siblings remain planned until this first style anchor is assessed. Original covers, profiles, local save schemas and signing stay unchanged.
+
+---
+
 ## Current work phase — WS-14J three-theme page-accent art (Nov 9)
 
 **Owner says:** "Seems good. Let's move on." Treat this as consent to **start the next visual/art phase** and positive general design feedback; it is **not specific evidence** that the new five-tap Hint / 20×20 drag and save-reopen checklist was completed.
