@@ -32,6 +32,12 @@
 
 **UI composition rules:** no invisible gesture-eating overlays; native button semantics stay active; bulb is a Canvas vector (no emoji/color mismatch, no separate PNG required); reduced-motion is valid static. The H prototype changes only QA art-visible book pages; **non-QA/release presentations must not be altered solely to show unapproved art.**
 
+## WS-14H2 owner device findings and regular-book size boundary — Nov 9
+
+[Actual phone/screenshots and source preset decision](devlog/2026-11-09_WS14H2_PHONE_SPACING_AND_BOOK_SIZE_CEILING.md): four Woodland 12/15/20 gameplay screenshots confirm the icon-only bulb and compact header have **much better on-phone breathing room**. **Regular illustrated books: 12×12 relaxed, 15×15 standard, 20×20 maximum.** Oversized **25×25/30×30** remain elective Free Play choices (already included via `soloPresets`), with an optional future **Large Puzzles** grouping. Do **not** remove larger generators, mutate frozen page recipes or move persisted sessions. 100×100 Marathon remains a separate unimplemented future concept.
+
+**Remaining P0 gates:** the user saw “No hints available” at 0/24 on 20×20; core enforces 4 hint steps for this size and the UI currently conflates quota expiration with persistence/blocked states. Verify first hint on a fresh page, distinguish failure reasons before changing policy, and prove a saved 20×20 word claim/zoom. Space/Garden tint and accessibility/landscape are not yet owner-reviewed. No new art/production layout lock based on positive screenshots alone.
+
 ## Milestones and acceptance gates
 
 ### WS-14H1 — Compact gameplay source and build (implementation underway)
