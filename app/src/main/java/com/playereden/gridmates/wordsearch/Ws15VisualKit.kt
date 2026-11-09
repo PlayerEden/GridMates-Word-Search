@@ -102,6 +102,36 @@ internal fun Ws15ModeEmblem(kind: Ws15ModeGlyph, modifier: Modifier = Modifier) 
     }
 }
 
+/**
+ * Space-efficient real action for small launcher cards. Icon-only visual,
+ * but a full 48dp tap target with a descriptive accessible destination.
+ */
+@Composable
+internal fun Ws15ForwardActionButton(
+    onClick: () -> Unit,
+    actionDescription: String,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier.size(48.dp)
+            .semantics { contentDescription = actionDescription }
+            .testTag("storybook-quick-action")
+    ) {
+        Canvas(Modifier.size(24.dp)) {
+            drawLine(Forest, Offset(size.width*.22f,size.height*.5f),
+                Offset(size.width*.79f,size.height*.5f),
+                strokeWidth=2.3.dp.toPx(),cap=StrokeCap.Round)
+            drawLine(Forest, Offset(size.width*.56f,size.height*.24f),
+                Offset(size.width*.79f,size.height*.5f),
+                strokeWidth=2.3.dp.toPx(),cap=StrokeCap.Round)
+            drawLine(Forest, Offset(size.width*.79f,size.height*.5f),
+                Offset(size.width*.56f,size.height*.76f),
+                strokeWidth=2.3.dp.toPx(),cap=StrokeCap.Round)
+        }
+    }
+}
+
 /** Shared compact book/menu header. Screen-reader labels preserve destination. */
 @Composable
 internal fun Ws15BackHeader(

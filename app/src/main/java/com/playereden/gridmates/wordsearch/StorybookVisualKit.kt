@@ -204,7 +204,11 @@ internal fun StorybookQuickEntry(
     BoxWithConstraints(modifier.fillMaxWidth().testTag("storybook-quick-entry")) {
         // Home content is 324dp wide on a 360dp phone after screen gutters.
         // Keep its actions inline there to preserve first-fold Nearby access.
-        val stacked = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.5f
+        val stacked = maxWidth < 270.dp || LocalDensity.current.fontScale >= 1.6f
+        // On phone-width cards, a conventional forward action leaves enough
+        // width for the entire section name; accessibility keeps its label.
+        val iconAction = !stacked &&
+            (maxWidth < 420.dp || LocalDensity.current.fontScale >= 1.25f)
         val buttonModifier = Modifier.heightIn(min = StorybookTokens.touchTarget)
             .then(if (stacked) Modifier.fillMaxWidth() else Modifier)
             .then(if (actionDescription.isNullOrBlank()) Modifier else
@@ -226,14 +230,25 @@ internal fun StorybookQuickEntry(
                 }
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    PaperEyebrow(eyebrow)
+                    Text(eyebrow.uppercase(),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold, color = Gold,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(title, style = MaterialTheme.typography.titleSmall,
-                        color = Forest, fontWeight = FontWeight.SemiBold)
+                        color = Forest, fontWeight = FontWeight.SemiBold,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }
                 if (!stacked) {
-                    Button(onClick = onAction, modifier = buttonModifier
-                        .testTag("storybook-quick-action")) {
-                        Text(actionLabel, maxLines = 2)
+                    if (iconAction) {
+                        Ws15ForwardActionButton(
+                            onClick = onAction,
+                            actionDescription = actionDescription ?: actionLabel
+                        )
+                    } else {
+                        Button(onClick = onAction, modifier = buttonModifier
+                            .testTag("storybook-quick-action")) {
+                            Text(actionLabel, maxLines = 2)
+                        }
                     }
                 }
             }

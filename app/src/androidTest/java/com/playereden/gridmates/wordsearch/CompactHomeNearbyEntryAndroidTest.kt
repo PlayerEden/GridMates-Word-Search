@@ -38,7 +38,7 @@ class CompactHomeNearbyEntryAndroidTest {
             }
             rule.onNodeWithText("Word Search").assertIsDisplayed()
             rule.onNodeWithText("Continue Solo").assertIsDisplayed()
-            rule.onNodeWithText("Open Daily").assertIsDisplayed()
+            rule.onNodeWithContentDescription("Open Daily").assertIsDisplayed()
             rule.onNodeWithContentDescription("Open Nearby co-op").assertIsDisplayed()
         } finally {
             rooms.leaveRoom()
