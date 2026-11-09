@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -98,6 +99,9 @@ internal fun BookPageGameplayScreen(
     var revision by remember(catalog, bookId, pageId) { mutableIntStateOf(0) }
     // Do not reserve screen height for a generic instruction. Show only meaningful feedback.
     var status by remember(catalog, bookId, pageId) { mutableStateOf("") }
+    val noticeHistory = remember(catalog, bookId, pageId) { mutableStateListOf<String>() }
+    var noticeHistoryOpen by remember(catalog, bookId, pageId) { mutableStateOf(false) }
+    var toolsOpen by remember(catalog, bookId, pageId) { mutableStateOf(false) }
     var practice by remember(catalog, bookId, pageId) { mutableStateOf(false) }
     var practiceFound by remember(catalog, bookId, pageId) { mutableStateOf(emptySet<String>()) }
 
@@ -226,13 +230,18 @@ internal fun BookPageGameplayScreen(
             it.id !in wordsFound && (active?.hints?.get(it.id) ?: 0) >= 3
         }.map { it.positions }
 
-    // Clear low-priority tap feedback instead of letting it occupy a
-    // permanent row above the puzzle. Save failures and hints remain visible.
+    // All notice and hint feedback is transient and kept in in-session history.
+    // Never write notice history to the GMWS/GMWB save schema.
     LaunchedEffect(status) {
-        if (status == "Try selecting a word from the list." ||
-            status.startsWith("✓ ")) {
-            delay(2400L)
-            status = ""
+        val message = status
+        if (message.isNotBlank()) {
+            if (noticeHistory.firstOrNull() != message) {
+                noticeHistory.add(0, message)
+                if (noticeHistory.size > 30) noticeHistory.removeAt(noticeHistory.lastIndex)
+            }
+            delay(if (message.startsWith("Hint:") || message.contains("could not") ||
+                message.contains("recovery")) 6500L else 3500L)
+            if (status == message) status = ""
         }
     }
 
@@ -270,7 +279,8 @@ internal fun BookPageGameplayScreen(
                 BookPageBackButton(onBack = onBack)
                 val bookmarked = pageId ==
                     progressStore.progress.volumes[bookId]?.bookmarkedPageId
-                val showSmallArt = showPrototypeArt && !enlarged && contentWidthDp >= 320f
+                // Keep all three 48dp actions usable at small widths.
+                val showSmallArt = showPrototypeArt && !enlarged && contentWidthDp >= 400f
                 if (showSmallArt && committed) {
                     BookArt(book.theme, BookArtKind.COMPLETION, Modifier.size(26.dp),
                         fieldNotes = fieldNotesArt)
@@ -305,6 +315,11 @@ internal fun BookPageGameplayScreen(
                     }, color = Muted, style = MaterialTheme.typography.labelMedium,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
+                BookPageToolsButton(onClick = { toolsOpen = true })
+                BookPageNoticeHistoryButton(
+                    hasNotices = noticeHistory.isNotEmpty(),
+                    onClick = { noticeHistoryOpen = true }
+                )
                 if (!practice && !committed) {
                     // Icon-only hint, with a full 48dp touch target and an
                     // accessibility description. Same durable hint policy.
@@ -368,33 +383,41 @@ internal fun BookPageGameplayScreen(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                 ) { Text("Finish practice") }
             }
-            // An instruction is not a status; show feedback only after a real
-            // hint, claim, error or mode change.
-            if (status.isNotBlank()) {
-                Text(status, style = MaterialTheme.typography.bodyMedium,
-                    color = Forest, maxLines = if (enlarged) 3 else 2,
-                    modifier = Modifier.testTag("ws14k-page-feedback"))
-            }
             if (landscape) {
                 Row(Modifier.fillMaxWidth().weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(Modifier.width(viewport), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         ZoomableWordGrid(board, wordsFound, hintPaths, viewport,
                             choose, onStep = {}, boardFontId = boardFontId,
-                            compactControls = true)
+                            compactControls = true,
+                            zoomConsoleVisible = toolsOpen,
+                            onDismissZoomConsole = { toolsOpen = false })
                     }
                     WordList(board, wordsFound, daily = false,
-                        modifier = Modifier.weight(1f).fillMaxHeight(), scrollAll = true)
+                        modifier = Modifier.weight(1f).fillMaxHeight(), scrollAll = true,
+                        bookThemeAccent = showPrototypeArt)
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     ZoomableWordGrid(board, wordsFound, hintPaths, viewport,
                         choose, onStep = {}, boardFontId = boardFontId,
-                            compactControls = true)
+                            compactControls = true,
+                            zoomConsoleVisible = toolsOpen,
+                            onDismissZoomConsole = { toolsOpen = false })
                 }
                 WordList(board, wordsFound, daily = false,
-                    modifier = Modifier.fillMaxWidth().weight(1f), scrollAll = true)
+                    modifier = Modifier.fillMaxWidth().weight(1f), scrollAll = true,
+                        bookThemeAccent = showPrototypeArt)
             }
+        }
+        // Overlays paint ABOVE gameplay without taking any board/list height.
+        if (status.isNotBlank()) {
+            BookPageNoticeOverlay(message = status,
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 57.dp))
+        }
+        if (noticeHistoryOpen) {
+            BookPageNoticeHistoryDialog(notices = noticeHistory.toList(),
+                onDismiss = { noticeHistoryOpen = false })
         }
     }
 }
