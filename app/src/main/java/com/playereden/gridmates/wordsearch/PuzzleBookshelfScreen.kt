@@ -49,6 +49,20 @@ internal fun PuzzleBookshelfScreen(
     onToggleArt: (() -> Unit)? = null
 ) {
     val healthy = isBookStateReadable(catalog, progress)
+    // The approved catalog, save rules and error screens stay identical.
+    // Only the QA visual browse surface becomes an actual physical bookcase.
+    if (showPrototypeArt && healthy && catalog.books.isNotEmpty()) {
+        BookcaseBookshelfScreen(
+            catalog = catalog,
+            progress = progress,
+            onBack = onBack,
+            onOpenBook = onOpenBook,
+            fieldNotesArt = fieldNotesArt,
+            onToggleArt = onToggleArt,
+            modifier = modifier
+        )
+        return
+    }
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 20.dp),
