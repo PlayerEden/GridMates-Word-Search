@@ -195,7 +195,10 @@ jobs:
           print('PASS WS-14J: exact Woodland PNG in QA, zero WS-14J bytes in release')
           PY
       - name: Verify all three WS-14K2 motifs in QA and none in release
-        run: python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release-unsigned.apk
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE" || { echo "::error::Missing release APK"; exit 1; }
+          python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
