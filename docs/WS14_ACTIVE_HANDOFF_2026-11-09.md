@@ -2,6 +2,18 @@
 
 **Start here for a new game-dev chat.** First read [the chronological development journal](DEVELOPMENT_JOURNAL.md) and [newest pass entry](devlog/2026-11-09_WS14K2_UNIFIED_GAMEPLAY_SPRITES_NOTICES_AND_TOOL_CONSOLE.md), then inspect live GitHub. This is a snapshot, not a replacement for checking the current branch. The owner reported **“Library file not found”** opening the in-chat APK link; the verified file is available at [the GitHub Actions artifact](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42576785170/artifacts/13656070327) as a ZIP containing `app-debug.apk`. The owner **has** shared screenshots of the earlier illustrated QA build; **owner has seen and liked the swipe-browser QA on phone; WS-14H compact light-bulb layout has now been photographed and positively reviewed on phone; 20×20 tracing remains unverified**. Subsequent passes must append the journal as a standing rule.
 
+## WS-14K2 — dual-green consolidated owner APK is ready (November 9)
+
+**STOP making single-icon APKs. The owner's requested consolidated functional + visual milestone is already built and dual-green.** Exact gameplay source `ba596f98c09d0ebe58c2bdd64f56fa9946dcbc85`: [standard Android QA #42682621963](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42682621963) SUCCESS and [art/release isolation #42682622439](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42682622439) SUCCESS.
+
+- **One recommended install artifact:** [WS-14K2 Android QA ZIP #13703662259](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42682621963/artifacts/13703662259). Extract `app-debug.apk`. Actual APK SHA-256: `30bcd610b3a7ca3576cd2cbebf6bc78166f6fcf8aa4ae68a29ce9cbf9a651d63`; package `com.playereden.gridmates.wordsearch.qa`, versionCode 57. Art lab also has an artifact, but use the standard QA ZIP only.
+- **What should be visible in real book gameplay:** original illustrated cover untouched; real newly generated Woodland/Space/Garden theme motif appears in WordList heading and header where room/state allows, transparent PNGs in QA debug only; simple native back/Hint, **Puzzle tools** modal with Select/Zoom−/Fit/Zoom+, **Notice history** and temporary floating hints (3.5/6.5 s), icon-only remaining-word filter. Actual bitmap exports all hash-verified against separate source SVGs.
+- **Safety:** The original approved portraits, saved progress and word-search engine were not modified. The app might have a signing conflict if prior QA signer differs; back up/extract progress before uninstall/reinstall. CI is not real-device acceptance. All new art remains unreviewed and excluded from release.
+- **What to do next:** owner tests the **single unified build**, sends screenshots/observations of gameplay and popup functions, plus explicit 20×20 tracing and reopen/hints (not known yet). Only then schedule a meaningful refinement batch. Do not keep generating standalone status images or making unrelated design changes.
+- **Exact code, QA and rollback history:** [WS-14K2 development receipt](devlog/2026-11-09_WS14K2_UNIFIED_GAMEPLAY_SPRITES_NOTICES_AND_TOOL_CONSOLE.md), [journal](DEVELOPMENT_JOURNAL.md), PR #131 draft.
+
+---
+
 ## WS-14K2 unified owner-test milestone — real three-theme art + notice overlays + tool console (Nov 9)
 
 **The owner specifically asked for a larger integrated development pass instead of multiple tiny APKs.** Source work is implemented on PR #131, journaled at [WS-14K2 milestone](devlog/2026-11-09_WS14K2_UNIFIED_GAMEPLAY_SPRITES_NOTICES_AND_TOOL_CONSOLE.md). Recheck live CI before saying a new APK is ready.
