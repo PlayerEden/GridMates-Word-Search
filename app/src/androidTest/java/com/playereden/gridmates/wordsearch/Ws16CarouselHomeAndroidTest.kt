@@ -63,4 +63,15 @@ class Ws16CarouselHomeAndroidTest {
         compose.onNodeWithTag("ws16b-compact-menu").assertExists()
     }
 
+    @Test fun collectionHasDedicatedHomeEntryAndReturnsWithoutFooter() {
+        compose.onNodeWithTag("ws16d-home-collection")
+            .performScrollTo().performClick()
+        compose.onNodeWithText("Your Collection").assertExists()
+        compose.onNodeWithText("Portraits").assertExists()
+        compose.onNodeWithContentDescription("Back to Home").performClick()
+        compose.onNodeWithTag("ws16-home-header").assertExists()
+        compose.onNodeWithTag("ws16-full-shelf").performScrollTo().assertExists()
+        compose.onNodeWithContentDescription("Open Play").assertDoesNotExist()
+    }
+
 }
