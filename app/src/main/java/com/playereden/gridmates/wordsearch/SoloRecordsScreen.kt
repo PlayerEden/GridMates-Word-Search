@@ -29,10 +29,11 @@ import java.util.Date
 
 @Composable
 internal fun SoloRecordsScreen(profile: SoloProfile) {
-    Text("Your puzzle journal", color = Forest,
-        style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-    Text("Your puzzle and match history stays on this device.",
-        color = Muted, style = MaterialTheme.typography.bodyMedium)
+    StorybookHeading(
+        eyebrow = "GridMates · Records",
+        title = "Your puzzle journal",
+        subtitle = "Puzzles and matches saved on this device"
+    )
 
     var journalTab by rememberSaveable { mutableStateOf("Solo") }
     var soloPage by rememberSaveable { mutableIntStateOf(0) }
