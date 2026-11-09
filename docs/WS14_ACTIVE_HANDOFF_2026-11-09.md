@@ -30,6 +30,18 @@
 
 ---
 
+## CURRENT: WS-16B asset-first action kit implemented — exact CI pending
+
+**Owner request:** actual illustrated buttons and layout, not just another sketch. Completed in code/art at source `0fb918c4b967a5b5bfe888289ca03a771e8ea0ac`; see [WS-16B devlog](devlog/2026-11-09_WS16B_ASSET_FIRST_HOME_ACTIONS_AND_COMPACT_MENU.md). Added four original editable action SVG masters with matching runtime Compose Canvas art; 1.72:1 Daily Puzzle/Together compact action layout, smaller Play page padding, native full labels and accessibility, compact menu, Custom naming, QA-only reserved Quick Play visual slot. Full illustrated book carousel and current saves/routing unchanged. Last owner-approved phone visual baseline is WS-16A.
+
+**Critical honesty:** Quick Play is **NOT playable** yet; QA preview only explicitly says "coming soon" and is not clickable; production does not show it. The real new mixed-word generator (not merely random theme/book) is WS-17. Existing Solo/Custom continues using old saves/IDs. No new phone acceptance for WS-16B yet.
+
+**Exact-source workflows initially running:** [Android #42714316623](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42714316623) and [Art/release #42714317153](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42714317153), both source `0fb918c4`. Do not claim success/APK until final conclusions and artifact verified. Later [skip ci] docs are not new code builds. Old rollback remains verified WS-16A [QA ZIP #13713432908](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42704988037/artifacts/13713432908).
+
+**Next:** fix CI errors if any; make one owner QA APK; evaluate fit before shrinking book covers or reorganizing full shelf spines. Keep draft PR #131 and the dev journal current.
+
+---
+
 ## NEXT: WS-16B action assets + WS-17 endless Random Play design
 
 **Owner feedback after installing actual WS-16A QA (Nov 9):** Carousel-first Home visually approved ("Hell yeah"); five screenshots confirm Woodland/Space focus, bookshelf and menu render. Together button truncates to "Toget..." and menu is too spacious; separate book spines look detached and Garden alone wastes shelf space. Do not infer that direct book gameplay or save/resume has been tested from screenshots.
