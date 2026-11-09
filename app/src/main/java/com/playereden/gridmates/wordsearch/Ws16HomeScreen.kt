@@ -1,15 +1,12 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -24,8 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,7 +52,8 @@ internal fun Ws16HomeScreen(
     onMyPuzzles: () -> Unit,
     onNewSolo: () -> Unit,
     onDaily: () -> Unit,
-    onNearby: () -> Unit
+    onNearby: () -> Unit,
+    showQuickPlayPreview: Boolean = false
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     val books = catalog?.books.orEmpty()
@@ -137,9 +133,9 @@ internal fun Ws16HomeScreen(
     PaperPanel(Modifier.fillMaxWidth().testTag("ws16-continue-solo")) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-            Ws15ModeEmblem(Ws15ModeGlyph.SOLO)
+            Ws16BActionArt(Ws16BArt.CONTINUE)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(if (soloComplete) "New Solo" else "Continue Solo",
+                Text(if (soloComplete) "Custom" else "Continue",
                     color = Forest, fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall)
                 Text(active.theme.label + " · ${soloSize}×$soloSize" +
@@ -155,82 +151,26 @@ internal fun Ws16HomeScreen(
             }
         }
     }
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        // At 360dp phones content width is ~324dp: keep two quick actions
-        // side-by-side. At 320dp or enlarged layouts, stack them instead.
-        if (maxWidth < 300.dp) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Ws16ActionButton("Daily", Ws15ModeGlyph.DAILY, onDaily,
-                    Modifier.fillMaxWidth())
-                Ws16ActionButton("Together", Ws15ModeGlyph.TOGETHER, onNearby,
-                    Modifier.fillMaxWidth())
-            }
-        } else {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                Ws16ActionButton("Daily", Ws15ModeGlyph.DAILY, onDaily,
-                    Modifier.weight(1f))
-                Ws16ActionButton("Together", Ws15ModeGlyph.TOGETHER, onNearby,
-                    Modifier.weight(1f))
-            }
-        }
-    }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically) {
-        TextButton(onClick = onNewSolo,
-            modifier = Modifier.heightIn(min = 48.dp).testTag("ws16-new-solo")) {
-            Text("New Solo")
-        }
-        TextButton(onClick = onMyPuzzles,
-            modifier = Modifier.heightIn(min = 48.dp).testTag("ws16-my-puzzles")) {
-            Text("My Puzzles")
-        }
-    }
+    Ws16BHomeActions(
+        onDaily = onDaily,
+        onNearby = onNearby,
+        onCustom = onNewSolo,
+        onMyPuzzles = onMyPuzzles,
+        showQuickPlayPreview = showQuickPlayPreview
+    )
 
     if (menuOpen) {
-        AlertDialog(
-            onDismissRequest = { menuOpen = false },
-            title = { Text("Word Search menu", color = Forest) },
-            text = {
-                Column(Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    val options = listOfNotNull(
-                        "Settings & backup" to onSettings,
-                        "How to play" to onHelp,
-                        "Records" to onRecords,
-                        "My Puzzles" to onMyPuzzles,
-                        if (catalog != null && bookProgress != null &&
-                            books.isNotEmpty()) "Full shelf" to onFullShelf else null,
-                        "New Solo" to onNewSolo
-                    )
-                    options.forEach { (label, action) ->
-                        TextButton(onClick = { menuOpen = false; action() },
-                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                            Text(label)
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { menuOpen = false }) { Text("Close") }
-            }
+        Ws16BCompactMenu(
+            options = listOfNotNull(
+                "Settings & backup" to onSettings,
+                "How to play" to onHelp,
+                "Records" to onRecords,
+                "My Puzzles" to onMyPuzzles,
+                if (catalog != null && bookProgress != null &&
+                    books.isNotEmpty()) "Full shelf" to onFullShelf else null,
+                "Custom" to onNewSolo
+            ),
+            onDismiss = { menuOpen = false }
         )
-    }
-}
-
-@Composable
-private fun Ws16ActionButton(
-    label: String,
-    glyph: Ws15ModeGlyph,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedButton(onClick = onClick,
-        modifier = modifier.heightIn(min = 64.dp).testTag("ws16-action-" + label.lowercase())
-            .semantics { contentDescription = "Open $label" }) {
-        Row(verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-            Ws15ModeEmblem(glyph)
-            Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
     }
 }
