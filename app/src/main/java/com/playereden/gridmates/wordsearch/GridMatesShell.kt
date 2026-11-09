@@ -200,7 +200,8 @@ internal fun GridMatesShell(
                         progressStore = progressStore,
                         sessionStore = sessionStore,
                         boardFontId = soloStore.effectiveBoardFontId,
-                        onExit = { pageName = Page.PLAY.name }
+                        onExit = { pageName = Page.PLAY.name },
+                        showPrototypeArt = qa.enabled
                     )
                 }
             } else {
