@@ -1,6 +1,7 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -20,8 +21,8 @@ class QaBookshelfLauncherAndroidTest {
         compose.waitForIdle()
         compose.onNodeWithText("Puzzle Books").assertExists()
         compose.onNodeWithText("Woodland").assertExists()
-        compose.onNodeWithText("TEST BOOK · 2 chapters").assertExists()
-        compose.onNodeWithText("Open book").performClick()
+        compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
+        compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started · TEST").assertExists()
         compose.onNodeWithText("Start reading").assertExists()
