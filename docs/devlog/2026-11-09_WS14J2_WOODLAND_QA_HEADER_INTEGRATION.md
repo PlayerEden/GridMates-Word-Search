@@ -30,3 +30,17 @@
 
 ## Next one action
 Read BOTH final workflow conclusions for commit 01c20de. If either fails, inspect real job logs and repair the code or environment before any install claim. After dual green, inspect artifact SHA/APK entries and hand over GitHub ZIP with a small physical QA checklist: Woodland header visible, 320/360dp, large font fallback, Space/Garden unchanged, hints and 20×20 touch safe, saved progress intact. Only then make Space and Garden matching transparent source-backed assets.
+
+## Final exact-code GitHub Actions receipt — resolved after original entry
+
+Both workflows reached **SUCCESS** on the **same gameplay source commit** `01c20de43f4ee157cf9aa7a5b6cac7ea09d830e3`:
+
+- [Android QA #42675610221](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42675610221): successful Android compile, unit tests, lint, Android instrumentation source *compilation*, debug package and exact candidate hash check inside APK.
+- [Art/release isolation #42675610184](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42675610184): successful debug + release compilation, verified one exact Woodland `assets/ws14j/page-accents/woodland.png` candidate in debug and **zero** `assets/ws14j/` assets in release.
+- **Owner test artifact:** [Android QA ZIP #13699334694](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42675610221/artifacts/13699334694). ZIP contains `app-debug.apk`; artifact was unexpired when checked. ZIP SHA-256 in GitHub logs `56732923808b5b1f64cf810bb9ff0aac1a82c05c8753ce8e3e96241f866f2d81`.
+- **Actual APK checksum (from logged `sha256sum`):** `1df127b0fb655f5c9786729e10ca29440e5f1f40e8607c505fa956aa9260f8c5`.
+- **Package/build metadata in Android logs:** `com.playereden.gridmates.wordsearch.qa`, versionCode `57`, versionName `0.9.13-visual-kit-foundation-qa`.
+- **Still pending:** installation on owner's phone, 32dp aesthetic acceptance, 20×20 tracing, five hint taps and persistence; ZIP artifact verification by CI is *not* physical Android test.
+- **New deferred roadmap:** [WS-14K screenshot-led compact icon UI and asset kit](../WS14K_GAMEPLAY_UI_MINIMIZATION_AFTER_PHONE_QA_2026-11-09.md). Owner expressly prioritizes getting screenshots from a real install before implementing more icon-heavy UI; no additional UI code or images were changed in this documentation pass.
+
+**Next single action:** owner downloads the exact WS-14J2 QA artifact ZIP, safely installs compatible APK, plays Woodland/Space/Garden and sends real screenshots/feedback. Maintain backup/signing safeguards and draft PR; use the screenshots to decide whether WS-14K header consolidation increases board room without accessibility regressions.
