@@ -104,6 +104,10 @@ jobs:
           python3 tools/asset_pipeline/build_ws16ad_book_factory.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ad_book_factory.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ad_spine_policy.py' -v
+      - name: Rebuild all three WS16AE V2 painted books and spines
+        run: |
+          python3 tools/asset_pipeline/build_ws16ae_books_v2.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ae_books_v2.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -190,6 +194,8 @@ jobs:
           PY
       - name: Verify all three WS-14K2 visual motifs in exact Android QA APK
         run: python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify all three WS16AE V2 covers and spines in QA APK
+        run: python3 tools/asset_pipeline/verify_ws16ae_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16AD packaged QA book factory assets
         run: python3 tools/asset_pipeline/verify_ws16ad_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16AB generated-painted shelf is SHA matched in Android QA APK

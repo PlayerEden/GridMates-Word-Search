@@ -78,6 +78,20 @@ internal fun ws16adQaBookArtPath(theme: WordTheme, kind: BookArtKind): String? {
     return "ws16ad/$folder/$slug.png"
 }
 
+/** WS16AE: all three source-retouched V2 covers and independent spines. */
+internal fun ws16aeQaBookArtPath(theme: WordTheme, kind: BookArtKind): String? {
+    val slug = when (theme) {
+        WordTheme.WOODLAND -> "woodland"
+        WordTheme.SPACE -> "space"
+        WordTheme.GARDEN -> "garden"
+    }
+    return when (kind) {
+        BookArtKind.COVER -> "ws16ae/covers/$slug.png"
+        BookArtKind.SPINE -> "ws16ae/spines/$slug.png"
+        else -> null
+    }
+}
+
 /** Compatibility for existing bookshelf cover-availability checks. */
 internal fun ws14QaCoverPath(theme: WordTheme, kind: BookArtKind): String? =
     if (kind == BookArtKind.COVER) ws14QaBookArtPath(theme, kind) else null
@@ -149,12 +163,13 @@ internal fun BookArt(
     val existingStudyPath = bookArtPath(theme, kind, fieldNotes) ?: return
     val preferredNewPath = preferredWs14QaCoverPath(theme, kind, fieldNotes)
     val preferredBookFactory = if (fieldNotes) ws16adQaBookArtPath(theme, kind) else null
+    val preferredPaintedV2 = if (fieldNotes) ws16aeQaBookArtPath(theme, kind) else null
     val preferredPageAccent = ws14jQaPageAccentPath(theme, kind, pageAccentCandidate)
     val preferredThreeThemes = ws14k2QaGameMotifPath(theme, kind, pageAccentCandidate)
     val bitmap = remember(context, existingStudyPath, preferredNewPath,
-        preferredBookFactory, preferredPageAccent, preferredThreeThemes) {
+        preferredPaintedV2, preferredBookFactory, preferredPageAccent, preferredThreeThemes) {
         listOfNotNull(preferredThreeThemes, preferredPageAccent,
-            preferredBookFactory, preferredNewPath, existingStudyPath)
+            preferredPaintedV2, preferredBookFactory, preferredNewPath, existingStudyPath)
             .firstNotNullOfOrNull { path ->
                 runCatching {
                     decodeBookArt(context, path)
