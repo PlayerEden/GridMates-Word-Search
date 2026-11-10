@@ -49,4 +49,4 @@ jobs:
         with:
           name: GridMates-WordSearch-WS01-QA
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 7
+          retention-days: 3
