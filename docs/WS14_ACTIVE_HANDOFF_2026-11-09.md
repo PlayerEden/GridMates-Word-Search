@@ -1,5 +1,8 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+**WS16G corrected-build note:** New SVG importer first failed at gold medallion invalid `--43.2` path on exact code `317071b3`. Corrected source/manifest SHA at [`d9c228f`](https://github.com/PlayerEden/GridMates-Word-Search/commit/d9c228f379ab99728696f20fcccd3295b14d460b). Rebuilds [Android #42744842244](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744842244) and [Art #42744842181](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744842181) have advanced into Gradle; exact completion still to verify. Generated standalone PNG candidate ZIP also preserved in user's personal ChatGPT Library `/Game Design/GridMates Word Search/WS16G_Batch1_candidate_sprites.zip`, SHA256 `a4a3f9bf097dc61209cac52a1225655e629a022284354c4f478fc40515619aa9` (not an Android input). Maintain draft PR and WS-16F fallback.
+
+
 ## WS-16G3/G4 — Eight real standalone shelf masters, QA renderer + Compose connected (Nov 9)
 
 **Current actual implementation SHA:** [`317071b3`](https://github.com/PlayerEden/GridMates-Word-Search/commit/317071b3744e2f162a2bde89ddacdb9ae65b78ad), [open draft PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131). Eight separately editable source-hashed SVG components under `design/visual-system/masters/ws16g-batch1/` plus a reproducible **CairoSVG==2.8.2** debug-only renderer and QA APK byte-hash verifier. Source corresponding renderings are consumed by `Ws16GShelfArtwork.kt` in Home and the repeated Full Library shelves; original native Canvas remains automatic fallback when debug-only images are absent (release). The old book covers and all interactions/saves remain untouched.

@@ -25,3 +25,11 @@
 
 ## Next exact action
 Check both workflows on the same implementation SHA `317071b3`. If compiler/Python/build error, fix and rerun with exact SHA, then read actual Android artifact ZIP contents and APK hash. Ask owner for Home and Your Library screenshots to assess real shelf/contact shadow/card balance. Don't promote owner-unapproved art into release; don't reset saved progress.
+
+## First CI failure and corrected source
+
+Initial integrated code SHA `317071b3744e2f162a2bde89ddacdb9ae65b78ad` was **NOT green**: [Android #42744463642](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744463642) and [art/release #42744463637](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744463637) both stopped at the new SVG rasterizer. The exact error was `cairosvg.helpers.PointError`, traced to an extra minus sign (`--43.2`) in a new gold-medallion path. Renderer and app logic did not progress to build on these failed runs.
+
+Fixed the malformed SVG coordinate **and re-hashed the pinned source** at [`d9c228f379ab99728696f20fcccd3295b14d460b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/d9c228f379ab99728696f20fcccd3295b14d460b). Corrected medallion SHA-256: `103f9024af8e245ddc29a896631e6817d404ee25a8e339b394e52715b25159e6`. Corrected-source [Android #42744842244](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744842244) and [art #42744842181](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744842181) passed the new rasterization step and were running Gradle when this documentation was updated. **Do not call them green yet.**
+
+The 26-candidate standalone PNG ZIP plus original generated image, extraction script, per-asset hashes and alpha QA was saved in the user's private ChatGPT Library at `/Game Design/GridMates Word Search/WS16G_Batch1_candidate_sprites.zip`. Actual archive SHA-256 `a4a3f9bf097dc61209cac52a1225655e629a022284354c4f478fc40515619aa9`. These image-generated cutout candidates are not the vector-sourced sprites imported by this Android build; alpha edges still await refinement, and no release approval is implied.

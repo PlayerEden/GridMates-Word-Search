@@ -483,5 +483,15 @@
       "release_approval": false
     }
   ],
-  "current_art_source_note": "Eight original versioned GitHub SVG masters are imported by tools/asset_pipeline/render_ws16g_shelf.py into app/src/debug/assets/ws16g/shelf and consumed by Ws16GShelfArtwork.kt on Home and Your Library with Canvas fallback in release. Image-generated contact-sheet PNG cutouts were created in conversation only, not imported into app. Owner artwork and real phone approval pending."
+  "current_art_source_note": "Eight original versioned GitHub SVG masters are imported by tools/asset_pipeline/render_ws16g_shelf.py into app/src/debug/assets/ws16g/shelf and consumed by Ws16GShelfArtwork.kt on Home and Your Library with Canvas fallback in release. Image-generated contact-sheet PNG cutouts were created in conversation only, not imported into app. Owner artwork and real phone approval pending.",
+  "candidate_png_pack": {
+    "storage": "ChatGPT personal Library",
+    "path": "/Game Design/GridMates Word Search/WS16G_Batch1_candidate_sprites.zip",
+    "sha256": "a4a3f9bf097dc61209cac52a1225655e629a022284354c4f478fc40515619aa9",
+    "source_original_sha256": "e0fc50537512cfc4561dfa49652003999e91f589730f1e1c1392b8e14948f74a",
+    "image_count": 26,
+    "status": "CANDIDATE_ALPHA_UNREVIEWED_NOT_GITHUB_NOT_APK"
+  },
+  "corrected_qa_code_sha": "d9c228f379ab99728696f20fcccd3295b14d460b",
+  "qa_check_status": "CORRECTED_CODE_PASSED_SVG_RENDER__ANDROID_AND_ART_GRADLE_IN_PROGRESS_AT_DOC_UPDATE"
 }
