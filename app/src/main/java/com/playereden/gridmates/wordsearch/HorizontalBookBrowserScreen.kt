@@ -103,7 +103,7 @@ internal fun HorizontalBookBrowserScreen(
         ) {
             item(key = "ws14d-title") {
                 Ws15BackHeader(
-                    title = "Puzzle Books",
+                    title = "Your Library",
                     subtitle = "Swipe to explore",
                     onBack = onBack,
                     backLabel = "Back to Play",

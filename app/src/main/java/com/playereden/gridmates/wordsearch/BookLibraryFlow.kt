@@ -58,7 +58,7 @@ internal fun BookLibraryFlow(
     // The owner's current preference is the more detailed Study B, while
     // keeping Study A available as an immediate, lossless visual rollback.
     var fieldNotesArt by remember(catalog) { mutableStateOf(showPrototypeArt) }
-    // WS-16: Home is the swipe carousel; Full Shelf defaults to the
+    // WS-16F: Home is the swipe carousel; Full Library defaults to the
     // multi-book physical bookcase instead of duplicating the Home showcase.
     // Preview options still allow the older swipe view for QA comparison.
     var horizontalLibrary by remember(catalog) { mutableStateOf(false) }
@@ -74,7 +74,7 @@ internal fun BookLibraryFlow(
         Column(Modifier.fillMaxSize().padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
             TextButton(onClick = onExit) { Text("Back to Play") }
-            PaperEyebrow("Puzzle Books")
+            PaperEyebrow("Your Library")
             Text(progressStore.warning ?: sessionStore.warning
                 ?: "Book progress cannot be opened safely. Original files were preserved.")
         }

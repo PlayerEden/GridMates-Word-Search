@@ -44,8 +44,8 @@ internal fun Ws16DLibraryShortcuts(
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LibraryShortcut(
-                    label = "Full shelf",
-                    accessibleLabel = "Open Full Shelf puzzle books",
+                    label = "Full Library",
+                    accessibleLabel = "Open Full Library puzzle books",
                     isCollection = false,
                     onClick = onFullShelf,
                     modifier = Modifier.weight(1f),
@@ -65,8 +65,8 @@ internal fun Ws16DLibraryShortcuts(
                 verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (fullShelfAvailable) {
                     LibraryShortcut(
-                        label = "Full shelf",
-                        accessibleLabel = "Open Full Shelf puzzle books",
+                        label = "Full Library",
+                        accessibleLabel = "Open Full Library puzzle books",
                         isCollection = false,
                         onClick = onFullShelf,
                         modifier = Modifier.fillMaxWidth(),

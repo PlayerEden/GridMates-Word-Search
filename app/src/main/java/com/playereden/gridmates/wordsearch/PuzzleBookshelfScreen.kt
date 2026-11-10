@@ -96,7 +96,7 @@ internal fun PuzzleBookshelfScreen(
                     Text("Back to Play")
                 }
                 PaperEyebrow("GridMates · Word Search")
-                Text("Puzzle Books", color = Forest,
+                Text("Your Library", color = Forest,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold)
                 if (showPrototypeArt) {
@@ -254,10 +254,10 @@ internal fun PuzzleBookDetailScreen(
         item(key = "book-heading") {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Ws15BackHeader(
-                    title = "Puzzle Books",
+                    title = "Your Library",
                     subtitle = "Book details",
                     onBack = onBack,
-                    backLabel = "Back to Puzzle Books"
+                    backLabel = "Back to Your Library"
                 )
                 if (showPrototypeArt && book != null) {
                     // After picking a volume from a shelf it appears as a

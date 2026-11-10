@@ -79,8 +79,8 @@ internal fun BookcaseBookshelfScreen(
         ) {
             item(key = "bookshelf-title") {
                 Ws15BackHeader(
-                    title = "Puzzle Books",
-                    subtitle = "Your bookshelf",
+                    title = "Your Library",
+                    subtitle = "Browse your puzzle books",
                     onBack = onBack,
                     backLabel = "Back to Play",
                     onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
@@ -96,7 +96,7 @@ internal fun BookcaseBookshelfScreen(
                 Text(
                     catalog.books.size.toString() +
                         (if (catalog.books.size == 1) " book" else " books") +
-                        " on your shelf",
+                        " in your library",
                     style = MaterialTheme.typography.labelMedium, color = Muted,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                     textAlign = TextAlign.Center
@@ -133,16 +133,50 @@ private fun BookcaseShelfRow(
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold, color = Muted,
             modifier = Modifier.padding(start = 7.dp, bottom = 4.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.Bottom) {
-            books.forEach { book ->
-                Box(Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) {
-                    BookStandingArt(book, fieldNotesArt) { onOpenBook(book.id) }
-                }
+        // WS-16F: one real bookcase segment per catalog row. The warm
+        // backboard and uprights stay behind the interactive book objects.
+        Box(Modifier.fillMaxWidth().height(184.dp)) {
+            Canvas(Modifier.matchParentSize()
+                .testTag("ws16f-bookcase-backboard-$shelfIndex")) {
+                val u = 1.dp.toPx()
+                val w = size.width
+                val h = size.height
+                drawRoundRect(
+                    brush = Brush.verticalGradient(listOf(
+                        Color(0xFFEEDFBF), Color(0xFFE7D2AC),
+                        Color(0xFFDAC093))),
+                    topLeft = Offset(5*u,0f),
+                    size = Size(w-10*u,h-8*u),
+                    cornerRadius = CornerRadius(5*u),
+                    alpha = .65f
+                )
+                val upright = Brush.verticalGradient(listOf(
+                    Color(0xFFCE8B48), Color(0xFF975A2D),
+                    Color(0xFF683C22)))
+                drawRoundRect(upright, Offset(2*u,1*u),
+                    Size(9*u,h-10*u),CornerRadius(2*u))
+                drawRoundRect(upright, Offset(w-11*u,1*u),
+                    Size(9*u,h-10*u),CornerRadius(2*u))
+                drawLine(Color(0xFFEFC38A).copy(alpha=.77f),
+                    Offset(7*u,8*u),Offset(7*u,h-18*u),.8f*u)
+                drawLine(Color(0xFFEFC38A).copy(alpha=.77f),
+                    Offset(w-7*u,8*u),Offset(w-7*u,h-18*u),.8f*u)
             }
-            repeat(columns - books.size) { Box(Modifier.weight(1f)) }
+            // Same reusable carved shelf as Home, composited behind the
+            // covers rather than consuming an extra isolated vertical row.
+            WoodenShelfPlank(shelfIndex, Modifier.align(Alignment.BottomCenter))
+            Row(Modifier.fillMaxWidth().align(Alignment.TopCenter)
+                    .padding(horizontal = 11.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.Bottom) {
+                books.forEach { book ->
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) {
+                        BookStandingArt(book, fieldNotesArt) { onOpenBook(book.id) }
+                    }
+                }
+                repeat(columns - books.size) { Box(Modifier.weight(1f)) }
+            }
         }
-        WoodenShelfPlank(shelfIndex)
         Row(Modifier.fillMaxWidth().padding(top = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.Top) {
@@ -205,38 +239,10 @@ private fun BookStandingArt(
     }
 }
 
-/** Restrained, native-vector woodgrain and a subtle lip for physical shelf depth. */
+/** Every real Library shelf uses the same modular wood art as Home. */
 @Composable
-private fun WoodenShelfPlank(index: Int) {
-    Canvas(Modifier.fillMaxWidth().height(23.dp).testTag("wooden-shelf-plank-$index")) {
-        val faceHeight = size.height * 0.77f
-        val radius = 3.dp.toPx()
-        drawRoundRect(
-            brush = Brush.verticalGradient(listOf(
-                Color(0xFFE8D5B1), Color(0xFFB99B75), Color(0xFF927450)
-            )),
-            cornerRadius = CornerRadius(radius, radius),
-            size = Size(size.width, faceHeight)
-        )
-        drawLine(Color(0xFFF7E9CB),
-            Offset(3.dp.toPx(), 3.dp.toPx()),
-            Offset(size.width - 3.dp.toPx(), 3.dp.toPx()),
-            strokeWidth = 1.5.dp.toPx())
-        drawRoundRect(
-            brush = Brush.verticalGradient(listOf(
-                Color(0xFF927450), Color(0xFF6F573E)
-            )),
-            topLeft = Offset(0f, faceHeight),
-            size = Size(size.width, size.height - faceHeight),
-            cornerRadius = CornerRadius(radius, radius)
-        )
-        drawLine(Color(0xFF806748).copy(alpha = 0.37f),
-            Offset(size.width * 0.18f, size.height * 0.44f),
-            Offset(size.width * 0.39f, size.height * 0.44f),
-            strokeWidth = 0.8.dp.toPx())
-        drawLine(Color(0xFF806748).copy(alpha = 0.28f),
-            Offset(size.width * 0.67f, size.height * 0.53f),
-            Offset(size.width * 0.83f, size.height * 0.53f),
-            strokeWidth = 0.8.dp.toPx())
+private fun WoodenShelfPlank(index: Int, modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxWidth().testTag("wooden-shelf-plank-$index")) {
+        Ws16EStorybookShelf()
     }
 }
