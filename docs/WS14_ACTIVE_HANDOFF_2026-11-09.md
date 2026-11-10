@@ -1,6 +1,6 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
-**WS16AD Book Factory Stage 1 (source integrated; CI pending):** [actual 12-asset factory and debug-only book art QA](devlog/2026-11-10_WS16AD_BOOK_FACTORY_STAGE1.md); [locked book contract](../design/visual-system/WS16AD_BOOK_FACTORY_CONTRACT.md). Three original-theme covers/spines normalized in a reproducible factory, 3 blank non-playable book pairs in separate SVG masters, original source retained and APK isolation checks wired. Local isolated tests **4/4 passed**. **The V1 ® remains in title artwork**, real corrected V2/owner visual approval pending; no release claim. Prior verified WS16AB [Android #42906649312](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42906649312) remains fallback.
+**WS16AD Book Factory Stage 1 (dual-green build/asset-isolation QA):** [actual 12-asset factory and debug-only book art QA](devlog/2026-11-10_WS16AD_BOOK_FACTORY_STAGE1.md); [locked book contract](../design/visual-system/WS16AD_BOOK_FACTORY_CONTRACT.md). Three original-theme covers/spines normalized in a reproducible factory, 3 blank non-playable book pairs in separate SVG masters, original source retained and APK isolation checks wired. Local isolated tests **4/4 passed**. **The V1 ® remains in title artwork**, real corrected V2/owner visual approval pending; no release claim. Prior verified WS16AB [Android #42906649312](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42906649312) remains fallback.
 
 ## Current priority sequence — WS16AD book factory to beta (Nov 10)
 

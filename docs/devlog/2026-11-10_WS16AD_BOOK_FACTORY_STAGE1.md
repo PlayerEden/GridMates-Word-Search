@@ -1,5 +1,5 @@
 # WS-16AD — Master Book Factory, Stage 1 (November 10, 2026)
-> **Status:** ENGINEERING SOURCE COMMITTED IN DRAFT; EXACT-SOURCE ANDROID/ART CI PENDING, owner handset art approval PENDING. No finalized corrected artwork or new published books claimed.
+> **Status:** EXACT-SOURCE ANDROID + ART/RELEASE CI GREEN; owner handset and final V2 ® correction still PENDING. No finalized corrected artwork or new published books claimed.
 
 ## Who, what, why and previous checkpoint
 - Owner intends many repeatable physical puzzle books, requests clean straight edges, independent substantial spines, a few unplayable future-volume placeholders and a reusable template. Painted WS16AB shelf visually accepted on owner's actual handset.
@@ -22,6 +22,15 @@
 - This stage's first pushed factory commit caused a preliminary source-only push; final compiled source is the **follow-up integration commit**; fill its exact SHA and CI IDs below after green tests, not before.
 
 ## CI and APK evidence
-- **CI**: waiting for final integration commit. Do not refer users to unfinished APK.
+- **CI:** both final exact-source GitHub workflows green; see receipt below.
 - **Rollback:** same WS16AB dual-green build above, no uninstall or data clear.
 - **Next single action:** verify exact-source CI + new QA APK; then owner phone geometry comparison. Next visual art pass must use genuine regenerated/edited Woodland illustration to remove ®, followed by Space and Garden using same locked factory shape.
+
+## Final exact-source build and artifact receipt (same-day follow-up)
+
+- **Compiled source:** [`6e875255b38f0d03519c14aabe9e15d02b66c1d2`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6e875255b38f0d03519c14aabe9e15d02b66c1d2).
+- **Android QA SUCCESS:** [run #42913471215](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42913471215), [GitHub ZIP artifact #13808268305](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42913471215/artifacts/13808268305) containing `app-debug.apk`, **18,032,182 bytes**, SHA256 `790a964f7cd31f9f1d4c3cbbe8877b0436b231ecb545d94598f1c031e2722add`.
+- **Art/release isolation SUCCESS:** [run #42913471182](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42913471182), [art ZIP artifact #13809085825](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42913471182/artifacts/13809085825), alternate APK SHA256 `363ec30e3f3dff86d948960fab0561255784c5f53ea0ca6fb6acf2e7bf892a1d`. Outer APK packaging differs, but all **281 internal filenames and extracted file bytes agree** across the independently built APKs.
+- Packaged `assets/ws16ad/` has 12 real PNG assets plus `manifest.json` (13 files). Recomputed all 12 PNG SHA256 digests: each matches the manifest. Independent art workflow verifies **zero** candidate WS16AD assets in the release APK. The 4 dedicated Python unit tests passed; normal Android compile/lint/unit and instrumentation-source compilation passed. This is NOT physical Android phone QA.
+- **Remaining:** Rebuild original no-® corrected cover masters and approve against real phone; WS16AD geometry proof is not legally/pixel approved. Stable WS16AB APK and all old art remain rollback.
+
