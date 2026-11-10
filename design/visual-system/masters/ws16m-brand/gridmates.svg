@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs>
+ <linearGradient id="oak" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#F7D783"/><stop offset=".43" stop-color="#C69040"/><stop offset="1" stop-color="#875929"/></linearGradient>
+ <linearGradient id="jade" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#528360"/><stop offset=".6" stop-color="#285F49"/><stop offset="1" stop-color="#153E33"/></linearGradient>
+ <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF6D7"/><stop offset="1" stop-color="#EBD5A2"/></linearGradient>
+</defs>
+<!-- A reusable two-tile family insignia, readable at 28dp -->
+<rect x="23" y="34" width="151" height="146" rx="22" fill="#4A351F" opacity=".22"/>
+<rect x="17" y="25" width="147" height="143" rx="20" fill="url(#oak)" stroke="#6F4C23" stroke-width="9"/>
+<rect x="30" y="39" width="121" height="115" rx="13" fill="url(#paper)" stroke="#E9BB59" stroke-width="5"/>
+<path d="M65 67V118M92 67V118M119 67V118M43 91H140" stroke="#A7813B" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>
+<rect x="83" y="91" width="154" height="144" rx="21" fill="#463A24" opacity=".24"/>
+<rect x="77" y="82" width="151" height="144" rx="20" fill="url(#jade)" stroke="#103E2F" stroke-width="9"/>
+<rect x="91" y="97" width="123" height="115" rx="13" fill="none" stroke="#E6BB60" stroke-width="7"/>
+<!-- Interlocking, warm gold pair of puzzle partners -->
+<path d="M117 141H139Q131 127 142 120Q157 112 165 123Q171 131 163 141H184V164H163Q172 176 163 186Q151 195 140 184Q135 177 140 164H117Z" fill="url(#paper)" stroke="#D9AA51" stroke-width="5" stroke-linejoin="round"/>
+<path d="M101 110L116 110M189 197L206 197" stroke="#F5D986" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+</svg>
