@@ -49,8 +49,9 @@ class BookFactoryTests(unittest.TestCase):
             self.assertNotIn('<text',src)
     def test_only_code_loads_geometry_qa_art(self):
         art=(ROOT/'app/src/main/java/com/playereden/gridmates/wordsearch/BookArt.kt').read_text()
-        self.assertIn('ws16ad/covers/',art)
-        self.assertIn('ws16ad/spines/',art)
+        self.assertIn('BookArtKind.COVER -> "covers"',art)
+        self.assertIn('BookArtKind.SPINE -> "spines"',art)
+        self.assertIn('return "ws16ad/$folder/$slug.png"',art)
         self.assertIn('preferredBookFactory',art)
         self.assertIn('preferredNewPath',art)
         self.assertNotIn('ws16ad/placeholders/',art)
