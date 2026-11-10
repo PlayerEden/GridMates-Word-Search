@@ -30,6 +30,16 @@
 
 ---
 
+## CURRENT: WS-16E Pass 3 slim Home spacing from owner Android screenshots
+
+**Owner-supplied screenshots:** WS-16E Pass 2 illustrated parchment cards looked cohesive, but Continue and Daily/Together were too tall and pushed Custom/My Puzzles just under the first viewport. **Actual source commit `338e4c65783240579d614202696a44cb84903f80`** shortens Continue min height 100→76dp and rewrites progress label as e.g. `Woodland · 2/44 found` (so "found" no longer wraps), reduces Daily/Together min height 82→68dp and icon/padding, shrinks **Home-only** section gaps 10→8dp and outer vertical padding 12→10dp. Native labels, 48dp+ touch areas and large-font growth remain. Existing book art/carousel, shelf, buttons and click routes unchanged. Detailed [pass 3 devlog](devlog/2026-11-09_WS16E_PASS3_SLIM_HOME_ACTIONS.md).
+
+**Exact-source CI initially pending:** [Android #42733181348](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42733181348), [art/release #42733181417](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42733181417), both source `338e4c65`. Do not claim verified APK until both success and SHA receipt. Last verified fallback: WS-16E Pass 2 [APK ZIP #13724199339](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226177/artifacts/13724199339). Keep draft PR #131 unmerged. Owner phone acceptance still required.
+
+**Next:** pass both CI, share one APK artifact, assess whether Custom/My Puzzles now appears without the small scroll on owner's phone while preserving readable Daily/Together labels. If not, recover remaining space from decorative gaps before shrinking books or reverting accessibility.
+
+---
+
 ## CURRENT: WS-16E Pass 2 shared parchment frames integrated — CI pending
 
 **Owner latest visual direction:** quiet/nearly flat warm cream background across all GridMates; cozy home/library atmosphere comes from interchangeable illustrated object and UI components, not bespoke full-screen paintings per game. Keep rich Word Search book covers/carved shelf. **Actual source implementation:** `GridMatesIllustratedFrames.kt` provides `MEDIUM`, `FEATURE`, `PANEL`, `PRIMARY_PILL` native scalable frame art, click/pressed/accessibility support, `GridMatesIllustratedPill` and native text links. Six original SVG frame/ornament/icon-plate masters in `design/visual-system/modular/masters/shared/`, with real SHA-256 in [source register](../design/visual-system/modular/gm-shared-frame-source-register.json); these are editable references, while runtime draws matching native Compose Canvas shapes. This is portable family design inside Word Search only—not a shared cross-repo dependency.
