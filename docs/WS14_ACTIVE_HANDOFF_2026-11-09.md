@@ -1,5 +1,14 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+## WS-16G2 — Batch 1 master painterly asset kit production brief (Nov 9)
+
+**Owner request:** stop one-at-a-time cosmetic changes and build a cohesive **whole visual asset family**. The [WS-16G2 Batch 1 brief](design/WS16G_BATCH1_PAINTERLY_ASSET_PRODUCTION_BRIEF_2026-11-09.md) specifies exact styles, proposed source dimensions, transparent exports, layer boundaries, portrait/tablet fit and QA for 20 roles. [Machine-readable tracking register](../design/visual-system/modular/ws16g-batch1-production-register.json) explicitly differentiates existing SVG/Compose analogs from **new painterly masters NOT YET GENERATED**; one Library row is a reuse recipe. [Development pass receipt](devlog/2026-11-09_WS16G2_BATCH1_ASSET_PRODUCTION_BRIEF.md). **No new art bitmap / no APK** from this docs-only pass.
+
+Prior WS-16G1 `2ff2918e` source passed both [Android #42740219803](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42740219803) and [Art #42740219820](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42740219820). That verifies code/art gates, **not** patched phone appearance. Last known owner-viewed WS-16F visual build and fallback is QA ZIP #13727073915.
+
+**Next action:** create actual transparent shelf/front/bracket/shadow/paper/frame masters and files (1A), hash and upload/import into debug QA; then illustrated action icon family (1B), verify a consolidated Android build and owner phone screenshots. Do not respond with another plan only. Preserve PR #131 draft, local saves and all existing book arts.
+
+
 ## WS-16G1 — Real Home screenshot review and narrow Together alignment (Nov 9)
 
 Owner supplied a real WS-16F QA Home screenshot. The ivory paper has no visible edge gaps, the Space cover and neighbor peeks remain readable and the ornate shelf is well positioned; all Home actions including Custom/My Puzzles are present. The compact **Together** icon and text are visually offset toward the left, so [code `2ff2918e`](https://github.com/PlayerEden/GridMates-Word-Search/commit/2ff2918e5b11d4c61ad3bbca16a6ac0b71993230) centers its column within the card and decreases icon from 36dp to 30dp. All routes, books, saves, release isolation and previous art untouched. CI is pending at initial log; no new artifact/approval claim. [Pass journal](devlog/2026-11-09_WS16G1_OWNER_HOME_SCREEN_TOGETHER_ALIGNMENT.md). Next: confirm source-matched CI and get user's **Your Library** screenshot before deeper bookcase asset changes. WS-16F ZIP #13727073915 remains verified fallback.
