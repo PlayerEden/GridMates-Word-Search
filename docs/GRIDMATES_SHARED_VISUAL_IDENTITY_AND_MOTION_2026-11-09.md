@@ -107,3 +107,18 @@ The owner wants the GridMates games to feel **like one family rather than unrela
 **Practical material system:** Warm walnut shelves, quiet parchment and ivory panels, antique-gold details, deep forest-ink text, subtle botanical/bookish ornaments, restrained shadows. Decorative elements should be deliberately placed and **not** occupy every free pixel. Aim for a comfortable home atmosphere rather than a lavish fantasy museum or rigid institutional library.
 
 **Modular sourcing:** GM_SHARED frames, button/pill templates, icon chips, text treatment and shared brand are portable. WS_THEME bookshelf, paper-book art and leaves belong to Word Search first. Existing working Android source is at WS-16E shelf commit `92a1d899`, with dual-green Android/art QA and owner screenshots; this new note changes *direction only*, no app code or Sudoku/Crossword repo. Detail and checklist: [WS-16E modular kit](design/WS16E_MODULAR_GRIDMATES_UI_ASSET_PRODUCTION_PLAN_V1_2026-11-09.md).
+
+
+## Owner refinement — Quiet nearly-flat background as series default (November 9, 2026)
+
+**Firm design preference:** A **simple, almost flat warm background** should be the GridMates series default. The cozy home/library identity comes chiefly from **reusable illustrated objects and interface assets**, not from full-screen painted rooms or wallpaper. Avoid inventing a separate elaborate background per title.
+
+**Practical implementation rules:**
+- Start with the same soft cream/parchment base color (or optional exceptionally subtle low-contrast paper grain) for Word Search, Sudoku and later GridMates games. The plain fill must look complete even with optional decorations disabled.
+- Give visual attention to tangible objects and reusable components: parchment button/card frames, green/gold Play pills, icon plates, borders, bookplates, section flourishes, matching typography, the shared brand mark, and title-specific focal artwork.
+- Edge/corner embellishments (small leaves, botanical trim, bookish etching, warm wood accent) are **optional, isolated transparent overlays**, never baked into a background image. Do not block text, touch regions or scrolling and omit them on smaller screens where needed.
+- The illustrated Word Search shelf and book covers are the main scene; they can be detailed while the surrounding background remains quiet. Sudoku may later use a notebook or desk object, but should share the base background and UI kit.
+- Implement shared frame/art families **once in extractable source**, then opt-in to reuse in each title; distinguish portable `GM_SHARED` vs thematic `WS_THEME` parts. Native text and progress remain editable and accessible.
+- Any former suggestions to create a full home-library room background or mandatory rich parchment texture are **superseded by this preference**. Favor quiet blank space over clutter.
+
+**Next development focus:** continue making modular shared parchment/card/button template assets after the current WS-16E bookshelf, and use minimal theme-specific edging where visually useful. This note is documentation only; it does not modify Android code, save files or other game repositories.
