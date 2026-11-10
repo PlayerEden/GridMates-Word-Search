@@ -25,3 +25,8 @@ The owner reviewed WS-16E first shelf photos: the newly carved walnut plank and 
 ## Next after phone review
 
 Refine actual frame artwork and spacing based on handset screenshots; then update Word Search-specific icon subjects and minimal optional corner/edge accents. Avoid creating a giant one-piece illustrated background. The separate WS-17 Quick Play mixed-word generator and per-book collection reward catalog remain independently planned work, not part of this asset pass.
+
+
+## Corrected first compile issue
+
+First consolidated Android source `47ae4f479af0e8f754a55204bcc1b89d1da0585a` had a Kotlin compile failure in `GridMatesIllustratedFrames.kt`: an unnecessary invalid top-level import of the `BoxScope.matchParentSize` extension. This was removed in correction commit `227b55e6a0c8a97010a591deee59b0e034141d8a`, without changing functionality or artwork. The earlier [Android run #42730780471](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42730780471) failed and is **not a usable APK**. The initial separate art run was superseded/cancelled. Corrected exact-source runs are [Android #42731226177](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226177) and [Art #42731226186](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226186), to be verified before handoff.
