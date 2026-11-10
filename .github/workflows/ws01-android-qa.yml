@@ -182,4 +182,4 @@ jobs:
         with:
           name: GridMates-WordSearch-Woodland-Verified-QA
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 7
+          retention-days: 3
