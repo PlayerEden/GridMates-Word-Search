@@ -38,3 +38,15 @@ Compare the approved reference and real rendered app:
 ## Next after owner handset review
 
 Adjust book/shelf overlap carefully without shrinking covers. Consider truly painterly modular shelf PNG/endcap exports and light removable foliage/lantern edge art **only after** measuring the real handset result, keeping shared GM_BACKGROUND distinct from title-specific WS decorations. Avoid adding a background scene to Sudoku; only reusable shared UI materials go there later. WS-17 generator and per-book collection unlock milestones are separate roadmaps.
+
+## Final VERIFIED source-matched QA receipts
+
+**Both workflows COMPLETED SUCCESS on code and art SHA `83a06cbf22adcfef5aa20bde87b01033ec04ba0f`**. Subsequent [skip ci] documentation updates do not change the APK.
+
+- Standard Android [#42737788114](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42737788114): **SUCCESS** — unit tests, lint, Android instrumentation test SOURCE compilation and `assembleDebug`; no claim of emulator/handset execution.
+- QA artwork and release-isolation [#42737788236](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42737788236): **SUCCESS** — six QA-only book cover/spine sprites absent from release; 18 original + 18 alternative portrait SVG sources/36 SHA-matched native QA PNGs; 3 exact original motif hashes; all release isolated.
+- Downloadable owner [QA ZIP artifact #13727073915](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42737788114/artifacts/13727073915) contains `app-debug.apk`. Artifact title mentions Woodland historically but build is complete WS-16F.
+- **APK SHA-256:** `88075143e0a82a1fb59e96c3519de96043bbf734fa4f8b75b1b213b31f76dec8`.
+- **Artifact ZIP SHA-256:** `55c52865b3192b7159e2303fd3622a35b0fc12c1200b8ad3061ea2530b4504d5`; GitHub reported 13,976,910 bytes.
+- **QA package:** `com.playereden.gridmates.wordsearch.qa`, versionCode `57`, versionName `0.9.13-visual-kit-foundation-qa`. Same versionCode as previous QA APK; back up saves before uninstall when troubleshooting signing conflicts.
+- **Owner real Android visual / tap acceptance PENDING.** The exact source compiles and release-art isolation passes; book/shelf contact, background warmth and Library bookcase appearance still need screenshot review. PR #131 remains DRAFT, unmerged; rollback is previous verified WS-16E Pass 3 APK.
