@@ -30,6 +30,16 @@
 
 ---
 
+## CURRENT: WS-16E shelf-first original art implemented — Android/art dual green
+
+**Owner-approved target:** illustrated walnut storybook shelf in Home, but keep dynamic text and book interaction native; all template components modular/reusable. **Actual first shelf commit:** [92a1d899](https://github.com/PlayerEden/GridMates-Word-Search/commit/92a1d89905c5ce1ff1223d0558164795f400ee43). Six independent original shelf SVG masters and source SHA-256 registry under `design/visual-system/modular/`; new scalable `Ws16EStorybookShelf.kt` with woodgrain, brackets and gold relief; `Ws16BookCoverPager.kt` replaces its simple 13dp woodbar with 34dp shelf. Real 234dp pager, 218dp covers, side peeks and tap focus/play untouched. [Full devlog](devlog/2026-11-09_WS16E_MODULAR_ILLUSTRATED_SHELF_FIRST_BUILD.md).
+
+**Exact-source verified DUAL GREEN:** [Android #42724381974](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42724381974), [Art #42724381998](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42724381998) both SUCCESS on `92a1d899`. [APK QA ZIP #13720434658](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42724381974/artifacts/13720434658) contains `app-debug.apk` SHA-256 `a71680c1c3b476f25727a33efcf2ff657d0bcacf5377b897666b7b549edc7d53`. Build/source verification is complete; Android instrumentation **source** compiled but was not run on the owner's handset. The new shelf and painterly quality still need phone owner review. QA versionCode remains 57; backup before uninstall. PR #131 still draft.
+
+**Next:** owner screenshots comparing shelf against the real Woodland/Space/Garden art and Home scroll spacing; refine shelf only if it reads too flat/busy or books don't contact wood. Then implement shared GridMates parchment action frames (native text/icons/states) from [WS-16E modular plan](design/WS16E_MODULAR_GRIDMATES_UI_ASSET_PRODUCTION_PLAN_V1_2026-11-09.md) as a separate grouped code/asset pass. Do not mark currently unreviewed SVG source masters as release-approved, nor expose the unimplemented Quick Play generator.
+
+---
+
 ## NEXT: WS-16E — modular illustrated Home asset kit, shelf FIRST (approved concept)
 
 **Owner design decision (Nov 9):** The rich painted parchment Home concept with an ornate storybook walnut shelf is the visual target. Reusable UI templates are a first-class requirement: **neutral shared GridMates frames and menu components; Word Search-owned decorative shelf, book accents and thematic icon subjects; native editable text on top of art;** do not flatten the mockup into one bitmap. Existing content, profile, save and all click behavior stays working. We may adjust the layout or scale after actual asset integration, but first remove whitespace before shrinking featured covers.
