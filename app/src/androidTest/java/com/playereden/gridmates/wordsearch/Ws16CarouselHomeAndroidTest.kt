@@ -42,6 +42,10 @@ class Ws16CarouselHomeAndroidTest {
     @Test fun focusedCoverDirectlyEntersPageAndBackReturnsHome() {
         compose.onNodeWithTag("ws16-home-books").assertExists()
         compose.onNodeWithTag("ws16e-storybook-shelf").assertExists()
+        // Neighbor previews should be complete, tappable books with arrows,
+        // not slices clipped by the phone's viewport.
+        compose.onNodeWithTag("ws16-carousel-next").assertExists()
+        compose.onNodeWithContentDescription("Next book: Space").assertExists()
         compose.onNodeWithContentDescription("Play Woodland", substring = true)
             .performClick()
         compose.waitForIdle()

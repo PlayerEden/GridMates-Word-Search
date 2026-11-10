@@ -2,13 +2,16 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -17,18 +20,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.PuzzleBook
 
 /**
- * One actual source for the illustrated cover pager in Home and Full Shelf.
- * Neighbor cover tap: focus; current cover tap: invoke caller's intent.
- * Never writes a bookmark or puzzle completion.
+ * WS-16O: fully contained small neighbor volumes and accessible directional
+ * arrows. The large center volume remains swipeable and playable; side
+ * thumbnails are clickable and never hang outside the device viewport.
+ * No changes to saved focus/book/page progress.
  */
 @Composable
 internal fun Ws16BookCoverPager(
@@ -41,24 +49,51 @@ internal fun Ws16BookCoverPager(
     if (books.isEmpty()) return
     BoxWithConstraints(modifier.fillMaxWidth().testTag("ws16-shared-cover-carousel")) {
         val width = maxWidth
+        // Keep the hero book exactly as large as the accepted WS-16N build.
         val coverWidth = (width * .59f).coerceIn(136.dp, 186.dp)
-        val peek = ((width - coverWidth) / 2).coerceAtLeast(0.dp)
+            .coerceAtMost((width - 80.dp).coerceAtLeast(120.dp))
+        val sideWidth = (width - coverWidth) / 2
+        val index = pagerState.currentPage.coerceIn(0, books.lastIndex)
+
         Box(Modifier.fillMaxWidth().height(252.dp)) {
-            // The wooden rail is behind the interactive covers; they overlap
-            // its upper edge rather than standing above a 20dp empty gutter.
-            // WS-16G5 owner phone review: the cover PNGs retain a tiny clear-alpha
-            // footer, leaving a visible gap above the wood. Bring the entire
-            // decorative shelf up by 6dp behind the unmodified clickable books.
-            Ws16EStorybookShelf(Modifier.align(Alignment.BottomCenter)
-                .offset(y = (-6).dp))
+            // One continuous wood rail; covers overlap its upper edge.
+            Ws16EStorybookShelf(
+                Modifier.align(Alignment.BottomCenter).offset(y = (-6).dp)
+            )
+
+            if (sideWidth >= 42.dp) {
+                if (index > 0) {
+                    Ws16NeighborBook(
+                        book = books[index - 1],
+                        sideWidth = sideWidth,
+                        fieldNotesArt = fieldNotesArt,
+                        previous = true,
+                        onClick = { onCoverTap(index - 1, false) },
+                        modifier = Modifier.align(Alignment.TopStart)
+                    )
+                }
+                if (index < books.lastIndex) {
+                    Ws16NeighborBook(
+                        book = books[index + 1],
+                        sideWidth = sideWidth,
+                        fieldNotesArt = fieldNotesArt,
+                        previous = false,
+                        onClick = { onCoverTap(index + 1, false) },
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    )
+                }
+            }
+
+            // Pager is deliberately confined to the center column. Neighbor
+            // pages no longer render as cut-off slices at the screen edges.
+            // Swiping the full-sized center book still changes focus.
             HorizontalPager(
                 state = pagerState,
-                pageSize = PageSize.Fixed(coverWidth),
-                contentPadding = PaddingValues(horizontal = peek),
-                pageSpacing = 10.dp,
-                key = { index -> books[index].id },
-                modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth()
-                    .height(226.dp).testTag("ws14d-cover-pager")
+                pageSize = PageSize.Fill,
+                key = { page -> books[page].id },
+                modifier = Modifier.align(Alignment.TopCenter)
+                    .width(coverWidth).height(226.dp)
+                    .testTag("ws14d-cover-pager")
             ) { page ->
                 val book = books[page]
                 val focused = pagerState.currentPage == page
@@ -73,7 +108,7 @@ internal fun Ws16BookCoverPager(
                         .semantics {
                             contentDescription =
                                 (if (focused) "Play " else "Select ") +
-                                book.title.removeSuffix(" · TEST BOOK")
+                                    book.title.removeSuffix(" · TEST BOOK")
                         }
                         .clickable(role = Role.Button) {
                             onCoverTap(page, focused)
@@ -86,6 +121,52 @@ internal fun Ws16BookCoverPager(
                         fieldNotes = fieldNotesArt)
                 }
             }
+        }
+    }
+}
+
+/** Compact complete book, not a clipped piece of a full-size next page. */
+@Composable
+private fun Ws16NeighborBook(
+    book: PuzzleBook,
+    sideWidth: Dp,
+    fieldNotesArt: Boolean,
+    previous: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val title = book.title.removeSuffix(" · TEST BOOK")
+    val previewWidth = (sideWidth - 12.dp).coerceIn(32.dp, 67.dp)
+    Column(
+        modifier = modifier.width(sideWidth).height(216.dp)
+            .semantics {
+                contentDescription =
+                    (if (previous) "Previous book: " else "Next book: ") + title
+            }
+            .clickable(role = Role.Button, onClick = onClick)
+            .testTag(if (previous) "ws16-carousel-prev" else "ws16-carousel-next"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        BookArt(
+            book.theme, BookArtKind.COVER,
+            Modifier.width(previewWidth).height(previewWidth * 1.38f),
+            fieldNotes = fieldNotesArt
+        )
+        Canvas(Modifier.size(19.dp)) {
+            val c = Color(0xFF2C6146)
+            val sign = if (previous) -1f else 1f
+            val sx = size.width * .5f
+            drawLine(
+                c, Offset(sx - sign * size.width * .17f, size.height * .20f),
+                Offset(sx + sign * size.width * .14f, size.height * .50f),
+                strokeWidth = 2.2.dp.toPx(), cap = StrokeCap.Round
+            )
+            drawLine(
+                c, Offset(sx + sign * size.width * .14f, size.height * .50f),
+                Offset(sx - sign * size.width * .17f, size.height * .80f),
+                strokeWidth = 2.2.dp.toPx(), cap = StrokeCap.Round
+            )
         }
     }
 }
