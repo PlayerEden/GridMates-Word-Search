@@ -34,3 +34,18 @@ Do **not** claim a new verified APK or install recommendation until both runs su
 ## Next modular batch after shelf feedback
 
 Make scalable `GM_SHARED` parchment frames (medium / feature / panel / CTA pill / dialog), with native icon/text slots and pressed/disabled/focused states. Refit existing main-menu controls into those frames as one grouped pass; afterward consider a small lantern, title divider, corner foliage and theme-neutral lower flora. Avoid a tiny APK per decoration.
+
+## Final exact-source CI and owner test package
+
+**Dual green on exact code SHA `92a1d89905c5ce1ff1223d0558164795f400ee43`.** Documentation-only [skip ci] commits after this SHA do not represent a rebuilt APK.
+
+- [Android QA #42724381974](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42724381974): **SUCCESS** — core/app unit tests, lint, instrumentation test **source compilation**, assembled debug APK.
+- [Art/release isolation #42724381998](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42724381998): **SUCCESS** — six existing QA-only book cover/spine sprites absent in release; 18 + 18 portraits/36 matched PNGs and three motif assets verified; no QA-only release contamination.
+- **Owner QA ZIP:** [GitHub artifact #13720434658](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42724381974/artifacts/13720434658), contains `app-debug.apk`. Artifact label mentions Woodland historically; code is full WS-16E app.
+- **APK SHA-256:** `a71680c1c3b476f25727a33efcf2ff657d0bcacf5377b897666b7b549edc7d53`. **ZIP SHA-256:** `fb73f1e2cf5168be30b8441f09e54d696827e3ad51f8b9741a32007829005d87`. ZIP final size 13,960,893 bytes as reported by GitHub.
+- Editable-source files have independently computed, validated SHA-256 entries in [WS-16E shelf source register](../../design/visual-system/modular/ws16e-shelf-source-register.json). Status stays `GENERATED_UNREVIEWED`: editable SVG masters are not Android runtime PNG exports; their analogous native Compose shelf is QA tested, **not yet owner-approved**.
+- Device QA/owner on-phone review still pending; test book/shelf contact, walnut vs book art quality, side-peek gestures, Full Shelf + Collection, Quick Play placeholder, and scroll height. Existing profile/custom/word-search saved data unchanged. PR #131 draft/unmerged.
+- QA package/versionCode are unchanged from preceding v57 builds; before uninstalling for a signing conflict, export/backup progress.
+
+## Next owner-feedback decision
+If the shelf feels too flat or basic beside the painted covers, refine the **individual SVG-source and Compose rendering** with richer wood texture and a better carved bracket/medallion (rather than replacing Home with a static background). If it fits visually, proceed to the reusable GM_SHARED parchment action frame kit and only then secondary foliage/lantern polish. Keep covers large until phone evidence justifies otherwise.
