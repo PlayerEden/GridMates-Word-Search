@@ -24,3 +24,14 @@
 ## CI
 - [Standard Android QA #42872139928](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42872139928) and [art/release-isolation #42872140103](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42872140103): **running at initial documentation**; no new APK claimed until success and file inspection.
 - Previous WS-16Q dual-green source `bfad66f6` and [QA artifact #13788295356](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42866268890/artifacts/13788295356) remains rollback (3-day retention).
+
+## Final exact-source QA — both workflows green
+
+**App source compiled:** [`fc551418612b23d000e99a5f4129c3a8e4f364d3`](https://github.com/PlayerEden/GridMates-Word-Search/commit/fc551418612b23d000e99a5f4129c3a8e4f364d3). Subsequent `[skip ci]` documentation commits are not new app code.
+
+- [Android QA #42872139928](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42872139928) — **SUCCESS**. [Preferred QA artifact #13789673829](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42872139928/artifacts/13789673829) ZIP contains `app-debug.apk`, independently extracted **14,990,432 bytes**, SHA-256 `00b805bd8358d835837439fbc05d7af8cbcd26228240c5cea15a24adfe6abe5e`. Created standalone conversation QA file `WS16R_Home_Buttons_QA.apk`.
+- [Art/debug-release QA #42872140103](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42872140103) — **SUCCESS**. [Alternate art QA artifact #13790622132](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42872140103/artifacts/13790622132), alternate APK SHA-256 `867047421d541cc728c6a8999bab3d6c6c1365817457da0ec0b28d1edc0c1b1e`.
+- Independently downloaded and opened both APKs; **all 258 extracted internal file paths and bytes identical**. Outer APK ZIP metadata differs. All **21 existing PNG illustrations** (8 shelf, 6 Home buttons, 5 botanical, 2 brand) present; QA art hash and production-release isolation tests passed. No new sprites or save schema changes.
+- Android instrumented test *sources* compile in CI, but the workflows do not execute Android UI tests on a physical phone or emulator. Owner has **not** viewed WS-16R on a device yet. Main-menu visual acceptance remains pending.
+
+**Next:** Owner installs WS16R over compatible debug signer, checks all six Home actions at actual phone size, verifies Daily/Together illustration balance, gold icon separators, and no new scrolling or tap/label clipping in fullscreen. Compare Standard briefly and repeat at larger Android font if practical. Keep draft PR #131 open pending owner screenshot and feedback.
