@@ -83,16 +83,16 @@ internal fun Ws16BHomeActions(
 @Composable
 private fun Ws16BDailyButton(onClick: () -> Unit, modifier: Modifier) {
     GridMatesIllustratedFrame(
-        modifier = modifier.heightIn(min = 82.dp)
+        modifier = modifier.heightIn(min = 68.dp)
             .testTag("ws16-action-daily")
             .semantics { contentDescription = "Open Daily Puzzle" },
         variant = GridMatesFrameVariant.MEDIUM,
         onClick = onClick
     ) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            Ws16BActionArt(Ws16BArt.DAILY, iconSize = 42.dp)
+            Ws16BActionArt(Ws16BArt.DAILY, iconSize = 40.dp)
             Text("Daily Puzzle", modifier = Modifier.weight(1f),
                 color = Forest, fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall,
@@ -105,26 +105,26 @@ private fun Ws16BDailyButton(onClick: () -> Unit, modifier: Modifier) {
 private fun Ws16BTogetherButton(onClick: () -> Unit, modifier: Modifier,
                                  stacked: Boolean) {
     GridMatesIllustratedFrame(
-        modifier = modifier.heightIn(min = 82.dp)
+        modifier = modifier.heightIn(min = 68.dp)
             .testTag("ws16-action-together")
             .semantics { contentDescription = "Open Together on local Wi-Fi" },
         variant = GridMatesFrameVariant.MEDIUM,
         onClick = onClick
     ) {
         if (stacked) {
-            Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 42.dp)
+                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 40.dp)
                 Text("Together", color = Forest,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall)
             }
         } else {
-            Column(Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+            Column(Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 42.dp)
+                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 36.dp)
                 Text("Together", color = Forest,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.labelMedium,
