@@ -1,5 +1,12 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+## WS-16Q — TRUE one-pager partial-edge bookshelf (Nov 10)
+
+The owner explicitly selected **option 1**, not decorative edging yet. Source [`bfad66f6`](https://github.com/PlayerEden/GridMates-Word-Search/commit/bfad66f6bcbf09a65d492aac0f01ba96a2d0cfb5) replaces the WS16O/P static minis + little arrows with **one real horizontal pager**: fixed-width full illustrated volumes, symmetrical content padding, centered hero 218dp as before, viewport 36dp wider than padded Home to meet physical screen edges. Adjacent full books peek naturally and each scales smoothly with scroll, anchored at bottom to avoid floating. Preserve shelf/book content/title/progress/routes/Android mode saves. Android UI source assertion now rejects mini tags and expects real next-book page. [Full development receipt](devlog/2026-11-10_WS16Q_FULL_WIDTH_PARTIAL_EDGE_CAROUSEL.md).
+
+At initial documentation [Android QA #42866268890](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42866268890) and [art/release QA #42866268846](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42866268846) were running, so no verified APK yet. After dual-green and APK verification, owner should test **Space selected** and screenshot a slow mid-swipe to check no half-books from center crop and physical-edge peeking. Only consider subtle designed edge framing if option 1 still looks unfinished. Keep PR #131 draft.
+
+
 ## WS-16P final VERIFIED Android QA — full-width moving covers (Nov 10 UTC)
 
 Corrected source [`57f73c7`](https://github.com/PlayerEden/GridMates-Word-Search/commit/57f73c7a50681b189a7ffae52d766daa539ca9e4) **dual-green**, [Android #42771300333](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300333) and [art/release #42771300203](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300203). Preferred [Android artifact #13742221740](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300333/artifacts/13742221740) contains `app-debug.apk` SHA256 `50ea06a94e34d6ecffac6c354c2505573730aea814711cc5bb8b06ad5e05ef07`. Also exported to conversation as `WS16P_Full_Width_Smooth_Carousel_QA.apk`; actual APK internally has 258 matching files across separate workflows, 21/21 asset hashes correct. [WS16P devlog](devlog/2026-11-10_WS16P_FULL_WIDTH_CAROUSEL_SWIPE.md).
