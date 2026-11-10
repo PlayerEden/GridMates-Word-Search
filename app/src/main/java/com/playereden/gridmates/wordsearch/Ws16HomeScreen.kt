@@ -133,21 +133,22 @@ internal fun Ws16HomeScreen(
     )
 
     GridMatesIllustratedFrame(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp)
+        modifier = Modifier.fillMaxWidth().heightIn(min = 76.dp)
             .testTag("ws16-continue-solo"),
         variant = GridMatesFrameVariant.FEATURE
     ) {
         Row(Modifier.fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-            Ws16BActionArt(Ws16BArt.CONTINUE)
+            Ws16BActionArt(Ws16BArt.CONTINUE, iconSize = 40.dp)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(if (soloComplete) "Custom" else "Continue",
                     color = Forest, fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall)
-                Text(active.theme.label + " · ${soloSize}×$soloSize" +
-                    if (soloComplete) " · Finished" else
+                // Keep progress explicit and on one line at normal phone widths.
+                // Grid dimensions remain visible in Custom and the active puzzle.
+                Text(active.theme.label + if (soloComplete) " · Finished" else
                         " · ${active.foundIds.size}/${soloPuzzle.targets.size} found",
                     color = Muted, style = MaterialTheme.typography.labelSmall,
                     maxLines = 2, overflow = TextOverflow.Ellipsis)
