@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -149,11 +152,15 @@ internal fun Ws16HomeScreen(
             .testTag("ws16-continue-solo"),
         variant = GridMatesFrameVariant.FEATURE
     ) {
-        Row(Modifier.fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 5.dp),
+        Row(Modifier.fillMaxWidth().heightIn(min = 68.dp)
+            .padding(horizontal = 11.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-            Ws16BActionArt(Ws16BArt.CONTINUE, iconSize = 40.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Ws16BActionArt(Ws16BArt.CONTINUE, iconSize = 42.dp)
+            // Separate the bookmark illustration from live status text,
+            // keeping the Play pill visibly primary and fully tappable.
+            Spacer(Modifier.width(1.dp).height(31.dp)
+                .background(Color(0x77B78F47)))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(if (soloComplete) "New Solo" else "Continue Solo",
                     color = Forest, fontWeight = FontWeight.Bold,

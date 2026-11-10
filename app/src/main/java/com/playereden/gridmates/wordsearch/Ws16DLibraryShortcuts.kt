@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 
 /**
  * WS-16D: Books are the play destination; Collection is the reward gallery.
@@ -102,14 +103,16 @@ private fun LibraryShortcut(
         variant = GridMatesFrameVariant.MEDIUM,
         onClick = onClick
     ) {
-        Row(Modifier.padding(horizontal = 9.dp, vertical = 8.dp),
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp)
+            .padding(horizontal = 8.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             LibraryShortcutArt(isCollection = isCollection)
             Text(
-                label, color = Forest,
+                label, modifier = Modifier.weight(1f), color = Forest,
                 fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.titleSmall,
+                overflow = TextOverflow.Ellipsis,
                 maxLines = 2
             )
         }
@@ -119,8 +122,8 @@ private fun LibraryShortcut(
 @Composable
 private fun LibraryShortcutArt(isCollection: Boolean) {
     if (Ws16HIllustratedAction(if (isCollection) "collection" else "full-library",
-            37.dp)) return
-    Canvas(Modifier.size(32.dp)) {
+            41.dp)) return
+    Canvas(Modifier.size(36.dp)) {
         val w = size.width
         val h = size.height
         val stroke = 2.dp.toPx()

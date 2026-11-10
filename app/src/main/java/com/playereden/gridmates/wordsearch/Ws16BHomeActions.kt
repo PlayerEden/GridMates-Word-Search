@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -11,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -33,7 +38,9 @@ internal fun Ws16BHomeActions(
     compactHome: Boolean = false
 ) {
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val stacked = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.35f
+        // Keep comfortable icon+title space; stack at high font scales rather
+        // than compressing the squirrels and shortening accessible labels.
+        val stacked = maxWidth < 305.dp || LocalDensity.current.fontScale >= 1.25f
         if (stacked) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Ws16BDailyButton(onDaily, Modifier.fillMaxWidth())
@@ -42,7 +49,7 @@ internal fun Ws16BHomeActions(
         } else {
             Row(Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Ws16BDailyButton(onDaily, Modifier.weight(1.72f))
+                Ws16BDailyButton(onDaily, Modifier.weight(1.38f))
                 Ws16BTogetherButton(onNearby, Modifier.weight(1f), false)
             }
         }
@@ -58,11 +65,16 @@ internal fun Ws16BHomeActions(
                     "Quick Play. Mixed-word mode in development, not playable yet" },
             variant = GridMatesFrameVariant.FEATURE
         ) {
-            Row(Modifier.padding(horizontal = 12.dp,
-                vertical = if (compactHome) 5.dp else 8.dp),
+            Row(Modifier.fillMaxWidth()
+                .heightIn(min = if (compactHome) 58.dp else 64.dp)
+                .padding(horizontal = 12.dp, vertical = if (compactHome) 4.dp else 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                 Ws16BActionArt(Ws16BArt.QUICK, iconSize = 46.dp)
+                // An inset antique-gold keyline gives the painted action its
+                // own lane, as in the storybook reference, without raster text.
+                Spacer(Modifier.width(1.dp).height(31.dp)
+                    .background(Color(0x77B78F47)))
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text("Quick Play", color = Forest,
@@ -94,10 +106,11 @@ private fun Ws16BDailyButton(onClick: () -> Unit, modifier: Modifier) {
         variant = GridMatesFrameVariant.MEDIUM,
         onClick = onClick
     ) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+        Row(Modifier.fillMaxWidth().heightIn(min = 68.dp)
+            .padding(horizontal = 9.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            Ws16BActionArt(Ws16BArt.DAILY, iconSize = 40.dp)
+            Ws16BActionArt(Ws16BArt.DAILY, iconSize = 42.dp)
             Text("Daily Puzzle", modifier = Modifier.weight(1f),
                 color = Forest, fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall,
@@ -117,26 +130,27 @@ private fun Ws16BTogetherButton(onClick: () -> Unit, modifier: Modifier,
         onClick = onClick
     ) {
         if (stacked) {
-            Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            Row(Modifier.fillMaxWidth().heightIn(min = 68.dp)
+                .padding(horizontal = 12.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 40.dp)
+                horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 42.dp)
                 Text("Together", color = Forest,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall)
             }
         } else {
-            // Match the Daily icon-label hierarchy without making the
-            // narrow Together card any taller or reducing its tap target.
-            Row(Modifier.fillMaxWidth().heightIn(min = 62.dp)
-                .padding(horizontal = 4.dp, vertical = 3.dp),
+            // Same art size and title hierarchy as Daily, adjusted for this
+            // narrower card. No top-stacked squirrel icon or tiny caption.
+            Row(Modifier.fillMaxWidth().heightIn(min = 68.dp)
+                .padding(horizontal = 7.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center) {
-                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 29.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 36.dp)
                 Text("Together", modifier = Modifier.weight(1f),
                     color = Forest, fontWeight = FontWeight.SemiBold,
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleSmall,
+                    textAlign = TextAlign.Start,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1)
             }
