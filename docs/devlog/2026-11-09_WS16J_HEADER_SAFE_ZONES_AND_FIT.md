@@ -28,3 +28,17 @@
 5. No changes in Library three spines/empty shelf, focused book cover, save/resume or QA-only asset isolation.
 
 **Next:** verify both workflows, inspect actual APK and SHA, then owner Home screenshot. If screen visually fits, return to the remaining genuinely painterly paper/panel assets, not new catalog content.
+
+## Final WS-16J exact-source QA receipt (Nov 10 UTC)
+
+**Compiled code source:** [`a84ce7f34a5c450c5f0162c0083c2046c04af406`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a84ce7f34a5c450c5f0162c0083c2046c04af406). Subsequent documentation-only commits use `[skip ci]` and are not new APK code.
+
+- **Android QA** [#42752903137](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42752903137) **SUCCESS**, including project unit tests, lint, Android instrumentation *source compilation*, exact art manifests and debug APK. Compilation is NOT on-device instrumentation execution.
+- **Artwork/release-isolation QA** [#42752903075](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42752903075) **SUCCESS**, including release candidate art exclusion. PR #131 remains draft/unmerged.
+- **Preferred owner QA artifact** [#13734770660](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42752903137/artifacts/13734770660), ZIP contains `app-debug.apk`, size **14,925,742 bytes**, SHA-256 `1e10a5bb62aa91e1f36f226f1b5de1624000f029220f518e50948ced622d126e`.
+- Alternate art workflow [artifact #13734825356](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42752903075/artifacts/13734825356) contains an APK SHA-256 `6aceaba64b8beb6be15f29d357cc42cb3fc058d734ece5713619eb2e6cbe0a40`. The outer ZIP metadata differs, but independently downloaded both and compared **all 249 internal file paths and extracted bytes, all exactly identical**.
+- Independently read the standard Android APK's source/export manifest files and verified **8 shelf sprites + 6 illustrated actions + 5 botanical pieces** and three manifests against exact embedded PNG byte hashes: all pass.
+- No gameplay, existing book art, local save schema, bookcase/Library structure, media licensing/owner approval or production release changed.
+- Owner has not physically tested this WS-16J corrected layout yet. A code/CI pass does not prove it eliminates the tiny scroll on owner's specific device; that needs the next screenshot.
+
+**Next owner acceptance:** install standard artifact #13734770660, screenshot full Home at normal font. Check no leaf/letter/icon collisions; full-width gold header rule; Continue shorter and Play still usable; Custom/My Puzzles without tiny scroll. Check at least one larger-font setting for intentional overflow/scroll. If accepted, move to paper/frame painterly finishing—not expanding the three-book Library.
