@@ -30,3 +30,16 @@ Refine actual frame artwork and spacing based on handset screenshots; then updat
 ## Corrected first compile issue
 
 First consolidated Android source `47ae4f479af0e8f754a55204bcc1b89d1da0585a` had a Kotlin compile failure in `GridMatesIllustratedFrames.kt`: an unnecessary invalid top-level import of the `BoxScope.matchParentSize` extension. This was removed in correction commit `227b55e6a0c8a97010a591deee59b0e034141d8a`, without changing functionality or artwork. The earlier [Android run #42730780471](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42730780471) failed and is **not a usable APK**. The initial separate art run was superseded/cancelled. Corrected exact-source runs are [Android #42731226177](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226177) and [Art #42731226186](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226186), to be verified before handoff.
+
+## Final verified WS-16E Pass 2 QA receipt
+
+**Both exact-source checks passed at corrected source `227b55e6a0c8a97010a591deee59b0e034141d8a`**, independent of subsequent documentation-only commits.
+
+- [Android QA #42731226177](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226177): **SUCCESS** (unit tests, lint, Android test *source compilation*, APK assembly; not an on-phone test).
+- [Art/release #42731226186](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226186): **SUCCESS** (six QA-only book cover/spine images absent from release, 18+18 portrait source images/36 matched native PNGs and three verified motif assets release isolated).
+- [Owner QA APK ZIP #13724199339](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226177/artifacts/13724199339), contains `app-debug.apk`. Historic artifact name includes Woodland; app contains complete WS-16E Pass 2.
+- APK SHA-256: `d4535ecbc312afac18ddd23b53c0f80d03ee3f0f14847fb0bf40185e9ccf6a6e`.
+- Artifact ZIP SHA-256: `462b362d966c863a320cd6d4db32226b233e66fb412b19f8bb72f812c3f66e7c`; 13,969,819 bytes.
+- QA applicationId `com.playereden.gridmates.wordsearch.qa`, versionCode 57, versionName `0.9.13-visual-kit-foundation-qa`. Export backup before uninstall or signing-conflict fixes.
+- Master SVG hashes: [GM_SHARED source register](../../design/visual-system/modular/gm-shared-frame-source-register.json), **owner art review pending**. No SVG direct Android drawable claim; runtime uses analogous Canvas rendering.
+- PR #131 remains draft. New framed Home not yet phone-accepted. Obtain top/bottom/Menu screenshots and test tap/Back before merging.
