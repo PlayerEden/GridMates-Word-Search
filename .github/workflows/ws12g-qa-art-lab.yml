@@ -57,6 +57,7 @@ jobs:
             ofl/ibmplexmono
             ofl/dmmono
             ofl/patrickhand
+            ofl/literata
       - name: Import original reviewed font resources and licenses
         run: |
           python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2

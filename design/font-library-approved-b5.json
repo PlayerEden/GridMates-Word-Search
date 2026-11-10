@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "status": "pinned_approved_for_B5_source_intake_not_phone_accepted",
+  "status": "pinned_approved_for_B5_plus_GridMates_storybook_typography_QA_not_owner_accepted",
   "sourceRepository": "google/fonts",
   "sourceCommit": "24ddc1f324cac5d9f5aedca126d298f56e3f1640",
   "license": "OFL-1.1",
-  "policy": "All fonts free. Three optional styles unlock only through existing achievement evidence. No shop, ads, IAP or currency.",
+  "policy": "Five verified SIL-OFL fonts (original four plus Literata), commercial app bundling allowed with notices. UI storybook typography is owner QA pending; optional puzzle-number unlocks remain unchanged.",
   "entries": [
     {
       "id": "atkinson",
@@ -65,6 +65,21 @@
       "androidFile": "gm_patrick_hand.ttf",
       "unlockAchievementId": "one_daily",
       "licenseNoticeAsset": "font_licenses/patrick_ofl.txt"
+    },
+    {
+      "id": "literata",
+      "family": "Literata",
+      "sourcePath": "ofl/literata/Literata[opsz,wght].ttf",
+      "sourceGitBlobSha1": "0a81b4984a4a4eb101e0ddc28babc85bb137efef",
+      "sourceBytes": 955132,
+      "sourceSha256": null,
+      "licensePath": "ofl/literata/OFL.txt",
+      "licenseGitBlobSha1": "9d3b4e3b1e9068fbda799f57833ff831d05cc271",
+      "licenseBytes": 4389,
+      "licenseSha256": null,
+      "androidFile": "gm_literata.ttf",
+      "unlockAchievementId": null,
+      "licenseNoticeAsset": "font_licenses/literata_ofl.txt"
     }
   ]
 }

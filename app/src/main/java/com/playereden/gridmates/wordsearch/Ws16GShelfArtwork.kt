@@ -44,7 +44,11 @@ internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val art = remember(context) { readShelfPieces(context) }
     if (art == null) {
-        Ws16ECanvasShelfFallback(modifier)
+        androidx.compose.foundation.layout.Box(
+            modifier.fillMaxWidth().height(42.dp)) {
+            Ws16ECanvasShelfFallback()
+            Ws16TShelfPatina(Modifier.align(Alignment.Center))
+        }
         return
     }
     Box(modifier.fillMaxWidth().height(42.dp).testTag("ws16e-storybook-shelf")) {
@@ -60,6 +64,9 @@ internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
             Modifier.align(Alignment.BottomEnd).width(26.dp).height(34.dp))
         ShelfPart(art.getValue("top"),
             Modifier.align(Alignment.TopCenter).offset(y = 3.dp).fillMaxWidth().height(10.dp))
+        // Irregular, transparent glaze sits above stretched grain panels,
+        // below the crisp independent gold carving.
+        Ws16TShelfPatina(Modifier.align(Alignment.Center))
         ShelfPart(art.getValue("medallion"),
             Modifier.align(Alignment.TopCenter).offset(y = 17.dp).width(84.dp).height(18.dp))
     }

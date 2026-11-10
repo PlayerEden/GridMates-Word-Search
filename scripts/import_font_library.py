@@ -25,13 +25,13 @@ def main():
     from fontTools.ttLib import TTFont
     root=pathlib.Path(args.source).resolve()
     manifest=json.loads(pathlib.Path(args.manifest).read_text(encoding="utf-8"))
-    assert len(manifest["entries"]) == 4
+    assert len(manifest["entries"]) == 5
     assert manifest["sourceCommit"] == "24ddc1f324cac5d9f5aedca126d298f56e3f1640"
     assert manifest["license"] == "OFL-1.1"
     OUTPUT_FONT_DIR.mkdir(parents=True,exist_ok=True)
     OUTPUT_LICENSE_DIR.mkdir(parents=True,exist_ok=True)
     for e in manifest["entries"]:
-        assert e["id"] in {"atkinson", "plex", "dmmono", "patrick"}
+        assert e["id"] in {"atkinson", "plex", "dmmono", "patrick", "literata"}
         assert e["sourcePath"].endswith(".ttf") and e["licensePath"].endswith("/OFL.txt")
         assert e["androidFile"].startswith("gm_") and e["androidFile"].endswith(".ttf")
         assets=[]
@@ -67,8 +67,8 @@ def main():
             print("FONT_GLYPHS",e["id"],"A-Z=PASS","Spanish-supported="+covered,
                   "family="+str(family))
         print("FONT_APPROVED_PACKAGE",e["id"],e["androidFile"])
-    assert len(list(OUTPUT_FONT_DIR.glob("gm_*.ttf"))) >= 4
-    print("APPROVED_FONT_COUNT=4")
+    assert len(list(OUTPUT_FONT_DIR.glob("gm_*.ttf"))) >= 5
+    print("APPROVED_FONT_COUNT=5")
 
 if __name__=="__main__":
     main()

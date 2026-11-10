@@ -56,6 +56,7 @@ jobs:
             ofl/ibmplexmono
             ofl/dmmono
             ofl/patrickhand
+            ofl/literata
       - name: Verify and bundle font binaries and license notices
         run: |
           python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
@@ -117,13 +118,13 @@ jobs:
           test -f "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep '^package:'
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "name='com.playereden.gridmates.wordsearch.qa'"
-          echo "Checking four bundled OFL fonts and licenses..."
-          for id in atkinson plex_mono dm_mono patrick_hand; do
+          echo "Checking five bundled OFL fonts and licenses..."
+          for id in atkinson plex_mono dm_mono patrick_hand literata; do
             unzip -Z1 "$APK" | grep -F "gm_${id}" >/dev/null || {
               echo "::error::Missing packaged font gm_$id"; exit 1;
             }
           done
-          for id in atkinson plex dmmono patrick; do
+          for id in atkinson plex dmmono patrick literata; do
             unzip -Z1 "$APK" | grep -F "font_licenses/${id}_ofl.txt" >/dev/null || {
               echo "::error::Missing bundled font license $id"; exit 1;
             }

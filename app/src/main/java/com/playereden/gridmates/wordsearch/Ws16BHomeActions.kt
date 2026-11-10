@@ -70,7 +70,7 @@ internal fun Ws16BHomeActions(
                 .padding(horizontal = 12.dp, vertical = if (compactHome) 4.dp else 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                Ws16BActionArt(Ws16BArt.QUICK, iconSize = 46.dp)
+                Ws16BActionArt(Ws16BArt.QUICK, iconSize = 43.dp)
                 // An inset antique-gold keyline gives the painted action its
                 // own lane, as in the storybook reference, without raster text.
                 Spacer(Modifier.width(1.dp).height(31.dp)
@@ -78,9 +78,10 @@ internal fun Ws16BHomeActions(
                 Column(Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text("Quick Play", color = Forest,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold)
-                    Text("Mixed-word boards · coming soon", color = Muted,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold)
+                    Text("Mixed-word boards · coming soon",
+                        color = Muted.copy(alpha = .86f),
                         style = MaterialTheme.typography.labelMedium)
                 }
             }
@@ -92,6 +93,10 @@ internal fun Ws16BHomeActions(
         verticalAlignment = Alignment.CenterVertically) {
         GridMatesIllustratedLink("Custom", onCustom,
             modifier = Modifier.testTag("ws16-new-solo"))
+        // The reference's quiet rule visually groups the two footer actions.
+        // Remains non-interactive and does not enlarge the Home layout.
+        Spacer(Modifier.width(1.dp).height(18.dp)
+            .background(Gold.copy(alpha = .67f)))
         GridMatesIllustratedLink("My Puzzles", onMyPuzzles,
             modifier = Modifier.testTag("ws16-my-puzzles"))
     }
@@ -146,7 +151,7 @@ private fun Ws16BTogetherButton(onClick: () -> Unit, modifier: Modifier,
                 .padding(horizontal = 7.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 36.dp)
+                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 39.dp)
                 Text("Together", modifier = Modifier.weight(1f),
                     color = Forest, fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.titleSmall,
