@@ -73,7 +73,7 @@ internal fun GridMatesIllustratedFrame(
 
 @Composable
 internal fun GridMatesIllustratedPill(
-    label: String, onClick: () -> Unit,
+    label: String, onClick: (() -> Unit)?,
     modifier: Modifier = Modifier, enabled: Boolean = true
 ) {
     GridMatesIllustratedFrame(
