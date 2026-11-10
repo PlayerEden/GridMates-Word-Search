@@ -1,6 +1,7 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -64,7 +65,9 @@ class Ws16CarouselHomeAndroidTest {
         compose.onNodeWithText("Try swipe library").assertExists()
         compose.onNodeWithText("Close").performClick()
         compose.onNodeWithTag("ws15-back").performClick()
-        compose.onNodeWithTag("ws16-resume-solo").performScrollTo().assertExists()
+        compose.onNodeWithTag("ws16-continue-solo")
+            .performScrollTo().assertHasClickAction()
+        compose.onNodeWithTag("ws16-resume-solo").assertExists()
     }
     @Test fun asymmetricAssetsAndQuickPlayPlaceholderHaveHonestRouting() {
         compose.onNodeWithTag("ws16-action-daily").performScrollTo().assertExists()
@@ -91,7 +94,8 @@ class Ws16CarouselHomeAndroidTest {
     @Test fun sharedParchmentFramesKeepAllNativeActionsDiscoverable() {
         compose.onNodeWithTag("ws16-full-shelf").performScrollTo().assertExists()
         compose.onNodeWithTag("ws16d-home-collection").assertExists()
-        compose.onNodeWithTag("ws16-continue-solo").performScrollTo().assertExists()
+        compose.onNodeWithTag("ws16-continue-solo")
+            .performScrollTo().assertHasClickAction()
         compose.onNodeWithTag("ws16-resume-solo").assertExists()
         compose.onNodeWithTag("ws16-resume-solo").assertExists()
         compose.onNodeWithContentDescription("Open Daily Puzzle")
