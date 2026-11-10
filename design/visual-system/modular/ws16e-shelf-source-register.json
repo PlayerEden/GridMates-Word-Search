@@ -3,7 +3,7 @@
   "visual_system": "gridmates-word-search-cozy-paperback",
   "assets": [
     {
-      "asset_id": "WS16E_WS16E_SHELF_TOP_V1",
+      "asset_id": "WS_SHELF_TOP_V1",
       "family": "WS16E_SHELF",
       "purpose": "walnut top bevel",
       "theme": "word-search-neutral",
@@ -17,7 +17,7 @@
       "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
     },
     {
-      "asset_id": "WS16E_WS16E_SHELF_FRONT_CENTER_V1",
+      "asset_id": "WS_SHELF_FRONT_CENTER_V1",
       "family": "WS16E_SHELF",
       "purpose": "repeatable front face",
       "theme": "word-search-neutral",
@@ -31,7 +31,7 @@
       "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
     },
     {
-      "asset_id": "WS16E_WS16E_SHELF_END_LEFT_V1",
+      "asset_id": "WS_SHELF_END_LEFT_V1",
       "family": "WS16E_SHELF",
       "purpose": "left carved bracket",
       "theme": "word-search-neutral",
@@ -45,7 +45,7 @@
       "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
     },
     {
-      "asset_id": "WS16E_WS16E_SHELF_END_RIGHT_V1",
+      "asset_id": "WS_SHELF_END_RIGHT_V1",
       "family": "WS16E_SHELF",
       "purpose": "right carved bracket",
       "theme": "word-search-neutral",
@@ -59,7 +59,7 @@
       "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
     },
     {
-      "asset_id": "WS16E_WS16E_SHELF_LEAF_MEDALLION_V1",
+      "asset_id": "WS_SHELF_LEAF_MEDALLION_V1",
       "family": "WS16E_SHELF",
       "purpose": "gold leaf center ornament",
       "theme": "word-search-neutral",
@@ -73,7 +73,7 @@
       "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
     },
     {
-      "asset_id": "WS16E_WS16E_SHELF_CONTACT_SHADOW_V1",
+      "asset_id": "WS_SHELF_CONTACT_SHADOW_V1",
       "family": "WS16E_SHELF",
       "purpose": "transparent book contact shadow",
       "theme": "word-search-neutral",
