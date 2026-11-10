@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -147,19 +149,25 @@ internal fun Ws16HomeScreen(
         onCollection = onCollection
     )
 
+    // The entire paper card is one accessible action. The green Play pill
+    // is a visual affordance, not a second overlapping tap target.
+    val soloAction: () -> Unit = if (soloComplete) onNewSolo else onSolo
     GridMatesIllustratedFrame(
         modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp)
             .qaTrackBounds("Continue Solo")
-            .testTag("ws16-continue-solo"),
-        variant = GridMatesFrameVariant.FEATURE
+            .testTag("ws16-continue-solo")
+            .semantics { contentDescription = if (soloComplete)
+                "Start a new solo word search" else "Continue saved solo word search" },
+        variant = GridMatesFrameVariant.FEATURE,
+        onClick = soloAction
     ) {
         Row(Modifier.fillMaxWidth().heightIn(min = 68.dp)
             .padding(horizontal = 11.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Ws16BActionArt(Ws16BArt.CONTINUE, iconSize = 42.dp)
-            // Separate the bookmark illustration from live status text,
-            // keeping the Play pill visibly primary and fully tappable.
+            // Separate bookmark art from the actual saved Solo progress.
+            // The whole card responds to taps, including the Play pill.
             Spacer(Modifier.width(1.dp).height(31.dp)
                 .background(Color(0x77B78F47)))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -168,14 +176,15 @@ internal fun Ws16HomeScreen(
                     style = MaterialTheme.typography.titleSmall)
                 // Keep progress explicit and on one line at normal phone widths.
                 // Grid dimensions remain visible in Custom and the active puzzle.
-                Text(active.theme.label + if (soloComplete) " · Finished" else
+                Text((if (soloComplete) "" else "Saved: ") + active.theme.label +
+                    if (soloComplete) " · Finished" else
                         " · ${active.foundIds.size}/${soloPuzzle.targets.size} words",
                     color = Muted, style = MaterialTheme.typography.labelSmall,
                     maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
             GridMatesIllustratedPill(
                 label = if (soloComplete) "New" else "Play",
-                onClick = if (soloComplete) onNewSolo else onSolo,
+                onClick = null,
                 modifier = Modifier.testTag("ws16-resume-solo")
             )
         }
