@@ -118,6 +118,8 @@ private fun LibraryShortcut(
 
 @Composable
 private fun LibraryShortcutArt(isCollection: Boolean) {
+    if (Ws16HIllustratedAction(if (isCollection) "collection" else "full-library",
+            37.dp)) return
     Canvas(Modifier.size(32.dp)) {
         val w = size.width
         val h = size.height

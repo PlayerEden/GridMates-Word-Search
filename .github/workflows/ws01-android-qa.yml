@@ -78,6 +78,10 @@ jobs:
         run: |
           python3 tools/asset_pipeline/render_ws16g_shelf.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16g_shelf_art.py' -v
+      - name: Render WS16H illustrated Home icons to debug-only sprites
+        run: |
+          python3 tools/asset_pipeline/render_ws16h_home.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16h_home.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -166,6 +170,8 @@ jobs:
         run: python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16G shelf art is source-matched in the QA APK
         run: python3 tools/asset_pipeline/verify_ws16g_shelf_apks.py app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify six source-hashed WS16H action sprites in QA APK
+        run: python3 tools/asset_pipeline/verify_ws16h_home_apk.py app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
           name: GridMates-WordSearch-Woodland-Verified-QA

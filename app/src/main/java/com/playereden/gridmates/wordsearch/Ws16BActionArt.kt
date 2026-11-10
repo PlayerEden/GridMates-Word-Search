@@ -25,6 +25,7 @@ internal enum class Ws16BArt { DAILY, TOGETHER, QUICK, CONTINUE }
 @Composable
 internal fun Ws16BActionArt(kind: Ws16BArt,
                             modifier: Modifier = Modifier, iconSize: Dp = 44.dp) {
+    if (Ws16HIllustratedAction(kind.name.lowercase(), iconSize, modifier)) return
     Box(modifier.size(iconSize)
         .background(StorybookTokens.warmPaper, RoundedCornerShape(11.dp))
         .clearAndSetSemantics { },
