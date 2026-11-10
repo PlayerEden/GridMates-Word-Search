@@ -29,3 +29,14 @@ The [WS-16E plan](../../../docs/design/WS16E_MODULAR_GRIDMATES_UI_ASSET_PRODUCTI
 - Compare the ornate shelf with previously verified 13dp shelf using the WS-16D APK. Watch book bottom contact, side-book peek and swipe, book cover tap/direct play, section progress, 320dp/360dp/393dp/411dp widths, large fonts and bottom of scroll.
 - Use exact-source Android QA + art/release isolation workflows; instrumentation compile is not an on-phone test.
 - Keep PR #131 draft/unmerged until review; preserve fallback and saved progress. No new mode unlocks or reset of current book/solo progress in this pass.
+
+
+## Implemented GM_SHARED framed buttons — WS-16E Pass 2
+
+The **shared first family** is now in `app/src/main/java/com/playereden/gridmates/wordsearch/GridMatesIllustratedFrames.kt`. This class renders scalable medium cards, feature cards, a quiet panel/dialog backing and the forest-green/gold CTA pill through Compose Canvas. It draws **independent corner flourishes and border geometry** at whatever size the native content requires, not a stretched screenshot. Separate utility links keep underlined live text, and dedicated action subject icons remain swap-friendly.
+
+Individual editable masters are in `masters/shared/`: `gm-frame-medium-v1.svg`, `gm-frame-feature-v1.svg`, `gm-frame-panel-v1.svg`, `gm-pill-primary-v1.svg`, `gm-ornament-corner-v1.svg`, `gm-icon-plate-v1.svg`. The **actual SHA-256 for every source master** is in [the shared frame source register](gm-shared-frame-source-register.json), all pending individual owner artwork review. These SVGs are **not used directly** as Android drawable assets: native Compose draws analogous shapes, while the SVGs are editorially editable masters for later adoption. An important design limit is **no baked strings, no one-piece UI screenshot and no wallpaper texture**.
+
+**Current first integration:** `Ws16DLibraryShortcuts.kt` (Full Shelf/Collection), `Ws16BHomeActions.kt` (Daily/Together/QA Quick Play, menu, Custom/My Puzzles links), `Ws16HomeScreen.kt` (Continue feature frame plus green Play pill). Existing actions, text and backups remain native and functional; QA Quick Play remains explicitly non-clickable until the real generator is implemented. Not yet copied to other GridMates repositories.
+
+**Implementation SHA:** initial `47ae4f47`, corrected `227b55e6` after removing a compile-only import error. Exact-source Android/art checks require a verified success before owner APK handoff. See [Pass 2 development log](../../../docs/devlog/2026-11-09_WS16E_PASS2_SHARED_PARCHMENT_FRAMES.md).
