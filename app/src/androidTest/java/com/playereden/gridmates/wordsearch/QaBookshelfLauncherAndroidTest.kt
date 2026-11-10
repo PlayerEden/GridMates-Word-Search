@@ -21,7 +21,7 @@ class QaBookshelfLauncherAndroidTest {
     @Test fun homeHasClearlyLabeledTestBookLauncherAndCanOpenAnActualVolume() {
         compose.onNodeWithTag("ws16-full-shelf").performScrollTo().performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Puzzle Books").assertExists()
+        compose.onNodeWithText("Your Library").assertExists()
         // WS-16: Full Shelf is the actual multi-book bookcase by default.
         // Swipe comparison remains reachable through preview options.
         compose.onNodeWithText("Woodland").assertExists()
@@ -32,6 +32,6 @@ class QaBookshelfLauncherAndroidTest {
         compose.onNodeWithText("Start solving").assertExists()
         compose.onNodeWithTag("ws15-back").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Puzzle Books").assertExists()
+        compose.onNodeWithText("Your Library").assertExists()
     }
 }

@@ -63,7 +63,7 @@ class PuzzleBookshelfScreenAndroidTest {
                 }
             }
         }
-        compose.onNodeWithText("Puzzle Books").assertIsDisplayed()
+        compose.onNodeWithText("Your Library").assertIsDisplayed()
         compose.onNodeWithText("Our first puzzle books are being prepared").assertIsDisplayed()
         compose.onNodeWithText("Open book").assertDoesNotExist()
         compose.onNodeWithText("Back to Play").performClick()

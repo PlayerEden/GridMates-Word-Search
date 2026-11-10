@@ -72,13 +72,14 @@ class QaActualBookcaseAndroidTest {
         }
         compose.onNodeWithTag("real-bookcase-screen").assertExists()
         compose.onNodeWithTag("wooden-shelf-plank-0").assertExists()
+        compose.onNodeWithTag("ws16f-bookcase-backboard-0").assertExists()
         compose.onNodeWithTag("book-cover-" + woodland.id).assertExists()
         compose.onNodeWithTag("book-spine-" + woodland.id).assertExists()
         compose.onNodeWithText("Woodland").assertExists()
         compose.onAllNodesWithText("TEST BOOK · 1 chapter")[0].assertExists()
         compose.onNodeWithTag("shelf-cover-select-" + woodland.id).performClick()
         compose.runOnIdle { assertEquals(woodland.id, selected) }
-        compose.onNodeWithText("Your bookshelf").assertExists()
+        compose.onNodeWithText("Browse your puzzle books").assertExists()
 
         // Three actual published/QA catalog entries require two shelf rows
         // at ordinary phone width. There are no fake locked future books.
@@ -121,7 +122,7 @@ class QaActualBookcaseAndroidTest {
                 }
             }
         }
-        compose.onNodeWithText("1 book on your shelf").assertExists()
+        compose.onNodeWithText("1 book in your library").assertExists()
         compose.onNodeWithText("SHELF 2").assertDoesNotExist()
         compose.onNodeWithText("Locked").assertDoesNotExist()
     }

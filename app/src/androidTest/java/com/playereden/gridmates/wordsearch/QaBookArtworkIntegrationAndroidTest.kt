@@ -63,7 +63,7 @@ class QaBookArtworkIntegrationAndroidTest {
         compose.onAllNodesWithText("Open book")[0].performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started").assertExists()
-        compose.onNodeWithText("Back to Puzzle Books").performClick()
+        compose.onNodeWithText("Back to Your Library").performClick()
         compose.waitForIdle()
         // A user can compare styles without creating a new puzzle or
         // resetting the BookLibraryStore bookmark/progress files.
@@ -80,7 +80,7 @@ class QaBookArtworkIntegrationAndroidTest {
         // This regression verifies the old bookcase with both artwork studies.
         compose.onNodeWithText("Classic shelves").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Puzzle Books").assertExists()
+        compose.onNodeWithText("Your Library").assertExists()
         compose.onNodeWithText(
             if (newCover) "Illustrated cover preview · release review pending"
             else "Prototype artwork · final illustrations can change"

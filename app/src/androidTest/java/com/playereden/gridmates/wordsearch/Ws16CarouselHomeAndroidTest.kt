@@ -15,6 +15,7 @@ class Ws16CarouselHomeAndroidTest {
 
     @Test fun sharedBrandAndHeaderNavigateToWorkingLocalDestinations() {
         compose.onNodeWithTag("ws16-home-header").assertExists()
+        compose.onNodeWithTag("gm-shared-parchment-background").assertExists()
         compose.onNodeWithContentDescription("Open player profile").performClick()
         compose.onNodeWithText("Player profile").assertExists()
         compose.onNodeWithTag("ws16c-profile-collection").performClick()
@@ -45,8 +46,9 @@ class Ws16CarouselHomeAndroidTest {
     }
 
     @Test fun fullShelfAndSoloShortcutAreStillReachable() {
+        compose.onNodeWithText("Full Library").performScrollTo().assertExists()
         compose.onNodeWithTag("ws16-full-shelf").performScrollTo().performClick()
-        compose.onNodeWithText("Puzzle Books").assertExists()
+        compose.onNodeWithText("Your Library").assertExists()
         compose.onNodeWithTag("ws15-preview-tools").performClick()
         compose.onNodeWithText("Try swipe library").assertExists()
         compose.onNodeWithText("Close").performClick()
