@@ -2,10 +2,13 @@ package com.playereden.gridmates.wordsearch
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -30,10 +34,15 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 internal fun Ws16HomeHeader(onProfile: () -> Unit, onMenu: () -> Unit) {
-    Row(Modifier.fillMaxWidth().testTag("ws16-home-header"),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Column(Modifier.weight(1f),
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        // WS-16J: Reserve a quiet border between title and hanging leaves.
+        // On narrow or enlarged-font layouts, reclaim this space for legibility.
+        val roomy = maxWidth >= 340.dp && LocalDensity.current.fontScale < 1.35f
+        val leftInset = if (roomy) 20.dp else 4.dp
+        Row(Modifier.fillMaxWidth().testTag("ws16-home-header"),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.weight(1f).padding(start = leftInset),
             verticalArrangement = Arrangement.spacedBy(0.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -52,6 +61,7 @@ internal fun Ws16HomeHeader(onProfile: () -> Unit, onMenu: () -> Unit) {
                     overflow = TextOverflow.Ellipsis)
             }
         }
+        if (roomy) Spacer(Modifier.width(7.dp))
         IconButton(onClick = onProfile,
             modifier = Modifier.size(48.dp)
                 .semantics { contentDescription = "Open player profile" }
@@ -79,6 +89,7 @@ internal fun Ws16HomeHeader(onProfile: () -> Unit, onMenu: () -> Unit) {
                         strokeWidth = 2.2.dp.toPx(), cap = StrokeCap.Round)
                 }
             }
+        }
         }
     }
 }

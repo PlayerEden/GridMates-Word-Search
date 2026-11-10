@@ -28,7 +28,11 @@ import androidx.compose.ui.unit.dp
  * absent (release), nothing draws or changes layout except the regular Home.
  */
 @Composable
-private fun Ws16IDecorSprite(name: String, modifier: Modifier) {
+private fun Ws16IDecorSprite(
+    name: String,
+    modifier: Modifier,
+    contentScale: ContentScale = ContentScale.Fit
+) {
     val ctx = LocalContext.current
     val bitmap = remember(ctx, name) {
         runCatching {
@@ -38,7 +42,7 @@ private fun Ws16IDecorSprite(name: String, modifier: Modifier) {
         }.getOrNull()
     } ?: return
     Image(bitmap = bitmap.asImageBitmap(), contentDescription = null,
-        contentScale = ContentScale.Fit, modifier = modifier)
+        contentScale = contentScale, modifier = modifier)
 }
 
 /** Always below the transparent Scaffold, therefore cannot intercept Home taps. */
@@ -47,11 +51,11 @@ internal fun Ws16IHomeEdgeDecor() {
     Box(Modifier.fillMaxSize().clearAndSetSemantics { }
         .testTag("ws16i-home-edge-decor")) {
         Ws16IDecorSprite("top-left",
-            Modifier.align(Alignment.TopStart).offset(x = (-5).dp, y = 31.dp)
-                .width(111.dp).height(76.dp).alpha(.68f))
+            Modifier.align(Alignment.TopStart).offset(x = (-38).dp, y = (-24).dp)
+                .width(94.dp).height(68.dp).alpha(.66f))
         Ws16IDecorSprite("top-right",
-            Modifier.align(Alignment.TopEnd).offset(x = 3.dp, y = 28.dp)
-                .width(116.dp).height(76.dp).alpha(.67f))
+            Modifier.align(Alignment.TopEnd).offset(x = 35.dp, y = (-26).dp)
+                .width(96.dp).height(68.dp).alpha(.65f))
         Ws16IDecorSprite("bottom-left",
             Modifier.align(Alignment.BottomStart).offset(x = (-4).dp, y = (-22).dp)
                 .width(132.dp).height(76.dp).alpha(.84f))
@@ -65,5 +69,6 @@ internal fun Ws16IHomeEdgeDecor() {
 @Composable
 internal fun Ws16IHeaderDivider() {
     Ws16IDecorSprite("divider",
-        Modifier.fillMaxWidth().height(15.dp).testTag("ws16i-home-divider"))
+        Modifier.fillMaxWidth().height(11.dp).testTag("ws16i-home-divider"),
+        contentScale = ContentScale.FillBounds)
 }

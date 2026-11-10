@@ -135,12 +135,12 @@ internal fun Ws16HomeScreen(
     )
 
     GridMatesIllustratedFrame(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 76.dp)
+        modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp)
             .testTag("ws16-continue-solo"),
         variant = GridMatesFrameVariant.FEATURE
     ) {
         Row(Modifier.fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             Ws16BActionArt(Ws16BArt.CONTINUE, iconSize = 40.dp)
