@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "design_family": "GM_SHARED",
+  "implementation": "GridMatesIllustratedFrames.kt",
+  "status": "SOURCE_CREATED__PENDING_OWNER_REVIEW",
+  "notes": "Editable original SVG reference masters; runtime renders corresponding native Compose Canvas geometry. No PNG/9-patch exports or cross-game adoption are implied.",
+  "assets": [
+    {
+      "id": "GM_FRAME_MEDIUM_V1",
+      "path": "design/visual-system/modular/masters/shared/gm-frame-medium-v1.svg",
+      "sha256": "55d48da000110a14ca7537d0f0c9041f037be74e57fe6da54e1a0b4b28562703",
+      "state": "GENERATED_UNREVIEWED",
+      "runtime": "native Compose Canvas",
+      "rights": "original authored SVG, verify before production release"
+    },
+    {
+      "id": "GM_FRAME_FEATURE_V1",
+      "path": "design/visual-system/modular/masters/shared/gm-frame-feature-v1.svg",
+      "sha256": "32167fdc79775fad6c23d025a6feaef92e25197144a451e8851210ebfe75b219",
+      "state": "GENERATED_UNREVIEWED",
+      "runtime": "native Compose Canvas",
+      "rights": "original authored SVG, verify before production release"
+    },
+    {
+      "id": "GM_FRAME_PANEL_V1",
+      "path": "design/visual-system/modular/masters/shared/gm-frame-panel-v1.svg",
+      "sha256": "8b808c21789220626dcc1fd7ea755e05b7d8cd07793bc080ce5d94915e3a467a",
+      "state": "GENERATED_UNREVIEWED",
+      "runtime": "native Compose Canvas",
+      "rights": "original authored SVG, verify before production release"
+    },
+    {
+      "id": "GM_PILL_PRIMARY_V1",
+      "path": "design/visual-system/modular/masters/shared/gm-pill-primary-v1.svg",
+      "sha256": "243f53c4c20539c8521369c8e78f1c376cb2a032037e82d839372e67820382ec",
+      "state": "GENERATED_UNREVIEWED",
+      "runtime": "native Compose Canvas",
+      "rights": "original authored SVG, verify before production release"
+    },
+    {
+      "id": "GM_ORNAMENT_CORNER_V1",
+      "path": "design/visual-system/modular/masters/shared/gm-ornament-corner-v1.svg",
+      "sha256": "2618e64159e17629aaf299c0a82eba1462fd62dc88434dc5f72ba074d40dd474",
+      "state": "GENERATED_UNREVIEWED",
+      "runtime": "native Compose Canvas",
+      "rights": "original authored SVG, verify before production release"
+    },
+    {
+      "id": "GM_ICON_PLATE_V1",
+      "path": "design/visual-system/modular/masters/shared/gm-icon-plate-v1.svg",
+      "sha256": "349ad6dfa1b244ebcfedb7b87535d615c73a114aa30c44b40cbb512a48884871",
+      "state": "GENERATED_UNREVIEWED",
+      "runtime": "native Compose Canvas",
+      "rights": "original authored SVG, verify before production release"
+    }
+  ]
+}
