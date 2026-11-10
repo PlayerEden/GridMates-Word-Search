@@ -1,5 +1,13 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+## WS-16AA — now implemented: dual-green direct Android QA candidate (Nov 10)
+
+Source [b8adce02](https://github.com/PlayerEden/GridMates-Word-Search/commit/b8adce02d87b0747238e52a0c5138d9c9bb617c8) adds independent original painted-style SVG masters for walnut rail, separate left/right corbels, center carving, localized top contact shadow and translucent paper-tooth texture. Reproducible script creates six source-SHA-pinned PNG files under debug assets with manifest and APK integrity tests. No release art leakage. Existing WS16G/Canvas fallback and all puzzles, saves, buttons and carousel remain intact.
+
+**Both final workflows passed:** [Android #42898700114](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42898700114) and [art/release #42898700175](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42898700175). [Preferred owner ZIP #13801572729](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42898700114/artifacts/13801572729): app-debug.apk, 15,758,974 bytes, SHA256 972c877074d9f54840f06a1a20149630977c88f5a9a68e61055cc7eeb4040b7a, all 267 internal files match independent build. [Full devlog/acceptance](devlog/2026-11-10_WS16AA_REAL_ASSETS_AND_ANDROID_QA.md).
+
+**Owner on-phone acceptance still pending**, particularly whether physically modeled vector artwork feels sufficiently painterly vs provided reference, and whether paper texture is subtle. Test Woodland/Space/Garden and Continue Solo taps; no uninstall/clear data. Do not call production release-approved or merge draft PR #131. Existing prior Android artifact #13799831994 is visual rollback.
+
 ## WS-16AA — APPROVED DIRECTION: real dimensional shelf + richer parchment (Nov 10)
 
 **Important owner correction:** The old shelf issue was **rectangular/blocky gray shading**, not shadows themselves. Owner wants true **depth and shadows**, like their provided painted reference: substantial top plane, fascia, shaded underside, modeled corbels, carved gold detail, soft natural book contacts. Current WS16W shelf with the gray band removed now feels **too flat**. Also increase the warm paper's **organic fine texture slightly**, while preserving text legibility and avoiding noisy/patterned wallpaper. Not yet permission to introduce lanterns/props or new books.
