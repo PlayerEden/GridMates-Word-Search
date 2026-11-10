@@ -20,3 +20,9 @@ Source commit: [`be4d76eb2fe2fece0ef3aef319b789b96bd2660b`](https://github.com/P
 - Accept on real phone only after testing both **dragging the center book** and **tapping left/right mini books**: minis should disappear during transition and reappear when it completes; the large covers should move as whole books across the scene rather than being chopped at the center crop. Compare Space selected, Woodland/Garden previews and arrows. Verify the featured progress line stays aligned with the settled book.
 - Keep the three-book Library as-is, and continue toward actual puzzle-board UX after this pass. No fake loading spinner has been added. Draft PR remains unmerged.
 
+
+## Exact source correction and refreshed workflows
+
+- The initial functional commit `be4d76e` accidentally omitted an `Arrangement` import that the unchanged miniature-book Column requires. Before any APK was approved, corrected source commit [`57f73c7a50681b189a7ffae52d766daa539ca9e4`](https://github.com/PlayerEden/GridMates-Word-Search/commit/57f73c7a50681b189a7ffae52d766daa539ca9e4) restored that import. No behavior change beyond the intended WS-16P animation fix.
+- Initial Android/art runs #42771031364/#42771031442 were **cancelled** in favor of the corrected source. They are **not test evidence**.
+- Current source-matched workflows: [Android QA #42771300333](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300333) and [art/release isolation #42771300203](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300203), both pending at this log update. Never distribute an APK from the cancelled source.
