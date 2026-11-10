@@ -1,5 +1,12 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+## WS-16H FINAL dual-green Android QA — spine-out Library + six illustrated Home icons
+
+**This is the latest source-matched test APK**: source [`26ccb63e`](https://github.com/PlayerEden/GridMates-Word-Search/commit/26ccb63e097f4385b46f094b3859efc5758bccdd), [Android workflow #42749504771](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42749504771) **SUCCESS** and [art/release #42749504688](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42749504688) **SUCCESS**. [Install QA ZIP artifact #13732658725](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42749504771/artifacts/13732658725), `app-debug.apk` SHA-256 `5e9361eecfe7a1b06ecccebcb8169c67ae0961756b288c91dd4d5f52fcba03f3`. Six source-generated Home PNGs + eight established shelf PNGs verified in debug and isolated from release. **Owner has not seen this exact new phone build.** [Full log](devlog/2026-11-09_WS16H_BOOKCASE_AND_HOME_ILLUSTRATIONS.md).
+
+Owner priority order is firm: **Library real spine-out bookcase with three actual books and honest empty shelf, then finish existing Home/menus/art**, no catalog expansion. New six illustrated icon masters are first editable/vector art pass (not final owner-approved gouache textures). Future: phone screenshots, then fine botanicals and parchment/button material consistency, not new puzzle books. PR #131 remains draft.
+
+
 ## WS-16H — Owner correction: Full Library shows SPINES; main menu visuals before catalog expansion (Nov 9)
 
 The owner explicitly accepts sparse shelves and does NOT want new books or new gameplay until the existing art/UX is finished. Real Library now shows only actual existing title spines and one extra physically empty shelf, instead of repeating Home's illustrated front-cover gallery. Tap a spine -> pull-out cover/progress preview -> `View pages` opens the existing chapter route. [Code `820bb40f`](https://github.com/PlayerEden/GridMates-Word-Search/commit/820bb40ff5a91b6997f3a3abd375ff1fa320e0e8), [corrected QA test `afed9318`](https://github.com/PlayerEden/GridMates-Word-Search/commit/afed9318b6fb0c36eb3f7230676137bbde2be827).

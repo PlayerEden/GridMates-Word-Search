@@ -3,7 +3,7 @@
   "date": "2026-11-09",
   "project": "GridMates: Word Search",
   "milestone": "WS-16G2_BATCH1",
-  "status": "WS16G_SHELF_SVG_INTEGRATION_DUAL_GREEN__PHONE_REVIEW_PENDING",
+  "status": "WS16H_SIX_ACTIONS_AND_SPINE_OUT_LIBRARY_DUAL_GREEN__OWNER_PHONE_REVIEW_PENDING",
   "draft_pr": 131,
   "branch": "feature/ws14b-style-anchor-and-art-direction-2026-11-08",
   "scope_note": "20 distinct UI rendering roles, of which WS_BOOKCASE_ROW_SHELF_V1 is a reuse/composition role rather than a duplicate bitmap. Existing vector references and Compose analogs do not count as finished painterly exports.",
@@ -359,13 +359,17 @@
       "existing_reference_paths": [
         "design/visual-system/masters/ws16b-continue-action.svg"
       ],
-      "existing_runtime_correspondence": "Ws16BActionArt.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
-      "source_master_path": null,
-      "source_sha256": null,
-      "export_paths": [],
-      "export_sha256": [],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/continue.svg",
+      "source_sha256": "862c3e07315d42b7791ab8a8cceb35f43116012f9946d86870586724968caab4",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/continue.png"
+      ],
+      "export_sha256": [
+        "7ede9c1fa2009a3eb74055677ec6a10a31ea469b9a87d0891ace3054b6ddf0ba"
+      ],
       "owner_art_approval": false,
       "release_approval": false
     },
@@ -382,13 +386,17 @@
       "existing_reference_paths": [
         "design/visual-system/masters/ws16b-daily-action.svg"
       ],
-      "existing_runtime_correspondence": "Ws16BActionArt.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
-      "source_master_path": null,
-      "source_sha256": null,
-      "export_paths": [],
-      "export_sha256": [],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/daily.svg",
+      "source_sha256": "e3146d8266e90a4f6b784807c599eeaff5e05684a8ba9f09d5a377fecc9cbfed",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/daily.png"
+      ],
+      "export_sha256": [
+        "dfaa99be938ed5a28c2949761686e775a2f320cd6265d11607254afad8883e36"
+      ],
       "owner_art_approval": false,
       "release_approval": false
     },
@@ -405,13 +413,17 @@
       "existing_reference_paths": [
         "design/visual-system/masters/ws16b-together-action.svg"
       ],
-      "existing_runtime_correspondence": "Ws16BActionArt.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
-      "source_master_path": null,
-      "source_sha256": null,
-      "export_paths": [],
-      "export_sha256": [],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/together.svg",
+      "source_sha256": "1b788cce06ac82023e2fe46842cdf0b4069115f32fb252485eeb1d12989055ab",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/together.png"
+      ],
+      "export_sha256": [
+        "b08de5eef8b875b8d3c60fa68c0bb89e783245ca6bba167c659817b13d01c164"
+      ],
       "owner_art_approval": false,
       "release_approval": false
     },
@@ -428,13 +440,17 @@
       "existing_reference_paths": [
         "design/visual-system/masters/ws16b-quick-action.svg"
       ],
-      "existing_runtime_correspondence": "Ws16BActionArt.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
-      "source_master_path": null,
-      "source_sha256": null,
-      "export_paths": [],
-      "export_sha256": [],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/quick.svg",
+      "source_sha256": "c4169e7d1210da5558fadb5b584810a0da2bc15f68befaa6f392e04cf7277c13",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/quick.png"
+      ],
+      "export_sha256": [
+        "85401ba412922530b7b525cd986246d26279a8ceb294bf4eeab7d23d4c86bcd6"
+      ],
       "owner_art_approval": false,
       "release_approval": false
     },
@@ -449,13 +465,17 @@
       "alpha": "transparent",
       "assembly": "display 36–48dp, native Full Library text",
       "existing_reference_paths": [],
-      "existing_runtime_correspondence": "Ws16DLibraryShortcuts.kt (native icon)",
-      "source_status": "PLANNED_NO_SOURCE",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
-      "source_master_path": null,
-      "source_sha256": null,
-      "export_paths": [],
-      "export_sha256": [],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/full-library.svg",
+      "source_sha256": "d52a2cc5983ee7eb39296b6bcd6317c8877f0b52a142d14339652dc6882b3dd8",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/full-library.png"
+      ],
+      "export_sha256": [
+        "c954ef7a79543573da1b6b7c55f9fce571d126954d745399b9120f5028e6e1b5"
+      ],
       "owner_art_approval": false,
       "release_approval": false
     },
@@ -472,13 +492,17 @@
       "existing_reference_paths": [
         "design/visual-system/masters/ws16d-collection-gallery-shortcut.svg"
       ],
-      "existing_runtime_correspondence": "Ws16DLibraryShortcuts.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
-      "source_master_path": null,
-      "source_sha256": null,
-      "export_paths": [],
-      "export_sha256": [],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/collection.svg",
+      "source_sha256": "0143fd3cbc8ed07f88216a5e66bc8ae26913cb1a8d9291601de7bd22fa884310",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/collection.png"
+      ],
+      "export_sha256": [
+        "6a34a34ed26a1eb76fa86920910b96c1b9f0a746c599f7acd98a75a0d7f0f566"
+      ],
       "owner_art_approval": false,
       "release_approval": false
     }
@@ -495,6 +519,15 @@
   "corrected_qa_code_sha": "d9c228f379ab99728696f20fcccd3295b14d460b",
   "qa_check_status": "ANDROID_AND_ART_SUCCESS_SOURCE_D9C228F__ZERO_WS16G_ASSETS_IN_RELEASE",
   "qa_artifact": {
+    "source_commit": "26ccb63e097f4385b46f094b3859efc5758bccdd",
+    "standard_run": 42749504771,
+    "art_run": 42749504688,
+    "standard_artifact_id": 13732658725,
+    "apk_sha256": "5e9361eecfe7a1b06ecccebcb8169c67ae0961756b288c91dd4d5f52fcba03f3",
+    "status": "DUAL_GREEN_NOT_OWNER_APPROVED",
+    "new_raster_action_icons": 6
+  },
+  "previous_qa_artifact": {
     "workflow_standard_run": 42744842244,
     "workflow_art_run": 42744842181,
     "standard_artifact_id": 13730138987,
