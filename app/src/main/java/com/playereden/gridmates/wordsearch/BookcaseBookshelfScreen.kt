@@ -162,6 +162,7 @@ private fun BookcaseShelfRow(
                 drawLine(Color(0xFFEFC38A).copy(alpha=.77f),
                     Offset(w-7*u,8*u),Offset(w-7*u,h-18*u),.8f*u)
             }
+            Ws16GBookcaseBackboard(Modifier.matchParentSize())
             // Same reusable carved shelf as Home, composited behind the
             // covers rather than consuming an extra isolated vertical row.
             WoodenShelfPlank(shelfIndex, Modifier.align(Alignment.BottomCenter))

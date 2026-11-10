@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
  * No text, gesture handlers, save writes or book-specific content here.
  */
 @Composable
-internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
+internal fun Ws16ECanvasShelfFallback(modifier: Modifier = Modifier) {
     Canvas(modifier.fillMaxWidth().height(42.dp)
         .testTag("ws16e-storybook-shelf")) {
         val u = 1.dp.toPx()

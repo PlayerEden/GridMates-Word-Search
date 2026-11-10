@@ -79,6 +79,10 @@ jobs:
         run: |
           python3 tools/asset_pipeline/render_ws14k2_gameplay_motifs.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14k2_gameplay_motifs.py' -v
+      - name: Render 8 SHA-pinned WS16G shelf pieces into debug-only PNG assets
+        run: |
+          python3 tools/asset_pipeline/render_ws16g_shelf.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16g_shelf_art.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -93,6 +97,9 @@ jobs:
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
+      - name: Verify WS16G shelf PNGs in debug only and absent in release
+        run: |
+          python3 tools/asset_pipeline/verify_ws16g_shelf_apks.py app/build/outputs/apk/debug/app-debug.apk "$(find app/build/outputs/apk/release -name '*.apk' -print -quit)"
       - name: Verify WS-14 actual original cover exports and debug/release asset isolation
         shell: bash
         run: |
