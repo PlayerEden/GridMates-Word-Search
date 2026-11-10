@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -21,6 +22,8 @@ class MainActivity : ComponentActivity() {
     private var displayMode by mutableStateOf(DisplayMode.FULLSCREEN)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Native Android splash only. No timer or artificial loading overlay.
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         // Drawing parchment behind transparent bars works on older Android too.
         // Android 15 (targetSdk 35) otherwise forces edge-to-edge anyway.

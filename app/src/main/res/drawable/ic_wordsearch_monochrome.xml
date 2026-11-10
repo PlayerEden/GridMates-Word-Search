@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="256" android:viewportHeight="256">
+    <!-- Clean one-color grid-pencil adaptation of the same WS16M emblem. -->
+    <group android:pivotX="128" android:pivotY="128"
+        android:scaleX="0.76" android:scaleY="0.76">
+        <path android:pathData="M31,27Q31,19 44,19H207Q220,19 220,33V211Q220,223 207,223H44Q31,223 31,210Z"
+            android:fillColor="#00000000" android:strokeColor="#FF000000"
+            android:strokeWidth="14"/>
+        <path android:pathData="M99,42V203M150,42V203M49,92H202M49,145H202"
+            android:fillColor="#00000000" android:strokeColor="#FF000000"
+            android:strokeWidth="9"/>
+        <path android:pathData="M68,181L181,64"
+            android:fillColor="#00000000" android:strokeColor="#FF000000"
+            android:strokeWidth="16" android:strokeLineCap="round"/>
+        <group android:pivotX="125" android:pivotY="117" android:rotation="42">
+            <path android:pathData="M120,16H133Q141,16 141,24V162Q141,170 133,170H120Q112,170 112,162V24Q112,16 120,16Z"
+                android:fillColor="#FF000000"/>
+            <path android:pathData="M112,168H141L127,199Z"
+                android:fillColor="#FF000000"/>
+        </group>
+    </group>
+</vector>
