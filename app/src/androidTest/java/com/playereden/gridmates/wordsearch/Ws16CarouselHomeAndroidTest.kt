@@ -46,6 +46,7 @@ class Ws16CarouselHomeAndroidTest {
         // not slices clipped by the phone's viewport.
         compose.onNodeWithTag("ws16-carousel-next").assertExists()
         compose.onNodeWithContentDescription("Next book: Space").assertExists()
+        compose.onNodeWithTag("ws14d-cover-pager").assertExists()
         compose.onNodeWithContentDescription("Play Woodland", substring = true)
             .performClick()
         compose.waitForIdle()

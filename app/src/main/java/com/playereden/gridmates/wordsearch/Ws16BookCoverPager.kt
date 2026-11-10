@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.PuzzleBook
 
 /**
- * WS-16O: fully contained small neighbor volumes and accessible directional
+ * WS-16P: full-width moving book pages plus contained resting mini-neighbors.
+ * WS-16O introduced small neighbor volumes and accessible directional
  * arrows. The large center volume remains swipeable and playable; side
  * thumbnails are clickable and never hang outside the device viewport.
  * No changes to saved focus/book/page progress.
@@ -53,7 +53,7 @@ internal fun Ws16BookCoverPager(
         val coverWidth = (width * .59f).coerceIn(136.dp, 186.dp)
             .coerceAtMost((width - 80.dp).coerceAtLeast(120.dp))
         val sideWidth = (width - coverWidth) / 2
-        val index = pagerState.currentPage.coerceIn(0, books.lastIndex)
+        val index = pagerState.settledPage.coerceIn(0, books.lastIndex)
 
         Box(Modifier.fillMaxWidth().height(252.dp)) {
             // One continuous wood rail; covers overlap its upper edge.
@@ -61,7 +61,57 @@ internal fun Ws16BookCoverPager(
                 Modifier.align(Alignment.BottomCenter).offset(y = (-6).dp)
             )
 
-            if (sideWidth >= 42.dp) {
+            // The pager spans the ENTIRE carousel width so the complete
+            // books pass across the available page during a drag. Previously
+            // the pager was only coverWidth wide, abruptly cropping both
+            // full-size pages at the middle while the minis stayed frozen.
+            HorizontalPager(
+                state = pagerState,
+                pageSize = PageSize.Fill,
+                key = { page -> books[page].id },
+                modifier = Modifier.align(Alignment.TopCenter)
+                    .fillMaxWidth().height(226.dp)
+                    .testTag("ws14d-cover-pager")
+            ) { page ->
+                val book = books[page]
+                val focused = pagerState.settledPage == page
+                val lift by animateFloatAsState(
+                    targetValue = if (focused) 1.025f else .92f,
+                    animationSpec = tween(durationMillis = 220),
+                    label = "ws16-focused-cover"
+                )
+                // Outer page fills the available swipe lane. Only the book
+                // itself has clickable semantics, never transparent side air.
+                Box(Modifier.fillMaxWidth().height(226.dp),
+                    contentAlignment = Alignment.BottomCenter) {
+                    Box(
+                        Modifier.width(coverWidth).height(226.dp)
+                            .graphicsLayer { scaleX = lift; scaleY = lift }
+                            .semantics {
+                                contentDescription =
+                                    (if (focused) "Play " else "Select ") +
+                                        book.title.removeSuffix(" · TEST BOOK")
+                            }
+                            .clickable(role = Role.Button) {
+                                if (!pagerState.isScrollInProgress) {
+                                    onCoverTap(page, focused)
+                                }
+                            }
+                            .testTag("ws14d-cover-" + book.id),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        BookArt(book.theme, BookArtKind.COVER,
+                            Modifier.width(coverWidth - 8.dp).height(218.dp),
+                            fieldNotes = fieldNotesArt)
+                    }
+                }
+            }
+
+            // Fully contained mini books are REST-STATE hints, not extra
+            // sliding book pages. Hide them for the few moments of a swipe,
+            // so no duplicate/frozen books overlap the moving full covers.
+            // Rendering AFTER the pager also keeps their tap regions active.
+            if (!pagerState.isScrollInProgress && sideWidth >= 42.dp) {
                 if (index > 0) {
                     Ws16NeighborBook(
                         book = books[index - 1],
@@ -83,44 +133,6 @@ internal fun Ws16BookCoverPager(
                     )
                 }
             }
-
-            // Pager is deliberately confined to the center column. Neighbor
-            // pages no longer render as cut-off slices at the screen edges.
-            // Swiping the full-sized center book still changes focus.
-            HorizontalPager(
-                state = pagerState,
-                pageSize = PageSize.Fill,
-                key = { page -> books[page].id },
-                modifier = Modifier.align(Alignment.TopCenter)
-                    .width(coverWidth).height(226.dp)
-                    .testTag("ws14d-cover-pager")
-            ) { page ->
-                val book = books[page]
-                val focused = pagerState.currentPage == page
-                val lift by animateFloatAsState(
-                    targetValue = if (focused) 1.025f else .92f,
-                    animationSpec = tween(durationMillis = 220),
-                    label = "ws16-focused-cover"
-                )
-                Box(
-                    Modifier.fillMaxWidth().height(226.dp)
-                        .graphicsLayer { scaleX = lift; scaleY = lift }
-                        .semantics {
-                            contentDescription =
-                                (if (focused) "Play " else "Select ") +
-                                    book.title.removeSuffix(" · TEST BOOK")
-                        }
-                        .clickable(role = Role.Button) {
-                            onCoverTap(page, focused)
-                        }
-                        .testTag("ws14d-cover-" + book.id),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    BookArt(book.theme, BookArtKind.COVER,
-                        Modifier.width(coverWidth - 8.dp).height(218.dp),
-                        fieldNotes = fieldNotesArt)
-                }
-            }
         }
     }
 }
@@ -136,7 +148,7 @@ private fun Ws16NeighborBook(
     modifier: Modifier = Modifier
 ) {
     val title = book.title.removeSuffix(" · TEST BOOK")
-    val previewWidth = (sideWidth - 12.dp).coerceIn(32.dp, 67.dp)
+    val previewWidth = (sideWidth - 7.dp).coerceIn(32.dp, 74.dp)
     Column(
         modifier = modifier.width(sideWidth).height(216.dp)
             .semantics {

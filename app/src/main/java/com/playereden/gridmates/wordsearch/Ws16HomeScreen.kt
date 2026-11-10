@@ -67,7 +67,7 @@ internal fun Ws16HomeScreen(
     }
     val pager = rememberPagerState(initialPage = firstIndex, pageCount = { books.size })
     val scope = rememberCoroutineScope()
-    val selected = books.getOrNull(pager.currentPage)
+    val selected = books.getOrNull(pager.settledPage)
     val active = store.profile.active
     val soloPuzzle = remember(active.puzzleId) { SoloProgressRules.puzzle(active) }
     val soloComplete = WordSearchRules.complete(soloPuzzle, active.foundIds)
@@ -98,7 +98,7 @@ internal fun Ws16HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Your puzzle books", color = Forest, fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium)
-                Text("${pager.currentPage + 1} of ${books.size}",
+                Text("${pager.settledPage + 1} of ${books.size}",
                     color = Muted, style = MaterialTheme.typography.labelSmall)
             }
             Ws16BookCoverPager(
