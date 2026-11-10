@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
@@ -121,13 +123,19 @@ private fun Ws16BTogetherButton(onClick: () -> Unit, modifier: Modifier,
                     style = MaterialTheme.typography.titleSmall)
             }
         } else {
-            Column(Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
+            // Full-width compact contents: center icon + label as one deliberate
+            // unit, instead of anchoring the intrinsic-width column to the left.
+            // Larger fonts use the horizontal stacked/full-width branch above.
+            Column(Modifier.fillMaxWidth().heightIn(min = 62.dp)
+                .padding(horizontal = 4.dp, vertical = 3.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 36.dp)
-                Text("Together", color = Forest,
-                    fontWeight = FontWeight.SemiBold,
+                verticalArrangement = Arrangement.Center) {
+                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 30.dp)
+                Text("Together", modifier = Modifier.fillMaxWidth(),
+                    color = Forest, fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.labelMedium,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
                     maxLines = 1)
             }
         }
