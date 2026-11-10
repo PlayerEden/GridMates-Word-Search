@@ -1,7 +1,6 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -22,11 +21,12 @@ class QaBookshelfLauncherAndroidTest {
         compose.onNodeWithTag("ws16-full-shelf").performScrollTo().performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Your Library").assertExists()
-        // WS-16: Full Shelf is the actual multi-book bookcase by default.
-        // Swipe comparison remains reachable through preview options.
+        // The native bookcase displays the actual spine; tap to pull out
+        // the illustrated cover, then route into the existing chapters.
+        compose.onNodeWithTag("library-spine-woodland-volume-one").assertExists()
+        compose.onNodeWithTag("library-spine-woodland-volume-one").performClick()
         compose.onNodeWithText("Woodland").assertExists()
-        compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
-        compose.onAllNodesWithText("Open book")[0].performClick()
+        compose.onNodeWithTag("library-view-pages").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("Getting Started").assertExists()
         compose.onNodeWithText("Start solving").assertExists()

@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -56,7 +55,7 @@ class QaActualBookcaseAndroidTest {
     private val garden = fixture(WordTheme.GARDEN, "garden", 'c')
     private val catalog = BookCatalog(listOf(woodland, space, garden))
 
-    @Test fun bookcaseShowsRealStandingBooksAndTapCoverUsesStableBookId() {
+    @Test fun bookcaseShowsSpinesAndPullOutPreviewUsesStableBookId() {
         var selected: String? = null
         compose.setContent {
             GridMatesTheme {
@@ -73,24 +72,26 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("real-bookcase-screen").assertExists()
         compose.onNodeWithTag("wooden-shelf-plank-0").assertExists()
         compose.onNodeWithTag("ws16f-bookcase-backboard-0").assertExists()
-        compose.onNodeWithTag("book-cover-" + woodland.id).assertExists()
-        compose.onNodeWithTag("book-spine-" + woodland.id).assertExists()
+        compose.onNodeWithTag("library-spine-" + woodland.id).assertExists()
+        compose.onNodeWithTag("library-spine-" + space.id).assertExists()
+        compose.onNodeWithTag("library-spine-" + garden.id).assertExists()
+        compose.onNodeWithTag("book-cover-" + woodland.id).assertDoesNotExist()
+        compose.onNodeWithTag("library-spine-" + woodland.id).performClick()
+        compose.onNodeWithTag("library-pulled-book-dialog").assertExists()
+        compose.onNodeWithTag("library-pulled-cover-" + woodland.id).assertExists()
         compose.onNodeWithText("Woodland").assertExists()
-        compose.onAllNodesWithText("TEST BOOK · 1 chapter")[0].assertExists()
-        compose.onNodeWithTag("shelf-cover-select-" + woodland.id).performClick()
+        compose.onNodeWithTag("library-view-pages").performClick()
         compose.runOnIdle { assertEquals(woodland.id, selected) }
         compose.onNodeWithText("Browse your puzzle books").assertExists()
 
-        // Three actual published/QA catalog entries require two shelf rows
-        // at ordinary phone width. There are no fake locked future books.
+        // An empty second shelf is genuine furniture, not a fake catalog row.
         compose.onNodeWithTag("bookcase-lazy-shelves")
             .performScrollToNode(hasTestTag("bookcase-shelf-1"))
         compose.onNodeWithTag("wooden-shelf-plank-1").assertExists()
-        compose.onNodeWithTag("shelf-open-" + garden.id).performClick()
-        compose.runOnIdle { assertEquals(garden.id, selected) }
+        compose.onNodeWithText("Locked").assertDoesNotExist()
     }
 
-    @Test fun largeFontCreatesOneBookPerShelfWithoutChangingCatalog() {
+    @Test fun largeFontShowsRealSpinesWithoutChangingCatalog() {
         compose.setContent {
             GridMatesTheme {
                 CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
@@ -105,9 +106,10 @@ class QaActualBookcaseAndroidTest {
             }
         }
         compose.onNodeWithTag("real-bookcase-screen").assertExists()
-        compose.onNodeWithTag("bookcase-lazy-shelves")
-            .performScrollToNode(hasTestTag("bookcase-shelf-2"))
-        compose.onNodeWithTag("wooden-shelf-plank-2").assertExists()
+        compose.onNodeWithTag("library-spine-" + woodland.id).assertExists()
+        compose.onNodeWithTag("library-spine-" + garden.id).assertExists()
+        compose.onNodeWithTag("library-spine-" + garden.id).performClick()
+        compose.onNodeWithTag("library-view-pages").assertExists()
     }
 
     @Test fun oneBookDoesNotInventMoreVolumesOrLockedPlaceholders() {
@@ -123,7 +125,9 @@ class QaActualBookcaseAndroidTest {
             }
         }
         compose.onNodeWithText("1 book in your library").assertExists()
-        compose.onNodeWithText("SHELF 2").assertDoesNotExist()
+        compose.onNodeWithTag("library-spine-" + woodland.id).assertExists()
+        compose.onNodeWithTag("library-spine-" + space.id).assertDoesNotExist()
+        compose.onNodeWithTag("library-spine-" + garden.id).assertDoesNotExist()
         compose.onNodeWithText("Locked").assertDoesNotExist()
     }
 }
