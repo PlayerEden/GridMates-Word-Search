@@ -79,6 +79,12 @@ The owner wants the GridMates games to feel **like one family rather than unrela
 - Performance check: avoid decoding unscaled 2K masters on the device, avoid looping full-cover invalidations, preserve existing bounded bitmap sampling.
 - References: [Android official Compose animation quick guide](https://developer.android.com/develop/ui/compose/animation/quick-guide) and [Compose animation introduction](https://developer.android.com/develop/ui/compose/animation/introduction).
 
+## Owner-confirmed two-part series title artwork (Nov 10, WS-16AC)
+
+[Real-phone WS16AB review and follow-on art requirements](devlog/2026-11-10_WS16AC_OWNER_HOME_ACCEPTANCE_AND_NEXT_BRANDING_COVER_PASS.md) supersede the assumption that independent *small icons plus plain native type* are the finished GridMates branding. Owner wants **two separate complete transparent title graphics**: (1) an identical, portable **GridMates family wordmark**, used across Word Search, Sudoku and future Crossword, and (2) the specific **Word Search title wordmark** paired beneath it. The existing WS16M independent 25/28dp emblems are useful but **not** finished wordmark art; preserve them and native title text as fallback and for accessible UI. No ® anywhere. Do not bake the entire header, Profile/Menu icons, or gameplay content into the artwork. Source the eventual shared wordmark from one version/hash, not a fresh vaguely similar re-generation per game. New assets are **not yet generated**.
+
+The same owner's screenshot accepts the actual painted WS16AB shelf visual direction, and identifies white/bright crop fringes on otherwise strong book covers and the baked-in unregistered ® as the next cleanup target. Produce new V2 SHA-pinned cover/spine sources with clean straight outer book geometry, correct alpha matte, preserve fine perspective, inspect on both light/dark backgrounds, and remove ® in pixels. Keep V1/WS16AB rollback and do not promote artwork to release before review.
+
 ## First test plan — without new artwork first
 
 1. **Implement WS-14D horizontal bookshelf A/B** using existing covers and **no detached spine**, with clear selected-book controls and grounded color/material system. Keep original vertical shelf available and save behavior untouched.
