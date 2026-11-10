@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -45,7 +46,11 @@ internal fun Ws16BookCoverPager(
         Box(Modifier.fillMaxWidth().height(252.dp)) {
             // The wooden rail is behind the interactive covers; they overlap
             // its upper edge rather than standing above a 20dp empty gutter.
-            Ws16EStorybookShelf(Modifier.align(Alignment.BottomCenter))
+            // WS-16G5 owner phone review: the cover PNGs retain a tiny clear-alpha
+            // footer, leaving a visible gap above the wood. Bring the entire
+            // decorative shelf up by 6dp behind the unmodified clickable books.
+            Ws16EStorybookShelf(Modifier.align(Alignment.BottomCenter)
+                .offset(y = (-6).dp))
             HorizontalPager(
                 state = pagerState,
                 pageSize = PageSize.Fixed(coverWidth),

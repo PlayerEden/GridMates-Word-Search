@@ -228,15 +228,12 @@ private fun BookStandingArt(
             .testTag("shelf-cover-select-" + book.id),
         contentAlignment = Alignment.BottomCenter
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(3.dp),
-            verticalAlignment = Alignment.Bottom) {
-            BookArt(book.theme, BookArtKind.COVER,
-                Modifier.width(108.dp).height(148.dp).testTag("book-cover-" + book.id),
-                fieldNotes = fieldNotesArt)
-            BookArt(book.theme, BookArtKind.SPINE,
-                Modifier.width(13.dp).height(130.dp).testTag("book-spine-" + book.id),
-                fieldNotes = fieldNotesArt)
-        }
+        // The illustrated cover bitmap already includes the book's left spine.
+        // Drawing an extra separate spine beside it makes a misleading second
+        // miniature book. Keep the real clickable cover and its semantics.
+        BookArt(book.theme, BookArtKind.COVER,
+            Modifier.width(108.dp).height(148.dp).testTag("book-cover-" + book.id),
+            fieldNotes = fieldNotesArt)
     }
 }
 
