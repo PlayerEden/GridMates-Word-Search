@@ -38,7 +38,7 @@ class Ws16AaArtTest(unittest.TestCase):
         shelf = (src / "Ws16GShelfArtwork.kt").read_text()
         paper = (src / "GridMatesParchmentBackground.kt").read_text()
         pager = (src / "Ws16BookCoverPager.kt").read_text()
-        self.assertIn('ws16aa/rail.png', shelf)
+        self.assertIn('context.assets.open("ws16aa/" + key + ".png")', shelf)
         self.assertIn('ws16aa/parchment.png', paper)
         self.assertIn('Ws16AaShelf(', shelf)
         self.assertIn('Ws16ECanvasShelfFallback()', shelf)
