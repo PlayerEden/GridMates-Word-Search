@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
  * This complements the separately sourced WS16G image pieces without
  * flattening or re-stretching the original gold medallion/wood supports.
  *
- * No new bitmap files, touch surfaces, random/flickering positions or
- * book/progress dependency. A richer source-art paintover can replace
+ * No outboard undershelf shadows, new bitmap files, touch surfaces,
+ * random/flickering positions or book/progress dependency. A richer source-art paintover can replace
  * the existing shelves after the user sees a physical-device comparison.
  */
 @Composable
@@ -85,14 +85,9 @@ internal fun Ws16TShelfPatina(modifier: Modifier = Modifier) {
                 Size((5+i%4)*u, (.8f+i%2*.3f)*u))
         }
 
-        // Soft undershelf shadow extends beyond the painted front lip.
-        drawRect(
-            brush = Brush.verticalGradient(listOf(
-                Color(0x00492D1B), Color(0x29492D1B),
-                Color.Transparent
-            )),
-            topLeft = Offset(w*.07f, 28*u),
-            size = Size(w*.86f, 13*u)
-        )
+        // WS-16V: no rectangular shadow outside the painted apron.
+        // The independently illustrated shelf already has a shaded undercut.
+        // Previous 13dp gradient looked like an artificial gray stripe on
+        // real Android screenshots. Pigment/woodgrain stays inside the wood.
     }
 }

@@ -4,6 +4,19 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class BoardFontCollectionTest {
+    @Test fun permanentGridMatesFontsAreNotAchievementUnlocks() {
+        assertEquals("literata", GridMatesTypographyRoles.STORYBOOK)
+        assertEquals("atkinson", GridMatesTypographyRoles.INTERFACE)
+        assertEquals(GridMatesTypographyRoles.BOARD_STARTER, BoardFontCollection.DEFAULT_ID)
+        assertEquals(setOf("plex", "dmmono", "patrick"), BoardFontCollection.unlockableFontIds)
+        assertTrue(BoardFontCollection.unlockableFontIds
+            .intersect(GridMatesTypographyRoles.brandFontIds).isEmpty())
+        assertFalse(BoardFontCollection.definitions.any {
+            it.id == "literata" || it.id == "atkinson" &&
+                it.requiredAchievementId != null
+        })
+    }
+
     @Test fun defaultIsAlwaysAvailableAndUnknownFontsNeverEquip() {
         val p = SoloProfile(SoloProgressRules.freshV2(
             WordTheme.WOODLAND, PuzzleBoardSize.BOOK_CLASSIC,

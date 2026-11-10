@@ -43,9 +43,11 @@ private val gridMatesScheme = lightColorScheme(
     surfaceContainerLow = Paper
 )
 
-// WS-16U design tokens: source-pinned, locally bundled OFL fonts.
- // Literata is the GridMates storybook headline; Atkinson is the accessible UI.
- // No remote font service is required when the APK is installed.
+// WS-16V: permanent GridMates identity roles, not unlockable cosmetics.
+ // Literata = headings/storybook; Atkinson = menus, small text and guidance.
+ // Word Search's Atkinson-based board default is an always-free legacy starter;
+ // only independently listed board fonts are earned, never these UI roles.
+ // Both OFL fonts are locally bundled and carry their license notices.
 internal val GridMatesStoryTypeface = FontFamily(Font(R.font.gm_literata))
 internal val GridMatesControlTypeface = FontFamily(Font(R.font.gm_atkinson))
 

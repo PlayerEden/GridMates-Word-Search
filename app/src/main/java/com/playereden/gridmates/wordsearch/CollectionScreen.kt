@@ -195,8 +195,8 @@ internal fun CollectionScreen(store: SoloStore) {
             subtitle = fonts.count { it.unlocked }.toString() + " of " +
                 fonts.size + " unlocked"
         )
-        Text("All styles are free. Earn fonts through achievements, then equip " +
-            "one to change your puzzle letters. The readable default is always available.",
+        Text("Board fonts change puzzle letters only, not GridMates menus. " +
+            "The readable starter is always free; earn other styles through achievements.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val columns = if (maxWidth < 350.dp ||
