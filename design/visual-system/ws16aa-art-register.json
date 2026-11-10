@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "owner_approved": false,
+  "release_approved": false,
+  "debug_only": true,
+  "created": "2026-11-10",
+  "source": "Original standalone illustrated vector masters with carved walnut shading, organic grain, and transparent paper-tooth layers; no photographic UI mockup baked into assets.",
+  "assets": [
+    {
+      "id": "WS16AA_SHELF_RAIL_V1",
+      "path": "design/visual-system/masters/ws16aa/shelf-rail.svg",
+      "source_git_blob_sha1": "6184f5feecbf063d6c839da5fc106b01819b2b13",
+      "export_filename": "rail.png",
+      "export_width": 1280,
+      "export_height": 256,
+      "review_state": "QA_INTEGRATED_UNREVIEWED",
+      "rights": "Original illustration; commercial/release approval pending owner review"
+    },
+    {
+      "id": "WS16AA_SHELF_LEFT_V1",
+      "path": "design/visual-system/masters/ws16aa/shelf-left.svg",
+      "source_git_blob_sha1": "02d124e2438a76b456a658cb5a4a7149ca54bcd7",
+      "export_filename": "left.png",
+      "export_width": 284,
+      "export_height": 256,
+      "review_state": "QA_INTEGRATED_UNREVIEWED",
+      "rights": "Original illustration; commercial/release approval pending owner review"
+    },
+    {
+      "id": "WS16AA_SHELF_RIGHT_V1",
+      "path": "design/visual-system/masters/ws16aa/shelf-right.svg",
+      "source_git_blob_sha1": "8917e453057ce52107d4deaa23c674d3d06a736e",
+      "export_filename": "right.png",
+      "export_width": 284,
+      "export_height": 256,
+      "review_state": "QA_INTEGRATED_UNREVIEWED",
+      "rights": "Original illustration; commercial/release approval pending owner review"
+    },
+    {
+      "id": "WS16AA_SHELF_CARVING_V1",
+      "path": "design/visual-system/masters/ws16aa/shelf-carving.svg",
+      "source_git_blob_sha1": "6f80c9e2a930474d73a534ca180f1b9071925906",
+      "export_filename": "carving.png",
+      "export_width": 560,
+      "export_height": 172,
+      "review_state": "QA_INTEGRATED_UNREVIEWED",
+      "rights": "Original illustration; commercial/release approval pending owner review"
+    },
+    {
+      "id": "WS16AA_SHELF_CONTACT_V1",
+      "path": "design/visual-system/masters/ws16aa/shelf-contact.svg",
+      "source_git_blob_sha1": "f4e4262ba1bbbe143e5043e825bfa025c365fb91",
+      "export_filename": "contact.png",
+      "export_width": 500,
+      "export_height": 70,
+      "review_state": "QA_INTEGRATED_UNREVIEWED",
+      "rights": "Original illustration; commercial/release approval pending owner review"
+    },
+    {
+      "id": "WS16AA_PARCHMENT_V1",
+      "path": "design/visual-system/masters/ws16aa/paper-tooth.svg",
+      "source_git_blob_sha1": "f032354fc9cf6b71de61f23fd7253ef12685b678",
+      "export_filename": "parchment.png",
+      "export_width": 384,
+      "export_height": 384,
+      "review_state": "QA_INTEGRATED_UNREVIEWED",
+      "rights": "Original illustration; commercial/release approval pending owner review"
+    }
+  ]
+}

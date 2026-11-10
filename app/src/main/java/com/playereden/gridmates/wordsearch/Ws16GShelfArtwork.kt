@@ -29,6 +29,43 @@ import androidx.compose.ui.unit.dp
  * Release APK never bundles candidate assets: safely falls back to Canvas.
  * Book covers, buttons, IDs, progress and interaction remain independently native.
  */
+
+/** WS16AA: candidate painted assets. One native shelf with five independently
+ * rendered local illustrations; no book artwork or touch handling baked into it.
+ * All image loading happens once per Context. Release has none of these files.
+ */
+private fun readWs16AaShelf(context: Context): Map<String, Bitmap>? = runCatching {
+    listOf("rail", "left", "right", "carving", "contact").associateWith { key ->
+        context.assets.open("ws16aa/" + key + ".png").use {
+            BitmapFactory.decodeStream(it) ?: error("WS16AA invalid " + key)
+        }
+    }
+}.getOrNull()
+
+@Composable
+private fun Ws16AaShelf(art: Map<String, Bitmap>, modifier: Modifier) {
+    Box(modifier.fillMaxWidth().height(42.dp)
+        .qaTrackBounds("Wooden shelf").testTag("ws16e-storybook-shelf")) {
+        // Source-painted material and volumetric apron; repeatable neutral
+        // center has no fixed knot or medallion that could be stretched.
+        ShelfPart(art.getValue("rail"),
+            Modifier.align(Alignment.TopCenter).fillMaxWidth().height(42.dp))
+        // Corbels do not distort when Android display widths change.
+        ShelfPart(art.getValue("left"),
+            Modifier.align(Alignment.BottomStart).width(36.dp).height(42.dp))
+        ShelfPart(art.getValue("right"),
+            Modifier.align(Alignment.BottomEnd).width(36.dp).height(42.dp))
+        // Warm book contact sits ON the top plane; transparent edges,
+        // no rectangular gray bar beneath the silhouette.
+        ShelfPart(art.getValue("contact"),
+            Modifier.align(Alignment.TopCenter).offset(y = 3.dp)
+                .fillMaxWidth(.55f).height(7.dp))
+        ShelfPart(art.getValue("carving"),
+            Modifier.align(Alignment.Center).offset(y = 6.dp)
+                .width(92.dp).height(25.dp))
+    }
+}
+
 private fun readShelfPieces(context: Context): Map<String, Bitmap>? = runCatching {
     // Keep the legacy contact-shadow PNG in the QA source registry for
     // provenance, but don't load/draw its wide diffuse halo on Home.
@@ -49,6 +86,12 @@ private fun ShelfPart(bitmap: Bitmap, modifier: Modifier) {
 @Composable
 internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val ws16aa = remember(context) { readWs16AaShelf(context) }
+    if (ws16aa != null) {
+        Ws16AaShelf(ws16aa, modifier)
+        return
+    }
+    // Exact WS16G fallback remains for release and missing-candidate cases.
     val art = remember(context) { readShelfPieces(context) }
     if (art == null) {
         androidx.compose.foundation.layout.Box(

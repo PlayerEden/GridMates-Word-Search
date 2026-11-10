@@ -91,6 +91,10 @@ jobs:
         run: |
           python3 tools/asset_pipeline/render_ws16m_brand.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16m_brand.py' -v
+      - name: Render six source-pinned WS16AA painted shelf and paper assets
+        run: |
+          python3 tools/asset_pipeline/render_ws16aa.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16aa_art.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -177,6 +181,8 @@ jobs:
           PY
       - name: Verify all three WS-14K2 visual motifs in exact Android QA APK
         run: python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify WS16AA painted assets in actual Android debug APK
+        run: python3 tools/asset_pipeline/verify_ws16aa_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16G shelf art is source-matched in the QA APK
         run: python3 tools/asset_pipeline/verify_ws16g_shelf_apks.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify six source-hashed WS16H action sprites in QA APK
