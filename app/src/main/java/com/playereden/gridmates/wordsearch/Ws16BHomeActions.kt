@@ -29,7 +29,8 @@ internal fun Ws16BHomeActions(
     onNearby: () -> Unit,
     onCustom: () -> Unit,
     onMyPuzzles: () -> Unit,
-    showQuickPlayPreview: Boolean
+    showQuickPlayPreview: Boolean,
+    compactHome: Boolean = false
 ) {
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val stacked = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.35f
@@ -57,7 +58,8 @@ internal fun Ws16BHomeActions(
                     "Quick Play. Mixed-word mode in development, not playable yet" },
             variant = GridMatesFrameVariant.FEATURE
         ) {
-            Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            Row(Modifier.padding(horizontal = 12.dp,
+                vertical = if (compactHome) 5.dp else 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Ws16BActionArt(Ws16BArt.QUICK, iconSize = 46.dp)
@@ -73,7 +75,8 @@ internal fun Ws16BHomeActions(
         }
     }
 
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly,
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically) {
         GridMatesIllustratedLink("Custom", onCustom,
             modifier = Modifier.testTag("ws16-new-solo"))
@@ -123,15 +126,14 @@ private fun Ws16BTogetherButton(onClick: () -> Unit, modifier: Modifier,
                     style = MaterialTheme.typography.titleSmall)
             }
         } else {
-            // Full-width compact contents: center icon + label as one deliberate
-            // unit, instead of anchoring the intrinsic-width column to the left.
-            // Larger fonts use the horizontal stacked/full-width branch above.
-            Column(Modifier.fillMaxWidth().heightIn(min = 62.dp)
+            // Match the Daily icon-label hierarchy without making the
+            // narrow Together card any taller or reducing its tap target.
+            Row(Modifier.fillMaxWidth().heightIn(min = 62.dp)
                 .padding(horizontal = 4.dp, vertical = 3.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
-                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 30.dp)
-                Text("Together", modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+                Ws16BActionArt(Ws16BArt.TOGETHER, iconSize = 29.dp)
+                Text("Together", modifier = Modifier.weight(1f),
                     color = Forest, fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center,

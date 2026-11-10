@@ -79,16 +79,16 @@ internal fun Ws16IHomeEdgeDecor(mode: DisplayMode = DisplayMode.STANDARD) {
         Ws16IDecorSprite("bottom-left",
             Modifier.align(Alignment.BottomStart)
                 .offset(x = (-6).dp,
-                    y = if (immersive) (-2).dp else -(bottomInset + 3.dp))
+                    y = if (immersive) 13.dp else -(bottomInset + 3.dp))
                 .width(if (immersive) 158.dp else 135.dp)
-                .height(if (immersive) 98.dp else 76.dp)
+                .height(if (immersive) 91.dp else 76.dp)
                 .alpha(.89f))
         Ws16IDecorSprite("bottom-right",
             Modifier.align(Alignment.BottomEnd)
                 .offset(x = 3.dp,
-                    y = if (immersive) (-2).dp else -(bottomInset + 3.dp))
+                    y = if (immersive) 13.dp else -(bottomInset + 3.dp))
                 .width(if (immersive) 157.dp else 137.dp)
-                .height(if (immersive) 98.dp else 76.dp)
+                .height(if (immersive) 91.dp else 76.dp)
                 .alpha(.90f))
     }
 }

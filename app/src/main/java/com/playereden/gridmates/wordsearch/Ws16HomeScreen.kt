@@ -57,7 +57,8 @@ internal fun Ws16HomeScreen(
     onNearby: () -> Unit,
     showQuickPlayPreview: Boolean = false,
     displayMode: DisplayMode = DisplayMode.FULLSCREEN,
-    onDisplayModeChange: (DisplayMode) -> Unit = {}
+    onDisplayModeChange: (DisplayMode) -> Unit = {},
+    compactHome: Boolean = false
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     val books = catalog?.books.orEmpty()
@@ -74,7 +75,8 @@ internal fun Ws16HomeScreen(
 
     // Fullscreen lends a little more room to the illustrated page-top border.
     // Standard keeps the existing compact fit on smaller three-button phones.
-    if (displayMode == DisplayMode.FULLSCREEN) Spacer(Modifier.height(14.dp))
+    if (displayMode == DisplayMode.FULLSCREEN)
+        Spacer(Modifier.height(if (compactHome) 7.dp else 14.dp))
     Ws16HomeHeader(displayMode = displayMode,
         onProfile = onProfile, onMenu = { menuOpen = true })
     // An independent antique-gold botanical rule, no words baked in art.
@@ -153,13 +155,13 @@ internal fun Ws16HomeScreen(
             horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             Ws16BActionArt(Ws16BArt.CONTINUE, iconSize = 40.dp)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(if (soloComplete) "Custom" else "Continue",
+                Text(if (soloComplete) "New Solo" else "Continue Solo",
                     color = Forest, fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall)
                 // Keep progress explicit and on one line at normal phone widths.
                 // Grid dimensions remain visible in Custom and the active puzzle.
                 Text(active.theme.label + if (soloComplete) " · Finished" else
-                        " · ${active.foundIds.size}/${soloPuzzle.targets.size} found",
+                        " · ${active.foundIds.size}/${soloPuzzle.targets.size} words",
                     color = Muted, style = MaterialTheme.typography.labelSmall,
                     maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
@@ -175,7 +177,8 @@ internal fun Ws16HomeScreen(
         onNearby = onNearby,
         onCustom = onNewSolo,
         onMyPuzzles = onMyPuzzles,
-        showQuickPlayPreview = showQuickPlayPreview
+        showQuickPlayPreview = showQuickPlayPreview,
+        compactHome = compactHome
     )
 
     if (menuOpen) {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.safeGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -101,7 +102,13 @@ internal fun GridMatesShell(
 
     // WS-16C: Profile/Menu own the secondary destinations. No duplicate footer.
     // GM_SHARED: quiet, flexible paper behind every native screen.
-    Box(Modifier.fillMaxSize()) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        // WS-16N: use spare height rather than shrinking the book. Short
+        // displays and enlarged text retain natural scrolling.
+        val compactHome = page == Page.PLAY &&
+            displayMode == DisplayMode.FULLSCREEN &&
+            maxHeight >= 690.dp && maxHeight < 960.dp &&
+            LocalDensity.current.fontScale < 1.30f
         GridMatesParchmentBackground()
         // WS-16I: purely decorative Home foliage, behind the transparent
         // Scaffold. Neither icons, live copy nor touch regions are obscured.
@@ -169,8 +176,16 @@ internal fun GridMatesShell(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .verticalScroll(pageScroll)
-                .padding(horizontal = 18.dp, vertical = if (page == Page.PLAY) 6.dp else 20.dp),
-            verticalArrangement = Arrangement.spacedBy(if (page == Page.PLAY) 6.dp else 16.dp)
+                 .padding(horizontal = 18.dp, vertical = when {
+                    compactHome -> 3.dp
+                    page == Page.PLAY -> 6.dp
+                    else -> 20.dp
+                }),
+            verticalArrangement = Arrangement.spacedBy(when {
+                compactHome -> 3.dp
+                page == Page.PLAY -> 6.dp
+                else -> 16.dp
+            })
         ) {
             if (page == Page.RECORDS || page == Page.COLLECTION ||
                 page == Page.SETTINGS) {
@@ -239,7 +254,8 @@ internal fun GridMatesShell(
                         onNearby = { pageName = Page.NEARBY.name },
                         showQuickPlayPreview = qa.enabled,
                         displayMode = displayMode,
-                        onDisplayModeChange = onDisplayModeChange
+                        onDisplayModeChange = onDisplayModeChange,
+                        compactHome = compactHome
                     )
                 }
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
