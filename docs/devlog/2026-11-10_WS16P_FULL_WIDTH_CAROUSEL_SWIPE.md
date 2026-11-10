@@ -26,3 +26,15 @@ Source commit: [`be4d76eb2fe2fece0ef3aef319b789b96bd2660b`](https://github.com/P
 - The initial functional commit `be4d76e` accidentally omitted an `Arrangement` import that the unchanged miniature-book Column requires. Before any APK was approved, corrected source commit [`57f73c7a50681b189a7ffae52d766daa539ca9e4`](https://github.com/PlayerEden/GridMates-Word-Search/commit/57f73c7a50681b189a7ffae52d766daa539ca9e4) restored that import. No behavior change beyond the intended WS-16P animation fix.
 - Initial Android/art runs #42771031364/#42771031442 were **cancelled** in favor of the corrected source. They are **not test evidence**.
 - Current source-matched workflows: [Android QA #42771300333](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300333) and [art/release isolation #42771300203](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300203), both pending at this log update. Never distribute an APK from the cancelled source.
+
+## Final corrected-source WS-16P QA receipt — both successful
+
+- **Exact compiled source:** [`57f73c7a50681b189a7ffae52d766daa539ca9e4`](https://github.com/PlayerEden/GridMates-Word-Search/commit/57f73c7a50681b189a7ffae52d766daa539ca9e4). This is `be4d76e` plus the `Arrangement` import restoration. Subsequent documentation-only `[skip ci]` commits do not modify APK code.
+- [Standard Android QA #42771300333](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300333) **SUCCESS**, including source build/tests/lint and instrumentation test-source compilation. This is **not** execution of instrumentation on a device.
+- [Artwork/debug-release isolation #42771300203](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300203) **SUCCESS**.
+- Preferred owner [Android artifact #13742221740](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300333/artifacts/13742221740) contains `app-debug.apk`. Independently extracted 15,006,816-byte APK, SHA-256 **`50ea06a94e34d6ecffac6c354c2505573730aea814711cc5bb8b06ad5e05ef07`**, attached in conversation as `WS16P_Full_Width_Smooth_Carousel_QA.apk`.
+- Alternate art QA [artifact #13742276575](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771300203/artifacts/13742276575) produces APK SHA-256 `3d5de4294327c3e3ae235e05af0ba1d64a1008f91f074e6a8cbf9f1a14da6ee2`. **All 258 internal files have identical extracted bytes** between the two independent builds; only APK ZIP metadata differs.
+- Re-read the actual APK art manifests and computed hashes of **8 shelf PNGs + 6 Home action PNGs + 5 botanical PNGs + 2 header brand PNGs = 21/21 correct**.
+- Owner has **not yet run the corrected WS-16P APK on physical Android**. The screenshot-only bug is addressed by a source code fix, but the animation must be visually accepted on the device. PR #131 stays draft, no merge/release approval.
+- Next: owner tests swipe and taps on both sides with **Space focused** and a screenshot captured mid-gesture and after settling. Then avoid further Home churn and return to Word Search puzzle-board usability, saved-game functions and feature completeness.
+
