@@ -11,6 +11,24 @@
 
 Every theme is constructed from the same front/spine silhouette, resting baseline and scale, with title/plaque safely contained. Lettering and decorations may vary by theme but **outer geometry must not**. On future Full Library screens, vary visible book heights only by a few planned proportional variants; target large invisible tap regions (≥48dp) independent of a visually narrow spine. Do not distort the book PNG itself or overlap hit targets.
 
+## WS16AD-B: name length, spine height classes and touch areas
+
+The [owner-approved naming/presentation design rule](design/WS16AD_B_SPINE_NAMING_AND_PRESENTATION_POLICY_2026-11-10.md) now adds metadata to the otherwise unchanged source geometry:
+
+- **Preferred future names:** one word, ideally 4–8 letters. Shorter/longer themes are allowed with editorial discretion; do not rename existing IDs.
+- **Standard:** 1–7 letters (e.g. Space, Garden), suggested future proportional Full Library height **140dp**.
+- **Tall:** 8–11 letters (e.g. Woodland, Halloween), suggested future proportional height **148dp**.
+- **Editorial review:** multiword or 12+ letter names; no automatic shortening, compression or line break.
+- Both classes retain the *same* **128×640 source spine art**. If a later Full Library A/B implements height variation, scale the whole asset uniformly (nominal 1:5 width/height), maintain a consistent resting baseline, and retain a separate nonoverlapping **≥48dp touch target**.
+- The **current library layout is unchanged** in this pass; standard/tall data is recorded in debug manifest only. Blank coming-soon spines are anonymous, non-playable, and excluded from editorial name classification.
+- Current baked-in ® still requires an actual edited painting. The rule validates intended names and never modifies title pixels.
+
+Run the additional metadata test after the factory:
+
+```bash
+python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ad_spine_policy.py' -v
+```
+
 ## Asset bundle and source contract
 
 Per published themed book: stable book ID, editable theme illustration master, separate versioned cover and spine art, optional combined-shelf render derived from those, thumbnail as smaller export of cover, plaque/badge and optional chapter art **only if actually used**, metadata/palette, output SHA, source SHA, provenance/license and QA/release approval fields. Spine is separate art and can be displayed wide enough to read and tap.

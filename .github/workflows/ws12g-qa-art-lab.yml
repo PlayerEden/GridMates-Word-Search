@@ -108,6 +108,7 @@ jobs:
         run: |
           python3 tools/asset_pipeline/build_ws16ad_book_factory.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ad_book_factory.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ad_spine_policy.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

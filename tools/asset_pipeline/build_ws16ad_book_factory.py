@@ -13,6 +13,7 @@ from __future__ import annotations
 from PIL import Image,ImageFilter,ImageChops
 import hashlib,json,io,sys,os
 from pathlib import Path
+from book_spine_policy import spine_name_profile
 
 ROOT=Path(__file__).resolve().parents[2]
 OLD=ROOT/'app/src/debug/assets/ws14'
@@ -138,7 +139,9 @@ def generate(root:Path=ROOT)->dict:
                'input':str(source.relative_to(root)),'input_sha256':digest(data),
                'source_bbox':bbox,'output':str(output.relative_to(root)),
                'sha256':digest(raw),'output_bbox':result,'dimensions':list(img.size),
-               'contains_unreviewed_original_baked_lettering':True})
+               'contains_unreviewed_original_baked_lettering':True,
+               **({'spine_name_profile':spine_name_profile(theme.capitalize())}
+                  if kind=='spine' else {})})
     for index,(name,_,main,dark,lit) in enumerate(BLANKS):
         for kind in ('cover','spine'):
             source=blank_svg(kind,(main,dark,lit),index)
@@ -164,7 +167,16 @@ def generate(root:Path=ROOT)->dict:
      'owner_approved':False,'release_approved':False,'qa_only':True,
      'source_sheet':'design/visual-system/masters/ws14-generated-asset-sheet-original.png',
      'source_sheet_sha256':'9c452ba81352b9a3bd08496de5e8cf8d8ea9ed188af540d4db2b2d558c41808e',
-     'geometry':GEOMETRY,'assets':entries,
+     'geometry':GEOMETRY,
+     'spine_naming_policy':{
+         'master_geometry':'spine-128x640-v1',
+         'preferred_display_name':'one word, ideally 4-8 letters',
+         'standard':'1-7 letters; future proportional library view 140dp high',
+         'tall':'8-11 letters; future proportional library view 148dp high',
+         'editorial_review':'long or multiword name; typeset manually, no silent shortening',
+         'touch_target':'minimum 48dp independently of painted spine width',
+         'applies_in_runtime_now':False,
+     },'assets':entries,
      'open_gates':['Replace in-image unregistered ® in source painting',
        'Approve clean V2 book lettering and alpha edges on cream and dark backgrounds',
        'Verify hand-held tappable spines and native accessible labels',
