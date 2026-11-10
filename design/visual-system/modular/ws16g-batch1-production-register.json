@@ -3,7 +3,7 @@
   "date": "2026-11-09",
   "project": "GridMates: Word Search",
   "milestone": "WS-16G2_BATCH1",
-  "status": "SPEC_COMPLETE__NO_NEW_IMAGE_ASSETS_PRODUCED",
+  "status": "EIGHT_NEW_EDITABLE_VECTOR_MASTERS_COMMITTED__NO_NEW_ANDROID_ASSETS",
   "draft_pr": 131,
   "branch": "feature/ws14b-style-anchor-and-art-direction-2026-11-08",
   "scope_note": "20 distinct UI rendering roles, of which WS_BOOKCASE_ROW_SHELF_V1 is a reuse/composition role rather than a duplicate bitmap. Existing vector references and Compose analogs do not count as finished painterly exports.",
@@ -139,14 +139,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16e-shelf-top-v1.svg"
       ],
       "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-top-v1.svg",
+      "new_svg_sha256": "4329ebc3667fdbe3b71afe2f2f41fc7fefc10bc485595988c3a87dc63d3b8105"
     },
     {
       "id": "WS_SHELF_FRONT_V1",
@@ -162,14 +164,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16e-shelf-front-center-v1.svg"
       ],
       "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-front-v1.svg",
+      "new_svg_sha256": "d61cc6f6f5955e9758121d5a11aab13b49fe4b59f45ac1063453e3f485cc755b"
     },
     {
       "id": "WS_SHELF_APRON_CARVED_V1",
@@ -185,14 +189,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16f-carved-shelf-apron-v2.svg"
       ],
       "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-apron-v1.svg",
+      "new_svg_sha256": "c589228e9828b0a4bf1208f81d67fd0515b7aa19428bc4c249d3fef9a7d5996a"
     },
     {
       "id": "WS_SHELF_BRACKET_LEFT_V1",
@@ -208,14 +214,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16e-shelf-end-left-v1.svg"
       ],
       "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-bracket-left-v1.svg",
+      "new_svg_sha256": "28430f6a26fda520132e10ae69f0d0fc603d836becf8396877ed9efa0d8dad94"
     },
     {
       "id": "WS_SHELF_BRACKET_RIGHT_V1",
@@ -231,14 +239,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16e-shelf-end-right-v1.svg"
       ],
       "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-bracket-right-v1.svg",
+      "new_svg_sha256": "173bf826696d5aba3b1c31b86e4f1ab0a92eeac66f8ab080fdcf2fcc111af57c"
     },
     {
       "id": "WS_SHELF_CENTER_ORNAMENT_V1",
@@ -254,14 +264,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16e-shelf-leaf-medallion-v1.svg"
       ],
       "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-medallion-v1.svg",
+      "new_svg_sha256": "95c087e02d29fa097c616c6127a418759bf80e0aee57c2cc76217510a775757e"
     },
     {
       "id": "WS_SHELF_CONTACT_SHADOW_V1",
@@ -277,14 +289,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16e-shelf-contact-shadow-v1.svg"
       ],
       "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-contact-shadow-v1.svg",
+      "new_svg_sha256": "1b054ebfde296ed712c12213b8fd258dac1e26a7d71586fb4f8f72b83fb1f4a0"
     },
     {
       "id": "WS_BOOKCASE_BACKBOARD_V1",
@@ -300,14 +314,16 @@
         "design/visual-system/modular/masters/wordsearch/ws16f-bookcase-backboard-v1.svg"
       ],
       "existing_runtime_correspondence": "BookcaseBookshelfScreen.kt",
-      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
-      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "VECTOR_SOURCE_ONLY__PAINTERLY_PNG_AND_ANDROID_IMPORT_PENDING",
       "source_master_path": null,
       "source_sha256": null,
       "export_paths": [],
       "export_sha256": [],
       "owner_art_approval": false,
-      "release_approval": false
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-bookcase-backboard-v1.svg",
+      "new_svg_sha256": "60b64d5ba9ed6b81f9497149f2c53c41030bfd31538f3bf061084a125559566a"
     },
     {
       "id": "WS_BOOKCASE_ROW_SHELF_V1",
@@ -466,5 +482,6 @@
       "owner_art_approval": false,
       "release_approval": false
     }
-  ]
+  ],
+  "current_art_source_note": "Created 26 candidate PNG cutouts in conversation sandbox from an image-generated contact sheet; not in GitHub and not alpha approved. Eight independently editable SVG source masters are committed in GitHub, not automatically loaded by the Android app. Do not conflate the two formats or claim pixel equivalence."
 }
