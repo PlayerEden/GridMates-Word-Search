@@ -1,6 +1,5 @@
 package com.playereden.gridmates.wordsearch
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -10,9 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -98,14 +95,12 @@ private fun LibraryShortcut(
     modifier: Modifier,
     tag: String
 ) {
-    Surface(
-        onClick = onClick,
+    GridMatesIllustratedFrame(
         modifier = modifier.heightIn(min = 56.dp)
             .testTag(tag)
             .semantics { contentDescription = accessibleLabel },
-        shape = RoundedCornerShape(14.dp),
-        color = Paper,
-        border = BorderStroke(1.dp, StorybookTokens.panelBorder)
+        variant = GridMatesFrameVariant.MEDIUM,
+        onClick = onClick
     ) {
         Row(Modifier.padding(horizontal = 9.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,

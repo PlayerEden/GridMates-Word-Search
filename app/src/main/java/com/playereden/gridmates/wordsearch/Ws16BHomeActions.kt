@@ -1,6 +1,5 @@
 package com.playereden.gridmates.wordsearch
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -8,11 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,12 +48,13 @@ internal fun Ws16BHomeActions(
     // WS-17 needs its own mixed lexicon, deterministic generator and safe saves.
     // Reserve a real-sized asset slot in QA only, never a fake playable button.
     if (showQuickPlayPreview) {
-        Surface(modifier = Modifier.fillMaxWidth()
+        GridMatesIllustratedFrame(
+            modifier = Modifier.fillMaxWidth()
                 .testTag("ws16b-quick-play-preview")
                 .semantics { contentDescription =
                     "Quick Play. Mixed-word mode in development, not playable yet" },
-            shape = RoundedCornerShape(16.dp), color = Paper,
-            border = BorderStroke(1.dp, StorybookTokens.panelBorder)) {
+            variant = GridMatesFrameVariant.FEATURE
+        ) {
             Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -76,21 +73,22 @@ internal fun Ws16BHomeActions(
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically) {
-        TextButton(onClick = onCustom, modifier = Modifier.heightIn(min = 48.dp)
-            .testTag("ws16-new-solo")) { Text("Custom") }
-        TextButton(onClick = onMyPuzzles, modifier = Modifier.heightIn(min = 48.dp)
-            .testTag("ws16-my-puzzles")) { Text("My Puzzles") }
+        GridMatesIllustratedLink("Custom", onCustom,
+            modifier = Modifier.testTag("ws16-new-solo"))
+        GridMatesIllustratedLink("My Puzzles", onMyPuzzles,
+            modifier = Modifier.testTag("ws16-my-puzzles"))
     }
 }
 
 @Composable
 private fun Ws16BDailyButton(onClick: () -> Unit, modifier: Modifier) {
-    Surface(onClick = onClick,
+    GridMatesIllustratedFrame(
         modifier = modifier.heightIn(min = 82.dp)
             .testTag("ws16-action-daily")
             .semantics { contentDescription = "Open Daily Puzzle" },
-        shape = RoundedCornerShape(16.dp), color = Paper,
-        border = BorderStroke(1.dp, StorybookTokens.panelBorder)) {
+        variant = GridMatesFrameVariant.MEDIUM,
+        onClick = onClick
+    ) {
         Row(Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -106,12 +104,13 @@ private fun Ws16BDailyButton(onClick: () -> Unit, modifier: Modifier) {
 @Composable
 private fun Ws16BTogetherButton(onClick: () -> Unit, modifier: Modifier,
                                  stacked: Boolean) {
-    Surface(onClick = onClick,
+    GridMatesIllustratedFrame(
         modifier = modifier.heightIn(min = 82.dp)
             .testTag("ws16-action-together")
             .semantics { contentDescription = "Open Together on local Wi-Fi" },
-        shape = RoundedCornerShape(16.dp), color = Paper,
-        border = BorderStroke(1.dp, StorybookTokens.panelBorder)) {
+        variant = GridMatesFrameVariant.MEDIUM,
+        onClick = onClick
+    ) {
         if (stacked) {
             Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -142,8 +141,10 @@ internal fun Ws16BCompactMenu(
     onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
-        Surface(shape = RoundedCornerShape(20.dp), color = Paper,
-            modifier = Modifier.fillMaxWidth().testTag("ws16b-compact-menu")) {
+        GridMatesIllustratedFrame(
+            modifier = Modifier.fillMaxWidth().testTag("ws16b-compact-menu"),
+            variant = GridMatesFrameVariant.PANEL
+        ) {
             Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(1.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
@@ -151,13 +152,13 @@ internal fun Ws16BCompactMenu(
                     Text("Word Search menu", color = Forest,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold)
-                    TextButton(onClick = onDismiss,
+                    androidx.compose.material3.TextButton(onClick = onDismiss,
                         modifier = Modifier.heightIn(min = 48.dp)) {
                         Text("Close")
                     }
                 }
                 options.forEach { (label, action) ->
-                    TextButton(onClick = { onDismiss(); action() },
+                    androidx.compose.material3.TextButton(onClick = { onDismiss(); action() },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                         Row(Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Start) {

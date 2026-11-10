@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -133,8 +132,14 @@ internal fun Ws16HomeScreen(
         onCollection = onCollection
     )
 
-    PaperPanel(Modifier.fillMaxWidth().testTag("ws16-continue-solo")) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+    GridMatesIllustratedFrame(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp)
+            .testTag("ws16-continue-solo"),
+        variant = GridMatesFrameVariant.FEATURE
+    ) {
+        Row(Modifier.fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             Ws16BActionArt(Ws16BArt.CONTINUE)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -147,11 +152,11 @@ internal fun Ws16HomeScreen(
                     color = Muted, style = MaterialTheme.typography.labelSmall,
                     maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
-            OutlinedButton(onClick = if (soloComplete) onNewSolo else onSolo,
-                modifier = Modifier.heightIn(min = 48.dp)
-                    .testTag("ws16-resume-solo")) {
-                Text(if (soloComplete) "New" else "Play")
-            }
+            GridMatesIllustratedPill(
+                label = if (soloComplete) "New" else "Play",
+                onClick = if (soloComplete) onNewSolo else onSolo,
+                modifier = Modifier.testTag("ws16-resume-solo")
+            )
         }
     }
     Ws16BHomeActions(

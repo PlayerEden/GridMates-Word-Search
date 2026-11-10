@@ -75,4 +75,19 @@ class Ws16CarouselHomeAndroidTest {
         compose.onNodeWithContentDescription("Open Play").assertDoesNotExist()
     }
 
+    @Test fun sharedParchmentFramesKeepAllNativeActionsDiscoverable() {
+        compose.onNodeWithTag("ws16-full-shelf").performScrollTo().assertExists()
+        compose.onNodeWithTag("ws16d-home-collection").assertExists()
+        compose.onNodeWithTag("ws16-continue-solo").performScrollTo().assertExists()
+        compose.onNodeWithTag("ws16-resume-solo").assertExists()
+        compose.onNodeWithContentDescription("Open Daily Puzzle")
+            .performScrollTo().assertExists()
+        compose.onNodeWithContentDescription("Open Together on local Wi-Fi")
+            .performScrollTo().assertExists()
+        compose.onNodeWithTag("ws16b-quick-play-preview").performScrollTo().assertExists()
+        compose.onNodeWithText("Mixed-word boards · coming soon").assertExists()
+        compose.onNodeWithTag("ws16-new-solo").performScrollTo().assertExists()
+        compose.onNodeWithTag("ws16-my-puzzles").assertExists()
+    }
+
 }
