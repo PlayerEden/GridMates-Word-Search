@@ -34,6 +34,20 @@ Baseline: [WS16AB build receipt](2026-11-10_WS16AB_ACTUAL_PAINTED_SHELF_CANDIDAT
 - Examine books and title with developer overlay OFF first. Test carousel tap/swipe, in-book visuals, saved progress, Back, Standard vs Fullscreen, readability and overflow/large text. No data clear/uninstall for visual testing.
 - Keep current **approved shelf / parchment / action cards unchanged**. No new shelf shadow, lantern, button rearrangement, Quick Play implementation, LAN change or cosmetic expansion in this visual cleanup. PR stays draft until source/owner approvals.
 
+## Later backlog — Full Library bookshelf: physical spines, natural height variety, generous taps
+
+**Owner clarification, November 10:** The future Full Library must NOT render all books as ultra-thin, hard-to-tap vertical strips. The owner wants some visual spine **thickness** and is open to experimenting with **controlled variation in book heights** for a more natural, lived-in bookcase. This is explicitly a **later library UX/visual design study**, NOT an instruction to change the approved Home carousel in WS16AC or rush a library redesign while making V2 asset masters.
+
+Distinguish **fixed source-book geometry** from **library presentation geometry**:
+- Every theme gets the same reproducible base book form (front silhouette, page block, underlying spine model and aligned bottom contact) so new illustrated volumes all feel published by GridMates.
+- Library display may use a small curated set of proportionally correct **spine widths / height classes** (e.g., standard, short and tall bindings) or scale variants, while maintaining consistent construction, perspective and deliberate shelf baselines. Avoid randomly distorting one sprite or stretching its art.
+- **Tappable hit region is independent of visible spine width.** A slim-looking volume can still have a 48dp-or-greater comfortable interaction target via invisible padding or grouped focus behavior. Avoid overlapping hit regions that cause a neighbor to open unexpectedly. Consider accessibility focus labels and non-swipe selection alternatives.
+- A reasonable future experiment: compare uniform row vs three subtly staggered height groups, with larger physically readable spines and natural bookend/empty-space balance on a full shelf. Protect visibility of title/series, selected/locked states, and the ability to reach every book on 320dp phones.
+- The proposed 1–3 **blank/coming-soon volumes** should share the same template and display rules, but must not masquerade as playable/unlocked themes; clear noninteractive or future-content semantics.
+- Library shelf-scale options should be assessed in a separate QA layout and on real phone/screenshots; **do not change game content, save IDs, existing carousel art or user progress** while experimenting.
+
+**Priority:** Finish shared reproducible book production contract and clean V2 covers first; then make blank book candidates; **later** study library spine widths and bookcase height variation. No code or new assets are claimed by this note.
+
 ## Source of truth and outcome
 
 Existing shared principles remain in [GridMates Shared Visual Identity and Motion](../GRIDMATES_SHARED_VISUAL_IDENTITY_AND_MOTION_2026-11-09.md), particularly **no ®**, shared family + game-specific identity, and pinned portable assets. This note adds the owner's explicit request for **complete independent title artworks** rather than emblems plus native type.
