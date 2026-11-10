@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,15 +42,18 @@ internal fun Ws16BookCoverPager(
         val width = maxWidth
         val coverWidth = (width * .59f).coerceIn(136.dp, 186.dp)
         val peek = ((width - coverWidth) / 2).coerceAtLeast(0.dp)
-        Column {
+        Box(Modifier.fillMaxWidth().height(252.dp)) {
+            // The wooden rail is behind the interactive covers; they overlap
+            // its upper edge rather than standing above a 20dp empty gutter.
+            Ws16EStorybookShelf(Modifier.align(Alignment.BottomCenter))
             HorizontalPager(
                 state = pagerState,
                 pageSize = PageSize.Fixed(coverWidth),
                 contentPadding = PaddingValues(horizontal = peek),
                 pageSpacing = 10.dp,
                 key = { index -> books[index].id },
-                modifier = Modifier.fillMaxWidth().height(234.dp)
-                    .testTag("ws14d-cover-pager")
+                modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth()
+                    .height(226.dp).testTag("ws14d-cover-pager")
             ) { page ->
                 val book = books[page]
                 val focused = pagerState.currentPage == page
@@ -61,7 +63,7 @@ internal fun Ws16BookCoverPager(
                     label = "ws16-focused-cover"
                 )
                 Box(
-                    Modifier.fillMaxWidth().height(234.dp)
+                    Modifier.fillMaxWidth().height(226.dp)
                         .graphicsLayer { scaleX = lift; scaleY = lift }
                         .semantics {
                             contentDescription =
@@ -79,10 +81,6 @@ internal fun Ws16BookCoverPager(
                         fieldNotes = fieldNotesArt)
                 }
             }
-            // WS-16E: layered, modular illustrated wood. The cover pager itself
-            // and all focus/direct-play gestures are deliberately unchanged.
-            Ws16EStorybookShelf()
-
         }
     }
 }

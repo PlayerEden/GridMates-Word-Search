@@ -176,7 +176,7 @@ internal fun Ws16HomeScreen(
                 "Records" to onRecords,
                 "My Puzzles" to onMyPuzzles,
                 if (catalog != null && bookProgress != null &&
-                    books.isNotEmpty()) "Full shelf" to onFullShelf else null,
+                    books.isNotEmpty()) "Full Library" to onFullShelf else null,
                 "Custom" to onNewSolo
             ),
             onDismiss = { menuOpen = false }

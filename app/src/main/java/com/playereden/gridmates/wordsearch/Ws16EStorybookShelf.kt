@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
-    Canvas(modifier.fillMaxWidth().height(34.dp)
+    Canvas(modifier.fillMaxWidth().height(42.dp)
         .testTag("ws16e-storybook-shelf")) {
         val u = 1.dp.toPx()
         val w = size.width
@@ -45,6 +45,28 @@ internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
         drawOval(dark.copy(alpha = .11f),
             topLeft = Offset(w*.24f, 1*u),
             size = Size(w*.52f, 4*u))
+
+        // WS-16F: sculpted walnut apron, a separate layer that never holds
+        // text or touch input and doesn't stretch its gold ornament.
+        val apron = Path().apply {
+            moveTo(9*u,23*u)
+            lineTo(w-9*u,23*u)
+            lineTo(w-13*u,34*u)
+            cubicTo(w*.79f,34*u,w*.67f,34*u,w*.59f,38*u)
+            cubicTo(w*.54f,42*u,w*.46f,42*u,w*.41f,38*u)
+            cubicTo(w*.33f,34*u,w*.21f,34*u,13*u,34*u)
+            close()
+        }
+        drawPath(apron, brush = Brush.verticalGradient(listOf(
+            Color(0xFFC58543),Color(0xFF945829),Color(0xFF65371E))))
+        drawPath(apron, color = dark.copy(alpha=.72f),
+            style = Stroke(.85f*u))
+        drawLine(Color(0xFFF0BE73).copy(alpha=.65f),
+            Offset(18*u,31*u),Offset(w*.31f,31*u),
+            strokeWidth=.9f*u,cap=StrokeCap.Round)
+        drawLine(Color(0xFFF0BE73).copy(alpha=.65f),
+            Offset(w*.69f,31*u),Offset(w-18*u,31*u),
+            strokeWidth=.9f*u,cap=StrokeCap.Round)
 
         // Small carved supports sit behind the face, not on top of labels.
         fun support(left: Boolean) {

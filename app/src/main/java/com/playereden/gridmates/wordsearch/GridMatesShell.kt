@@ -95,7 +95,10 @@ internal fun GridMatesShell(
     }
 
     // WS-16C: Profile/Menu own the secondary destinations. No duplicate footer.
-    Scaffold(containerColor = Cream) { contentPadding ->
+    // GM_SHARED: quiet, flexible paper behind every native screen.
+    Box(Modifier.fillMaxSize()) {
+        GridMatesParchmentBackground()
+        Scaffold(containerColor = androidx.compose.ui.graphics.Color.Transparent) { contentPadding ->
         if (page == Page.NEARBY) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 NearbyCoopScreen(soloStore, nearbyRooms, onBack = {
@@ -250,6 +253,7 @@ internal fun GridMatesShell(
                 )
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }
+        }
         }
     }
 }

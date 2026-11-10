@@ -29,8 +29,8 @@ import kotlin.math.ceil
 @Composable
 internal fun GridMatesParchmentBackground(modifier: Modifier = Modifier) {
     Canvas(modifier.fillMaxSize()
-        .testTag("gm-shared-parchment-background")
-        .clearAndSetSemantics { }) {
+        .clearAndSetSemantics { }
+        .testTag("gm-shared-parchment-background")) {
         val w = size.width
         val h = size.height
         if (w <= 0f || h <= 0f) return@Canvas
