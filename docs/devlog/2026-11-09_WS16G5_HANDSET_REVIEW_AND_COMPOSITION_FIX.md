@@ -19,3 +19,13 @@
 - **New code source `22882862`:** [standard Android QA #42746766977](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42746766977) and [art/release #42746767151](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42746767151) started; status still needs checking. APK/artifact for this new code is not claimed in this log.
 - PR stays a draft and original Canvas fallback remains for release without debug-only sprites. No installs/uninstalls or save schema changes performed here.
 - **Next action:** verify both new workflows, fix any source-build errors, provide source-matched new QA link once green. Ask for owner Home and Library photo checks after the corrected build. Then resume the actual `WS-16G` **six-piece painterly action illustration family** and remaining foliage; don't endlessly tune minor padding instead of real asset production.
+
+## Final corrected-source CI verification
+
+**WS-16G5 actual source commit:** [`228828621ceaac56b4057204ab8ad0b7476c4c05`](https://github.com/PlayerEden/GridMates-Word-Search/commit/228828621ceaac56b4057204ab8ad0b7476c4c05).
+
+- **Standard Android QA:** [run #42746766977](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42746766977), **SUCCESS**, source-matched Gradle/core/app/unit/lint/Android test compilation plus debug APK; owner [artifact #13732195532](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42746766977/artifacts/13732195532), contains `app-debug.apk` SHA-256 `1f10184ac3f5438221984f7548e19256c498f31fad3982e149954c082196ec8a`.
+- **Illustrated art/QA-release isolation:** [run #42746767151](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42746767151), **SUCCESS**, art/debug/release tests and asset separation. Alternate [artifact #13732285531](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42746767151/artifacts/13732285531), debug APK SHA-256 `047736a5997d84465fced6a2add272b855d07bc85142f3efa3ecc259198181c5`.
+- Downloaded both workflow artifact ZIPs and compared actual APK contents: every internal file path and its extracted bytes matched (zero content differences); only outer APK ZIP packaging metadata differs.
+- Standard debug APK includes the eight `assets/ws16g/shelf/*.png` files and their SHA manifest, release build excludes unapproved WS16G QA art. No handset validation of the **new 6dp contact shift and duplicate spine removal** yet.
+- **Next owner step:** install artifact #13732195532 over existing QA version when compatible, then screenshot Woodland/Space Home and both Library shelves. Check book tapping/open/back and saved game. No changes to versionCode or save schema.
