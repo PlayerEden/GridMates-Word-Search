@@ -94,3 +94,16 @@ The owner wants the GridMates games to feel **like one family rather than unrela
 - Correct ®/rights status before any production release. No blanket claims of trademark rights, license clearance or source approval.
 - Do not add motion just because the technology can: quiet idle states are part of the identity.
 - Each subsequent implementation/asset/build pass must be recorded in [development journal](DEVELOPMENT_JOURNAL.md), with exact SHA, QA result, owner feedback, fallback and next task.
+
+
+## Owner clarification — The GridMates Home Library (November 9, 2026)
+
+**Approved family-level atmosphere:** GridMates should feel like a **cozy home and a personal library** — warm, lived-in, welcoming, bookish and calm. Think a space someone would happily spend a quiet afternoon in, with puzzle books, soft lamplight and useful handcrafted objects. This is a **shared art-direction principle**, not a literal requirement to render a full interior on every screen. The tagline **“Good puzzles. Good company.”** remains the emotional center.
+
+**Coherent family, different nooks:** Keep GridMates wordmark, wood/paper material language, typography, gentle lighting, tactile frames, art presentation and native navigation consistent across games. Let each title inhabit a distinct corner of that imagined home: **Word Search — the illustrated bookshelf**; **Sudoku — the puzzle desk/notebook**; **Crossword — a reading/writing nook** (future concept, not yet selected for implementation). Theme-specific covers, icons, and collectibles vary. Never reskin all screens as the same furniture view or replace real native labels with text painted into a full-screen illustration.
+
+**First phone evidence from WS-16E:** In the owner's November 9 Android screenshots, the carved walnut shelf is visibly integrated and has depth and a gold center ornament, beneath the Woodland cover with Space peek. The illustrated covers still appear to float **roughly a small visible gap** above the shelf rather than physically touching the top. In the next visual refinement, align cover bottom with the shelf top by adjusting pager alignment/padding or shelf compositing; avoid scaling down the strong book art just to correct contact. This is a visual observation, not proof of any broken click behavior. Preserve focused-cover tap/side-peek and the clear full-shelf/collection shortcuts.
+
+**Practical material system:** Warm walnut shelves, quiet parchment and ivory panels, antique-gold details, deep forest-ink text, subtle botanical/bookish ornaments, restrained shadows. Decorative elements should be deliberately placed and **not** occupy every free pixel. Aim for a comfortable home atmosphere rather than a lavish fantasy museum or rigid institutional library.
+
+**Modular sourcing:** GM_SHARED frames, button/pill templates, icon chips, text treatment and shared brand are portable. WS_THEME bookshelf, paper-book art and leaves belong to Word Search first. Existing working Android source is at WS-16E shelf commit `92a1d899`, with dual-green Android/art QA and owner screenshots; this new note changes *direction only*, no app code or Sudoku/Crossword repo. Detail and checklist: [WS-16E modular kit](design/WS16E_MODULAR_GRIDMATES_UI_ASSET_PRODUCTION_PLAN_V1_2026-11-09.md).
