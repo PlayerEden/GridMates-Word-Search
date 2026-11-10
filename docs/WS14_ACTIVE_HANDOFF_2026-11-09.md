@@ -30,6 +30,16 @@
 
 ---
 
+## CURRENT: WS-16E Pass 2 shared parchment frames integrated — CI pending
+
+**Owner latest visual direction:** quiet/nearly flat warm cream background across all GridMates; cozy home/library atmosphere comes from interchangeable illustrated object and UI components, not bespoke full-screen paintings per game. Keep rich Word Search book covers/carved shelf. **Actual source implementation:** `GridMatesIllustratedFrames.kt` provides `MEDIUM`, `FEATURE`, `PANEL`, `PRIMARY_PILL` native scalable frame art, click/pressed/accessibility support, `GridMatesIllustratedPill` and native text links. Six original SVG frame/ornament/icon-plate masters in `design/visual-system/modular/masters/shared/`, with real SHA-256 in [source register](../design/visual-system/modular/gm-shared-frame-source-register.json); these are editable references, while runtime draws matching native Compose Canvas shapes. This is portable family design inside Word Search only—not a shared cross-repo dependency.
+
+**Actual Home wiring:** full-shelf/collection shortcuts, Continue feature + green Play pill, Daily/Together, QA-only nonclickable Quick Play preview, text-only Custom/My Puzzles, compact Menu panel. Preserved real click routes and dynamic native strings, no extra wallpaper, no footer or save change. [Detailed devlog](devlog/2026-11-09_WS16E_PASS2_SHARED_PARCHMENT_FRAMES.md). First source `47ae4f47` failed due to an invalid top-level import; corrected **`227b55e6a0c8a97010a591deee59b0e034141d8a`**. **Only** corrected [Android #42731226177](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226177) and [art/release #42731226186](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226186) matter for final QA. At handoff section creation, CI was still running; do not claim green or artifact before checking. Existing last confirmed rollback remains WS-16E shelf-only [ZIP #13720434658](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42724381974/artifacts/13720434658) (APK SHA256 `a71680c1c3b476f25727a33efcf2ff657d0bcacf5377b897666b7b549edc7d53`).
+
+**Next:** exact-source CI success + artifact SHA; owner phone screenshots of Home at top/bottom, Daily/Together label fit, green Continue CTA, gallery/shelf, compact Menu. Refine frames/icons based on the actual phone. No real Quick Play generator or per-book unlock rewrite in this pass. PR #131 stays draft.
+
+---
+
 ## CURRENT: WS-16E shelf-first original art implemented — Android/art dual green
 
 **Owner-approved target:** illustrated walnut storybook shelf in Home, but keep dynamic text and book interaction native; all template components modular/reusable. **Actual first shelf commit:** [92a1d899](https://github.com/PlayerEden/GridMates-Word-Search/commit/92a1d89905c5ce1ff1223d0558164795f400ee43). Six independent original shelf SVG masters and source SHA-256 registry under `design/visual-system/modular/`; new scalable `Ws16EStorybookShelf.kt` with woodgrain, brackets and gold relief; `Ws16BookCoverPager.kt` replaces its simple 13dp woodbar with 34dp shelf. Real 234dp pager, 218dp covers, side peeks and tap focus/play untouched. [Full devlog](devlog/2026-11-09_WS16E_MODULAR_ILLUSTRATED_SHELF_FIRST_BUILD.md).
