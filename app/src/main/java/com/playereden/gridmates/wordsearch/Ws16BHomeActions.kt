@@ -60,6 +60,7 @@ internal fun Ws16BHomeActions(
     if (showQuickPlayPreview) {
         GridMatesIllustratedFrame(
             modifier = Modifier.fillMaxWidth()
+                .qaTrackBounds("Quick Play")
                 .testTag("ws16b-quick-play-preview")
                 .semantics { contentDescription =
                     "Quick Play. Mixed-word mode in development, not playable yet" },
@@ -88,7 +89,8 @@ internal fun Ws16BHomeActions(
         }
     }
 
-    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        .qaTrackBounds("Footer links"),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically) {
         GridMatesIllustratedLink("Custom", onCustom,
@@ -106,6 +108,7 @@ internal fun Ws16BHomeActions(
 private fun Ws16BDailyButton(onClick: () -> Unit, modifier: Modifier) {
     GridMatesIllustratedFrame(
         modifier = modifier.heightIn(min = 68.dp)
+            .qaTrackBounds("Daily Puzzle")
             .testTag("ws16-action-daily")
             .semantics { contentDescription = "Open Daily Puzzle" },
         variant = GridMatesFrameVariant.MEDIUM,
@@ -129,6 +132,7 @@ private fun Ws16BTogetherButton(onClick: () -> Unit, modifier: Modifier,
                                  stacked: Boolean) {
     GridMatesIllustratedFrame(
         modifier = modifier.heightIn(min = 68.dp)
+            .qaTrackBounds("Together")
             .testTag("ws16-action-together")
             .semantics { contentDescription = "Open Together on local Wi-Fi" },
         variant = GridMatesFrameVariant.MEDIUM,

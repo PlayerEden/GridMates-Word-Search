@@ -95,7 +95,7 @@ internal fun Ws16HomeScreen(
         LaunchedEffect(pager.settledPage, books) {
             books.getOrNull(pager.settledPage)?.let { onFocusedBookChanged(it.id) }
         }
-        Column(Modifier.fillMaxWidth().testTag("ws16-home-books"),
+        Column(Modifier.fillMaxWidth().qaTrackBounds("Books + progress").testTag("ws16-home-books"),
             verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
@@ -149,6 +149,7 @@ internal fun Ws16HomeScreen(
 
     GridMatesIllustratedFrame(
         modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp)
+            .qaTrackBounds("Continue Solo")
             .testTag("ws16-continue-solo"),
         variant = GridMatesFrameVariant.FEATURE
     ) {

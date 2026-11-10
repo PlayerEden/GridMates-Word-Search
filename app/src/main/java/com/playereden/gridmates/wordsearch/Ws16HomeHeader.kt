@@ -52,7 +52,7 @@ internal fun Ws16HomeHeader(
             veryRoomy -> 24.dp
             else -> 17.dp
         }
-        Row(Modifier.fillMaxWidth().testTag("ws16-home-header"),
+        Row(Modifier.fillMaxWidth().qaTrackBounds("Home header").testTag("ws16-home-header"),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Column(Modifier.weight(1f).padding(start = leftInset),

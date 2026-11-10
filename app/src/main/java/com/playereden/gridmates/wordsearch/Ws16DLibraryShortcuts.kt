@@ -98,6 +98,7 @@ private fun LibraryShortcut(
 ) {
     GridMatesIllustratedFrame(
         modifier = modifier.heightIn(min = 56.dp)
+            .qaTrackBounds(label)
             .testTag(tag)
             .semantics { contentDescription = accessibleLabel },
         variant = GridMatesFrameVariant.MEDIUM,

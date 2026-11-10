@@ -71,6 +71,7 @@ internal fun GridMatesShell(
     val context = LocalContext.current
     val defaultQaRuntime = remember(context) { QaBookshelfRuntime(context) }
     val qa = qaBookshelf ?: defaultQaRuntime
+    var devOverlay by remember(context) { mutableStateOf(GridMatesDevTools.load(context)) }
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     var homeFocusedBookId by rememberSaveable { mutableStateOf<String?>(null) }
     var homeBookIntent by rememberSaveable { mutableStateOf<String?>(null) }
@@ -102,7 +103,7 @@ internal fun GridMatesShell(
 
     // WS-16C: Profile/Menu own the secondary destinations. No duplicate footer.
     // GM_SHARED: quiet, flexible paper behind every native screen.
-    BoxWithConstraints(Modifier.fillMaxSize()) {
+    BoxWithConstraints(Modifier.fillMaxSize().qaObserveTouches()) {
         // WS-16N: use spare height rather than shrinking the book. Short
         // displays and enlarged text retain natural scrolling.
         val compactHome = page == Page.PLAY &&
@@ -277,17 +278,33 @@ internal fun GridMatesShell(
                     onBack = { pageName = Page.PLAY.name })
                 Page.RECORDS -> SoloRecordsScreen(soloStore.profile)
                 Page.COLLECTION -> CollectionScreen(soloStore)
-                Page.SETTINGS -> SoloSettingsScreen(
-                    soloStore,
-                    onPreviewArtwork = if (qa.enabled) {
-                        { pageName = Page.ART_LAB.name }
-                    } else null,
-                    displayMode = displayMode,
-                    onDisplayModeChange = onDisplayModeChange
-                )
+                Page.SETTINGS -> {
+                    SoloSettingsScreen(
+                        soloStore,
+                        onPreviewArtwork = if (qa.enabled) {
+                            { pageName = Page.ART_LAB.name }
+                        } else null,
+                        displayMode = displayMode,
+                        onDisplayModeChange = onDisplayModeChange
+                    )
+                    if (GridMatesDevTools.available) {
+                        GridMatesDevTools.Controls(devOverlay) { changed ->
+                            devOverlay = changed
+                            GridMatesDevTools.save(context, changed)
+                        }
+                    }
+                }
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }
         }
+        }
+        // Painted last, but with no pointer target or hitbox:
+        // existing menu clicks, book swipes and Android Back keep working.
+        if (GridMatesDevTools.available) {
+            GridMatesDevTools.Overlay(
+                flags = devOverlay,
+                home = page == Page.PLAY
+            )
         }
     }
 }

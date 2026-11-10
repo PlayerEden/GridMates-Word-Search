@@ -58,7 +58,7 @@ internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
         }
         return
     }
-    Box(modifier.fillMaxWidth().height(42.dp).testTag("ws16e-storybook-shelf")) {
+    Box(modifier.fillMaxWidth().height(42.dp).qaTrackBounds("Wooden shelf").testTag("ws16e-storybook-shelf")) {
         ShelfPart(art.getValue("apron"),
             Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(24.dp))
         ShelfPart(art.getValue("front"),

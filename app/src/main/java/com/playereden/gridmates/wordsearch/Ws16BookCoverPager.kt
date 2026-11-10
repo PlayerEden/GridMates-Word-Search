@@ -48,7 +48,7 @@ internal fun Ws16BookCoverPager(
 ) {
     if (books.isEmpty()) return
 
-    BoxWithConstraints(modifier.fillMaxWidth().testTag("ws16-shared-cover-carousel")) {
+    BoxWithConstraints(modifier.fillMaxWidth().qaTrackBounds("Book carousel").testTag("ws16-shared-cover-carousel")) {
         val contentWidth = maxWidth
         // Matching GridMatesShell's existing 18dp Home page gutter.
         // The pager fills the actual horizontal viewport without stretching
