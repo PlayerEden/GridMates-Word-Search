@@ -23,8 +23,8 @@ class QaBookshelfLauncherAndroidTest {
         compose.onNodeWithText("Your Library").assertExists()
         // The native bookcase displays the actual spine; tap to pull out
         // the illustrated cover, then route into the existing chapters.
-        compose.onNodeWithTag("library-spine-woodland-volume-one").assertExists()
-        compose.onNodeWithTag("library-spine-woodland-volume-one").performClick()
+        compose.onNodeWithTag("library-spine-woodland-qa-volume-one").assertExists()
+        compose.onNodeWithTag("library-spine-woodland-qa-volume-one").performClick()
         compose.onNodeWithText("Woodland").assertExists()
         compose.onNodeWithTag("library-view-pages").performClick()
         compose.waitForIdle()
