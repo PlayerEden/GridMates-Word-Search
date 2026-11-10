@@ -124,3 +124,14 @@ Decoration must be removable without loss of action/meaning. Avoid having Woodla
 **Out of scope:** implementing real mixed-vocabulary Quick Play, changing existing book/reward save IDs, changing currently earned portraits, restoring the bottom bar, forcing login/online services, automating asset adoption in the Sudoku/Crossword repos, or promoting unreviewed art to production.
 
 **Next action:** Build the shelf pack first; then make modular parchment frames and fit the Home action buttons. This is the working asset-production contract for the illustrated WS-16E pass.
+
+
+## Owner clarification — Flat-first shared backgrounds and modular decoration (November 9, 2026)
+
+**This supersedes any implication that every GridMates game needs a detailed full-screen illustrated room.** The owner prefers a **simple, nearly flat warm cream/paper background**, reused consistently across the series. Most atmosphere should come from the shared **reusable illustrated UI kit** plus a few individually placed Word Search props and optional edge/corner accents.
+
+**Updated art acceptance rule:** the core `GM_SHARED` background may be an ordinary Compose solid color with a very light optional paper-grain overlay; **no new mandatory background texture is needed**. The Home must look intentional with zero decorative edge images. The detailed book covers and the wooden shelf remain Word Search-specific focal assets. Shared parchment-button templates, icon plates and pill frames supply the library/home feel across other titles.
+
+**Priority adjustment:** after WS-16E bookshelf contact/padding is reviewed, build **GM_SHARED scalable parchment frames and button state variants before optional foliage, lanterns or full-screen textures**. Keep any leaves, mushroom/wood edge sprites in independent transparent layers that can be turned off or trimmed for narrow screens. Native text and tap regions never reside inside decorative art. Avoid baking faux room scenery into a full-screen screenshot.
+
+**Scope:** an approved direction for asset design, not approval of individual new images, not implementation of a cross-repository component package and not an app code change by itself.
