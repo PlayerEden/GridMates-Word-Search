@@ -25,3 +25,15 @@ Owner supplied two **real Android screenshot states** of WS-16E Pass 2 with rich
 **Safe fallback:** Previous dual-green WS-16E Pass 2 [QA ZIP #13724199339](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42731226177/artifacts/13724199339) (APK SHA-256 `d4535ecbc312afac18ddd23b53c0f80d03ee3f0f14847fb0bf40185e9ccf6a6e`). No saved puzzle schema/profile changes in this pass. Back up progress before uninstall due to signing conflicts.
 
 **Next:** after owner phone review, refine only remaining awkward spacing or icon sizing; avoid another whole-screen makeover. Separate WS-17 mixed-word Quick Play generator remains future work.
+
+## Verified exact-source Android and artwork receipt
+
+**Both CI workflows completed SUCCESS on UI/gameplay source `338e4c65783240579d614202696a44cb84903f80`**. Later documentation-only [skip ci] commits do not represent rebuilt APKs.
+
+- [Android QA #42733181348](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42733181348): **SUCCESS** — core/app unit tests, lint, Android instrumentation **source compilation**, assembled debug APK. Source compilation is not proof tests were executed on a real phone.
+- [Art/release isolation #42733181417](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42733181417): **SUCCESS** — 6 QA-only cover/spine sprites absent from release; 18+18 portrait sources and 36 SHA-matched native QA PNGs verified; 3 theme motifs debug-only with correct hashes.
+- **Owner test ZIP artifact:** [#13726026545](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42733181348/artifacts/13726026545), contains `app-debug.apk`. Historical artifact name includes Woodland, but compiled code is the Pass 3 slimmer Home.
+- **APK SHA-256:** `5d8cb4c3cc0e1dcc0bfe9ab029ad851eb18720b562eba81f5a82c2ef31bde5c7`.
+- **Artifact ZIP SHA-256:** `23189789669ff425d7900351259c0ee55a26e15d6c1cb74eec56cfcb6107bbc2`; GitHub artifact size 13,970,090 bytes.
+- QA package follows unchanged `com.playereden.gridmates.wordsearch.qa`, versionCode 57 family; no signing/version guarantee, back up progress before uninstalling a prior APK if a signing conflict occurs.
+- **Device UI acceptance pending:** owner needs to compare first-screen visibility of Custom/My Puzzles, text wrapping and card balance against screenshots. PR #131 remains draft/unmerged.
