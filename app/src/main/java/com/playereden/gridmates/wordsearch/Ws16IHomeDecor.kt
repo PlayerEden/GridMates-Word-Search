@@ -2,6 +2,12 @@ package com.playereden.gridmates.wordsearch
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateBottomPadding
+import androidx.compose.foundation.layout.calculateTopPadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,21 +53,45 @@ private fun Ws16IDecorSprite(
 
 /** Always below the transparent Scaffold, therefore cannot intercept Home taps. */
 @Composable
-internal fun Ws16IHomeEdgeDecor() {
+internal fun Ws16IHomeEdgeDecor(mode: DisplayMode = DisplayMode.STANDARD) {
+    val immersive = mode == DisplayMode.FULLSCREEN
+    val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     Box(Modifier.fillMaxSize().clearAndSetSemantics { }
         .testTag("ws16i-home-edge-decor")) {
+        // In Standard the leafy parts start near the visible paper edge, not
+        // underneath the clock/notification icons. Fullscreen displays fuller
+        // corners in the extra screen space without intercepting touch targets.
         Ws16IDecorSprite("top-left",
-            Modifier.align(Alignment.TopStart).offset(x = (-38).dp, y = (-24).dp)
-                .width(94.dp).height(68.dp).alpha(.66f))
+            Modifier.align(Alignment.TopStart)
+                .offset(x = (-62).dp,
+                    y = if (immersive) (-24).dp else topInset - 13.dp)
+                .width(if (immersive) 152.dp else 126.dp)
+                .height(if (immersive) 100.dp else 78.dp)
+                .alpha(if (immersive) .82f else .70f))
         Ws16IDecorSprite("top-right",
-            Modifier.align(Alignment.TopEnd).offset(x = 35.dp, y = (-26).dp)
-                .width(96.dp).height(68.dp).alpha(.65f))
+            Modifier.align(Alignment.TopEnd)
+                .offset(x = if (immersive) 60.dp else 63.dp,
+                    y = if (immersive) (-23).dp else topInset - 15.dp)
+                .width(if (immersive) 152.dp else 126.dp)
+                .height(if (immersive) 100.dp else 78.dp)
+                .alpha(if (immersive) .82f else .70f))
+        // In Standard, flower bases end ABOVE the navigation control area.
+        // In fullscreen, they can extend almost to the physical bottom edge.
         Ws16IDecorSprite("bottom-left",
-            Modifier.align(Alignment.BottomStart).offset(x = (-4).dp, y = (-22).dp)
-                .width(132.dp).height(76.dp).alpha(.84f))
+            Modifier.align(Alignment.BottomStart)
+                .offset(x = (-6).dp,
+                    y = if (immersive) (-2).dp else -(bottomInset + 3.dp))
+                .width(if (immersive) 158.dp else 135.dp)
+                .height(if (immersive) 98.dp else 76.dp)
+                .alpha(.89f))
         Ws16IDecorSprite("bottom-right",
-            Modifier.align(Alignment.BottomEnd).offset(x = 2.dp, y = (-22).dp)
-                .width(136.dp).height(74.dp).alpha(.88f))
+            Modifier.align(Alignment.BottomEnd)
+                .offset(x = 3.dp,
+                    y = if (immersive) (-2).dp else -(bottomInset + 3.dp))
+                .width(if (immersive) 157.dp else 137.dp)
+                .height(if (immersive) 98.dp else 76.dp)
+                .alpha(.90f))
     }
 }
 

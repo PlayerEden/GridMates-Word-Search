@@ -3,6 +3,9 @@ package com.playereden.gridmates.wordsearch
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,7 +63,9 @@ private enum class Page(val label: String) {
 @Composable
 internal fun GridMatesShell(
     soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel,
-    qaBookshelf: QaBookshelfRuntime? = null
+    qaBookshelf: QaBookshelfRuntime? = null,
+    displayMode: DisplayMode = DisplayMode.STANDARD,
+    onDisplayModeChange: (DisplayMode) -> Unit = {}
 ) {
     val context = LocalContext.current
     val defaultQaRuntime = remember(context) { QaBookshelfRuntime(context) }
@@ -100,8 +105,14 @@ internal fun GridMatesShell(
         GridMatesParchmentBackground()
         // WS-16I: purely decorative Home foliage, behind the transparent
         // Scaffold. Neither icons, live copy nor touch regions are obscured.
-        if (page == Page.PLAY) Ws16IHomeEdgeDecor()
-        Scaffold(containerColor = androidx.compose.ui.graphics.Color.Transparent) { contentPadding ->
+        if (page == Page.PLAY) Ws16IHomeEdgeDecor(displayMode)
+        Scaffold(
+            containerColor = androidx.compose.ui.graphics.Color.Transparent,
+            // Standard respects visible bars/cutout; fullscreen also reserves
+            // critical system-gesture edges even when bars themselves are hidden.
+            contentWindowInsets = if (displayMode == DisplayMode.FULLSCREEN)
+                WindowInsets.safeGestures else WindowInsets.safeDrawing
+        ) { contentPadding ->
         if (page == Page.NEARBY) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 NearbyCoopScreen(soloStore, nearbyRooms, onBack = {
@@ -226,7 +237,9 @@ internal fun GridMatesShell(
                         onNewSolo = { openSoloSetup(Page.PLAY) },
                         onDaily = { pageName = Page.DAILY.name },
                         onNearby = { pageName = Page.NEARBY.name },
-                        showQuickPlayPreview = qa.enabled
+                        showQuickPlayPreview = qa.enabled,
+                        displayMode = displayMode,
+                        onDisplayModeChange = onDisplayModeChange
                     )
                 }
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
@@ -252,7 +265,9 @@ internal fun GridMatesShell(
                     soloStore,
                     onPreviewArtwork = if (qa.enabled) {
                         { pageName = Page.ART_LAB.name }
-                    } else null
+                    } else null,
+                    displayMode = displayMode,
+                    onDisplayModeChange = onDisplayModeChange
                 )
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }

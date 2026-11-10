@@ -3,6 +3,8 @@ package com.playereden.gridmates.wordsearch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -53,7 +55,9 @@ internal fun Ws16HomeScreen(
     onNewSolo: () -> Unit,
     onDaily: () -> Unit,
     onNearby: () -> Unit,
-    showQuickPlayPreview: Boolean = false
+    showQuickPlayPreview: Boolean = false,
+    displayMode: DisplayMode = DisplayMode.STANDARD,
+    onDisplayModeChange: (DisplayMode) -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     val books = catalog?.books.orEmpty()
@@ -68,6 +72,9 @@ internal fun Ws16HomeScreen(
     val soloComplete = WordSearchRules.complete(soloPuzzle, active.foundIds)
     val soloSize = active.boardSize?.cells ?: active.difficulty.gridSize
 
+    // Fullscreen lends a little more room to the illustrated page-top border.
+    // Standard keeps the existing compact fit on smaller three-button phones.
+    if (displayMode == DisplayMode.FULLSCREEN) Spacer(Modifier.height(14.dp))
     Ws16HomeHeader(onProfile = onProfile, onMenu = { menuOpen = true })
     // An independent antique-gold botanical rule, no words baked in art.
     Ws16IHeaderDivider()
@@ -173,6 +180,10 @@ internal fun Ws16HomeScreen(
     if (menuOpen) {
         Ws16BCompactMenu(
             options = listOfNotNull(
+                "Display: " + displayMode.label + " · Switch to " +
+                    displayMode.alternate().label to {
+                        onDisplayModeChange(displayMode.alternate())
+                    },
                 "Settings & backup" to onSettings,
                 "How to play" to onHelp,
                 "Records" to onRecords,

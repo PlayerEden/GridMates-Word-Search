@@ -42,7 +42,9 @@ import com.playereden.gridmates.wordsearch.core.WoodlandCollection
 @Composable
 internal fun SoloSettingsScreen(
     store: SoloStore,
-    onPreviewArtwork: (() -> Unit)? = null
+    onPreviewArtwork: (() -> Unit)? = null,
+    displayMode: DisplayMode = DisplayMode.STANDARD,
+    onDisplayModeChange: (DisplayMode) -> Unit = {}
 ) {
     val context = LocalContext.current
     var message by rememberSaveable { mutableStateOf("") }
@@ -179,6 +181,43 @@ internal fun SoloSettingsScreen(
         Text("Before reinstalling, export a backup and verify the file. " +
             "If Android reports a signing conflict, uninstalling removes " +
             "the local save. Restore your backup after reinstalling.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+    }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.PREFERENCES,
+            title = "Display mode",
+            subtitle = "Choose how Android system bars appear"
+        )
+        Text("Current mode: " + displayMode.label,
+            color = Forest, style = MaterialTheme.typography.labelLarge)
+        Row(Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (displayMode == DisplayMode.STANDARD) {
+                Button(onClick = { onDisplayModeChange(DisplayMode.STANDARD) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Standard")
+                }
+                OutlinedButton(onClick = { onDisplayModeChange(DisplayMode.FULLSCREEN) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Fullscreen")
+                }
+            } else {
+                OutlinedButton(onClick = { onDisplayModeChange(DisplayMode.STANDARD) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Standard")
+                }
+                Button(onClick = { onDisplayModeChange(DisplayMode.FULLSCREEN) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Fullscreen")
+                }
+            }
+        }
+        Text("Standard keeps Android's controls visible over parchment. " +
+            "Fullscreen hides the status and navigation bars; swipe in from " +
+            "a screen edge to reveal them temporarily. This device remembers " +
+            "your choice, and you can switch back at any time.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
     }
 
