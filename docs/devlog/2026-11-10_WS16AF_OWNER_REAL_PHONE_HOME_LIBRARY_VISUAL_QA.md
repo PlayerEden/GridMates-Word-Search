@@ -23,6 +23,15 @@ These are **real-phone visual smoke-test screenshots only**. They prove the app 
 - Independent art/release verification [#42922678475](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42922678475) was initially canceled during a docs update, reran successfully on second attempt; [artifact #13813052640](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42922678475/artifacts/13813052640) expires December 10, 2026. Earlier WS16AE original dual-green builds remain documented.
 - PR #131 remains unmerged draft; owner-approved shelf material is not blanket production art release approval.
 
+
+## Follow-up real-phone interaction evidence — Space spine opens correct preview
+
+The owner supplied a further real Android screenshot and confirmed the spine was tapped. The `Space` spine in **Your Library** opened the `Space` modal with the full separate Space cover, `2 chapters · 0 of 3 pages completed`, `TEST BOOK`, and visible `Back to shelf` / `View pages` controls.
+
+**Confirmed by phone evidence:** library spine tap reaches matching full-cover/details preview, correct Space title and progress rendered. The `TEST BOOK` tag is expected for current QA catalog content, but must not leak into a real consumer book launch. This screenshot **does not establish** that pressing View pages navigates to the correct chapter, that Back dismisses correctly, or that the other two book spines and saved progress work.
+
+**Optional later refinement:** modal currently uses a large generic cream AlertDialog with generous whitespace; consider a short nonblocking “pull out book” animation and more compact book-details sheet in a separate UX pass. **Do not change the functioning interaction during current book-art correction.**
+
 ## Prioritized next checks
 1. Fix the printed spine marks and recheck all three corrected cover/spine pixels with the source-pinned Book Factory, keeping the artwork and saved content IDs stable.
 2. Real owner phone tap test: tap Woodland, Space, Garden spines; confirm correct full-cover preview, chapter/page progress and View pages/Back behavior. Also confirm center/neighbor carousel direct play.
