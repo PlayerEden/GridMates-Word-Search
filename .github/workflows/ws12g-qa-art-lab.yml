@@ -268,10 +268,10 @@ jobs:
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
-          name: GRIDMATES-WS14A-VISUAL-KIT-ANDROID-V57-QA-ONLY
+          name: GridMates-WordSearch-Debug-ArtQA
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 3
+          retention-days: 30
       - name: Clarify source and execution limits
         run: |
           {

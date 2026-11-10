@@ -212,6 +212,6 @@ jobs:
         run: python3 tools/asset_pipeline/verify_ws16m_brand_apk.py app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: GridMates-WordSearch-Woodland-Verified-QA
+          name: GridMates-WordSearch-Android-QA
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 3
+          retention-days: 30
