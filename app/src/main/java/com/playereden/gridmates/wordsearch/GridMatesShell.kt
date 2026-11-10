@@ -152,8 +152,8 @@ internal fun GridMatesShell(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .verticalScroll(pageScroll)
-                .padding(horizontal = 18.dp, vertical = if (page == Page.PLAY) 12.dp else 20.dp),
-            verticalArrangement = Arrangement.spacedBy(if (page == Page.PLAY) 10.dp else 16.dp)
+                .padding(horizontal = 18.dp, vertical = if (page == Page.PLAY) 10.dp else 20.dp),
+            verticalArrangement = Arrangement.spacedBy(if (page == Page.PLAY) 8.dp else 16.dp)
         ) {
             if (page == Page.RECORDS || page == Page.COLLECTION ||
                 page == Page.SETTINGS) {
