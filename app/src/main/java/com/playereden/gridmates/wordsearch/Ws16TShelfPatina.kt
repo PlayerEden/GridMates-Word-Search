@@ -5,89 +5,60 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 
 /**
- * WS-16T — subtle irregular transparent pigment and wood-grain overlay.
- * This complements the separately sourced WS16G image pieces without
- * flattening or re-stretching the original gold medallion/wood supports.
+ * WS-16W: shelf patina exists ONLY on the walnut face, not on its
+ * transparent margins. The older horizontal gradient washes painted
+ * outside the carved silhouette and formed rectangular gray artifacts.
  *
- * No outboard undershelf shadows, new bitmap files, touch surfaces,
- * random/flickering positions or book/progress dependency. A richer source-art paintover can replace
- * the existing shelves after the user sees a physical-device comparison.
+ * The illustrated shelf components supply real material/shading; these
+ * few deterministic fine curves provide variation without synthetic
+ * full-width shadows. No new art assets or user input.
  */
 @Composable
 internal fun Ws16TShelfPatina(modifier: Modifier = Modifier) {
     Canvas(modifier.fillMaxSize().testTag("ws16t-shelf-patina")) {
         val u = 1.dp.toPx()
         val w = size.width
-        if (w <= 0f || size.height < 30*u) return@Canvas
+        if (w <= 66f * u || size.height < 32f * u) return@Canvas
 
-        // The pictured shelf's left/right edges catch less illumination.
-        drawRect(
-            brush = Brush.horizontalGradient(listOf(
-                Color(0x3B472614), Color.Transparent,
-                Color.Transparent, Color(0x41432815)
-            )),
-            topLeft = Offset(0f, 9*u),
-            size = Size(w, 25*u)
-        )
-
-        // A warm body glaze varies from side to side rather than a flat,
-        // synthetic strip across the entire width.
-        drawRect(
-            brush = Brush.horizontalGradient(listOf(
-                Color(0x10EBC07E), Color(0x04EBC07E),
-                Color(0x1BB67740), Color(0x08F7D497),
-                Color(0x19B37743)
-            )),
-            topLeft = Offset(16*u, 13*u),
-            size = Size((w - 32*u).coerceAtLeast(1f), 17*u)
-        )
-
-        clipRect(left = 25*u, top = 15*u,
-            right = (w - 25*u).coerceAtLeast(25*u), bottom = 31*u) {
-            for (i in 0 until 33) {
-                // Deterministic hand-worked bends. Short offset lengths
-                // avoid rhythmic parallel stripes and obvious tiling.
-                val seed = (i * 37 + 11)
-                val startX = 25*u + ((seed * 31) % 331) / 331f *
-                    (w - 50*u).coerceAtLeast(1f)
-                val length = (8 + seed % 19) * u
-                val y = (17.3f + (seed % 11) * .88f) * u
-                val p = Path().apply {
+        // The rail itself is between y=13..30dp and inside fixed brackets.
+        // No pigment may escape into the transparent outside margins.
+        clipRect(
+            left = 28f * u, top = 16f * u,
+            right = w - 28f * u, bottom = 29f * u
+        ) {
+            for (i in 0 until 19) {
+                val seed = i * 73 + 19
+                val span = (w - 70f * u)
+                val startX = 35f * u + ((seed * 13) % 317) / 317f * span
+                val length = (6f + (seed % 21)) * u
+                val y = (17.4f + (seed % 10) * .98f) * u
+                val stroke = Path().apply {
                     moveTo(startX, y)
-                    cubicTo(startX + length*.24f, y - .75f*u,
-                        startX + length*.57f, y + 1.04f*u,
-                        startX + length, y + .15f*u)
+                    cubicTo(
+                        startX + length * .20f, y - .48f * u,
+                        startX + length * .73f, y + .66f * u,
+                        startX + length, y + .12f * u
+                    )
                 }
-                drawPath(p,
-                    if (i%3 == 0) Color(0x3D59311D)
-                    else Color(0x42ECC17A),
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(
-                        width = (.40f + (i%3)*.22f)*u, cap = StrokeCap.Round))
+                drawPath(
+                    path = stroke,
+                    color = if (i % 3 == 0) Color(0x20522D1B)
+                        else Color(0x2BE6AE68),
+                    style = Stroke(
+                        width = (.38f + (i % 3) * .16f) * u,
+                        cap = StrokeCap.Round
+                    )
+                )
             }
         }
-
-        // Hand-burnished dimples and contact wear, concentrated beneath
-        // where the central illustrated book actually rests.
-        for (i in 0 until 12) {
-            val x = w*(.24f + ((i*43)%97)/97f*.52f)
-            val y = (6.3f + (i%3)*1.15f)*u
-            drawOval(Color(0x246B3B1F), Offset(x,y),
-                Size((5+i%4)*u, (.8f+i%2*.3f)*u))
-        }
-
-        // WS-16V: no rectangular shadow outside the painted apron.
-        // The independently illustrated shelf already has a shaded undercut.
-        // Previous 13dp gradient looked like an artificial gray stripe on
-        // real Android screenshots. Pigment/woodgrain stays inside the wood.
     }
 }

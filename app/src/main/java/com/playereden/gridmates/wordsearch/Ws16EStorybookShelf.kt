@@ -38,13 +38,8 @@ internal fun Ws16ECanvasShelfFallback(modifier: Modifier = Modifier) {
         val gold = Color(0xFFDBAD48)
         val lightGold = Color(0xFFF6D27A)
 
-        // A diffuse contact shadow is behind the wood and the books.
-        drawOval(dark.copy(alpha = .14f),
-            topLeft = Offset(w*.10f, 0f),
-            size = Size(w*.80f, 7*u))
-        drawOval(dark.copy(alpha = .11f),
-            topLeft = Offset(w*.24f, 1*u),
-            size = Size(w*.52f, 4*u))
+        // WS-16W: no wide shadow ovals outside the walnut silhouette.
+        // Only a short shade on the actual top surface is allowed.
 
         // WS-16F: sculpted walnut apron, a separate layer that never holds
         // text or touch input and doesn't stretch its gold ornament.
@@ -155,6 +150,11 @@ internal fun Ws16ECanvasShelfFallback(modifier: Modifier = Modifier) {
             cap=StrokeCap.Round)
         drawLine(Color(0xFF6E3C1D).copy(alpha=.7f),
             Offset(5*u, 11*u), Offset(w-5*u, 11*u), strokeWidth=1*u)
+        // A faint book-weight mark lives ON the top plank, never beneath
+        // the underside. Release/fallback should match debug shadow intent.
+        drawOval(dark.copy(alpha = .11f),
+            topLeft = Offset(w*.27f, 5*u),
+            size = Size(w*.46f, 2.0f*u))
         for (i in 0..5) {
             val begin = w*(.065f + i*.15f)
             val span = w*(if (i%2 == 0) .08f else .12f)
