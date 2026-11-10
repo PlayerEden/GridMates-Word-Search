@@ -1,5 +1,14 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+## WS-16G3/G4 — Eight real standalone shelf masters, QA renderer + Compose connected (Nov 9)
+
+**Current actual implementation SHA:** [`317071b3`](https://github.com/PlayerEden/GridMates-Word-Search/commit/317071b3744e2f162a2bde89ddacdb9ae65b78ad), [open draft PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131). Eight separately editable source-hashed SVG components under `design/visual-system/masters/ws16g-batch1/` plus a reproducible **CairoSVG==2.8.2** debug-only renderer and QA APK byte-hash verifier. Source corresponding renderings are consumed by `Ws16GShelfArtwork.kt` in Home and the repeated Full Library shelves; original native Canvas remains automatic fallback when debug-only images are absent (release). The old book covers and all interactions/saves remain untouched.
+
+**Exact-source CI started**: [Android #42744463642](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744463642) and [art/release-isolation #42744463637](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42744463637), in progress at this handoff update, **no new QA artifact/checksum claim until BOTH succeed**. Generated contact-sheet candidate PNG pack (26 split candidate sprites, original image and extraction script) is in the current conversation only; not GitHub/Android, and it has remaining alpha cleanup. [WS16G production register](../design/visual-system/modular/ws16g-batch1-production-register.json), [development receipt](devlog/2026-11-09_WS16G3_FIRST_ASSET_QA_INTEGRATION.md).
+
+**Next single task:** check both runs to conclusion; fix exact compiler/renderer issues, then hand out the source-matched QA ZIP and obtain owner phone screenshots of Home + Your Library. Continue to action illustrations after confirming real sprite layout. **Fallback remains owner-viewed WS-16F QA ZIP #13727073915**; back up save progress before uninstall. PR remains draft.
+
+
 ## WS-16G2 — Batch 1 master painterly asset kit production brief (Nov 9)
 
 **Owner request:** stop one-at-a-time cosmetic changes and build a cohesive **whole visual asset family**. The [WS-16G2 Batch 1 brief](design/WS16G_BATCH1_PAINTERLY_ASSET_PRODUCTION_BRIEF_2026-11-09.md) specifies exact styles, proposed source dimensions, transparent exports, layer boundaries, portrait/tablet fit and QA for 20 roles. [Machine-readable tracking register](../design/visual-system/modular/ws16g-batch1-production-register.json) explicitly differentiates existing SVG/Compose analogs from **new painterly masters NOT YET GENERATED**; one Library row is a reuse recipe. [Development pass receipt](devlog/2026-11-09_WS16G2_BATCH1_ASSET_PRODUCTION_BRIEF.md). **No new art bitmap / no APK** from this docs-only pass.
