@@ -1,5 +1,10 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+## WS-16P — Fix full-book swipe animation, retain complete mini neighbors (Nov 10)
+
+Owner sent three WS16O handset screenshots. At rest new miniature book covers + arrows look contained, but third frame shows *large pages cut at the center 186dp pager viewport* while miniature Woodland/Garden previews stand frozen on either side. Source [`be4d76e`](https://github.com/PlayerEden/GridMates-Word-Search/commit/be4d76eb2fe2fece0ef3aef319b789b96bd2660b) uses full-screen-width swipe pager with **same original-size clickable center book**, draws miniature full preview covers on top only **when not scrolling**, and uses settled-page title and progress. No new art or gameplay. [WS16P devlog](devlog/2026-11-10_WS16P_FULL_WIDTH_CAROUSEL_SWIPE.md). [Android #42771031364](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771031364) and [art #42771031442](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42771031442) initially running; only share new APK when dual-green. Owner then needs screenshot DURING swipe and after settled Space to validate. Prior WS16O APK #13741496198 fallback; draft PR #131 unmerged.
+
+
 ## WS-16O source-matched VERIFIED QA (Nov 10 UTC)
 
 Code [`a16f0b7`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a16f0b70800d3d7b1e36e860e4d56e86cdca2e81) now passed **BOTH** [Android #42769471322](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471322) and [art/release #42769471595](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471595). Preferred [ZIP artifact #13741496198](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471322/artifacts/13741496198) contains `app-debug.apk`, SHA `1cc99fbd1f48f1093de0094c15d5992ab5a252f1f0c4b3975873ad1872070f27`. Also standalone user file `WS16O_Contained_Books_Clean_Icon_QA.apk`. All 258 internal files across both independent APKs match; 21/21 previous QA art assets pass PNG hashes, release art gate green. [Full log](devlog/2026-11-10_WS16O_CAROUSEL_ICON_LOADING.md).
