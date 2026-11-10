@@ -20,3 +20,15 @@
 - Owner phone acceptance must still compare **Standard vs Fullscreen**, and then confirm the new paper/frame warmth reads richly but does not reduce label contrast or slow the menu. Do not make Standard/Fullscreen default decision on behalf of the owner. If mobile screenshots reveal crowding or excessive parchment texture, revise the material—not the working game or bookcase.
 
 **Next:** Share one verified QA APK only if CI succeeds; owner compares modes on the same build, then choose default and resume the remaining concrete Home art refinements. No extra puzzle books at this stage.
+
+## Final source-matched QA receipt — BOTH workflows SUCCESS
+
+**Exactly compiled app source:** [`871c03941a29a47f0603b95ac02b28050b497955`](https://github.com/PlayerEden/GridMates-Word-Search/commit/871c03941a29a47f0603b95ac02b28050b497955). A later journal-only commit marked `[skip ci]` does not represent new APK code.
+
+- Standard Android [run #42761082558](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42761082558) — **SUCCESS**. [Artifact #13737283520](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42761082558/artifacts/13737283520) contains `app-debug.apk`. Independently extracted **14,925,774-byte** APK SHA-256 **`060d9981bde758ba81f25771f779c31e4c85de958f54209fda6b1d651c29ddef`**. Also copied for owner in conversation as `WS16L_Parchment_And_Gold_Frames_QA.apk`.
+- QA artwork/debug-release isolation [run #42761082413](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42761082413) — **SUCCESS**. Alternate QA artifact [#13737194900](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42761082413/artifacts/13737194900) contains a different outer APK hash `4dc5724bba83fdbaaf931ce9a1737c98f7ca75eff728244ce2584874d7324770`, but **all 249 internal paths and decompressed bytes match** the standard Android build.
+- Inspected the **real APK bytes**: all 8 bookshelf, 6 illustrated Home button and 5 botanical PNGs verified against their exact original generated SHA-256 manifests: 19/19 matched, and artwork-isolation CI remained green.
+- Android instrumentation test *source compilation* passed, but no claim of test execution on an emulator or of owner phone acceptance is made.
+- This paint/ink/native-Canvas polish created zero new bitmap assets. Owner preference for Standard/Fullscreen has not been given. Both display modes remain available.
+
+**Review instructions:** Install WS16L debug QA build if signing compatible; protect existing progress before uninstall. Compare Standard and Fullscreen on the same build, inspect header/logo safety and bottom flowers/link clearance, then decide display default. Also compare the new parchment warmth and card edging to WS16K. Preserve the current three-book spine-out Library and do not add more books until visuals and existing game are approved.
