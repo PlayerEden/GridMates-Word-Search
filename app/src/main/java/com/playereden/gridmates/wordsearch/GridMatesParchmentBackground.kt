@@ -156,7 +156,7 @@ internal fun GridMatesParchmentBackground(modifier: Modifier = Modifier) {
                         .roundToInt().coerceIn(1, tile.height)
                     drawImage(image = tile, srcOffset = IntOffset.Zero,
                         srcSize = IntSize(sw, sh), dstOffset = IntOffset(x, y),
-                        dstSize = IntSize(dw, dh), alpha = .72f)
+                        dstSize = IntSize(dw, dh), alpha = .86f)
                     x += tilePx
                 }
                 y += tilePx

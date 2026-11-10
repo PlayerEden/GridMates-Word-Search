@@ -95,6 +95,10 @@ jobs:
         run: |
           python3 tools/asset_pipeline/render_ws16aa.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16aa_art.py' -v
+      - name: Verify actual WS16AB shelf asset, original-file provenance and native integration
+        run: |
+          python3 tools/asset_pipeline/verify_ws16ab_apk.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ab_shelf.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -181,6 +185,8 @@ jobs:
           PY
       - name: Verify all three WS-14K2 visual motifs in exact Android QA APK
         run: python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify WS16AB generated-painted shelf is SHA matched in Android QA APK
+        run: python3 tools/asset_pipeline/verify_ws16ab_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16AA painted assets in actual Android debug APK
         run: python3 tools/asset_pipeline/verify_ws16aa_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16G shelf art is source-matched in the QA APK

@@ -34,6 +34,32 @@ import androidx.compose.ui.unit.dp
  * rendered local illustrations; no book artwork or touch handling baked into it.
  * All image loading happens once per Context. Release has none of these files.
  */
+
+/**
+ * WS-16AB: an actual generated painted shelf, exported from the original
+ * transparent 2172x724 artwork as a review-sized 720x149 WebP.
+ * This is a single QA image, NOT a procedural redraw or a screenshot.
+ * Android release does not contain the candidate asset.
+ */
+private fun readWs16AbShelf(context: Context): Bitmap? = runCatching {
+    context.assets.open("ws16ab/painted-shelf-v1.webp").use {
+        BitmapFactory.decodeStream(it)
+            ?: error("WS16AB painted shelf could not be decoded")
+    }
+}.getOrNull()
+
+@Composable
+private fun Ws16AbShelf(bitmap: Bitmap, modifier: Modifier) {
+    // The existing 42dp shelf starts at the correct 204dp book baseline in
+    // the 252dp carousel. The new illustrated piece is 50dp deep, so move it
+    // down 8dp relative to the existing bottom alignment. This preserves
+    // where books touch the *top* of the shelf while adding a true underside.
+    Box(modifier.offset(y = 8.dp).fillMaxWidth().height(50.dp)
+        .qaTrackBounds("Wooden shelf").testTag("ws16e-storybook-shelf")) {
+        ShelfPart(bitmap, Modifier.fillMaxWidth().height(50.dp))
+    }
+}
+
 private fun readWs16AaShelf(context: Context): Map<String, Bitmap>? = runCatching {
     listOf("rail", "left", "right", "carving", "contact").associateWith { key ->
         context.assets.open("ws16aa/" + key + ".png").use {
@@ -86,6 +112,12 @@ private fun ShelfPart(bitmap: Bitmap, modifier: Modifier) {
 @Composable
 internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val ws16ab = remember(context) { readWs16AbShelf(context) }
+    if (ws16ab != null) {
+        Ws16AbShelf(ws16ab, modifier)
+        return
+    }
+    // Keep V1 illustrated components and release Canvas fallback untouched.
     val ws16aa = remember(context) { readWs16AaShelf(context) }
     if (ws16aa != null) {
         Ws16AaShelf(ws16aa, modifier)
