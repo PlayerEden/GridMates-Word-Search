@@ -67,7 +67,7 @@ class Ws16CarouselHomeAndroidTest {
         compose.onNodeWithTag("ws15-back").performClick()
         compose.onNodeWithTag("ws16-continue-solo")
             .performScrollTo().assertHasClickAction()
-        compose.onNodeWithTag("ws16-resume-solo").assertExists()
+        compose.onNodeWithTag("ws16-resume-solo", useUnmergedTree = true).assertExists()
     }
     @Test fun asymmetricAssetsAndQuickPlayPlaceholderHaveHonestRouting() {
         compose.onNodeWithTag("ws16-action-daily").performScrollTo().assertExists()
@@ -96,8 +96,8 @@ class Ws16CarouselHomeAndroidTest {
         compose.onNodeWithTag("ws16d-home-collection").assertExists()
         compose.onNodeWithTag("ws16-continue-solo")
             .performScrollTo().assertHasClickAction()
-        compose.onNodeWithTag("ws16-resume-solo").assertExists()
-        compose.onNodeWithTag("ws16-resume-solo").assertExists()
+        compose.onNodeWithTag("ws16-resume-solo", useUnmergedTree = true).assertExists()
+        compose.onNodeWithTag("ws16-resume-solo", useUnmergedTree = true).assertExists()
         compose.onNodeWithContentDescription("Open Daily Puzzle")
             .performScrollTo().assertExists()
         compose.onNodeWithContentDescription("Open Together on local Wi-Fi")
