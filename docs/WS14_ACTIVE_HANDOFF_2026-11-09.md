@@ -1,5 +1,9 @@
 # WS-14 Active New-Chat Handoff — November 9, 2026
 
+## Current priority sequence — WS16AD book factory to beta (Nov 10)
+
+[Owner-directed forward roadmap](WS16AD_FORWARD_PLAN_BOOK_FACTORY_TO_BETA_2026-11-10.md): **first build stable modular master book geometry and V2 cleaned Woodland/Space/Garden cover/spine assets (remove white fringes and ®) + 1–3 clearly non-playable blank volumes**; next source-pinned complete GridMates shared wordmark + Word Search-specific wordmark; end-to-end book/page puzzle/touch/hint/save QA; implement real Quick Play WS17; later Full Library substantial/tappable spines and controlled book height classes, plus Collection UX. Conduct **two-actual-phone LAN Co-op/Race/Duel acceptance in parallel** whenever hardware is available, not after cosmetics. No release-ready claim; QA artifacts and draft PR remain. **Next exact action:** create WS16AD Book Factory master geometry/asset contract and one Woodland V2 proof with real source files and phone preview, then replicate rather than generating three independent geometries. Documentation-only roadmap, no new APK built in this pass.
+
 ## WS-16AC — owner phone feedback: shelf accepted; book jacket and shared title art next (Nov 10)
 
 The owner installed WS16AB and shared a real **Space** Home screenshot with 8dp grid/bounds overlay. They said the painted carved walnut shelf looks **nice**. Treat **WS16AB shelf** as current accepted visual direction; no new fake ambient rectangular shadow. The grid shown is debug mode, not a release UI problem.
