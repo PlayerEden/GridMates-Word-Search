@@ -40,3 +40,11 @@ Individual editable masters are in `masters/shared/`: `gm-frame-medium-v1.svg`, 
 **Current first integration:** `Ws16DLibraryShortcuts.kt` (Full Shelf/Collection), `Ws16BHomeActions.kt` (Daily/Together/QA Quick Play, menu, Custom/My Puzzles links), `Ws16HomeScreen.kt` (Continue feature frame plus green Play pill). Existing actions, text and backups remain native and functional; QA Quick Play remains explicitly non-clickable until the real generator is implemented. Not yet copied to other GridMates repositories.
 
 **Implementation SHA:** initial `47ae4f47`, corrected `227b55e6` after removing a compile-only import error. Exact-source Android/art checks require a verified success before owner APK handoff. See [Pass 2 development log](../../../docs/devlog/2026-11-09_WS16E_PASS2_SHARED_PARCHMENT_FRAMES.md).
+
+## WS-16F family paper material and title-specific bookcase layers
+
+**Deployed for Word Search QA, not yet extracted to other GridMates repositories.** Shared `GridMatesParchmentBackground.kt` draws nearly-flat ivory parchment, radial warm edge tint and deterministic faint paper flecks. It fills any viewport in the Scaffold and keeps text/cards native. Two independent editable SVG masters under `masters/shared/` document the tile and edge-wash references. This is intentionally a subtle material surface, **not** the fully illustrated mockup screenshot or a baked room mural.
+
+**Word Search only:** `masters/wordsearch/ws16f-carved-shelf-apron-v2.svg` and `ws16f-bookcase-backboard-v1.svg` are separate editable references; `Ws16EStorybookShelf.kt` and `BookcaseBookshelfScreen.kt` render corresponding scalable Compose Canvas wood layers. Home pager now overlaps the shelf rather than stacking separate whitespace blocks. The Library uses repeated real populated shelves and independent live book art.
+
+[Exact SHA-256 source register](ws16f-source-asset-register.json) lists all four new masters as `SOURCE_CREATED_PENDING_OWNER_ART_REVIEW`; no claim of pixel-identical Android SVG import or merged production asset. [WS-16F design plan](../../../docs/design/WS16F_SHARED_PARCHMENT_AND_LAYERED_FULL_LIBRARY_2026-11-09.md), [devlog and CI receipt](../../../docs/devlog/2026-11-09_WS16F_LAYERED_PARCHMENT_FULL_LIBRARY.md). Future implementation in Sudoku/Crossword requires deliberate reuse and tests.
