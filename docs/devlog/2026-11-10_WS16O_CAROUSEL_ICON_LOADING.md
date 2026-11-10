@@ -29,3 +29,16 @@
 - Latest source `a16f0b70800d3d7b1e36e860e4d56e86cdca2e81`. [Standard Android QA #42769471322](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471322) / [art/release #42769471595](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471595) **in progress at initial log**.
 - Previous dual-green accepted candidate WS-16N: corrected source `e9460ea`, [Android artifact #13740072635](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42767125319/artifacts/13740072635). Source commits are durable even if 3-day QA artifacts expire.
 - No new extra APKs needed until dual-green; one consolidated owner build, then evaluate actual phone images.
+
+## Final exact-source build / artifact receipt (Nov 10 UTC)
+
+- **Compiled application source:** [`a16f0b70800d3d7b1e36e860e4d56e86cdca2e81`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a16f0b70800d3d7b1e36e860e4d56e86cdca2e81). Later documentation-only commits use `[skip ci]`.
+- [Android QA #42769471322](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471322) **SUCCESS**. Source-level tests, lint, Android instrumentation compilation and QA APK. Real device/emulator instrumentation **not executed**.
+- [QA art vs release isolation #42769471595](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471595) **SUCCESS**, preserving prior release-art gates.
+- **Preferred standard artifact:** [#13741496198](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471322/artifacts/13741496198), zip contains `app-debug.apk`, exact 15,006,816-byte APK SHA-256 `1cc99fbd1f48f1093de0094c15d5992ab5a252f1f0c4b3975873ad1872070f27`. Also attached in conversation as verified standalone `WS16O_Contained_Books_Clean_Icon_QA.apk`.
+- Alternate art artifact [#13741895319](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42769471595/artifacts/13741895319), APK external SHA-256 `b0a285d67224c03b0712b2cdc2b5049c505abcf55ab77e1f6381e7c7e0899c70`. **All 258 internal paths/decompressed contents match** the standard APK exactly despite different ZIP container metadata.
+- Independently opened real APK and verified PNG SHA-256 from internal manifests: **8 shelf + 6 illustrated Home actions + 5 botanicals + 2 separate GridMates brand sprites = 21/21 correct**. Launcher vectors are compiled Android resources (not bitmap PNG assets). The same native splash and puzzle saves are preserved.
+- No new content, networking, production merge, release approval, or Android signing changes. Three-day artifact retention remains; old QA builds may expire.
+- **Owner handset still needed:** new complete side previews (not offscreen-clipped), tap arrows and swipe, full cover remains prominent, proper center book navigation, new smaller pencil/grid icon at real launcher size and in themed mode.
+
+**Follow-up for graphics review:** If side mini books look too small, tune thumbnail width/vertical alignment without reverting to cropped offscreen full-size pages. If icon still appears cluttered, improve silhouette and legibility at 48dp rather than adding more fine illustration detail. Loading indicator is **intentionally not activated** without an actual slow async task.
