@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-09",
+  "project": "GridMates Word Search",
+  "asset_family": "WS16F",
+  "no_release_approval_claimed": true,
+  "assets": [
+    {
+      "id": "GM_PARCHMENT_TILE_V1",
+      "scope": "GM_SHARED",
+      "source_path": "design/visual-system/modular/masters/shared/gm-parchment-tile-v1.svg",
+      "source_sha256": "e792d43f42f948c1e28526527642f33d0cf975eb4002d2b17bef68485666ebdd",
+      "status": "SOURCE_CREATED_PENDING_OWNER_ART_REVIEW",
+      "runtime_correspondence": "GridMatesParchmentBackground.kt, native Compose Canvas",
+      "license_provenance": "Original authored vector source; ownership review pending",
+      "notes": "Separate editable SVG source, not a PNG export. Native Android artwork is corresponding code drawing, not a pixel-identical imported SVG."
+    },
+    {
+      "id": "GM_PARCHMENT_EDGE_WASH_V1",
+      "scope": "GM_SHARED",
+      "source_path": "design/visual-system/modular/masters/shared/gm-parchment-edge-wash-v1.svg",
+      "source_sha256": "1d1be7da6658c5c0836658227c0cc78ddc911872453954f7c0088e1bb3015e84",
+      "status": "SOURCE_CREATED_PENDING_OWNER_ART_REVIEW",
+      "runtime_correspondence": "GridMatesParchmentBackground.kt, native Compose Canvas",
+      "license_provenance": "Original authored vector source; ownership review pending",
+      "notes": "Separate editable SVG source, not a PNG export. Native Android artwork is corresponding code drawing, not a pixel-identical imported SVG."
+    },
+    {
+      "id": "WS_SHELF_APRON_V2",
+      "scope": "WS_THEME",
+      "source_path": "design/visual-system/modular/masters/wordsearch/ws16f-carved-shelf-apron-v2.svg",
+      "source_sha256": "204c95ab0fd4acb6a86cba88d7ca8cbb662fb44843102bee5baef4ff17e71728",
+      "status": "SOURCE_CREATED_PENDING_OWNER_ART_REVIEW",
+      "runtime_correspondence": "WS-16F carved shelf / bookcase native Compose Canvas",
+      "license_provenance": "Original authored vector source; ownership review pending",
+      "notes": "Separate editable SVG source, not a PNG export. Native Android artwork is corresponding code drawing, not a pixel-identical imported SVG."
+    },
+    {
+      "id": "WS_BOOKCASE_BACKBOARD_V1",
+      "scope": "WS_THEME",
+      "source_path": "design/visual-system/modular/masters/wordsearch/ws16f-bookcase-backboard-v1.svg",
+      "source_sha256": "3205a7ed7ecd28b9919326b095e0c6b53f6860efe39dee48d7f27782438ffdf4",
+      "status": "SOURCE_CREATED_PENDING_OWNER_ART_REVIEW",
+      "runtime_correspondence": "WS-16F carved shelf / bookcase native Compose Canvas",
+      "license_provenance": "Original authored vector source; ownership review pending",
+      "notes": "Separate editable SVG source, not a PNG export. Native Android artwork is corresponding code drawing, not a pixel-identical imported SVG."
+    }
+  ]
+}
