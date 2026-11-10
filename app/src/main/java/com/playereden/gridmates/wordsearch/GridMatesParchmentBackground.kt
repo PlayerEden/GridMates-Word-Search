@@ -48,6 +48,30 @@ internal fun GridMatesParchmentBackground(modifier: Modifier = Modifier) {
             radius = maxOf(w, h) * .79f
         ))
 
+        // WS-16L: the soft, irregular warmth of an aged paperback leaf.
+        // These washes are deliberately lower contrast than any native text:
+        // they give the paper depth, not obvious corners or a painted vignette.
+        drawRect(brush = Brush.horizontalGradient(listOf(
+            Color(0x13C58E4E), Color(0x02C58E4E),
+            Color(0x00C58E4E), Color(0x0DBF8F58)
+        )))
+        drawCircle(
+            brush = Brush.radialGradient(listOf(
+                Color(0x13D8B77C), Color(0x00D8B77C)
+            ), center = Offset(w*.09f, h*.25f),
+                radius = maxOf(w*.56f, 145f*unit)),
+            radius = maxOf(w*.56f, 145f*unit),
+            center = Offset(w*.09f, h*.25f)
+        )
+        drawCircle(
+            brush = Brush.radialGradient(listOf(
+                Color(0x0FC99A5C), Color(0x00C99A5C)
+            ), center = Offset(w*.94f, h*.83f),
+                radius = maxOf(w*.60f, 165f*unit)),
+            radius = maxOf(w*.60f, 165f*unit),
+            center = Offset(w*.94f, h*.83f)
+        )
+
         // Deliberately restrained, deterministic flecks: no random flicker,
         // no bitmap resampling, and no seams at unusual aspect ratios.
         val cell = 18f*unit
@@ -66,6 +90,32 @@ internal fun GridMatesParchmentBackground(modifier: Modifier = Modifier) {
                             Color(0x0DA27842) else Color(0x11FFFFFF),
                         radius = (.29f + (seed and 7)*.08f)*unit,
                         center = Offset(cx,cy)
+                    )
+                }
+            }
+        }
+
+        // A sparse second pass of tiny paper fibers. All positions come from
+        // integer coordinates: no random changes on recomposition, animation
+        // flicker, bitmap tiling seams or new assets in the release package.
+        val fiberCell = 61f*unit
+        val fiberCols = ceil(w/fiberCell).toInt().coerceAtMost(80)
+        val fiberRows = ceil(h/fiberCell).toInt().coerceAtMost(100)
+        for (y in 0..fiberRows) {
+            for (x in 0..fiberCols) {
+                val seed = (x*28411) xor (y*71933) xor 0x5a13
+                val fx = (x + ((seed ushr 5) and 127)/128f)*fiberCell
+                val fy = (y + ((seed ushr 13) and 127)/128f)*fiberCell
+                if (fx < w && fy < h) {
+                    val dx = (2.4f + (seed and 3))*unit
+                    val dy = ((seed ushr 3) and 3)*.48f*unit
+                    drawLine(
+                        color = if ((seed and 1) == 0)
+                            Color(0x14B08C5A) else Color(0x13FFFFFF),
+                        start = Offset(fx,fy),
+                        end = Offset((fx+dx).coerceAtMost(w),
+                            (fy+dy).coerceAtMost(h)),
+                        strokeWidth = .33f*unit
                     )
                 }
             }

@@ -126,6 +126,28 @@ private fun DrawScope.drawGridMatesPaperFrame(
         topLeft = Offset.Zero, size = Size(w,h),
         cornerRadius = CornerRadius(rad), alpha = opacity*touch
     )
+    if (!pill) {
+        // WS-16L: separate ink/aged-paper glazing from the touch surface.
+        // Work is bounded by the existing rounded frame and drawn underneath
+        // live labels/icons, never as a fixed-size rasterized button.
+        drawRoundRect(
+            brush = Brush.horizontalGradient(listOf(
+                Color(0x10B88A43), Color(0x00B88A43),
+                Color(0x00B88A43), Color(0x0DB88A43)
+            )),
+            topLeft = Offset.Zero, size = Size(w,h),
+            cornerRadius = CornerRadius(rad), alpha = opacity
+        )
+        if (w>55*u && h>30*u) {
+            // Light catches the inner top and softly darkens the lower lip.
+            drawLine(Color(0x7CFFFFFF),
+                Offset(19*u,5*u),Offset(w-19*u,5*u),
+                strokeWidth=.85f*u,cap=StrokeCap.Round)
+            drawLine(Color(0x41AD8144),
+                Offset(19*u,h-5*u),Offset(w-19*u,h-5*u),
+                strokeWidth=.8f*u,cap=StrokeCap.Round)
+        }
+    }
     drawRoundRect(
         color = if (pill) Color(0xFFE5C16F) else gold,
         topLeft = Offset(.9f*u,.9f*u),
@@ -180,4 +202,19 @@ private fun DrawScope.drawGridMatesPaperFrame(
     if (w>65*u) drawLine(Color.White.copy(alpha=.66f*opacity),
         Offset(20*u,3.8f*u),Offset(w-20*u,3.8f*u),
         strokeWidth=.8f*u,cap=StrokeCap.Round)
+
+    // Almost invisible flecks at the corners give the paper frame a
+    // crafted surface rather than a perfectly flat computer gradient.
+    // Keep them outside text-heavy central space and deterministic.
+    if (w > 115*u && h > 46*u) {
+        val edge = Color(0x3DB98C4D)
+        for (i in 0 until 6) {
+            val shift = (i*7.2f + 22f)*u
+            val fromLeft = (i and 1) == 0
+            val x = if (fromLeft) shift else w-shift
+            val y = if ((i and 2) == 0) 7.5f*u else h-7.5f*u
+            drawCircle(edge, radius=(.28f + (i%3)*.12f)*u,
+                center=Offset(x,y),alpha=opacity*.37f)
+        }
+    }
 }
