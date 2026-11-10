@@ -15,6 +15,7 @@ class Ws16CarouselHomeAndroidTest {
 
     @Test fun sharedBrandAndHeaderNavigateToWorkingLocalDestinations() {
         compose.onNodeWithTag("ws16-home-header").assertExists()
+        compose.onNodeWithTag("ws16i-home-divider").assertExists()
         compose.onNodeWithTag("gm-shared-parchment-background").assertExists()
         compose.onNodeWithContentDescription("Open player profile").performClick()
         compose.onNodeWithText("Player profile").assertExists()

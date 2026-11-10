@@ -69,6 +69,8 @@ internal fun Ws16HomeScreen(
     val soloSize = active.boardSize?.cells ?: active.difficulty.gridSize
 
     Ws16HomeHeader(onProfile = onProfile, onMenu = { menuOpen = true })
+    // An independent antique-gold botanical rule, no words baked in art.
+    Ws16IHeaderDivider()
 
     store.warning?.let { message ->
         PaperPanel(Modifier.fillMaxWidth()) {

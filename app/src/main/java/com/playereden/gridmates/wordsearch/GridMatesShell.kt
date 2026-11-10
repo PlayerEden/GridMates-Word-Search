@@ -98,6 +98,9 @@ internal fun GridMatesShell(
     // GM_SHARED: quiet, flexible paper behind every native screen.
     Box(Modifier.fillMaxSize()) {
         GridMatesParchmentBackground()
+        // WS-16I: purely decorative Home foliage, behind the transparent
+        // Scaffold. Neither icons, live copy nor touch regions are obscured.
+        if (page == Page.PLAY) Ws16IHomeEdgeDecor()
         Scaffold(containerColor = androidx.compose.ui.graphics.Color.Transparent) { contentPadding ->
         if (page == Page.NEARBY) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
