@@ -4,10 +4,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class DisplayModeTest {
-    @Test fun parseStoredDisplayModeAlwaysHasSafeStandardFallback() {
-        assertEquals(DisplayMode.STANDARD, DisplayMode.fromStoredValue(null))
-        assertEquals(DisplayMode.STANDARD, DisplayMode.fromStoredValue(""))
-        assertEquals(DisplayMode.STANDARD, DisplayMode.fromStoredValue("INVALID"))
+    @Test fun fullscreenIsFirstInstallDefaultButStoredStandardStillWorks() {
+        assertEquals(DisplayMode.FULLSCREEN, DisplayMode.fromStoredValue(null))
+        assertEquals(DisplayMode.FULLSCREEN, DisplayMode.fromStoredValue(""))
+        assertEquals(DisplayMode.FULLSCREEN, DisplayMode.fromStoredValue("INVALID"))
         assertEquals(DisplayMode.STANDARD, DisplayMode.fromStoredValue("STANDARD"))
         assertEquals(DisplayMode.FULLSCREEN, DisplayMode.fromStoredValue("FULLSCREEN"))
     }

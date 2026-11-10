@@ -86,6 +86,10 @@ jobs:
         run: |
           python3 tools/asset_pipeline/render_ws16i_home_decor.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16i_home_decor.py' -v
+      - name: Render two distinct WS16M header emblems into QA assets
+        run: |
+          python3 tools/asset_pipeline/render_ws16m_brand.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16m_brand.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -178,6 +182,8 @@ jobs:
         run: python3 tools/asset_pipeline/verify_ws16h_home_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify five source-hashed WS16I Home assets in QA APK
         run: python3 tools/asset_pipeline/verify_ws16i_home_decor_apk.py app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify two WS16M branding PNGs in source-matched QA APK
+        run: python3 tools/asset_pipeline/verify_ws16m_brand_apk.py app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
           name: GridMates-WordSearch-Woodland-Verified-QA

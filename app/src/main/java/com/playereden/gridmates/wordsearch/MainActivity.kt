@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
     private val nearbyRooms by lazy { ViewModelProvider(this)[NearbyRoomViewModel::class.java] }
     private val qaBookshelf by lazy { QaBookshelfRuntime(applicationContext) }
 
-    private var displayMode by mutableStateOf(DisplayMode.STANDARD)
+    private var displayMode by mutableStateOf(DisplayMode.FULLSCREEN)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

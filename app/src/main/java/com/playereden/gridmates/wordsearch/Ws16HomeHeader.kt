@@ -28,17 +28,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
-/** WS-16 original editable family mark + Word Search-specific mini-grid.
- * The paired SVG originals are archived under design/visual-system/masters.
- * Text is native so large font settings never stretch a baked bitmap title.
+/** WS-16M fullscreen-first native wordmarks plus two distinct art emblems.
+ * Native "GridMates" and "Word Search" text remains crisp at large fonts;
+ * individually versioned SVGs supply identity illustration in QA.
  */
 @Composable
-internal fun Ws16HomeHeader(onProfile: () -> Unit, onMenu: () -> Unit) {
+internal fun Ws16HomeHeader(
+    displayMode: DisplayMode = DisplayMode.FULLSCREEN,
+    onProfile: () -> Unit,
+    onMenu: () -> Unit
+) {
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         // WS-16J: Reserve a quiet border between title and hanging leaves.
         // On narrow or enlarged-font layouts, reclaim this space for legibility.
-        val roomy = maxWidth >= 340.dp && LocalDensity.current.fontScale < 1.35f
-        val leftInset = if (roomy) 20.dp else 4.dp
+        // The old >=340dp threshold ignored common 360dp devices because
+        // horizontal page padding leaves a ~324dp content width.
+        val roomy = maxWidth >= 310.dp && LocalDensity.current.fontScale < 1.30f
+        val veryRoomy = maxWidth >= 370.dp
+        val leftInset = when {
+            !roomy -> 4.dp
+            displayMode == DisplayMode.FULLSCREEN && veryRoomy -> 35.dp
+            displayMode == DisplayMode.FULLSCREEN -> 23.dp
+            veryRoomy -> 24.dp
+            else -> 17.dp
+        }
         Row(Modifier.fillMaxWidth().testTag("ws16-home-header"),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -61,7 +74,7 @@ internal fun Ws16HomeHeader(onProfile: () -> Unit, onMenu: () -> Unit) {
                     overflow = TextOverflow.Ellipsis)
             }
         }
-        if (roomy) Spacer(Modifier.width(7.dp))
+        if (roomy && veryRoomy) Spacer(Modifier.width(7.dp))
         IconButton(onClick = onProfile,
             modifier = Modifier.size(48.dp)
                 .semantics { contentDescription = "Open player profile" }
@@ -97,7 +110,8 @@ internal fun Ws16HomeHeader(onProfile: () -> Unit, onMenu: () -> Unit) {
 /** Two linked paper tiles: the shared identity belongs to all GridMates titles. */
 @Composable
 private fun Ws16FamilyMark() {
-    Canvas(Modifier.size(22.dp).clearAndSetSemantics { }
+    if (Ws16MBrandEmblem("gridmates", 25.dp, "ws16-family-mark")) return
+    Canvas(Modifier.size(25.dp).clearAndSetSemantics { }
         .testTag("ws16-family-mark")) {
         val w = size.width
         val h = size.height
@@ -116,7 +130,8 @@ private fun Ws16FamilyMark() {
 /** Word Search-only identity, separate from the reusable GridMates logo. */
 @Composable
 private fun Ws16WordSearchMark() {
-    Canvas(Modifier.size(22.dp).clearAndSetSemantics { }
+    if (Ws16MBrandEmblem("wordsearch", 28.dp, "ws16-word-search-mark")) return
+    Canvas(Modifier.size(28.dp).clearAndSetSemantics { }
         .testTag("ws16-word-search-mark")) {
         val w = size.width
         val h = size.height

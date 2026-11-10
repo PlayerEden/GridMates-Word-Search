@@ -10,8 +10,10 @@ internal enum class DisplayMode(val label: String) {
     fun alternate(): DisplayMode = if (this == STANDARD) FULLSCREEN else STANDARD
 
     companion object {
+        // Persisted explicit Standard remains respected after an upgrade.
+        // Only users without a choice get the fullscreen-first default.
         fun fromStoredValue(value: String?): DisplayMode =
-            entries.firstOrNull { it.name == value } ?: STANDARD
+            entries.firstOrNull { it.name == value } ?: FULLSCREEN
     }
 }
 

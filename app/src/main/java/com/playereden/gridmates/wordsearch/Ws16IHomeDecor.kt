@@ -62,18 +62,18 @@ internal fun Ws16IHomeEdgeDecor(mode: DisplayMode = DisplayMode.STANDARD) {
         // corners in the extra screen space without intercepting touch targets.
         Ws16IDecorSprite("top-left",
             Modifier.align(Alignment.TopStart)
-                .offset(x = (-62).dp,
-                    y = if (immersive) (-24).dp else topInset - 13.dp)
-                .width(if (immersive) 152.dp else 126.dp)
-                .height(if (immersive) 100.dp else 78.dp)
-                .alpha(if (immersive) .82f else .70f))
+                .offset(x = if (immersive) (-80).dp else (-62).dp,
+                    y = if (immersive) (-36).dp else topInset - 13.dp)
+                .width(if (immersive) 168.dp else 126.dp)
+                .height(if (immersive) 113.dp else 78.dp)
+                .alpha(if (immersive) .85f else .70f))
         Ws16IDecorSprite("top-right",
             Modifier.align(Alignment.TopEnd)
-                .offset(x = if (immersive) 60.dp else 63.dp,
-                    y = if (immersive) (-23).dp else topInset - 15.dp)
-                .width(if (immersive) 152.dp else 126.dp)
-                .height(if (immersive) 100.dp else 78.dp)
-                .alpha(if (immersive) .82f else .70f))
+                .offset(x = if (immersive) 80.dp else 63.dp,
+                    y = if (immersive) (-35).dp else topInset - 15.dp)
+                .width(if (immersive) 168.dp else 126.dp)
+                .height(if (immersive) 113.dp else 78.dp)
+                .alpha(if (immersive) .85f else .70f))
         // In Standard, flower bases end ABOVE the navigation control area.
         // In fullscreen, they can extend almost to the physical bottom edge.
         Ws16IDecorSprite("bottom-left",

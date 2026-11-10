@@ -15,6 +15,8 @@ class Ws16CarouselHomeAndroidTest {
 
     @Test fun sharedBrandAndHeaderNavigateToWorkingLocalDestinations() {
         compose.onNodeWithTag("ws16-home-header").assertExists()
+        compose.onNodeWithTag("ws16-family-mark").assertExists()
+        compose.onNodeWithTag("ws16-word-search-mark").assertExists()
         compose.onNodeWithTag("ws16i-home-divider").assertExists()
         compose.onNodeWithText("Word Search").assertExists()
         compose.onNodeWithContentDescription("Open menu").assertExists()

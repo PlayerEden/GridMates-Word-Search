@@ -56,7 +56,7 @@ internal fun Ws16HomeScreen(
     onDaily: () -> Unit,
     onNearby: () -> Unit,
     showQuickPlayPreview: Boolean = false,
-    displayMode: DisplayMode = DisplayMode.STANDARD,
+    displayMode: DisplayMode = DisplayMode.FULLSCREEN,
     onDisplayModeChange: (DisplayMode) -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
@@ -75,7 +75,8 @@ internal fun Ws16HomeScreen(
     // Fullscreen lends a little more room to the illustrated page-top border.
     // Standard keeps the existing compact fit on smaller three-button phones.
     if (displayMode == DisplayMode.FULLSCREEN) Spacer(Modifier.height(14.dp))
-    Ws16HomeHeader(onProfile = onProfile, onMenu = { menuOpen = true })
+    Ws16HomeHeader(displayMode = displayMode,
+        onProfile = onProfile, onMenu = { menuOpen = true })
     // An independent antique-gold botanical rule, no words baked in art.
     Ws16IHeaderDivider()
 
