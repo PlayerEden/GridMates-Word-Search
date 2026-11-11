@@ -1,5 +1,5 @@
 # WS16AW — Full-bleed five-piece Library; safe-area padding moved to controls
-**Date:** November 11, 2026 (Kentucky) · **Status:** source changes committed; exact-source Android/art CI running; physical handset review NOT performed · **PR:** [#131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), still draft.
+**Date:** November 11, 2026 (Kentucky) · **Status:** dual-green exact-source Android/art CI confirmed; physical handset review NOT performed · **PR:** [#131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), still draft.
 
 ## Who / what / where / why
 - **Owner:** continue the modular Word Search Library from the previous full chat, removing the visible flat parchment strips above and below the painted cabinet.
@@ -23,10 +23,10 @@
 **Code/test commits:** `5532616`, `962398f`, `2ded722`, `8a93ada`, `524b307`, `b523ca8`, `fefbe7a90b953859444658a06ac0a440bc2bd04b` (final tested code/source commit).
 
 ## Build and QA receipt
-- Two exact-source workflows triggered for **`fefbe7a90b953859444658a06ac0a440bc2bd04b`**:
-  - [Android QA run #42978560074](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42978560074) — **running at journal creation; not yet a pass**.
-  - [Art and debug/release isolation #42978560291](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42978560291) — **running at journal creation; not yet a pass**.
-- No WS16AW APK link, checksum, verified install or visual acceptance is claimed at journal creation.
+- Two workflows on exact HEAD **`46270d2707b26539d0b0a675d2e91c9c1bab3040`** (Kotlin/test code unchanged from `fefbe7a90b953859444658a06ac0a440bc2bd04b`):
+  - [Android QA run #42978836813](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42978836813) — **SUCCESS**, exact branch HEAD `46270d2707b26539d0b0a675d2e91c9c1bab3040`, code still `fefbe7a...`.
+  - [Art and debug/release isolation #42978836809](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42978836809) — **SUCCESS**, same branch HEAD/source.
+- **Code-only Android QA artifact:** [ZIP #13836419629](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42978836813/artifacts/13836419629), ZIP 24,417,827 bytes, archive SHA256 `38c6a627d5a4e1b9503b1dec0614be0ce30de58fdc6a70e06aa1af88f7516b2d` (GitHub artifact digest). Separate art-check [ZIP #13837075652](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42978836809/artifacts/13837075652), ZIP 24,417,826 bytes, archive SHA256 `d2d79f0444dcdd62ef0c371870b6d97e0e2ef05ef0ed14cbf333d09f59a79e47`. These **do not contain the original five WS16AS images**; QA modular visual option remains gated off. Internal APK SHA256 not independently extracted, no install or phone test claimed.
 - Even if both CI builds pass, they remain **code/fallback-art QA builds** while the five new WS16AS PNG files are absent from GitHub. They cannot demonstrate the new cabinet visual on an Android phone.
 - Existing WS16AV locally independently signed APK is the **previous original-art visual-test candidate** and current phone-test fallback. Earlier GitHub-source WS16AT/WS16AU artifacts lack original art. Preserve existing book data and don't silently uninstall.
 - No merge, Play release, gameplay, catalog, LAN, unlock or signing changes.
@@ -37,4 +37,4 @@
 3. Build a source-matched Android QA APK with both the real art and this edge-to-edge layout, and visually review the **complete screen** on 320, 360, 412dp/tall/landscape and 200% font. Verify safe controls, wood coverage, two or more independent ledges, real spines touching the ledges, pagination only for real overflowing books, Back, book modal and View pages.
 4. Separate reusable standalone title/count plaques, arrows, dots and other consistent GridMates controls only *after* owner approves the shell geometry and edge-to-edge composition.
 
-**New-chat one-liner:** From PR #131 at WS16AW, check CI #42978560074/#42978560291, then import exact five original WS16AS shell binaries into GitHub; compile a real-art full-bleed candidate and ask for physical-phone review; keep the previous independently signed WS16AV test APK and older bookcase path for rollback.
+**New-chat one-liner:** PR #131 WS16AW code is dual-green via Android #42978836813 and art #42978836809 on commit `46270d27`. The original five WS16AS shell image binaries must be imported to GitHub before a real-art full-bleed QA APK can be built and phone-reviewed. The ZIP is listed in the ChatGPT Game Design Library, but attempted raw-byte materialization failed, so the images remain unavailable for repository ingestion; an accessible attachment of that existing ZIP (not regenerated artwork) is the simplest next input. Keep independently signed WS16AV test APK and older library path as rollback.
