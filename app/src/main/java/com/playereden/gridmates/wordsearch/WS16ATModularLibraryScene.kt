@@ -53,52 +53,66 @@ private fun ws16atLoad(context: Context, name: String): Bitmap? = runCatching {
     }
 }.getOrNull()
 
+/**
+ * Architectural paint is split into TWO compositing passes.
+ * The dark planks are behind the real shelves and book spines; carved columns,
+ * crown and base are in FRONT so shelves never appear pasted over pilasters.
+ * Each raster is an independent, source-accurate piece; no UI or shelf pixels
+ * have been painted into the cabinet assets.
+ */
 @Composable
-private fun WS16ATShell(modifier: Modifier = Modifier) {
+private fun WS16ATCabinetLayers(foreground: Boolean, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val artwork = remember(context) {
         ws16atShell.associateWith { ws16atLoad(context, it) }
     }
-    BoxWithConstraints(modifier.testTag("ws16at-five-part-shell")) {
-        val crownHeight = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.28f)
-        val baseHeight = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.18f)
-        val sideWidth = (maxWidth * 0.105f).coerceAtMost(46.dp)
+    BoxWithConstraints(modifier.testTag(if (foreground)
+        "ws16at-front-woodwork" else "ws16at-five-part-shell")) {
+        val crownHeight = (maxWidth * (198f / 602f))
+            .coerceAtMost(maxHeight * 0.25f)
+        val baseHeight = (maxWidth * (108f / 602f))
+            .coerceAtMost(maxHeight * 0.15f)
+        val leftWidth = maxWidth * (126f / 602f)
+        val rightWidth = maxWidth * (120f / 602f)
+        val backWidth = (maxWidth - leftWidth - rightWidth).coerceAtLeast(1.dp)
         val middleHeight = (maxHeight - crownHeight - baseHeight).coerceAtLeast(1.dp)
-        // The rear planks may flex vertically; the carved crown/base retain aspect.
-        Canvas(Modifier.fillMaxSize()) { drawRect(Color(0xFF753A1A)) }
-        artwork["recessed_backboard"]?.let { bitmap ->
-            Image(bitmap.asImageBitmap(), contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.fillMaxWidth()
-                    .height(middleHeight)
-                    .align(Alignment.TopCenter)
-                    .padding(top = crownHeight * 0.5f))
-        }
-        // The separately movable book shelves render over the backboard in
-        // the scene, with these rails placed last as the front architectural trim.
-        artwork["left_pilaster"]?.let { bitmap ->
-            Image(bitmap.asImageBitmap(), contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.align(Alignment.CenterStart)
-                    .width(sideWidth).height(middleHeight))
-        }
-        artwork["right_pilaster"]?.let { bitmap ->
-            Image(bitmap.asImageBitmap(), contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.align(Alignment.CenterEnd)
-                    .width(sideWidth).height(middleHeight))
-        }
-        artwork["top_crown"]?.let { bitmap ->
-            Image(bitmap.asImageBitmap(), contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.align(Alignment.TopCenter)
-                    .fillMaxWidth().height(crownHeight))
-        }
-        artwork["bottom_base"]?.let { bitmap ->
-            Image(bitmap.asImageBitmap(), contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.align(Alignment.BottomCenter)
-                    .fillMaxWidth().height(baseHeight))
+
+        if (!foreground) {
+            Canvas(Modifier.fillMaxSize()) { drawRect(Color(0xFF753A1A)) }
+            artwork["recessed_backboard"]?.let { bitmap ->
+                Image(bitmap.asImageBitmap(), contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.align(Alignment.TopStart)
+                        .offset(x = leftWidth, y = crownHeight)
+                        .width(backWidth).height(middleHeight))
+            }
+        } else {
+            artwork["left_pilaster"]?.let { bitmap ->
+                Image(bitmap.asImageBitmap(), contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.align(Alignment.TopStart)
+                        .offset(y = crownHeight)
+                        .width(leftWidth).height(middleHeight))
+            }
+            artwork["right_pilaster"]?.let { bitmap ->
+                Image(bitmap.asImageBitmap(), contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.align(Alignment.TopEnd)
+                        .offset(y = crownHeight)
+                        .width(rightWidth).height(middleHeight))
+            }
+            artwork["top_crown"]?.let { bitmap ->
+                Image(bitmap.asImageBitmap(), contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                        .fillMaxWidth().height(crownHeight))
+            }
+            artwork["bottom_base"]?.let { bitmap ->
+                Image(bitmap.asImageBitmap(), contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                        .fillMaxWidth().height(baseHeight))
+            }
         }
     }
 }
@@ -114,8 +128,9 @@ internal fun WS16ATModularLibraryScene(
     val density = LocalDensity.current
     BoxWithConstraints(modifier.fillMaxSize().testTag("ws16at-modular-library")) {
         val hitSlot = if (density.fontScale >= 1.65f) 54.dp else 48.dp
-        val sideInset = (maxWidth * 0.09f).coerceIn(26.dp, 50.dp)
-        val slots = ((maxWidth - (sideInset * 2)).value / hitSlot.value)
+        val leftWidth = maxWidth * (126f / 602f)
+        val rightWidth = maxWidth * (120f / 602f)
+        val slots = ((maxWidth - leftWidth - rightWidth).value / hitSlot.value)
             .toInt().coerceIn(1, 12)
         val tierCount = when {
             maxHeight < 480.dp -> 1
@@ -126,17 +141,17 @@ internal fun WS16ATModularLibraryScene(
         val pages = maxOf(1, (books.size + capacity - 1) / capacity)
         val pager = rememberPagerState(pageCount = { pages })
         val scope = rememberCoroutineScope()
-        val top = (maxWidth * (198f / 602f)).coerceAtLeast(98.dp)
-        val bottom = (maxWidth * (108f / 602f)).coerceAtLeast(52.dp)
+        val top = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.25f)
+        val bottom = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.15f)
         val available = (maxHeight - top - bottom).coerceAtLeast(1.dp)
         val tierHeight = available / tierCount
 
         // Backdrop and real shelves/books are independent; hide nothing in a bitmap.
-        WS16ATShell(Modifier.fillMaxSize())
+        WS16ATCabinetLayers(foreground = false, modifier = Modifier.fillMaxSize())
         HorizontalPager(
             state = pager,
             modifier = Modifier.fillMaxSize()
-                .padding(top = top, bottom = bottom)
+                .padding(start = leftWidth, end = rightWidth, top = top, bottom = bottom)
                 .testTag("ws16at-bookcase-pages")
         ) { page ->
             val pageBooks = books.drop(page * capacity).take(capacity)
@@ -160,6 +175,8 @@ internal fun WS16ATModularLibraryScene(
                 }
             }
         }
+        // Carved woodwork overlays the working shelf sprites at the real edges.
+        WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())
         // Native text, never printed into the illustration or decorative plaque.
         Text("Your Library", color = Color(0xFFFFE6B5),
             style = MaterialTheme.typography.titleLarge,
