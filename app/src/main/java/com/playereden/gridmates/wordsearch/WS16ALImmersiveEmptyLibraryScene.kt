@@ -107,7 +107,7 @@ internal fun WS16ALImmersiveEmptyLibraryScene(
             onPreviewOptions=onPreviewOptions,
             modifier=Modifier.padding(horizontal=6.dp)
         )
-        BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)
+        Box(Modifier.fillMaxWidth().weight(1f)
             .padding(horizontal=2.dp).testTag("ws16al-cabinet-stage")) {
             WS16ALResponsiveBookcaseBackground(Modifier.fillMaxSize())
             Row(
