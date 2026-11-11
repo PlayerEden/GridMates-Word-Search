@@ -1,4 +1,5 @@
 """WS16BB shelf art, library spacing and reusable illustrated controls."""
+import re
 import unittest
 from pathlib import Path
 from import_ws16bb_matched_shelf import ROOT, EXPECTED_SHA, EXPECTED_SIZE, verify
@@ -26,9 +27,11 @@ class CabinetRefinementTests(unittest.TestCase):
 
     def test_spaced_library_and_separate_count(self):
         scene=(APP/"WS16ATModularLibraryScene.kt").read_text()
-        self.assertIn("available * 0.46f",scene)
-        self.assertIn("available * 0.40f",scene)
-        self.assertIn("available * 0.14f",scene)
+        self.assertIn("val countBayHeight = shelfOverhang + countGap + countPlaqueBudget",scene)
+        self.assertIn("shelfTierSpace * 0.54f",scene)
+        self.assertIn("shelfTierSpace * 0.46f",scene)
+        self.assertIn("ws16bc-count-bay",scene)
+        self.assertIn("showFutureVolumes = tier > 0",scene)
         self.assertIn('label = "Coming soon"',scene)
         self.assertIn("futureTreatment = true",scene)
         self.assertIn("if (tierCount == 2)",scene)
@@ -56,7 +59,9 @@ class CabinetRefinementTests(unittest.TestCase):
 
     def test_install_over_stable_signing(self):
         gradle=(ROOT/"app/build.gradle.kts").read_text()
-        self.assertIn("?: 61",gradle)
+        match = re.search(r'versionCode\s*=\s*providers\.gradleProperty\("qaVersionCode"\)\.orNull\?\.toInt\(\)\s*\?:\s*(\d+)', gradle)
+        self.assertIsNotNone(match)
+        self.assertGreaterEqual(int(match.group(1)), 61)
         self.assertIn("qa-signing/wordsearch-qa.p12",gradle)
         self.assertIn('applicationIdSuffix = ".qa"',gradle)
         for wf in ("ws01-android-qa.yml","ws12g-qa-art-lab.yml"):
