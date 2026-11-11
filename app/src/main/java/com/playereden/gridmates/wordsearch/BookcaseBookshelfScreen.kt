@@ -65,7 +65,8 @@ internal fun BookcaseBookshelfScreen(
     fieldNotesArt: Boolean,
     onToggleArt: (() -> Unit)?,
     onToggleLayout: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    safeContentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     BoxWithConstraints(modifier.fillMaxSize().testTag("real-bookcase-screen")) {
         val fontScale = LocalDensity.current.fontScale
@@ -96,6 +97,7 @@ internal fun BookcaseBookshelfScreen(
                 onBack = onBack,
                 onBookSelected = { selectedBookId = it },
                 onPreviousArt = { modularPreview = false },
+                safeContentPadding = safeContentPadding,
                 modifier = Modifier.fillMaxSize()
             )
         } else if (fieldNotesArt && immersiveBooksPreview) {
@@ -114,7 +116,7 @@ internal fun BookcaseBookshelfScreen(
                 onModularCase = if (modularAssetsAvailable) {
                     { modularPreview = true }
                 } else null,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().padding(safeContentPadding)
             )
         } else if (fieldNotesArt && emptyCabinetPreview) {
             WS16ALImmersiveEmptyLibraryScene(
@@ -127,10 +129,10 @@ internal fun BookcaseBookshelfScreen(
                 onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
                     { previewToolsOpen = true }
                 } else null,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().padding(safeContentPadding)
             )
         } else {
-        Column(Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 7.dp)) {
+        Column(Modifier.fillMaxSize().padding(safeContentPadding).padding(horizontal = 6.dp, vertical = 7.dp)) {
             Ws15BackHeader(
                 title = "Your Library",
                 subtitle = "Browse your puzzle books",
