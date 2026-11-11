@@ -31,3 +31,14 @@ Rebuild/grow publisher spine masters to look physically thicker and **nearly tou
 - Never claim the static screenshot proves interactions or publication readiness.
 
 **Implementation is deliberately small; no new art, book IDs, save changes, Home UI changes or automatic PR merge.**
+
+
+## Exact-source QA receipt — both workflows passed
+
+- Compiled source commit: [`14b995215a2d489f734fecd3bed1886637323aa9`](https://github.com/PlayerEden/GridMates-Word-Search/commit/14b995215a2d489f734fecd3bed1886637323aa9).
+- Android CI [run #42954702947](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42954702947) **SUCCESS**, [artifact #13826443678](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42954702947/artifacts/13826443678). Artifact accessible with GitHub login, expires **December 11, 2026**.
+- Independent artwork/debug/release isolation [run #42954703030](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42954703030) **SUCCESS**, [artifact #13826642822](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42954703030/artifacts/13826642822).
+- Downloaded actual artifact archives from both runs; both archives contain `app-debug.apk` and pass ZIP integrity checks. Inspected both APKs: **311 of 311 identical path names and uncompressed content bytes matched** between independent workflows. APK signature-block marker is present; cryptographic signing/trust and device installation were not independently asserted.
+- Android standard QA `app-debug.apk`: **23,827,752 bytes**, SHA256 `3ca6ee59d0128211fc3412f53e0f0f39166091b6573a7288b9f7c2673df802ae`. Standard artifact ZIP SHA256 `82a458b7095c52ab4605ab63f5e5f653990e24b30efbeeb8a28bb1486b818879`.
+- All seven WS16AK actual debug entries (six painted parts + manifest) are bundled, and independent artwork/release-isolation workflow succeeded; book source IDs and fallback artwork are unchanged.
+- **Owner on-phone visual/tap acceptance pending.** Verify contact plane, book-count typography over the inlay, correct real spine → full-cover dialog → View pages, blank spine non-interaction, and Back/overflow at real phone dimensions. Prior green WS16AM APK remains rollback; PR #131 is still unmerged.
