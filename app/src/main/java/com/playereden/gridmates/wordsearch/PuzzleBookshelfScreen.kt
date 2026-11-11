@@ -46,6 +46,7 @@ internal fun PuzzleBookshelfScreen(
     onBack: () -> Unit,
     onOpenBook: (String) -> Unit,
     modifier: Modifier = Modifier,
+    safeContentPadding: PaddingValues = PaddingValues(0.dp),
     showPrototypeArt: Boolean = false,
     fieldNotesArt: Boolean = false,
     onToggleArt: (() -> Unit)? = null,
@@ -69,7 +70,7 @@ internal fun PuzzleBookshelfScreen(
                 onToggleLayout = onToggleLayout,
                 initialFocusedBookId = initialFocusedBookId,
                 onFocusedBookChanged = onFocusedBookChanged,
-                modifier = modifier
+                modifier = modifier.padding(safeContentPadding)
             )
         } else {
             BookcaseBookshelfScreen(
@@ -80,13 +81,14 @@ internal fun PuzzleBookshelfScreen(
                 fieldNotesArt = fieldNotesArt,
                 onToggleArt = onToggleArt,
                 onToggleLayout = onToggleLayout,
+                safeContentPadding = safeContentPadding,
                 modifier = modifier
             )
         }
         return
     }
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.padding(safeContentPadding),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
