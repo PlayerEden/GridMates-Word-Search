@@ -32,7 +32,7 @@ class ModularLibraryTests(unittest.TestCase):
         for name in ("top_crown","left_pilaster","right_pilaster",
                      "recessed_backboard","bottom_base"):
             self.assertIn('"' + name + '"',code)
-        self.assertIn("hasWs16atCabinetArt(context)",code)
+        self.assertIn("internal fun hasWs16atCabinetArt(context: Context)",code)
         self.assertIn("WS16AMSpineBay(",code)
         self.assertIn("Ws16EStorybookShelf()",code)
         self.assertIn("books.drop(page * capacity).take(capacity)",code)
