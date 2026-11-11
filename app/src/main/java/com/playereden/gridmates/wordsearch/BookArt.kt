@@ -92,6 +92,17 @@ internal fun ws16aeQaBookArtPath(theme: WordTheme, kind: BookArtKind): String? {
     }
 }
 
+/** Source-pinned V3 spine lettering cleanup. Front covers remain WS16AE V2. */
+internal fun ws16afCorrectedSpinePath(theme: WordTheme, kind: BookArtKind): String? {
+    if (kind != BookArtKind.SPINE) return null
+    val slug = when (theme) {
+        WordTheme.WOODLAND -> "woodland"
+        WordTheme.SPACE -> "space"
+        WordTheme.GARDEN -> "garden"
+    }
+    return "ws16af/spines/$slug.png"
+}
+
 /** Compatibility for existing bookshelf cover-availability checks. */
 internal fun ws14QaCoverPath(theme: WordTheme, kind: BookArtKind): String? =
     if (kind == BookArtKind.COVER) ws14QaBookArtPath(theme, kind) else null
@@ -164,12 +175,15 @@ internal fun BookArt(
     val preferredNewPath = preferredWs14QaCoverPath(theme, kind, fieldNotes)
     val preferredBookFactory = if (fieldNotes) ws16adQaBookArtPath(theme, kind) else null
     val preferredPaintedV2 = if (fieldNotes) ws16aeQaBookArtPath(theme, kind) else null
+    val preferredCorrectedSpine = if (fieldNotes) ws16afCorrectedSpinePath(theme, kind) else null
     val preferredPageAccent = ws14jQaPageAccentPath(theme, kind, pageAccentCandidate)
     val preferredThreeThemes = ws14k2QaGameMotifPath(theme, kind, pageAccentCandidate)
     val bitmap = remember(context, existingStudyPath, preferredNewPath,
-        preferredPaintedV2, preferredBookFactory, preferredPageAccent, preferredThreeThemes) {
+        preferredCorrectedSpine, preferredPaintedV2, preferredBookFactory,
+        preferredPageAccent, preferredThreeThemes) {
         listOfNotNull(preferredThreeThemes, preferredPageAccent,
-            preferredPaintedV2, preferredBookFactory, preferredNewPath, existingStudyPath)
+            preferredCorrectedSpine, preferredPaintedV2, preferredBookFactory,
+            preferredNewPath, existingStudyPath)
             .firstNotNullOfOrNull { path ->
                 runCatching {
                     decodeBookArt(context, path)
@@ -183,4 +197,20 @@ internal fun BookArt(
         contentScale = ContentScale.Fit,
         modifier = modifier
     )
+}
+
+/**
+ * Anonymous non-playable bookcase volume. Debug-only artwork source; no content
+ * ID, progress or onClick. Release APK contains no ws16ad placeholder pixels.
+ */
+@Composable
+internal fun BookFactoryBlankSpine(style: String, modifier: Modifier = Modifier) {
+    if (style !in listOf("linen", "night", "burgundy")) return
+    val context = LocalContext.current
+    val path = "ws16ad/placeholders/$style-spine.png"
+    val bitmap = remember(context, path) {
+        runCatching { decodeBookArt(context, path) }.getOrNull()
+    } ?: return
+    Image(bitmap.asImageBitmap(), contentDescription = null,
+        contentScale = ContentScale.Fit, modifier = modifier)
 }

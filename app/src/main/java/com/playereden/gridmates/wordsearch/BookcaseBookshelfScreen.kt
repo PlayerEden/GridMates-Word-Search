@@ -205,11 +205,18 @@ private fun SpineOutShelfRow(
             Ws16GBookcaseBackboard(Modifier.matchParentSize())
             WoodenShelfPlank(index, Modifier.align(Alignment.BottomCenter))
             Row(Modifier.align(Alignment.BottomStart)
-                    .padding(start = 15.dp, end = 15.dp, bottom = 36.dp),
+                    .padding(start = 15.dp, end = 15.dp, bottom = 28.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
                 verticalAlignment = Alignment.Bottom) {
                 books.forEach { book ->
-                    Box(Modifier.width(slotWidth).height(156.dp)
+                    // Small controlled height classes; uniformly scale the actual spine.
+                    // Keep the independent 48dp/54dp touch target regardless of artwork.
+                    val printedTitle = book.title.removeSuffix(" · TEST BOOK")
+                    val letters = printedTitle.substringBefore(" ").count { it.isLetter() }
+                    val tall = letters in 8..11
+                    val spineHeight = if (tall) 160.dp else 154.dp
+                    val spineWidth = if (tall) 32.dp else 31.dp
+                    Box(Modifier.width(slotWidth).height(170.dp)
                             .semantics {
                                 contentDescription = "Pull out " +
                                     book.title.removeSuffix(" · TEST BOOK")
@@ -220,11 +227,34 @@ private fun SpineOutShelfRow(
                         // The binding artwork is a real existing spine,
                         // not a duplicate cover or invented future volume.
                         BookArt(book.theme, BookArtKind.SPINE,
-                            Modifier.width(30.dp).height(148.dp)
+                            Modifier.width(spineWidth).height(spineHeight)
                                 .testTag("book-spine-" + book.id),
                             fieldNotes = fieldNotesArt)
                     }
                 }
+
+                // QA-only physical filler books: no PuzzleBook, no ID, no tap,
+                // no fake chapter count or progress. Each is a distinct source PNG.
+                if (fieldNotesArt && books.isEmpty() && index == 1) {
+                    listOf("linen", "night", "burgundy").forEach { style ->
+                        Box(Modifier.width(slotWidth).height(170.dp)
+                                .semantics {
+                                    contentDescription = "Upcoming puzzle book, coming soon"
+                                }
+                                .testTag("library-future-volume-$style"),
+                            contentAlignment = Alignment.BottomCenter) {
+                            BookFactoryBlankSpine(style,
+                                Modifier.width(31.dp).height(154.dp))
+                        }
+                    }
+                }
+            }
+            if (fieldNotesArt && books.isEmpty() && index == 1) {
+                Text("More books coming soon",
+                    modifier = Modifier.align(Alignment.TopCenter)
+                        .padding(top = 9.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color(0xFFFFE9C0))
             }
         }
     }

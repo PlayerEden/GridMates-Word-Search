@@ -113,6 +113,10 @@ jobs:
         run: |
           python3 tools/asset_pipeline/build_ws16ae_books_v2.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ae_books_v2.py' -v
+      - name: Repair all three source-pinned WS16AF spine lettering masters
+        run: |
+          python3 tools/asset_pipeline/build_ws16af_spines_clean.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16af_spines_clean.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -127,6 +131,11 @@ jobs:
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
+      - name: Verify WS16AF corrected spines in QA and zero in release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16af_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
       - name: Verify all WS16AE V2 painted book art is debug-only
         run: |
           RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
