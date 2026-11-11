@@ -54,5 +54,13 @@ class BookFactoryTests(unittest.TestCase):
         self.assertIn('return "ws16ad/$folder/$slug.png"',art)
         self.assertIn('preferredBookFactory',art)
         self.assertIn('preferredNewPath',art)
-        self.assertNotIn('ws16ad/placeholders/',art)
+        # WS16AG explicitly allows an *anonymous* debug-only library preview,
+        # but no placeholder may become a catalog book or a tappable selection.
+        self.assertIn('ws16ad/placeholders/',art)
+        self.assertIn('if (style !in listOf("linen", "night", "burgundy")) return',art)
+        lib=(ROOT/'app/src/main/java/com/playereden/gridmates/wordsearch/BookcaseBookshelfScreen.kt').read_text()
+        self.assertIn('if (fieldNotesArt && books.isEmpty() && index == 1)',lib)
+        self.assertIn('BookFactoryBlankSpine(style',lib)
+        self.assertIn('More books coming soon',lib)
+        self.assertNotIn('onSelect(style',lib)
 if __name__=='__main__':unittest.main()
