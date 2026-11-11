@@ -77,6 +77,8 @@ internal fun BookcaseBookshelfScreen(
         val scope = rememberCoroutineScope()
         var selectedBookId by rememberSaveable { mutableStateOf<String?>(null) }
         var previewToolsOpen by remember { mutableStateOf(false) }
+        // QA-only empty-background inspection; regular books are one tap away.
+        var emptyCabinetPreview by rememberSaveable { mutableStateOf(true) }
 
         Column(Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 7.dp)) {
             Ws15BackHeader(
@@ -88,9 +90,24 @@ internal fun BookcaseBookshelfScreen(
                     { previewToolsOpen = true }
                 } else null
             )
-            Text("Tap a spine to pull out a book.",
-                style = MaterialTheme.typography.bodyMedium, color = Muted,
-                modifier = Modifier.padding(start = 12.dp, bottom = 4.dp))
+            if (fieldNotesArt) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (emptyCabinetPreview) "Inspect the empty bookcase artwork"
+                        else "Tap a spine to pull out a book.",
+                        style = MaterialTheme.typography.bodyMedium, color = Muted,
+                        modifier = Modifier.weight(1f).padding(start = 12.dp))
+                    TextButton(
+                        onClick = { emptyCabinetPreview = !emptyCabinetPreview },
+                        modifier = Modifier.heightIn(min = 48.dp)
+                            .testTag("bookcase-empty-background-preview")
+                    ) { Text(if (emptyCabinetPreview) "Show books" else "Empty art") }
+                }
+            } else {
+                Text("Tap a spine to pull out a book.",
+                    style = MaterialTheme.typography.bodyMedium, color = Muted,
+                    modifier = Modifier.padding(start = 12.dp, bottom = 4.dp))
+            }
             HorizontalPager(
                 state = pager,
                 modifier = Modifier.fillMaxWidth().weight(1f)
@@ -100,6 +117,11 @@ internal fun BookcaseBookshelfScreen(
                 val pageBooks = catalog.books.drop(first).take(capacity)
                 BoxWithConstraints(Modifier.fillMaxSize()
                     .testTag("bookcase-page-$page")) {
+                    if (fieldNotesArt && emptyCabinetPreview) {
+                        // WS16AK: six source-exact wood modules, no baked book art or
+                        // clickable catalog objects in this controlled visual study.
+                        WS16AKEmptyBookcaseBackground(Modifier.fillMaxSize())
+                    } else {
                     BookcaseWoodParts(Modifier.fillMaxSize(), fieldNotesArt)
                     val tierHeight = (maxHeight - 65.dp).coerceAtLeast(100.dp) / 2
                     Column(Modifier.fillMaxSize()
@@ -111,6 +133,7 @@ internal fun BookcaseBookshelfScreen(
                         SpineOutShelfRow(page * 2 + 1, pageBooks.drop(slotsPerShelf),
                             slotsPerShelf, slotWidth, tierHeight, fieldNotesArt,
                             onSelect = { selectedBookId = it })
+                    }
                     }
                 }
             }
