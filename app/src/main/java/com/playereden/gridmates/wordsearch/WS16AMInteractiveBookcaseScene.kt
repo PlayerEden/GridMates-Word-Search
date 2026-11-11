@@ -86,7 +86,7 @@ internal fun WS16AMInteractiveBookcaseScene(
             // Keep only a small real-book label on the left of the base.
             // QA switches belong behind the header overflow, not on woodwork.
             Box(Modifier.align(Alignment.BottomStart)
-                .padding(start = 42.dp, bottom = 12.dp)
+                .padding(start = 58.dp, bottom = 12.dp)
                 .testTag("ws16am-book-count")) {
                 WS16AMBookCountPlaque(books.size)
             }
@@ -125,16 +125,14 @@ internal fun WS16AMInteractiveBookcaseScene(
 
 @Composable
 internal fun WS16AMBookCountPlaque(count: Int) {
-    Box(
-        Modifier.background(Color(0xDD17382D), RoundedCornerShape(6.dp))
-            .padding(horizontal = 8.dp, vertical = 5.dp)
-    ) {
-        Text(
-            count.toString() + if (count == 1) " book" else " books",
-            color = Color(0xFFFFE9BD),
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
+    // The carved base already contains a dark-green inlaid strip. A floating
+    // filled badge obscured its gold border and looked like a glued-on button.
+    Text(
+        count.toString() + if (count == 1) " book" else " books",
+        color = Color(0xFFFFE9BD),
+        style = MaterialTheme.typography.labelSmall,
+        modifier = Modifier.testTag("ws16an-inlaid-book-count")
+    )
 }
 
 @Composable
@@ -152,7 +150,7 @@ private fun WS16AMSpineBay(
         val artWidth = (artHeight * (104f / 542f)).coerceAtMost(slot - 3.dp)
         Row(
             modifier = Modifier.align(Alignment.BottomCenter)
-                .width(slot * slots).padding(bottom = 5.dp),
+                .width(slot * slots).padding(bottom = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalAlignment = Alignment.Bottom
         ) {
@@ -171,8 +169,8 @@ private fun WS16AMSpineBay(
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     Box(Modifier.align(Alignment.BottomCenter)
-                        .width(artWidth).height(3.dp)
-                        .background(Color(0x770F0806), RoundedCornerShape(50)))
+                        .width(artWidth).height(4.dp)
+                        .background(Color(0x990F0806), RoundedCornerShape(50)))
                     if (book != null) {
                         BookcaseSpineArt(
                             book.theme, true,

@@ -42,6 +42,13 @@ class InteractiveCabinetTests(unittest.TestCase):
         self.assertIn("ws16am-inspect-empty",code)
         self.assertIn("ws16am-old-case",code)
         self.assertIn("ws16am-book-count",code)
+        # WS16AN real-phone acceptance refinement: books sit closer to the
+        # illustrated contact plane, without stretching or shrinking tap slots.
+        self.assertIn(".width(slot * slots).padding(bottom = 2.dp)",code)
+        self.assertIn(".width(artWidth).height(4.dp)",code)
+        self.assertIn('testTag("ws16an-inlaid-book-count")',code)
+        self.assertNotIn('Color(0xDD17382D)',code)
+        self.assertIn('val hitSlot = if (fontScale >= 1.65f) 54.dp else 48.dp',code)
 
     def test_prior_library_and_details_remain_operational(self):
         live=(APP/"BookcaseBookshelfScreen.kt").read_text()
