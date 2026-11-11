@@ -145,6 +145,11 @@ internal fun WS16ATModularLibraryScene(
         val bottom = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.15f)
         val available = (maxHeight - top - bottom).coerceAtLeast(1.dp)
         val tierHeight = available / tierCount
+        // The approved Home shelf draws a 50dp image offset 8dp downward;
+        // its actual book-contact plane is 42dp above the row's lower edge.
+        // Reserve that entire plane so the spine bottoms meet the shelf top,
+        // rather than being partly hidden by the wooden apron.
+        val shelfContactDepth = 42.dp
 
         // Backdrop and real shelves/books are independent; hide nothing in a bitmap.
         WS16ATCabinetLayers(foreground = false, modifier = Modifier.fillMaxSize())
@@ -163,7 +168,8 @@ internal fun WS16ATModularLibraryScene(
                         WS16AMSpineBay(
                             books = pageBooks.drop(tier * slots).take(slots),
                             shelfIndex = shelfIndex, slots = slots,
-                            slot = hitSlot, height = tierHeight,
+                            slot = hitSlot,
+                            height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp),
                             onBookSelected = onBookSelected
                         )
                         Box(Modifier.align(Alignment.BottomCenter)
