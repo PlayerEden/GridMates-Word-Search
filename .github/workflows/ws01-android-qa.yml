@@ -120,6 +120,7 @@ jobs:
         run: |
           python3 tools/asset_pipeline/build_ws16ak_ci.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ak_ci.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16al_immersive_shell.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

@@ -80,6 +80,17 @@ internal fun BookcaseBookshelfScreen(
         // QA-only empty-background inspection; regular books are one tap away.
         var emptyCabinetPreview by rememberSaveable { mutableStateOf(true) }
 
+        if (fieldNotesArt && emptyCabinetPreview) {
+            WS16ALImmersiveEmptyLibraryScene(
+                bookCount = catalog.books.size,
+                onBack = onBack,
+                onShowBooks = { emptyCabinetPreview = false },
+                onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
+                    { previewToolsOpen = true }
+                } else null,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
         Column(Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 7.dp)) {
             Ws15BackHeader(
                 title = "Your Library",
@@ -166,6 +177,7 @@ internal fun BookcaseBookshelfScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp),
                 textAlign = TextAlign.Center)
         }
+        } // end WS16AL QA scene vs existing interactive bookcase
 
         val chosen = selectedBookId?.let { catalog.book(it) }
         if (chosen != null) {
