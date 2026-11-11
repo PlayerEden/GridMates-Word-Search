@@ -67,7 +67,7 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn('qa-signing/wordsearch-qa.p12', gradle)
         self.assertIn('signingConfig = signingConfigs.getByName("wordSearchQa")', gradle)
         self.assertIn('applicationIdSuffix = ".qa"', gradle)
-        version = re.search(r'versionCode\\s*=\\s*providers\\.gradleProperty\\("qaVersionCode"\\)\\.orNull\\?\\.toInt\\(\\)\\s*\\?:\\s*(\\d+)', gradle)
+        version = re.search(r'versionCode\s*=\s*providers\.gradleProperty\("qaVersionCode"\)\.orNull\?\.toInt\(\)\s*\?:\s*(\d+)', gradle)
         self.assertIsNotNone(version, "QA default versionCode must remain explicit")
         self.assertGreaterEqual(int(version.group(1)), 61)
         for name in ('ws01-android-qa.yml', 'ws12g-qa-art-lab.yml'):
