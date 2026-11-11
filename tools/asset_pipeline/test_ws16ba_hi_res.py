@@ -30,7 +30,11 @@ class HighResCabinetTests(unittest.TestCase):
   self.assertIn("maxHeight >= maxWidth * 1.7f",scene)
   self.assertIn("ContentScale.FillBounds else ContentScale.Crop",scene)
   gradle=(ROOT/"app/build.gradle.kts").read_text()
-  self.assertIn("?: 60",gradle)
+  # Version must be monotonic for install-over; don't freeze this old test to v60.
+        import re
+        match = re.search(r'versionCode\\s*=.*?\\?:\\s*(\\d+)', gradle)
+        self.assertIsNotNone(match)
+        self.assertGreaterEqual(int(match.group(1)), 60)
   self.assertIn('applicationIdSuffix = ".qa"',gradle)
   self.assertIn("qa-signing/wordsearch-qa.p12",gradle)
 if __name__=="__main__":unittest.main()
