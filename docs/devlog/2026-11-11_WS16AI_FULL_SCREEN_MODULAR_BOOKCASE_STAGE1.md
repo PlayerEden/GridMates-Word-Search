@@ -25,3 +25,14 @@
 6. Preserve known-good WS16AG as installed fallback until the owner approves this new cabinet.
 
 **Next:** check exact source Actions; fix any Kotlin/QA tests and rerun; provide verified GitHub APK after dual green and inspect owner phone screenshots.
+
+## Exact-source dual-green Android / artwork verification — November 11
+
+- **Compiled source:** `daa52f4c72ba8d5b044f3fdae0c1e3312b3037a9` (the code commit, before this documentation-only receipt).
+- **Android QA SUCCESS:** [run #42938169217](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42938169217), [download artifact #13818369919](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42938169217/artifacts/13818369919) (requires GitHub sign-in), archive `WS16AI_Android_QA.zip` **20,588,762 bytes**, SHA256 `beeddeff2abf8b9f0f7e18a41a09753e6a99ee221d25fdb1ba6a1c4a6cc39ffe`. Contained `app-debug.apk` **21,067,797 bytes**, SHA256 `023126d4e22290c469ef1de40617071ac22cf3ca014819b9efd3c0d3a05af625`.
+- **Independent art/release isolation SUCCESS:** [run #42938169145](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42938169145), [artifact #13820080212](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42938169145/artifacts/13820080212), `WS16AI_Art_QA.zip` **20,588,762 bytes**, SHA256 `3e4391a6731ad833751ebe5f2c6660f105000770b65a7d5999fe918f9a2f4199`. Its independently compiled debug APK outer SHA256 is `21cc5e780cc62dc9205bc43c5061ad4fdcdcfcde636ba23a806e4aa768e0ccc7`.
+- **Cross-build package integrity:** despite differing ZIP packaging metadata, all **304 internal paths and extracted bytes match exactly**, 0 differences. Both APK ZIP checks report no corruption.
+- **Source art integrity:** actual debug APK contains exactly 12 entries under `assets/ws16ai/`: 5 different wood PNG sprites, 6 separate physical-spine PNGs, and a SHA256 manifest. All **11 PNG hashes matched the packaged manifest**. The independent artwork workflow verifies no WS16AI art in the release APK.
+- **Availability:** GitHub artifact retention is 30 days, expiring **December 11, 2026 UTC**; sign-in required to download Actions artifacts, even though the repository is public.
+- **Phone QA still pending:** exact app installation, near-touching book density, backboard/pillar alignment, shorter-height devices, swipe/page indicator when real book count grows beyond capacity, accessibility, real spine → book preview → pages, and non-interactive blank volumes. Do not mark release approved or merge PR #131 yet. Preserve last verified WS16AG install and save state.
+
