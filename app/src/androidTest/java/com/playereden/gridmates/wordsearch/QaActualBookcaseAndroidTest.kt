@@ -71,7 +71,7 @@ class QaActualBookcaseAndroidTest {
         }
         compose.onNodeWithTag("real-bookcase-screen").assertExists()
         compose.onNodeWithTag("wooden-shelf-plank-0").assertExists()
-        compose.onNodeWithTag("ws16f-bookcase-backboard-0").assertExists()
+        compose.onNodeWithTag("ws16ai-painted-bookcase").assertExists()
         compose.onNodeWithTag("library-spine-" + woodland.id).assertExists()
         compose.onNodeWithTag("library-spine-" + space.id).assertExists()
         compose.onNodeWithTag("library-spine-" + garden.id).assertExists()
@@ -84,9 +84,8 @@ class QaActualBookcaseAndroidTest {
         compose.runOnIdle { assertEquals(woodland.id, selected) }
         compose.onNodeWithText("Browse your puzzle books").assertExists()
 
-        // An empty second shelf is genuine furniture, not a fake catalog row.
-        compose.onNodeWithTag("bookcase-lazy-shelves")
-            .performScrollToNode(hasTestTag("bookcase-shelf-1"))
+        // Second tier shares a painted cabinet and decorative anonymous bindings.
+        compose.onNodeWithTag("bookcase-shelf-1").assertExists()
         compose.onNodeWithTag("wooden-shelf-plank-1").assertExists()
         compose.onNodeWithText("Locked").assertDoesNotExist()
     }
