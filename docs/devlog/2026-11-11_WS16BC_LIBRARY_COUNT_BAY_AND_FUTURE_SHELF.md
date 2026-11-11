@@ -33,6 +33,12 @@
 - **Fallback:** previously supplied WS16BB version 61 [artifact #13888564089](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43092038677/artifacts/13888564089). Do not uninstall or clear saved data to switch visual builds.
 - **Owner testing still needed:** check lower shelf/plaque on actual portrait phone, choose each themed spine, verify View pages and saved progress, compare Collection/Profile, inspect narrow/large-font and landscape fallback. Production art rights and release gate remain separate.
 
+## CI failure and regression-test repair (same pass)
+
+The first v62 source `a9b9d98c` failed both pipelines **before Android compilation**, not because of a crash or broken art: inherited source-only tests in `test_ws16at_modular_library.py` and `test_ws16bb_shelf.py` still expected the literal `?: 61` and fixed 46%/40%/14% old geometry. [Android #43101804838](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43101804838) and [art #43101804933](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43101804933) both reported FAILURE at this stage. Repaired both tests to check `versionCode >= 61` using the actual gradleProperty version expression, assert the new source-backed count/shelf contract and the unchanged signer. Corrected Python regex escaping before resubmission.
+
+**Latest Android/code source:** [`0f99722e`](https://github.com/PlayerEden/GridMates-Word-Search/commit/0f99722e00cd4ebcf0d30e826c6d90c5676d21c0). New Android QA [#43102415463](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43102415463) and independent art/release [#43102415476](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43102415476) started; at correction journal update, their outcome is **still pending**. These are the runs to trust for v62, not the failed earlier runs. No APK is verified until both pass and its actual contents and certificate are checked.
+
 ## Next exact action
 
 Check **both** exact-code workflows and source-matched APK artifact; if green, verify QA signature/package/version and share v62 install-over APK and GitHub ZIP. If a check fails, repair the precise cause without claiming a verified v62. Keep PR #131 draft and retain v61 rollback.
