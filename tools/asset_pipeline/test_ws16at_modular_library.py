@@ -45,7 +45,7 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertLess(code.index("HorizontalPager("),
                         code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"))
         self.assertLess(code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"),
-                        code.index('Text("Your Library"'))
+                        code.index('Ws16AZCabinetPlaque('))
         self.assertIn("Ws16EStorybookShelf()",code)
         self.assertIn("val shelfContactDepth = 42.dp",code)
         self.assertIn("height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp)",code)
@@ -63,11 +63,26 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn('qa-signing/wordsearch-qa.p12', gradle)
         self.assertIn('signingConfig = signingConfigs.getByName("wordSearchQa")', gradle)
         self.assertIn('applicationIdSuffix = ".qa"', gradle)
-        self.assertIn('?: 58', gradle)
+        self.assertIn('?: 59', gradle)
         for name in ('ws01-android-qa.yml', 'ws12g-qa-art-lab.yml'):
             workflow = (ROOT / '.github/workflows' / name).read_text()
             self.assertIn('75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419', workflow)
             self.assertIn('apksigner', workflow)
+
+    def test_ws16az_reusable_library_controls(self):
+        scene=(APP/"WS16ATModularLibraryScene.kt").read_text()
+        kit=(APP/"Ws16AZCabinetUiKit.kt").read_text()
+        self.assertIn("internal fun Ws16AZCabinetPlaque(", kit)
+        self.assertIn("internal fun Ws16AZCabinetControl(", kit)
+        self.assertIn("size(48.dp)", kit)
+        self.assertIn("Role.Button", kit)
+        self.assertIn("contentDescription = description", kit)
+        self.assertIn('label = "Your Library"', scene)
+        self.assertIn('testTag("ws16at-real-count")', scene)
+        for part in ("BACK", "PREVIOUS", "NEXT", "ART_OPTIONS"):
+            self.assertIn("Ws16AZCabinetGlyph."+part, scene)
+        self.assertNotIn('Text("‹"', scene)
+        self.assertNotIn('Text("⋯"', scene)
 
     def test_existing_details_stay_in_charge_and_no_qa_without_art(self):
         live=(APP/"BookcaseBookshelfScreen.kt").read_text()

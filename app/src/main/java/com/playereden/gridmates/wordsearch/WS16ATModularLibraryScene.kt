@@ -190,61 +190,66 @@ internal fun WS16ATModularLibraryScene(
         // shelf/book stage remain full-bleed behind visible or gesture bars.
         Box(Modifier.fillMaxSize().padding(safeContentPadding)
             .testTag("ws16aw-safe-overlays")) {
-        Text("Your Library", color = Color(0xFFFFE6B5),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1, overflow = TextOverflow.Ellipsis,
+        Ws16AZCabinetPlaque(
+            label = "Your Library", title = true,
             modifier = Modifier.align(Alignment.TopCenter)
-                .padding(start = 60.dp, end = 60.dp,
+                .padding(start = 62.dp, end = 62.dp,
                     top = (top - 58.dp).coerceAtLeast(38.dp))
-                .testTag("ws16at-library-title"))
-        Text("‹", style = MaterialTheme.typography.headlineLarge,
-            color = Color(0xFFFFE6B5),
+                .testTag("ws16at-library-title")
+        )
+        Ws16AZCabinetControl(
+            glyph = Ws16AZCabinetGlyph.BACK,
+            description = "Back to Play", onClick = onBack,
             modifier = Modifier.align(Alignment.TopStart)
                 .padding(start = 9.dp, top = 10.dp)
-                .size(48.dp)
-                .semantics { contentDescription = "Back to Play" }
-                .clickable(role = Role.Button, onClick = onBack)
-                .testTag("ws16at-back"))
-        Text("${books.size} ${if (books.size == 1) "book" else "books"}",
-            color = Color(0xFFFFE6B5),
-            style = MaterialTheme.typography.labelMedium,
+                .testTag("ws16at-back")
+        )
+        Ws16AZCabinetPlaque(
+            label = "${books.size} ${if (books.size == 1) "book" else "books"}",
+            title = false,
             modifier = Modifier.align(Alignment.BottomCenter)
                 .padding(bottom = 12.dp)
-                .testTag("ws16at-real-count"))
+                .testTag("ws16at-real-count")
+        )
         if (pages > 1) {
             Row(Modifier.align(Alignment.BottomCenter)
-                    .padding(bottom = bottom - 9.dp)
+                    .padding(bottom = (bottom - 9.dp).coerceAtLeast(46.dp))
                     .testTag("ws16at-pagination"),
                 verticalAlignment = Alignment.CenterVertically) {
-                Text("◀", modifier = Modifier.size(48.dp)
-                    .semantics { contentDescription = "Previous bookcase" }
-                    .clickable(enabled = pager.currentPage > 0,
-                        role = Role.Button) {
+                Ws16AZCabinetControl(
+                    glyph = Ws16AZCabinetGlyph.PREVIOUS,
+                    description = "Previous bookcase",
+                    enabled = pager.currentPage > 0,
+                    onClick = {
                         scope.launch { pager.animateScrollToPage(pager.currentPage - 1) }
-                    }.testTag("ws16at-prev"),
-                    color = Color(0xFFFFE6B5))
-                Text("${pager.currentPage + 1} / $pages",
-                    color = Color(0xFFFFE6B5),
-                    style = MaterialTheme.typography.labelMedium)
-                Text("▶", modifier = Modifier.size(48.dp)
-                    .semantics { contentDescription = "Next bookcase" }
-                    .clickable(enabled = pager.currentPage < pages - 1,
-                        role = Role.Button) {
+                    },
+                    modifier = Modifier.testTag("ws16at-prev")
+                )
+                Ws16AZCabinetPlaque(
+                    label = "${pager.currentPage + 1} / $pages",
+                    title = false,
+                    modifier = Modifier.testTag("ws16at-page-label")
+                )
+                Ws16AZCabinetControl(
+                    glyph = Ws16AZCabinetGlyph.NEXT,
+                    description = "Next bookcase",
+                    enabled = pager.currentPage < pages - 1,
+                    onClick = {
                         scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
-                    }.testTag("ws16at-next"),
-                    color = Color(0xFFFFE6B5))
+                    },
+                    modifier = Modifier.testTag("ws16at-next")
+                )
             }
         }
-        // QA escape route — does not change saved books or global art setting.
-        Text("⋯", color = Color(0xFFFFE6B5),
-            style = MaterialTheme.typography.headlineLarge,
+        // Keep the old Library renderer one tap away for visual comparison.
+        Ws16AZCabinetControl(
+            glyph = Ws16AZCabinetGlyph.ART_OPTIONS,
+            description = "Previous Library artwork",
+            onClick = onPreviousArt,
             modifier = Modifier.align(Alignment.TopEnd)
                 .padding(end = 9.dp, top = 10.dp)
-                .size(48.dp)
-                .semantics { contentDescription = "Previous Library artwork" }
-                .clickable(role = Role.Button, onClick = onPreviousArt)
-                .testTag("ws16at-previous-art"))
+                .testTag("ws16at-previous-art")
+        )
         } // inset overlay only; original shell fills the outer Box
     }
 }
