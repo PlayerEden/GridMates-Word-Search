@@ -107,7 +107,17 @@ internal fun WS16AMInteractiveBookcaseScene(
         AlertDialog(
             onDismissRequest = { qaMenuOpen = false },
             title = { Text("Library visual test") },
-            text = { Text("Compare the illustrated cabinet with and without books. Your saved puzzles won't change.") },
+            text = {
+                Column {
+                    Text("Compare the illustrated cabinet with and without books. Your saved puzzles won't change.")
+                    if (onModularCase != null) {
+                        TextButton(
+                            onClick = { qaMenuOpen = false; onModularCase() },
+                            modifier = Modifier.testTag("ws16at-open-modular")
+                        ) { Text("Try modular Library") }
+                    }
+                }
+            },
             confirmButton = {
                 TextButton(
                     onClick = { qaMenuOpen = false; onInspectEmpty() },
