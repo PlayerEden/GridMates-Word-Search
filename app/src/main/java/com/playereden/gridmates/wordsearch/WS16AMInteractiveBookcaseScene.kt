@@ -35,6 +35,7 @@ internal fun WS16AMInteractiveBookcaseScene(
     onBookSelected: (String) -> Unit,
     onInspectEmpty: () -> Unit,
     onOldCase: () -> Unit,
+    onModularCase: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val fontScale = LocalDensity.current.fontScale
@@ -136,7 +137,7 @@ internal fun WS16AMBookCountPlaque(count: Int) {
 }
 
 @Composable
-private fun WS16AMSpineBay(
+internal fun WS16AMSpineBay(
     books: List<PuzzleBook>,
     shelfIndex: Int,
     slots: Int,
