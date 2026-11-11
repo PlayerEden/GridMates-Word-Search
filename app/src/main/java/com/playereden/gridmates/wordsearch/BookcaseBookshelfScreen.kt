@@ -83,12 +83,15 @@ internal fun BookcaseBookshelfScreen(
         var emptyCabinetPreview by rememberSaveable { mutableStateOf(false) }
         // Keep the working WS16AI bookcase as a manually selectable QA rollback.
         var immersiveBooksPreview by rememberSaveable { mutableStateOf(true) }
-        var modularPreview by rememberSaveable { mutableStateOf(false) }
         val context = LocalContext.current
-        // A new art path is never selectable until all five real shell images
-        // are packaged. No placeholder or flattened proof art is substituted.
+        // Only the verified five-piece QA art can enable this experiment.
+        // When available, show it first for immediate phone review; the old
+        // illustrated case remains one tap away from the top QA escape.
         val modularAssetsAvailable = remember(context) {
             hasWs16atCabinetArt(context)
+        }
+        var modularPreview by rememberSaveable(modularAssetsAvailable) {
+            mutableStateOf(modularAssetsAvailable)
         }
 
         if (fieldNotesArt && modularPreview && modularAssetsAvailable) {

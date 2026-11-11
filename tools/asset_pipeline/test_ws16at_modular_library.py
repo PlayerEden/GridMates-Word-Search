@@ -98,6 +98,16 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn('testTag("ws16at-back")', modular)
         self.assertIn('testTag("ws16at-pagination")', modular)
 
+    def test_real_original_github_source_sheet_and_five_parts(self):
+        source = ROOT / "design/visual-system/masters/ws16as"
+        if not (source / "manifest.json").is_file():
+            self.skipTest("Original five-piece art not in this checkpoint")
+        from assemble_ws16as_github_kit import verify_original_sources
+        manifest, sheet, pieces = verify_original_sources()
+        self.assertEqual(len(pieces), 5)
+        self.assertIn(b"ws16as.modular-art.v1", manifest)
+        self.assertGreater(len(sheet), 1000000)
+
     def test_importer_is_debug_only_and_rejects_baked_shelves(self):
         importer=(PIPE/"import_ws16as_modular_library.py").read_text()
         self.assertIn('app/src/debug/assets/ws16as/shell',importer)

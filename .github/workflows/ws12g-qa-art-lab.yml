@@ -132,6 +132,9 @@ jobs:
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16al_immersive_shell.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16am_immersive_bookcase.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16at_modular_library.py' -v
+      - name: Reassemble original WS16AS art kit from hash-pinned source parts
+        if: ${{ hashFiles('design/visual-system/masters/ws16as/manifest.json') != '' }}
+        run: python3 tools/asset_pipeline/assemble_ws16as_github_kit.py
       - name: Extract original WS16AS five-part painted shell from hash-pinned ZIP
         if: ${{ hashFiles('design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip') != '' }}
         run: python3 tools/asset_pipeline/import_ws16as_modular_library.py --kit design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip
