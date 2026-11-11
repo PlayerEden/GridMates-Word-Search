@@ -25,3 +25,14 @@ Owner's actual WS16AN phone screenshots show the cabinet is now cohesive and the
 - Owner phone acceptance pending: inspect both shelves with overlay off; verify near-touch spacing, rounded edge quality, colored aging/texture of blanks, natural upper/lower title proportions, and all real spine→cover→View pages/Back interactions. Inspect 320/360/412dp and large font. Rework art if new book shoulders look artificially mechanical.
 
 **IMPORTANT:** WS16AO is a QA candidate using authored source-derived leather bindings, not an excuse to silently call all new spines "approved." If the material doesn't match the richly illustrated covers, keep WS16AN as rollback and redesign the actual physical spine masters.
+
+## Verified exact-source build receipt — 2 of 2 CI workflows green
+
+- **Compiled source:** [aa68086faeed950b8d605f4845f13ccdaf048e01](https://github.com/PlayerEden/GridMates-Word-Search/commit/aa68086faeed950b8d605f4845f13ccdaf048e01). Includes generator, Kotlin binding profiles, tests, and exact-byte verifier.
+- **Android QA SUCCESS:** [run #42958972519](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42958972519), [artifact #13827653984](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42958972519/artifacts/13827653984). GitHub login required; expires **December 11, 2026**.
+- **Independent debug/release art QA SUCCESS:** [run #42958972448](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42958972448), [artifact #13828950464](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42958972448/artifacts/13828950464). Expires **December 11, 2026**.
+- Downloaded both ZIP artifacts and verified their inner debug APKs: **324/324 matching internal filenames and byte-identical uncompressed data**. Outer APK packaging hashes legitimately differ.
+- Android QA APK: **24,866,991 bytes**, SHA256 **ea8b5fecc35b9ea991204c0a36a0d454981b319a76eb4fd9d0b6f46f76e47f85**. Independent art APK outer SHA256 **a6f41aa568cbe79164fd3e230de5694cf52a54a5edf7211aa69d48a9da81860b**.
+- Verified embedded WS16AO manifest and all **12** spine sprites against their recorded SHA256 hashes; **standard 166×542** and **tall 166×662**. Independent release-isolation check passed, with WS16AO artwork absent from release.
+- Convenience source-true ZIP contains exact packaged 12 PNGs plus their manifest. Reproducible generator remains GitHub source of truth. Original WS16AN APK remains rollback.
+- **Owner phone art/tap acceptance PENDING.** New side bindings look more mechanically tooled than the original painted center: owner may request full physical-master repaint. CI green does not establish phone interaction or publication acceptance.
