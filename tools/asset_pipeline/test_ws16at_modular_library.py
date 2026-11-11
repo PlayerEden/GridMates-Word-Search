@@ -8,8 +8,9 @@ PIPE = ROOT / "tools/asset_pipeline"
 
 def geometry(width, height, font_scale, real_books):
     hit = 54 if font_scale >= 1.65 else 48
-    inset = max(26, min(50, width * .09))
-    slots = max(1, min(12, int((width - inset * 2) / hit)))
+    left = width * (126 / 602)
+    right = width * (120 / 602)
+    slots = max(1, min(12, int((width - left - right) / hit)))
     tiers = (1 if height < 480 else
              3 if height >= 830 and real_books > 2 * slots else 2)
     capacity = slots * tiers
@@ -34,6 +35,17 @@ class ModularLibraryTests(unittest.TestCase):
             self.assertIn('"' + name + '"',code)
         self.assertIn("internal fun hasWs16atCabinetArt(context: Context)",code)
         self.assertIn("WS16AMSpineBay(",code)
+        self.assertIn("WS16ATCabinetLayers(foreground = false",code)
+        self.assertIn("WS16ATCabinetLayers(foreground = true",code)
+        self.assertIn(".padding(start = leftWidth, end = rightWidth, top = top, bottom = bottom)",code)
+        self.assertIn(".coerceAtMost(maxHeight * 0.25f)",code)
+        self.assertIn(".coerceAtMost(maxHeight * 0.15f)",code)
+        self.assertLess(code.index("WS16ATCabinetLayers(foreground = false, modifier = Modifier.fillMaxSize())"),
+                        code.index("HorizontalPager("))
+        self.assertLess(code.index("HorizontalPager("),
+                        code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"))
+        self.assertLess(code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"),
+                        code.index('Text("Your Library"'))
         self.assertIn("Ws16EStorybookShelf()",code)
         self.assertIn("books.drop(page * capacity).take(capacity)",code)
         self.assertIn("slot = hitSlot",code)
