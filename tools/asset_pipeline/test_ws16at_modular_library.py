@@ -76,7 +76,7 @@ class ModularLibraryTests(unittest.TestCase):
         modular=(APP/"WS16ATModularLibraryScene.kt").read_text()
 
         # The router passes insets instead of cropping the entire book route.
-        self.assertIn("Box(Modifier.fillMaxSize()) {\\n                    BookLibraryFlow(", shell)
+        self.assertIn("Box(Modifier.fillMaxSize()) {\n                    BookLibraryFlow(", shell)
         self.assertIn("safeContentPadding = contentPadding", shell)
         # Book gameplay, detail, legacy browsing and unavailable-state UI
         # still stay above Android system gesture/navigation areas.
