@@ -68,6 +68,36 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("onBookSelected(book.id)",old)
         self.assertIn("internal fun WS16AMSpineBay(",old)
 
+    def test_ws16aw_full_bleed_shell_and_safe_native_overlays(self):
+        shell=(APP/"GridMatesShell.kt").read_text()
+        flow=(APP/"BookLibraryFlow.kt").read_text()
+        browse=(APP/"PuzzleBookshelfScreen.kt").read_text()
+        case=(APP/"BookcaseBookshelfScreen.kt").read_text()
+        modular=(APP/"WS16ATModularLibraryScene.kt").read_text()
+
+        # The router passes insets instead of cropping the entire book route.
+        self.assertIn("Box(Modifier.fillMaxSize()) {\\n                    BookLibraryFlow(", shell)
+        self.assertIn("safeContentPadding = contentPadding", shell)
+        # Book gameplay, detail, legacy browsing and unavailable-state UI
+        # still stay above Android system gesture/navigation areas.
+        self.assertIn("Box(Modifier.fillMaxSize().padding(safeContentPadding)) {", flow)
+        self.assertIn("Column(Modifier.fillMaxSize().padding(safeContentPadding))", flow)
+        self.assertIn("modifier = modifier.padding(safeContentPadding)", browse)
+        self.assertIn("safeContentPadding = safeContentPadding", case)
+        self.assertIn("Modifier.fillMaxSize().padding(safeContentPadding)", case)
+
+        # Native controls are inset; the five painterly wood pieces and
+        # independent shelf/book compositor use the full parent geometry.
+        self.assertIn('testTag("ws16aw-safe-overlays")', modular)
+        self.assertIn("Box(Modifier.fillMaxSize().padding(safeContentPadding)", modular)
+        self.assertLess(modular.index('WS16ATCabinetLayers(foreground = false'),
+                        modular.index('testTag("ws16aw-safe-overlays")'))
+        self.assertLess(modular.index('WS16ATCabinetLayers(foreground = true'),
+                        modular.index('testTag("ws16aw-safe-overlays")'))
+        self.assertIn('testTag("ws16at-real-count")', modular)
+        self.assertIn('testTag("ws16at-back")', modular)
+        self.assertIn('testTag("ws16at-pagination")', modular)
+
     def test_importer_is_debug_only_and_rejects_baked_shelves(self):
         importer=(PIPE/"import_ws16as_modular_library.py").read_text()
         self.assertIn('app/src/debug/assets/ws16as/shell',importer)
