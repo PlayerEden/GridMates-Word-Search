@@ -211,7 +211,10 @@ internal fun WS16AMSpineBay(
                         ]
                         BookcaseFutureSpineArt(
                             style, Modifier.width(artWidth).height(artHeight)
-                                .alpha(if (futureTreatment) .34f else 1f),
+                                .alpha(if (futureTreatment) .34f else 1f)
+                                .then(if (futureTreatment) Modifier.testTag(
+                                    "ws16bc-visible-future-$shelfIndex-$i"
+                                ) else Modifier),
                             profile = profile
                         )
                     }
