@@ -128,6 +128,9 @@ jobs:
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16al_immersive_shell.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16am_immersive_bookcase.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16at_modular_library.py' -v
+      - name: Extract original WS16AS five-part painted shell from hash-pinned ZIP
+        if: ${{ hashFiles('design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip') != '' }}
+        run: python3 tools/asset_pipeline/import_ws16as_modular_library.py --kit design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -216,6 +219,8 @@ jobs:
         run: python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16AK six painted bands in exact Android QA APK
         run: python3 tools/asset_pipeline/verify_ws16ak_apk.py app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify exact original WS16AS artwork (optional) in debug APK
+        run: python3 tools/asset_pipeline/verify_ws16as_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16AI full-screen modular bookcase in Android QA APK
         run: python3 tools/asset_pipeline/verify_ws16ai_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify 12 WS16AO source-pinned physical spines packaged in debug
