@@ -23,6 +23,7 @@ import com.playereden.gridmates.wordsearch.core.PuzzleBook
 import com.playereden.gridmates.wordsearch.core.PuzzleChallenge
 import com.playereden.gridmates.wordsearch.core.WordTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -128,5 +129,38 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("library-spine-" + space.id).assertDoesNotExist()
         compose.onNodeWithTag("library-spine-" + garden.id).assertDoesNotExist()
         compose.onNodeWithText("Locked").assertDoesNotExist()
+    }
+
+    @Test fun modularPortraitCountClearsCarvingAndOnlyLowerShelfShowsFutureBooks() {
+        var selected: String? = null
+        compose.setContent {
+            GridMatesTheme {
+                Box(Modifier.width(360.dp).height(760.dp)) {
+                    WS16ATModularLibraryScene(
+                        books = catalog.books,
+                        onBack = {},
+                        onBookSelected = { selected = it },
+                        onPreviousArt = {}
+                    )
+                }
+            }
+        }
+        compose.onNodeWithTag("ws16at-modular-library").assertExists()
+        compose.onNodeWithTag("ws16bc-count-bay").assertExists()
+        compose.onNodeWithText("3 books").assertExists()
+        compose.onNodeWithTag("ws16bb-upcoming-label").assertExists()
+        // Never make faded future volumes look like a fourth unlocked book.
+        compose.onNodeWithTag("ws16bc-visible-future-0-3").assertDoesNotExist()
+        compose.onNodeWithTag("ws16bc-visible-future-1-1").assertExists()
+
+        val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
+            .fetchSemanticsNode().boundsInRoot
+        val bookCount = compose.onNodeWithTag("ws16at-real-count")
+            .fetchSemanticsNode().boundsInRoot
+        assertTrue("Book count must clear the lower shelf's carved apron",
+            bookCount.top > lowerShelf.bottom)
+
+        compose.onNodeWithTag("ws16am-spine-" + woodland.id).performClick()
+        compose.runOnIdle { assertEquals(woodland.id, selected) }
     }
 }
