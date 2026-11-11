@@ -156,19 +156,25 @@ internal fun WS16ATModularLibraryScene(
         val top = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.25f)
         val bottom = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.15f)
         val available = (maxHeight - top - bottom).coerceAtLeast(1.dp)
-        // WS16BB: make the lower display shelf a deliberate feature rather
-        // than pushing it to the very bottom of tall phones. The spare 14%
-        // becomes room for the native book-count plaque, not a fake book row.
-        val tierHeights = if (tierCount == 2) listOf(
-            available * 0.46f, available * 0.40f
-        ) else List(tierCount) { available / tierCount }
         val cabinetPortrait = hasWs16baCabinetArt(LocalContext.current) &&
             maxHeight >= maxWidth * 1.7f
-        // The approved Home shelf draws a 50dp image offset 8dp downward;
-        // its actual book-contact plane is 42dp above the row's lower edge.
-        // Reserve that entire plane so the spine bottoms meet the shelf top,
-        // rather than being partly hidden by the wooden apron.
+        // WS16BC: measure the painted shelf's actual extension beneath its
+        // book-contact plane. A bottom-anchored count used to cover the carving
+        // on some aspect ratios, even when the wood looked fine in screenshots.
         val shelfContactDepth = 42.dp
+        val shelfOverhang = if (cabinetPortrait) {
+            ((maxWidth - leftWidth - rightWidth).coerceAtLeast(1.dp) *
+                (125f / 586f)).coerceIn(42.dp, 72.dp) - shelfContactDepth
+        } else 0.dp
+        val countGap = if (density.fontScale >= 1.65f) 8.dp else 12.dp
+        val countPlaqueBudget = if (density.fontScale >= 1.65f) 52.dp else 38.dp
+        val countBayHeight = shelfOverhang + countGap + countPlaqueBudget
+        // Reserve only the space that the shelf/carved apron and native plaque
+        // require. Use the remaining height for real books, not dead wood space.
+        val shelfTierSpace = (available - countBayHeight).coerceAtLeast(1.dp)
+        val tierHeights = if (tierCount == 2) listOf(
+            shelfTierSpace * 0.54f, shelfTierSpace * 0.46f
+        ) else List(tierCount) { available / tierCount }
 
         // Backdrop and real shelves/books are independent; hide nothing in a bitmap.
         WS16ATCabinetLayers(foreground = false, modifier = Modifier.fillMaxSize())
@@ -192,6 +198,7 @@ internal fun WS16ATModularLibraryScene(
                             slot = hitSlot,
                             height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp),
                             futureTreatment = true,
+                            showFutureVolumes = tier > 0,
                             onBookSelected = onBookSelected
                         )
                         Box(Modifier.align(Alignment.BottomCenter)
@@ -215,7 +222,23 @@ internal fun WS16ATModularLibraryScene(
                         }
                     }
                 }
-                if (tierCount == 2) Spacer(Modifier.height(available * 0.14f))
+                // The live count belongs directly beneath the LAST painted
+                // shelf, after its full carved overhang; it is not a loose
+                // overlay positioned from the bottom of the screen.
+                if (tierCount == 2) {
+                    Spacer(Modifier.height(shelfOverhang + countGap))
+                    Box(
+                        Modifier.fillMaxWidth().height(countPlaqueBudget)
+                            .testTag("ws16bc-count-bay"),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Ws16AZCabinetPlaque(
+                            label = "${books.size} ${if (books.size == 1) "book" else "books"}",
+                            title = false,
+                            modifier = Modifier.testTag("ws16at-real-count")
+                        )
+                    }
+                }
             }
         }
         // Carved woodwork overlays the working shelf sprites at the real edges.
@@ -238,14 +261,16 @@ internal fun WS16ATModularLibraryScene(
                 .padding(start = 9.dp, top = 10.dp)
                 .testTag("ws16at-back")
         )
-        Ws16AZCabinetPlaque(
-            label = "${books.size} ${if (books.size == 1) "book" else "books"}",
-            title = false,
-            modifier = Modifier.align(Alignment.BottomCenter)
-                .padding(bottom = if (tierCount == 2)
-                    bottom + available * 0.055f else 12.dp)
-                .testTag("ws16at-real-count")
-        )
+        if (tierCount != 2) {
+            // Compact/overflow tier modes keep the existing bottom placard.
+            Ws16AZCabinetPlaque(
+                label = "${books.size} ${if (books.size == 1) "book" else "books"}",
+                title = false,
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .padding(bottom = 12.dp)
+                    .testTag("ws16at-real-count")
+            )
+        }
         if (pages > 1) {
             Row(Modifier.align(Alignment.BottomCenter)
                     .padding(bottom = (bottom - 9.dp).coerceAtLeast(46.dp))
