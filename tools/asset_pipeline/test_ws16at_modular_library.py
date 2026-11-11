@@ -47,6 +47,8 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertLess(code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"),
                         code.index('Text("Your Library"'))
         self.assertIn("Ws16EStorybookShelf()",code)
+        self.assertIn("val shelfContactDepth = 42.dp",code)
+        self.assertIn("height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp)",code)
         self.assertIn("books.drop(page * capacity).take(capacity)",code)
         self.assertIn("slot = hitSlot",code)
         self.assertIn('testTag("ws16at-real-count")',code)
