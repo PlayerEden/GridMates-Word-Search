@@ -1,4 +1,5 @@
 """WS16AT QA contract: cabinet, shelf, book and plaque stay independent."""
+import re
 import unittest
 from pathlib import Path
 
@@ -66,11 +67,22 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn('qa-signing/wordsearch-qa.p12', gradle)
         self.assertIn('signingConfig = signingConfigs.getByName("wordSearchQa")', gradle)
         self.assertIn('applicationIdSuffix = ".qa"', gradle)
-        self.assertIn('?: 61', gradle)
+        version = re.search(r'versionCode\\s*=\\s*providers\\.gradleProperty\\("qaVersionCode"\\)\\.orNull\\?\\.toInt\\(\\)\\s*\\?:\\s*(\\d+)', gradle)
+        self.assertIsNotNone(version, "QA default versionCode must remain explicit")
+        self.assertGreaterEqual(int(version.group(1)), 61)
         for name in ('ws01-android-qa.yml', 'ws12g-qa-art-lab.yml'):
             workflow = (ROOT / '.github/workflows' / name).read_text()
             self.assertIn('75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419', workflow)
             self.assertIn('apksigner', workflow)
+
+    def test_ws16bc_shelf_anchored_count_and_future_separation(self):
+        scene = (APP / "WS16ATModularLibraryScene.kt").read_text()
+        spines = (APP / "WS16AMInteractiveBookcaseScene.kt").read_text()
+        self.assertIn("val shelfOverhang = if (cabinetPortrait)", scene)
+        self.assertIn("val countBayHeight = shelfOverhang + countGap + countPlaqueBudget", scene)
+        self.assertIn('testTag("ws16bc-count-bay")', scene)
+        self.assertIn("showFutureVolumes = tier > 0", scene)
+        self.assertIn("showFutureVolumes: Boolean = true", spines)
 
     def test_ws16az_reusable_library_controls(self):
         scene=(APP/"WS16ATModularLibraryScene.kt").read_text()
