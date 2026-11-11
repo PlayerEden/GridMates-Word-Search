@@ -3,6 +3,8 @@ package com.playereden.gridmates.wordsearch
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -36,7 +38,8 @@ internal fun BookLibraryFlow(
     onExit: () -> Unit,
     showPrototypeArt: Boolean = false,
     /** Home may send an existing catalog book straight into the next safe page. */
-    initialBookId: String? = null
+    initialBookId: String? = null,
+    safeContentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val initialBook = initialBookId?.takeIf { catalog.book(it) != null }
     val directFromHome = initialBook != null
@@ -71,7 +74,7 @@ internal fun BookLibraryFlow(
 
     if (unavailable) {
         BackHandler(onBack = onExit)
-        Column(Modifier.fillMaxSize().padding(18.dp),
+        Column(Modifier.fillMaxSize().padding(safeContentPadding).padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
             TextButton(onClick = onExit) { Text("Back to Play") }
             PaperEyebrow("Your Library")
@@ -85,6 +88,7 @@ internal fun BookLibraryFlow(
         pageId != null && bookId != null -> {
             val activeBook = requireNotNull(bookId)
             val activePage = requireNotNull(pageId)
+            Box(Modifier.fillMaxSize().padding(safeContentPadding)) {
             BookPageGameplayScreen(
                 catalog = catalog,
                 bookId = activeBook,
@@ -109,13 +113,14 @@ internal fun BookLibraryFlow(
                     }
                 }
             )
+            }
         }
         bookId != null -> {
             BackHandler {
                 if (directFromHome) onExit() else bookId = null
             }
             val currentBook = requireNotNull(bookId)
-            Column(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().padding(safeContentPadding)) {
                 if (feedback != null) {
                     Text(feedback.orEmpty(), modifier = Modifier.padding(12.dp))
                 }
@@ -167,6 +172,7 @@ internal fun BookLibraryFlow(
                 initialFocusedBookId = focusedBookId,
                 onFocusedBookChanged = { focusedBookId = it },
                 onBack = onExit,
+                safeContentPadding = safeContentPadding,
                 onOpenBook = { selectedBook ->
                     if (catalog.book(selectedBook) != null) {
                         bookId = selectedBook
