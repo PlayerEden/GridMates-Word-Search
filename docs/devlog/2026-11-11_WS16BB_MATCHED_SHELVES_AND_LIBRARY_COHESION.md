@@ -1,0 +1,20 @@
+# WS16BB — Cabinet-matched shelves, deliberate book spacing and shared UI
+
+**Date:** November 11, 2026 · **Owner review:** WS16BA real Android screenshot. **PR:** #131 remains draft. **Status:** source committed and exact-source CI required before any APK claim.
+
+## Why / before
+WS16BA v60 finished a higher-resolution 1024×2298 cabinet. Owner liked the woodwork but correctly pointed out that the shelves did not match the cabinet. The modular Library continued loading the earlier WS16AB shelf artwork, which was smaller and stylistically disconnected. Equal-height tier layout left the lower row near the base, the count plaque overlapped its carving, and bright decorative blank spines looked like real books. This pass addresses these problems together instead of isolated cosmetic edits.
+
+## Actual implementation
+1. A new transparent, independent **586×125** warm walnut-and-gold shelf sprite was isolated from a newly illustrated GridMates Library study to match the new cabinet's finer gilded carving. It contains no text or clickable books. Committed source: `design/visual-system/masters/ws16bb/shelf-matched-qa.png`, SHA256 `691496fae9340fa4131d235abd11589cd2e9155384773d0887848bfde11c4c1e`.
+2. `import_ws16bb_matched_shelf.py` checks pixel geometry, RGBA transparency, SHA and QA-only flags, then puts the independent PNG in `app/src/debug/assets/ws16bb/`. `verify_ws16bb_apk.py` checks the identical PNG in the actual APK and its exclusion from release. Both Android and independent artwork CI use this source and run `test_ws16bb_shelf.py`.
+3. `Ws16BBMatchedCabinetShelf.kt` renders the new shelf at its original aspect ratio, using the same 42dp book-contact plane as the earlier shelf. The modular Library chooses it only with the tall WS16BA cabinet, preserving the original shelf art for landscape, production or missing candidate assets. Both old and new wood sprites remain independently replaceable.
+4. Two-tier Library spacing changes to 46% upper row, 40% lower row and 14% free space between lower shelf and base. This raises the lower shelf without changing real book touch regions. The book-count placard now sits in that lower reserved space rather than covering the shelf carving.
+5. The `WS16AMSpineBay` retains all real catalog IDs and tap callbacks but now accepts optional `futureTreatment`. Only the modular preview opts in: a limited centered set of non-clickable faded future spines and a native `Coming soon` label make placeholders visibly distinct from real books. Older library route stays unchanged.
+6. Profile hub reuses `GridMatesIllustratedFrame` for profile summary and working Collection/Records/My Puzzles actions. Collection receives the same reusable framed heading. Native text and semantics stay live; no source art contains UI words.
+7. QA `versionCode` advances 60→61. Same `com.playereden.gridmates.wordsearch.qa` and existing `qa-signing/wordsearch-qa.p12`, unchanged pinned certificate check. No uninstall, data resets, gameplay, LAN or achievements schema changes.
+
+## Verification, limitations and rollback
+The last owner-installed visual checkpoint is WS16BA v60. Android [#42992813240](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42992813240) and art/release [#42992813098](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42992813098) both passed on `ac628d34`. [Artifact #13843430500](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42992813240/artifacts/13843430500) is the rollback APK ZIP. WS16BB is **not on-phone approved**. Source and workflows must pass exact GitHub CI; output APK and SHA must be recorded only after verification.
+
+Next action: verify source-consistent Android, lint, code/test compile, art/release isolation, signing fingerprint; give owner a directly install-over Android APK. Inspect the new shelf versus the cabinet, top/bottom book contact, updated gap, separate count, real book taps, Back/page arrows, landscape fallback, Profile and Collection buttons, and large-font behavior. Keep PR draft and old art for rollback until accepted.

@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -153,7 +154,8 @@ internal fun WS16AMSpineBay(
     slots: Int,
     slot: Dp,
     height: Dp,
-    onBookSelected: (String) -> Unit
+    onBookSelected: (String) -> Unit,
+    futureTreatment: Boolean = false
 ) {
     BoxWithConstraints(Modifier.fillMaxWidth().height(height)
         .testTag("ws16am-spine-shelf-" + shelfIndex)) {
@@ -173,6 +175,9 @@ internal fun WS16AMSpineBay(
         ) {
             for (i in 0 until slots) {
                 val book = books.getOrNull(i)
+                val isFutureVisible = !futureTreatment || if (books.isEmpty()) {
+                    i == (slots - 1) / 2 || i == slots / 2
+                } else i == books.size
                 Box(
                     Modifier.width(slot).height(artHeight + 4.dp)
                         .then(if (book != null) Modifier
@@ -185,9 +190,11 @@ internal fun WS16AMSpineBay(
                         else Modifier.testTag("ws16am-future-" + shelfIndex + "-" + i)),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    Box(Modifier.align(Alignment.BottomCenter)
-                        .width(artWidth).height(4.dp)
-                        .background(Color(0x990F0806), RoundedCornerShape(50)))
+                    if (book != null || isFutureVisible) {
+                        Box(Modifier.align(Alignment.BottomCenter)
+                            .width(artWidth).height(4.dp)
+                            .background(Color(0x990F0806), RoundedCornerShape(50)))
+                    }
                     if (book != null) {
                         BookcaseSpineArt(
                             book.theme, true,
@@ -195,12 +202,13 @@ internal fun WS16AMSpineBay(
                                 .testTag("ws16am-art-" + book.id),
                             profile = profile
                         )
-                    } else {
+                    } else if (isFutureVisible) {
                         val style = listOf("linen", "night", "burgundy")[
                             (shelfIndex * slots + i) % 3
                         ]
                         BookcaseFutureSpineArt(
-                            style, Modifier.width(artWidth).height(artHeight),
+                            style, Modifier.width(artWidth).height(artHeight)
+                                .alpha(if (futureTreatment) .34f else 1f),
                             profile = profile
                         )
                     }

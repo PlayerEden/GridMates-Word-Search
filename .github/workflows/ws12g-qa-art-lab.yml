@@ -142,6 +142,10 @@ jobs:
         run: |
           python3 tools/asset_pipeline/build_ws16ba_hi_res.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ba_hi_res.py' -v
+      - name: Import hash-pinned independent WS16BB cabinet-matched shelf
+        run: |
+          python3 tools/asset_pipeline/import_ws16bb_matched_shelf.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bb_shelf.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -174,6 +178,11 @@ jobs:
           RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
           test -n "$RELEASE"
           python3 tools/asset_pipeline/verify_ws16as_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16BB QA-only matched shelf absent from release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16bb_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
       - name: Verify source-pinned WS16BA debug APK and release isolation
         run: |
           RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
@@ -344,7 +353,7 @@ jobs:
           {
             echo '### WS-14A unified native visual components · unapproved art remains isolated'
             echo 'Debug APK has 18 original + 18 illustrated SVG art and 36 matched native PNG images; release has none.'
-            echo 'QA v58 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'QA v61 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
             echo 'The artwork is unapproved; QA prototype art is already integrated into book cards and does not affect save/unlock logic.'
           } >> "$GITHUB_STEP_SUMMARY"

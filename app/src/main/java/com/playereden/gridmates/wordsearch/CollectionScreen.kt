@@ -145,11 +145,20 @@ internal fun CollectionScreen(store: SoloStore) {
         )
     }
 
-    StorybookHeading(
-        eyebrow = "Your profile & rewards",
-        title = "Your Collection",
-        subtitle = "Collect more portraits and fonts as you finish puzzles. Everything is free."
-    )
+    // WS16BB: carry the same reusable illustrated panel family from Home
+    // and the cabinet into Collection without baking any names or labels.
+    GridMatesIllustratedFrame(
+        modifier = Modifier.fillMaxWidth().testTag("ws16bb-collection-heading"),
+        variant = GridMatesFrameVariant.PANEL
+    ) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp)) {
+            StorybookHeading(
+                eyebrow = "Your profile & rewards",
+                title = "Your Collection",
+                subtitle = "Collect more portraits and fonts as you finish puzzles. Everything is free."
+            )
+        }
+    }
 
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {

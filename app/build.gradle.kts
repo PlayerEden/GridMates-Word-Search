@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 60
-        versionName = "0.9.16-hires-cabinet"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 61
+        versionName = "0.9.17-cabinet-shelf-and-library-ui"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

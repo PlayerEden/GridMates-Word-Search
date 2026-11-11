@@ -156,7 +156,14 @@ internal fun WS16ATModularLibraryScene(
         val top = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.25f)
         val bottom = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.15f)
         val available = (maxHeight - top - bottom).coerceAtLeast(1.dp)
-        val tierHeight = available / tierCount
+        // WS16BB: make the lower display shelf a deliberate feature rather
+        // than pushing it to the very bottom of tall phones. The spare 14%
+        // becomes room for the native book-count plaque, not a fake book row.
+        val tierHeights = if (tierCount == 2) listOf(
+            available * 0.46f, available * 0.40f
+        ) else List(tierCount) { available / tierCount }
+        val cabinetPortrait = hasWs16baCabinetArt(LocalContext.current) &&
+            maxHeight >= maxWidth * 1.7f
         // The approved Home shelf draws a 50dp image offset 8dp downward;
         // its actual book-contact plane is 42dp above the row's lower edge.
         // Reserve that entire plane so the spine bottoms meet the shelf top,
@@ -175,22 +182,40 @@ internal fun WS16ATModularLibraryScene(
             Column(Modifier.fillMaxSize().testTag("ws16at-page-$page")) {
                 repeat(tierCount) { tier ->
                     val shelfIndex = page * tierCount + tier
+                    val shelfBooks = pageBooks.drop(tier * slots).take(slots)
+                    val tierHeight = tierHeights[tier]
                     Box(Modifier.fillMaxWidth().height(tierHeight)
                         .testTag("ws16at-movable-shelf-$shelfIndex")) {
                         WS16AMSpineBay(
-                            books = pageBooks.drop(tier * slots).take(slots),
+                            books = shelfBooks,
                             shelfIndex = shelfIndex, slots = slots,
                             slot = hitSlot,
                             height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp),
+                            futureTreatment = true,
                             onBookSelected = onBookSelected
                         )
                         Box(Modifier.align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .testTag("ws16at-home-shelf-$shelfIndex")) {
-                            Ws16EStorybookShelf()
+                            if (cabinetPortrait) {
+                                Ws16BBMatchedCabinetShelf()
+                            } else {
+                                Ws16EStorybookShelf()
+                            }
+                        }
+                        // Locked/upcoming volumes are deliberately subdued:
+                        // only catalog books are full-color and clickable.
+                        if (tier > 0 && shelfBooks.isEmpty()) {
+                            Ws16AZCabinetPlaque(
+                                label = "Coming soon", title = false,
+                                modifier = Modifier.align(Alignment.TopCenter)
+                                    .padding(top = 14.dp)
+                                    .testTag("ws16bb-upcoming-label")
+                            )
                         }
                     }
                 }
+                if (tierCount == 2) Spacer(Modifier.height(available * 0.14f))
             }
         }
         // Carved woodwork overlays the working shelf sprites at the real edges.
@@ -217,7 +242,8 @@ internal fun WS16ATModularLibraryScene(
             label = "${books.size} ${if (books.size == 1) "book" else "books"}",
             title = false,
             modifier = Modifier.align(Alignment.BottomCenter)
-                .padding(bottom = 12.dp)
+                .padding(bottom = if (tierCount == 2)
+                    bottom + available * 0.055f else 12.dp)
                 .testTag("ws16at-real-count")
         )
         if (pages > 1) {

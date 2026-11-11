@@ -46,8 +46,10 @@ class ModularLibraryTests(unittest.TestCase):
                         code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"))
         self.assertLess(code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"),
                         code.index('Ws16AZCabinetPlaque('))
+        self.assertIn("Ws16BBMatchedCabinetShelf()",code)
         self.assertIn("Ws16EStorybookShelf()",code)
         self.assertIn("val shelfContactDepth = 42.dp",code)
+        self.assertIn("futureTreatment = true",code)
         self.assertIn("height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp)",code)
         self.assertIn("books.drop(page * capacity).take(capacity)",code)
         self.assertIn("slot = hitSlot",code)
@@ -64,7 +66,7 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn('qa-signing/wordsearch-qa.p12', gradle)
         self.assertIn('signingConfig = signingConfigs.getByName("wordSearchQa")', gradle)
         self.assertIn('applicationIdSuffix = ".qa"', gradle)
-        self.assertIn('?: 60', gradle)
+        self.assertIn('?: 61', gradle)
         for name in ('ws01-android-qa.yml', 'ws12g-qa-art-lab.yml'):
             workflow = (ROOT / '.github/workflows' / name).read_text()
             self.assertIn('75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419', workflow)

@@ -57,8 +57,11 @@ internal fun Ws16CProfileHub(
         onBack = onHome,
         backLabel = "Back to Home"
     )
-    PaperPanel(Modifier.fillMaxWidth().testTag("ws16c-profile-summary")) {
-        Row(Modifier.fillMaxWidth(),
+    GridMatesIllustratedFrame(
+        modifier = Modifier.fillMaxWidth().testTag("ws16c-profile-summary"),
+        variant = GridMatesFrameVariant.FEATURE
+    ) {
+        Row(Modifier.fillMaxWidth().padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(76.dp)
@@ -99,21 +102,42 @@ internal fun Ws16CProfileHub(
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold)
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedButton(
-            onClick = onCollection,
+        GridMatesIllustratedFrame(
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
-                .testTag("ws16c-profile-collection")
-        ) { Text("Portraits, collections & achievements") }
-        OutlinedButton(
-            onClick = onRecords,
+                .testTag("ws16c-profile-collection"),
+            variant = GridMatesFrameVariant.MEDIUM,
+            onClick = onCollection
+        ) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 52.dp)
+                .padding(horizontal = 15.dp), contentAlignment = Alignment.CenterStart) {
+                Text("Portraits, collections & achievements", color = Forest,
+                    fontWeight = FontWeight.SemiBold)
+            }
+        }
+        GridMatesIllustratedFrame(
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
-                .testTag("ws16c-profile-records")
-        ) { Text("Records & statistics") }
-        OutlinedButton(
-            onClick = onMyPuzzles,
+                .testTag("ws16c-profile-records"),
+            variant = GridMatesFrameVariant.MEDIUM,
+            onClick = onRecords
+        ) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 52.dp)
+                .padding(horizontal = 15.dp), contentAlignment = Alignment.CenterStart) {
+                Text("Records & statistics", color = Forest,
+                    fontWeight = FontWeight.SemiBold)
+            }
+        }
+        GridMatesIllustratedFrame(
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
-                .testTag("ws16c-profile-my-puzzles")
-        ) { Text("My Puzzles") }
+                .testTag("ws16c-profile-my-puzzles"),
+            variant = GridMatesFrameVariant.MEDIUM,
+            onClick = onMyPuzzles
+        ) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 52.dp)
+                .padding(horizontal = 15.dp), contentAlignment = Alignment.CenterStart) {
+                Text("My Puzzles", color = Forest,
+                    fontWeight = FontWeight.SemiBold)
+            }
+        }
     }
     Text("Your profile and progress stay on this device unless you choose to export a backup.",
         color = Muted, style = MaterialTheme.typography.bodySmall)
