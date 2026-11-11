@@ -20,3 +20,17 @@ The physical WS16AK screenshot showed the beautiful empty painted bookcase inser
 
 ## Rollback
 Prior WS16AK dual-green Android source `ac807009` and APK, original WS16AI live bookcase art, and Home shelf retained. New files only loaded in debug art mode and PR #131 remains draft.
+
+
+## Exact-source QA receipt (after Android lint repair)
+
+- **Compiled source:** [`8586c6e1422a8c2f31803fbb336539181e97e9c7`](https://github.com/PlayerEden/GridMates-Word-Search/commit/8586c6e1422a8c2f31803fbb336539181e97e9c7).
+- Initial source `5ba0d091` reached Android compilation but failed strict lint `UnusedBoxWithConstraintsScope` in the new immersive UI shell. A targeted `Box` correction was committed; **do not claim first commit passed**.
+- **Standard Android QA SUCCESS:** [run #42948574750](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42948574750), [download artifact #13824710475](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42948574750/artifacts/13824710475). GitHub sign-in required; 30-day retention until Dec 11, 2026.
+- **Independent debug/release art-isolation SUCCESS:** [run #42948574738](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42948574738), [artifact #13824790040](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42948574738/artifacts/13824790040).
+- Standard Android archive SHA256 `d28c4556f33a232ac50c66ee2cbcfbf8073d9f610a3b240dc91820a6a962b041`. Embedded `app-debug.apk`: **23,811,368 bytes**, SHA256 `57de4ef33f06626b6014407b441b20c82e39358378c616f6324da14cb53be820`. ZIP integrity OK; 5 DEX files.
+- Independent art archive SHA256 `150f547491b9005e9e4cf9700999f9fdfa056fd681160a052d0ecb74df57e2ed`. Its APK outer SHA256 `880ae5fed3933c8f52b657b142be7f5dda564f68b172f1c0332b4c6367322790` (different build packaging); **all 311 identical internal filenames and extracted file contents are exact byte-matches** with standard Android APK.
+- `assets/ws16ak/` contains **six original-source-derived painted PNGs and a manifest**; all six output PNG SHA256 values independently recomputed from the actual APK and matched its source manifest, with no archive corruption.
+- Dedicated new WS16AL source/geometry/QA tests passed; standard full app tests/lint/debug compilation passed, and independent art workflow verifies no unapproved WS16AK images in release.
+- **Owner handset acceptance PENDING:** source and APK passing is not proof of physical Android visual quality, 320/360/412 portrait rendering, font scaling or actual taps. Previous WS16AK/WS16AI candidates remain rollback. PR #131 stays draft/unmerged.
+
