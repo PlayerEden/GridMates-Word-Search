@@ -1,6 +1,6 @@
 # WS-16AK B — Real illustrated empty-bookcase Android QA integration
 
-**November 10, 2026. Status on source commit: real master image and six-band generator committed, Android/art CI pending; owner phone review pending.**
+**November 10, 2026. Status on source commit: real master image and six-band generator committed, Android and art/release CI SUCCESS; owner phone review pending.**
 
 ## Owner intent
 After the owner selected an actual painted empty walnut cabinet, the immediate priority is to test the **empty cabinet itself** before adding book spines into it. Keep the playable library/Book Factory and saved progress intact; never substitute an invented procedural gradient or an upside-down Home shelf.
@@ -19,3 +19,14 @@ After the owner selected an actual painted empty walnut cabinet, the immediate p
 - **Next** only after owner approves background: align book-contact planes and add books as separate overlays on this new background; then revisit spacings/placeholders and expand future bookcase paging.
 
 **Fallback:** existing WS16AI source renderer and successful APK; do not uninstall or clear QA app data.
+
+## Exact-source Android and artwork QA receipt
+
+- **Compiled source:** [`ac807009a1b2440a2f126b9dde44458831dd2bfb`](https://github.com/PlayerEden/GridMates-Word-Search/commit/ac807009a1b2440a2f126b9dde44458831dd2bfb).
+- **Android QA: SUCCESS** — [run #42944866452](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42944866452), [ZIP artifact #13822112791](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42944866452/artifacts/13822112791). GitHub sign-in required; expires **December 11, 2026**. Download ZIP SHA256 `1f99a1c16f23a0f47688a8ede00979b564670a6631b17ad213389cd16c84ceb5`.
+- Its `app-debug.apk` is **23,794,984 bytes**, SHA256 `d7a30ad72930c470bbf10db7c9391f873f64a6d1118f9995727a9a4de9218df5`, independently ZIP-tested with no damaged entries.
+- **Independent artwork/release isolation: SUCCESS** — [run #42944866350](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42944866350), [artifact #13822367097](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42944866350/artifacts/13822367097). Outer alternate APK SHA256 `6233787870070c6be67c1aad0d56c992c6efc0d9f4e59579a86049e7cfda179c`; both APKs have **311/311 identically named internal files and identical extracted file bytes**.
+- The actual Android package contains 6 PNG bands plus `assets/ws16ak/manifest.json`. Recomputed **all 6** image SHA256 hashes against packaged manifest: **6/6 match**. The manifest cites the source master SHA `e2f8fcf3732698f4657a9e01a0996a34be72f71d5387b14e3d5be4b0d6d0f606`; source hash and per-band exact reconstruction validated in both CI runs. Release APK holds **zero** WS16AK assets (independent art QA check).
+- The new Android build is **technically verified but not physically visually accepted**. Actual phone screenshot must judge the native cabinet: crown, side posts, backing, both shelf planes, base, cropping and safe-area display at device resolution. **Empty art / Show books** toggles only with field-notes artwork enabled; existing book sprites/screens remain reachable. Do not uninstall or clear saved puzzles.
+- Existing WS16AI full bookcase and older accepted Home walnut shelf remain the rollback; no new published book, save data, or gameplay change.
+
