@@ -55,6 +55,20 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn('testTag("ws16at-pagination")',code)
         self.assertNotIn("BookFactoryBlankSpine(",code)
 
+    def test_cabinet_proportion_and_install_over_signing_contract(self):
+        scene = (APP / 'WS16ATModularLibraryScene.kt').read_text()
+        self.assertEqual(scene.count('contentScale = ContentScale.Crop'), 3)
+        self.assertEqual(scene.count('contentScale = ContentScale.FillBounds'), 2)
+        gradle = (ROOT / 'app/build.gradle.kts').read_text()
+        self.assertIn('qa-signing/wordsearch-qa.p12', gradle)
+        self.assertIn('signingConfig = signingConfigs.getByName("wordSearchQa")', gradle)
+        self.assertIn('applicationIdSuffix = ".qa"', gradle)
+        self.assertIn('?: 58', gradle)
+        for name in ('ws01-android-qa.yml', 'ws12g-qa-art-lab.yml'):
+            workflow = (ROOT / '.github/workflows' / name).read_text()
+            self.assertIn('75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419', workflow)
+            self.assertIn('apksigner', workflow)
+
     def test_existing_details_stay_in_charge_and_no_qa_without_art(self):
         live=(APP/"BookcaseBookshelfScreen.kt").read_text()
         old=(APP/"WS16AMInteractiveBookcaseScene.kt").read_text()

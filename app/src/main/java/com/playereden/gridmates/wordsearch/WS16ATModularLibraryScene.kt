@@ -58,6 +58,7 @@ private fun ws16atLoad(context: Context, name: String): Bitmap? = runCatching {
  * Architectural paint is split into TWO compositing passes.
  * The dark planks are behind the real shelves and book spines; carved columns,
  * crown and base are in FRONT so shelves never appear pasted over pilasters.
+ * Middle layers use aspect-preserving crops on tall phones, instead of elongating carvings, ivy and wood grain.
  * Each raster is an independent, source-accurate piece; no UI or shelf pixels
  * have been painted into the cabinet assets.
  */
@@ -82,7 +83,7 @@ private fun WS16ATCabinetLayers(foreground: Boolean, modifier: Modifier = Modifi
             Canvas(Modifier.fillMaxSize()) { drawRect(Color(0xFF753A1A)) }
             artwork["recessed_backboard"]?.let { bitmap ->
                 Image(bitmap.asImageBitmap(), contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.align(Alignment.TopStart)
                         .offset(x = leftWidth, y = crownHeight)
                         .width(backWidth).height(middleHeight))
@@ -90,14 +91,14 @@ private fun WS16ATCabinetLayers(foreground: Boolean, modifier: Modifier = Modifi
         } else {
             artwork["left_pilaster"]?.let { bitmap ->
                 Image(bitmap.asImageBitmap(), contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.align(Alignment.TopStart)
                         .offset(y = crownHeight)
                         .width(leftWidth).height(middleHeight))
             }
             artwork["right_pilaster"]?.let { bitmap ->
                 Image(bitmap.asImageBitmap(), contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.align(Alignment.TopEnd)
                         .offset(y = crownHeight)
                         .width(rightWidth).height(middleHeight))

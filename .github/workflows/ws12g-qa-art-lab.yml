@@ -152,6 +152,14 @@ jobs:
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
+      - name: Verify stable QA signing certificate for install-over updates
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -f "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" | tee /tmp/ws-signature.txt
+          grep -iF '75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419' /tmp/ws-signature.txt || {
+            echo "::error::Wrong QA signing identity; reject update APK."; exit 1;
+          }
       - name: Verify WS16AK illustrated cabinet only in debug APK
         run: |
           RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
@@ -327,7 +335,7 @@ jobs:
           {
             echo '### WS-14A unified native visual components · unapproved art remains isolated'
             echo 'Debug APK has 18 original + 18 illustrated SVG art and 36 matched native PNG images; release has none.'
-            echo 'QA v57 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'QA v58 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
             echo 'The artwork is unapproved; QA prototype art is already integrated into book cards and does not affect save/unlock logic.'
           } >> "$GITHUB_STEP_SUMMARY"
