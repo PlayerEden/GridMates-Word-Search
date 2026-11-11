@@ -48,10 +48,14 @@ internal fun hasWs16atCabinetArt(context: Context): Boolean = runCatching {
     ws16atShell.all { "$it.png" in available }
 }.getOrDefault(false)
 
-private fun ws16atLoad(context: Context, name: String): Bitmap? = runCatching {
-    context.assets.open("ws16as/shell/$name.png").use {
-        BitmapFactory.decodeStream(it)
-    }
+internal fun hasWs16baCabinetArt(context: Context): Boolean = runCatching {
+    val available = context.assets.list("ws16ba/shell")?.toSet() ?: emptySet()
+    ws16atShell.all { "$it.png" in available }
+}.getOrDefault(false)
+
+private fun ws16atLoad(context: Context, name: String, highRes: Boolean): Bitmap? = runCatching {
+    val folder = if (highRes) "ws16ba/shell" else "ws16as/shell"
+    context.assets.open("$folder/$name.png").use { BitmapFactory.decodeStream(it) }
 }.getOrNull()
 
 /**
@@ -65,11 +69,16 @@ private fun ws16atLoad(context: Context, name: String): Bitmap? = runCatching {
 @Composable
 private fun WS16ATCabinetLayers(foreground: Boolean, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val artwork = remember(context) {
-        ws16atShell.associateWith { ws16atLoad(context, it) }
-    }
     BoxWithConstraints(modifier.testTag(if (foreground)
         "ws16at-front-woodwork" else "ws16at-five-part-shell")) {
+        // New 1024×2298 source downscales cleanly on portrait phones;
+        // retain the original art for landscape or missing QA candidates.
+        val highRes = hasWs16baCabinetArt(context) &&
+            maxHeight >= maxWidth * 1.7f
+        val artwork = remember(context, highRes) {
+            ws16atShell.associateWith { ws16atLoad(context, it, highRes) }
+        }
+        val middleScale = if (highRes) ContentScale.FillBounds else ContentScale.Crop
         val crownHeight = (maxWidth * (198f / 602f))
             .coerceAtMost(maxHeight * 0.25f)
         val baseHeight = (maxWidth * (108f / 602f))
@@ -83,7 +92,7 @@ private fun WS16ATCabinetLayers(foreground: Boolean, modifier: Modifier = Modifi
             Canvas(Modifier.fillMaxSize()) { drawRect(Color(0xFF753A1A)) }
             artwork["recessed_backboard"]?.let { bitmap ->
                 Image(bitmap.asImageBitmap(), contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    contentScale = middleScale,
                     modifier = Modifier.align(Alignment.TopStart)
                         .offset(x = leftWidth, y = crownHeight)
                         .width(backWidth).height(middleHeight))
@@ -91,14 +100,14 @@ private fun WS16ATCabinetLayers(foreground: Boolean, modifier: Modifier = Modifi
         } else {
             artwork["left_pilaster"]?.let { bitmap ->
                 Image(bitmap.asImageBitmap(), contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    contentScale = middleScale,
                     modifier = Modifier.align(Alignment.TopStart)
                         .offset(y = crownHeight)
                         .width(leftWidth).height(middleHeight))
             }
             artwork["right_pilaster"]?.let { bitmap ->
                 Image(bitmap.asImageBitmap(), contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    contentScale = middleScale,
                     modifier = Modifier.align(Alignment.TopEnd)
                         .offset(y = crownHeight)
                         .width(rightWidth).height(middleHeight))

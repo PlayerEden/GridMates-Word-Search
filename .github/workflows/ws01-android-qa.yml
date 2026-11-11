@@ -12,6 +12,7 @@ on:
       - 'scripts/**'
       - 'design/woodland/**'
       - 'design/visual-system/masters/ws16as/**'
+      - 'design/visual-system/masters/ws16ba/**'
       - 'tools/ci/**'
       - 'tools/asset_pipeline/**'
       - '.github/workflows/ws01-android-qa.yml'
@@ -135,6 +136,10 @@ jobs:
       - name: Extract original WS16AS five-part painted shell from hash-pinned ZIP
         if: ${{ hashFiles('design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip') != '' }}
         run: python3 tools/asset_pipeline/import_ws16as_modular_library.py --kit design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip
+      - name: Generate 5 source-aligned WS16BA high-resolution portrait cabinet PNGs
+        run: |
+          python3 tools/asset_pipeline/build_ws16ba_hi_res.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ba_hi_res.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -233,6 +238,8 @@ jobs:
         run: python3 tools/asset_pipeline/verify_ws16ak_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify exact original WS16AS artwork (optional) in debug APK
         run: python3 tools/asset_pipeline/verify_ws16as_apk.py app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify five high-res cabinet pieces in QA APK
+        run: python3 tools/asset_pipeline/verify_ws16ba_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify WS16AI full-screen modular bookcase in Android QA APK
         run: python3 tools/asset_pipeline/verify_ws16ai_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify 12 WS16AO source-pinned physical spines packaged in debug

@@ -138,6 +138,10 @@ jobs:
       - name: Extract original WS16AS five-part painted shell from hash-pinned ZIP
         if: ${{ hashFiles('design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip') != '' }}
         run: python3 tools/asset_pipeline/import_ws16as_modular_library.py --kit design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip
+      - name: Generate 5 source-aligned WS16BA high-resolution portrait cabinet PNGs
+        run: |
+          python3 tools/asset_pipeline/build_ws16ba_hi_res.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ba_hi_res.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -170,6 +174,11 @@ jobs:
           RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
           test -n "$RELEASE"
           python3 tools/asset_pipeline/verify_ws16as_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify source-pinned WS16BA debug APK and release isolation
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ba_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
       - name: Verify WS16AI cabinet sprites stay in debug only
         run: |
           RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
