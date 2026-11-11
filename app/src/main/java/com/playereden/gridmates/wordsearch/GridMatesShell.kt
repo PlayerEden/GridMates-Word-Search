@@ -133,7 +133,7 @@ internal fun GridMatesShell(
             val progressStore = qa.progressStore
             val sessionStore = qa.sessionStore
             if (progressStore != null && sessionStore != null) {
-                Box(Modifier.fillMaxSize().padding(contentPadding)) {
+                Box(Modifier.fillMaxSize()) {
                     BookLibraryFlow(
                         catalog = qa.catalog,
                         progressStore = progressStore,
@@ -144,6 +144,7 @@ internal fun GridMatesShell(
                             pageName = Page.PLAY.name
                         },
                         showPrototypeArt = qa.enabled,
+                        safeContentPadding = contentPadding,
                         initialBookId = homeBookIntent
                     )
                 }
