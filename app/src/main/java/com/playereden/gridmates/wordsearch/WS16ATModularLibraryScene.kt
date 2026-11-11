@@ -115,7 +115,7 @@ internal fun WS16ATModularLibraryScene(
     BoxWithConstraints(modifier.fillMaxSize().testTag("ws16at-modular-library")) {
         val hitSlot = if (density.fontScale >= 1.65f) 54.dp else 48.dp
         val sideInset = (maxWidth * 0.09f).coerceIn(26.dp, 50.dp)
-        val slots = ((maxWidth - 2 * sideInset).value / hitSlot.value)
+        val slots = ((maxWidth - (sideInset * 2)).value / hitSlot.value)
             .toInt().coerceIn(1, 12)
         val tierCount = when {
             maxHeight < 480.dp -> 1
