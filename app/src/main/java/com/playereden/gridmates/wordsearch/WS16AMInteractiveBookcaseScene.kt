@@ -146,8 +146,14 @@ private fun WS16AMSpineBay(
 ) {
     BoxWithConstraints(Modifier.fillMaxWidth().height(height)
         .testTag("ws16am-spine-shelf-" + shelfIndex)) {
-        val artHeight = (maxHeight - 19.dp).coerceAtLeast(32.dp)
-        val artWidth = (artHeight * (104f / 542f)).coerceAtMost(slot - 3.dp)
+        // Publisher geometry is true pixel aspect, not a stretched cover.
+        // Tall upper volumes and standard lower volumes share visible width,
+        // while each keeps its unscaled typography and 48/54dp tap region.
+        val profile = if (shelfIndex % 2 == 0) "tall" else "standard"
+        val bindingRatio = if (profile == "tall") 166f / 662f else 166f / 542f
+        val artWidth = minOf(slot - 2.dp,
+            (maxHeight - 10.dp).coerceAtLeast(24.dp) * bindingRatio)
+        val artHeight = artWidth / bindingRatio
         Row(
             modifier = Modifier.align(Alignment.BottomCenter)
                 .width(slot * slots).padding(bottom = 2.dp),
@@ -175,14 +181,16 @@ private fun WS16AMSpineBay(
                         BookcaseSpineArt(
                             book.theme, true,
                             Modifier.width(artWidth).height(artHeight)
-                                .testTag("ws16am-art-" + book.id)
+                                .testTag("ws16am-art-" + book.id),
+                            profile = profile
                         )
                     } else {
                         val style = listOf("linen", "night", "burgundy")[
                             (shelfIndex * slots + i) % 3
                         ]
                         BookcaseFutureSpineArt(
-                            style, Modifier.width(artWidth).height(artHeight)
+                            style, Modifier.width(artWidth).height(artHeight),
+                            profile = profile
                         )
                     }
                 }

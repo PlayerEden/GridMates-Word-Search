@@ -70,36 +70,44 @@ internal fun BookcaseWoodParts(modifier: Modifier, fieldNotesArt: Boolean) {
 
 /** Separate spine artwork, not a resized/cropped full cover. */
 @Composable
-private fun BookcaseSpineImage(name: String, modifier: Modifier): Boolean {
+private fun BookcaseSpineImage(name: String, modifier: Modifier, profile: String? = null): Boolean {
     val context = LocalContext.current
-    val bitmap = remember(context, name) {
-        loadBookcaseAsset(context, "ws16ai/spines/$name.png")
+    // WS16AO deliberately does not change the previous WS16AI fallback view.
+    val bitmap = remember(context, name, profile) {
+        val candidate = if (profile == "tall" || profile == "standard") {
+            loadBookcaseAsset(context, "ws16ao/spines/$profile/$name.png")
+        } else null
+        candidate ?: loadBookcaseAsset(context, "ws16ai/spines/$name.png")
     }
     if (bitmap != null) {
         Image(bitmap.asImageBitmap(), contentDescription = null,
-            contentScale = ContentScale.FillBounds, modifier = modifier)
+            contentScale = if (profile == null) ContentScale.FillBounds else ContentScale.Fit,
+            modifier = modifier)
     }
     return bitmap != null
 }
 
 @Composable
 internal fun BookcaseSpineArt(
-    theme: WordTheme, fieldNotesArt: Boolean, modifier: Modifier = Modifier
+    theme: WordTheme, fieldNotesArt: Boolean, modifier: Modifier = Modifier,
+    profile: String? = null
 ) {
     val slug = when (theme) {
         WordTheme.WOODLAND -> "woodland"
         WordTheme.SPACE -> "space"
         WordTheme.GARDEN -> "garden"
     }
-    if (!fieldNotesArt || !BookcaseSpineImage(slug, modifier)) {
+    if (!fieldNotesArt || !BookcaseSpineImage(slug, modifier, profile)) {
         BookArt(theme, BookArtKind.SPINE, modifier, fieldNotes = fieldNotesArt)
     }
 }
 
 @Composable
-internal fun BookcaseFutureSpineArt(style: String, modifier: Modifier = Modifier) {
+internal fun BookcaseFutureSpineArt(
+    style: String, modifier: Modifier = Modifier, profile: String? = null
+) {
     // Explicitly decorative: no book ID, progress, click handler or pages.
-    if (!BookcaseSpineImage(style, modifier)) {
+    if (!BookcaseSpineImage(style, modifier, profile)) {
         BookFactoryBlankSpine(style, modifier)
     }
 }
