@@ -27,3 +27,16 @@ Remaining visible flaw: **Show books** and **3 books** were separate large recta
 ## Safeguard
 
 The working WS16AL candidate APK and earlier WS16AI are retained. Development branch PR #131 remains draft. Source/CI green alone never means final publication or author approval.
+
+## Final exact-source QA receipt
+
+- **Compiled source:** [`f40605247dff5d50d32d7b8bc3c1a068c01b0309`](https://github.com/PlayerEden/GridMates-Word-Search/commit/f40605247dff5d50d32d7b8bc3c1a068c01b0309).
+- **Android QA SUCCESS:** [run #42951462605](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42951462605), [APK ZIP artifact #13826020052](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42951462605/artifacts/13826020052). Sign into GitHub to download; retention through **December 11, 2026**.
+- **Independent artwork/debug/release QA SUCCESS:** [run #42951462688](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42951462688), [independent artifact #13825351172](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42951462688/artifacts/13825351172), same 30-day retention.
+- Extracted normal Android `app-debug.apk` is **23,827,752 bytes**, SHA256 **`18ce273b39879542ca49dc538fdcbd7d9317e8478543ab3048815ea2c85aa740`**. Two ZIP artifacts integrity-tested, two extracted APK archives integrity-tested.
+- **All 311 internal APK entries have the exact same uncompressed bytes** between standard and independent Android builds. This is stronger than comparing their outer archive hashes and establishes exact packed contents.
+- `assets/ws16ak/manifest.json` and all six real painted source bands are present; SHA256 of each image independently matched its manifest entry. Independent release-art isolation passed. 
+- Python source-geometry/overlay structural tests passed in both workflows, plus Android full compilation, unit tests and lint. **No real-device tap or layout acceptance claimed** for this new composite build.
+- QA phone review: check actual shelf contact and gaps of first and second rows, no lower shelf clipping, 5 visible spine slots per row on typical 360dp device, real book selection → full cover → View pages and Back, blanks non-tappable, header 3-dot Empty woodwork and Previous bookcase switching, count as real books only, swipe page behavior when catalog grows. Previous WS16AL APK remains rollback; do not uninstall/delete save data.
+- Exact-source QA build is ready for owner test, but draft PR remains unmerged, production artwork remains unapproved.
+
