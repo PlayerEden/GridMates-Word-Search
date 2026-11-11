@@ -11,6 +11,7 @@ on:
       - 'gradle.properties'
       - 'scripts/**'
       - 'design/woodland/**'
+      - 'design/visual-system/masters/ws16as/**'
       - 'tools/ci/**'
       - 'tools/asset_pipeline/**'
       - '.github/workflows/ws01-android-qa.yml'
