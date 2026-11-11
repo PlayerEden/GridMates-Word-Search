@@ -126,6 +126,7 @@ jobs:
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ak_ci.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16al_immersive_shell.py' -v
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16am_immersive_bookcase.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16at_modular_library.py' -v
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
