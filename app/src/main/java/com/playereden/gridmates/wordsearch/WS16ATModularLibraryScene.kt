@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.PuzzleBook
@@ -123,6 +124,7 @@ internal fun WS16ATModularLibraryScene(
     onBack: () -> Unit,
     onBookSelected: (String) -> Unit,
     onPreviousArt: () -> Unit,
+    safeContentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
@@ -183,12 +185,17 @@ internal fun WS16ATModularLibraryScene(
         }
         // Carved woodwork overlays the working shelf sprites at the real edges.
         WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())
-        // Native text, never printed into the illustration or decorative plaque.
+        // Only controls respect Android safe insets. The cabinet wood and live
+        // shelf/book stage remain full-bleed behind visible or gesture bars.
+        Box(Modifier.fillMaxSize().padding(safeContentPadding)
+            .testTag("ws16aw-safe-overlays")) {
         Text("Your Library", color = Color(0xFFFFE6B5),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
+            maxLines = 1, overflow = TextOverflow.Ellipsis,
             modifier = Modifier.align(Alignment.TopCenter)
-                .padding(top = (top - 58.dp).coerceAtLeast(38.dp))
+                .padding(start = 60.dp, end = 60.dp,
+                    top = (top - 58.dp).coerceAtLeast(38.dp))
                 .testTag("ws16at-library-title"))
         Text("‹", style = MaterialTheme.typography.headlineLarge,
             color = Color(0xFFFFE6B5),
@@ -237,5 +244,6 @@ internal fun WS16ATModularLibraryScene(
                 .semantics { contentDescription = "Previous Library artwork" }
                 .clickable(role = Role.Button, onClick = onPreviousArt)
                 .testTag("ws16at-previous-art"))
+        } // inset overlay only; original shell fills the outer Box
     }
 }
