@@ -155,7 +155,8 @@ internal fun WS16AMSpineBay(
     slot: Dp,
     height: Dp,
     onBookSelected: (String) -> Unit,
-    futureTreatment: Boolean = false
+    futureTreatment: Boolean = false,
+    showFutureVolumes: Boolean = true
 ) {
     BoxWithConstraints(Modifier.fillMaxWidth().height(height)
         .testTag("ws16am-spine-shelf-" + shelfIndex)) {
@@ -175,9 +176,11 @@ internal fun WS16AMSpineBay(
         ) {
             for (i in 0 until slots) {
                 val book = books.getOrNull(i)
-                val isFutureVisible = !futureTreatment || if (books.isEmpty()) {
-                    i == (slots - 1) / 2 || i == slots / 2
-                } else i == books.size
+                val isFutureVisible = showFutureVolumes && (
+                    !futureTreatment || if (books.isEmpty()) {
+                        i == (slots - 1) / 2 || i == slots / 2
+                    } else i == books.size
+                )
                 Box(
                     Modifier.width(slot).height(artHeight + 4.dp)
                         .then(if (book != null) Modifier
