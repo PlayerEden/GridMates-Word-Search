@@ -1,6 +1,13 @@
 # WS16AT — Modular Library native integration, reversible QA gate
 **Date:** November 10, 2026 Kentucky / November 11 UTC · **PR:** #131 draft · **Status:** code integrated, first Android and art tests currently repeating after two narrowly scoped corrections; new artwork **not yet** in GitHub or APK.
 
+## Verified exact-source CI — Android + independent art/release both GREEN
+- Exact branch source/documentation commit tested: `e80412adb6d74054b6c58567660daaa8c1c8df6e`; no Kotlin changes after that run.
+- [Android QA run #42970461129](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42970461129) **SUCCESS**, artifact [#13832479856](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42970461129/artifacts/13832479856), name `GridMates-WordSearch-Android-QA`.
+- [Independent debug-art/release isolation run #42970461142](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42970461142) **SUCCESS**, debug artifact [#13833735914](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42970461142/artifacts/13833735914).
+- New structural tests are included in BOTH workflows. Existing book logic, source/QA checks and Android APK assembly complete. These are **code-only** build artifacts for the new guarded renderer; `ws16as/shell` PNGs are still missing and the new Library option is intentionally hidden in the compiled app.
+- Do NOT label this a final visual-test APK or owner-approved artwork. **Next required action is transferring the actual 5 art binaries** into source control, applying the pinned importer, and checking actual phone screen/gestures.
+
 ## Owner direction
 - The little permanent crown emblem may stay for now, since later independent placards could cover it.
 - Cabinet uses ONLY five architectural sprites (recessed back, left/right pilasters, crown, base). **No permanent horizontal shelves, text, plaques, book spines, or buttons** in the cabinet bitmap.
