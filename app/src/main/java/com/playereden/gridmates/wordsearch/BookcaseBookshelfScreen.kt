@@ -35,6 +35,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -81,8 +82,23 @@ internal fun BookcaseBookshelfScreen(
         var emptyCabinetPreview by rememberSaveable { mutableStateOf(false) }
         // Keep the working WS16AI bookcase as a manually selectable QA rollback.
         var immersiveBooksPreview by rememberSaveable { mutableStateOf(true) }
+        var modularPreview by rememberSaveable { mutableStateOf(false) }
+        val context = LocalContext.current
+        // A new art path is never selectable until all five real shell images
+        // are packaged. No placeholder or flattened proof art is substituted.
+        val modularAssetsAvailable = remember(context) {
+            hasWs16atCabinetArt(context)
+        }
 
-        if (fieldNotesArt && immersiveBooksPreview) {
+        if (fieldNotesArt && modularPreview && modularAssetsAvailable) {
+            WS16ATModularLibraryScene(
+                books = catalog.books,
+                onBack = onBack,
+                onBookSelected = { selectedBookId = it },
+                onPreviousArt = { modularPreview = false },
+                modifier = Modifier.fillMaxSize()
+            )
+        } else if (fieldNotesArt && immersiveBooksPreview) {
             WS16AMInteractiveBookcaseScene(
                 books = catalog.books,
                 onBack = onBack,
@@ -95,6 +111,9 @@ internal fun BookcaseBookshelfScreen(
                     immersiveBooksPreview = false
                     emptyCabinetPreview = false
                 },
+                onModularCase = if (modularAssetsAvailable) {
+                    { modularPreview = true }
+                } else null,
                 modifier = Modifier.fillMaxSize()
             )
         } else if (fieldNotesArt && emptyCabinetPreview) {
