@@ -78,13 +78,33 @@ internal fun BookcaseBookshelfScreen(
         var selectedBookId by rememberSaveable { mutableStateOf<String?>(null) }
         var previewToolsOpen by remember { mutableStateOf(false) }
         // QA-only empty-background inspection; regular books are one tap away.
-        var emptyCabinetPreview by rememberSaveable { mutableStateOf(true) }
+        var emptyCabinetPreview by rememberSaveable { mutableStateOf(false) }
+        // Keep the working WS16AI bookcase as a manually selectable QA rollback.
+        var immersiveBooksPreview by rememberSaveable { mutableStateOf(true) }
 
-        if (fieldNotesArt && emptyCabinetPreview) {
+        if (fieldNotesArt && immersiveBooksPreview) {
+            WS16AMInteractiveBookcaseScene(
+                books = catalog.books,
+                onBack = onBack,
+                onBookSelected = { selectedBookId = it },
+                onInspectEmpty = {
+                    immersiveBooksPreview = false
+                    emptyCabinetPreview = true
+                },
+                onOldCase = {
+                    immersiveBooksPreview = false
+                    emptyCabinetPreview = false
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        } else if (fieldNotesArt && emptyCabinetPreview) {
             WS16ALImmersiveEmptyLibraryScene(
                 bookCount = catalog.books.size,
                 onBack = onBack,
-                onShowBooks = { emptyCabinetPreview = false },
+                onShowBooks = {
+                    immersiveBooksPreview = true
+                    emptyCabinetPreview = false
+                },
                 onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
                     { previewToolsOpen = true }
                 } else null,
@@ -113,6 +133,13 @@ internal fun BookcaseBookshelfScreen(
                         modifier = Modifier.heightIn(min = 48.dp)
                             .testTag("bookcase-empty-background-preview")
                     ) { Text(if (emptyCabinetPreview) "Show books" else "Empty art") }
+                    TextButton(
+                        onClick = {
+                            immersiveBooksPreview = true
+                            emptyCabinetPreview = false
+                        },
+                        modifier = Modifier.testTag("ws16am-return-to-immersive")
+                    ) { Text("New case") }
                 }
             } else {
                 Text("Tap a spine to pull out a book.",

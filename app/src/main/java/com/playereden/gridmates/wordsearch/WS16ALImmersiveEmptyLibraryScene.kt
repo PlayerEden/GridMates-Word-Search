@@ -100,45 +100,49 @@ internal fun WS16ALImmersiveEmptyLibraryScene(
     onPreviewOptions: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
+    var qaMenuOpen by remember { mutableStateOf(false) }
     Column(modifier.fillMaxSize().padding(horizontal=3.dp,vertical=2.dp)
         .testTag("ws16al-immersive-empty-library")) {
         Ws15BackHeader(
             title="Your Library", onBack=onBack, backLabel="Back to Play",
-            onPreviewOptions=onPreviewOptions,
+            onPreviewOptions={ qaMenuOpen = true },
             modifier=Modifier.padding(horizontal=6.dp)
         )
         Box(Modifier.fillMaxWidth().weight(1f)
             .padding(horizontal=2.dp).testTag("ws16al-cabinet-stage")) {
             WS16ALResponsiveBookcaseBackground(Modifier.fillMaxSize())
-            Row(
-                Modifier.fillMaxWidth().align(Alignment.BottomCenter)
-                    .padding(start=44.dp,end=44.dp,bottom=13.dp),
-                horizontalArrangement=Arrangement.SpaceBetween,
-                verticalAlignment=Alignment.CenterVertically
+
+            Box(
+                Modifier.align(Alignment.BottomStart)
+                    .padding(start=42.dp,bottom=12.dp)
+                    .testTag("ws16al-real-book-count")
             ) {
-                Surface(color=Color(0xEE1A3B30),
-                    shape=RoundedCornerShape(7.dp),
-                    border=BorderStroke(1.dp,Color(0xFFD9AD66))) {
-                    Text(
-                        bookCount.toString()+(if(bookCount==1) " book" else " books"),
-                        modifier=Modifier.padding(horizontal=9.dp,vertical=7.dp)
-                            .testTag("ws16al-real-book-count"),
-                        color=Color(0xFFFFE9BD),
-                        style=MaterialTheme.typography.labelSmall,
-                        fontWeight=FontWeight.SemiBold
-                    )
-                }
-                Surface(color=Color(0xEE1A3B30),
-                    shape=RoundedCornerShape(7.dp),
-                    border=BorderStroke(1.dp,Color(0xFFD9AD66))) {
-                    TextButton(onClick=onShowBooks,
-                        modifier=Modifier.heightIn(min=48.dp)
-                            .testTag("ws16al-show-books")) {
-                        Text("Show books",color=Color(0xFFFFE9BD),
-                            style=MaterialTheme.typography.labelMedium)
-                    }
-                }
+                WS16AMBookCountPlaque(bookCount)
             }
         }
+    }
+    if (qaMenuOpen) {
+        AlertDialog(
+            onDismissRequest = { qaMenuOpen = false },
+            title = { Text("Library visual test") },
+            text = { Text("Inspect the empty woodwork or return to the interactive books.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        qaMenuOpen = false
+                        onShowBooks()
+                    },
+                    modifier = Modifier.testTag("ws16al-show-books")
+                ) { Text("Show books") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        qaMenuOpen = false
+                        onPreviewOptions?.invoke()
+                    }
+                ) { Text("More options") }
+            }
+        )
     }
 }
