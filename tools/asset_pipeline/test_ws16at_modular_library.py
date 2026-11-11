@@ -45,7 +45,7 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertLess(code.index("HorizontalPager("),
                         code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"))
         self.assertLess(code.index("WS16ATCabinetLayers(foreground = true, modifier = Modifier.fillMaxSize())"),
-                        code.index('Ws16AZCabinetPlaque('))
+                        code.index('label = "Your Library"'))
         self.assertIn("Ws16BBMatchedCabinetShelf()",code)
         self.assertIn("Ws16EStorybookShelf()",code)
         self.assertIn("val shelfContactDepth = 42.dp",code)
