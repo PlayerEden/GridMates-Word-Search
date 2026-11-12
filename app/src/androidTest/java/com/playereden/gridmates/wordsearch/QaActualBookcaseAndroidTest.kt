@@ -161,6 +161,14 @@ class QaActualBookcaseAndroidTest {
             kotlin.math.abs(woodlandBounds.top - spaceBounds.top) < 2f)
         assertTrue("Real Garden book occupies the lower shelf",
             gardenBounds.top > woodlandBounds.bottom)
+        // WS16BE: the original rounded single-binding source is narrower and
+        // its top must not disappear under the native Library heading.
+        val titleBounds = compose.onNodeWithTag("ws16at-library-title")
+            .fetchSemanticsNode().boundsInRoot
+        val topArtwork = compose.onNodeWithTag("ws16am-art-" + woodland.id)
+            .fetchSemanticsNode().boundsInRoot
+        assertTrue("Real spine artwork must clear the Library title plaque",
+            topArtwork.top >= titleBounds.bottom)
 
         val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
             .fetchSemanticsNode().boundsInRoot
