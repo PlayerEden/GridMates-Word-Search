@@ -32,6 +32,12 @@
 - v63 APK **NOT YET VERIFIED**; do not claim availability, signing/hash, success or any on-device preview before actual evidence.
 - CI tests build and compile Android tests but are not a real owner handset visual review; note final workflows/artifact and any failures when available.
 
+## CI correction — adaptive slot contract
+
+First v63 code source `2cad9c47` failed [Android #43141264381](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141264381) and [art #43141264469](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141264469) **before Android compilation** because one inherited Python source test still asserted the literal `slot = hitSlot`. The new sparse catalog correctly uses `slot = if (balancedSparseLayout) 60.dp else hitSlot` while preserving the standard 48/54dp hit slots for larger catalogs. Fixed the assertion rather than reverting the implementation.
+
+**Latest candidate code/test commit:** [`c54b4b18afbe9e2525238f47521fe770daea75f7`](https://github.com/PlayerEden/GridMates-Word-Search/commit/c54b4b18afbe9e2525238f47521fe770daea75f7). Corrected [Android QA #43141513582](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513582) and independent [art/release #43141513574](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513574) **IN PROGRESS** at log update. No APK/owner handset approval yet; must verify exact source and package before delivery.
+
 ## Outcome and next step
 
 **Completed:** implementation, source/Android test changes, QA version bump, initiated independent dual-CI runs. The direction is a candidate, not an approved replacement for v62.
