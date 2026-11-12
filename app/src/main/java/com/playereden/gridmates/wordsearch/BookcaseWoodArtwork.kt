@@ -78,6 +78,10 @@ private fun BookcaseSpineImage(name: String, modifier: Modifier, profile: String
             // WS16BE: prefer the source-original SINGLE rounded binding.
             // The WS16AO PNGs contain separately generated square shoulder
             // panels that looked like a second book behind each real spine.
+            // WS16BF debug-only: same round silhouette, cleaned edge alpha
+            // and curved lighting painted onto the ONE existing spine face.
+            "curved" -> loadBookcaseAsset(context, "ws16bf/spines/$name.png")
+                ?: loadBookcaseAsset(context, "ws16ai/spines/$name.png")
             "clean" -> loadBookcaseAsset(context, "ws16ai/spines/$name.png")
             "tall", "standard" ->
                 loadBookcaseAsset(context, "ws16ao/spines/$profile/$name.png")
