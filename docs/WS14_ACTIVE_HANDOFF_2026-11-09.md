@@ -1,3 +1,13 @@
+## Active visual feedback — WS16BD real-book-first candidate (Nov 11, 2026)
+
+**Owner's v62 phone review:** Home still inviting but Library screenshot visually underwhelming; owner said **"Meh"**. It displays real Woodland/Space/Garden only on upper shelf while faded fake spines + "Coming soon" consume lower half. This is a **negative visual acceptance**, not a release go-ahead.
+
+**New source candidate:** [`2cad9c478362f7e49353be03140349ba33f7463f`](https://github.com/PlayerEden/GridMates-Word-Search/commit/2cad9c478362f7e49353be03140349ba33f7463f), draft [PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), branch `feature/ws14b-style-anchor-and-art-direction-2026-11-08`. On a portrait cabinet with 2–4 actual catalog books, balance existing books across both shelves (3 = 2+1), 60dp centered real spine slots, no fake bindings or dominant "Coming soon"; preserve previous shelf art, book details/dialogs, saves, other menus and LAN. v63 with same QA signing config and package. Added source and UI regression checks. No image binaries or gameplay changed.
+
+**First v63 CI runs (not yet verified):** [Android #43141264381](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141264381) and [art/release #43141264469](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141264469), code source `2cad9c47`. **No v63 APK should be offered until green workflow and exact package/signature/hash evidence.** Previous v62 successful [Android artifact #13893295859](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43102415463/artifacts/13893295859) remains known-safe version (owner-installed), v62 QA APK SHA `de09063fd9ba65fa279167486ee094ddf27d2afab4b45e8bc1840e6d7be5fa50`.
+
+**Next exact action:** finish/repair both v63 runs, verify APK + same signing identity, share for owner visual test, compare to screenshot; if still unsatisfying, prioritize structural UX direction rather than successive plaque spacing. Do not merge draft PR or promote debug assets. [WS16BD journal](devlog/2026-11-11_WS16BD_REAL_BOOK_LIBRARY_BALANCE.md).
+
 ## Latest checkpoint — WS16BC final verified Android v62 APK (November 11, 2026)
 
 **Active development PR:** [#131 draft](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), branch `feature/ws14b-style-anchor-and-art-direction-2026-11-08`. **Exact source of the delivered app:** [`0f99722e00cd4ebcf0d30e826c6d90c5676d21c0`](https://github.com/PlayerEden/GridMates-Word-Search/commit/0f99722e00cd4ebcf0d30e826c6d90c5676d21c0). Subsequent documentation-only `[skip ci]` commits do not change the APK.
