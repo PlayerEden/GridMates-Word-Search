@@ -131,7 +131,7 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithText("Locked").assertDoesNotExist()
     }
 
-    @Test fun modularPortraitShowsPhysicalCoversAndOpensStableBookId() {
+    @Test fun modularPortraitPacksThreeRealSpinesSideBySide() {
         var selected: String? = null
         compose.setContent {
             GridMatesTheme {
@@ -146,44 +146,86 @@ class QaActualBookcaseAndroidTest {
             }
         }
         compose.onNodeWithTag("ws16at-modular-library").assertExists()
-        compose.onNodeWithTag("ws16bc-count-bay").assertExists()
-        compose.onNodeWithText("3 books").assertExists()
+        compose.onNodeWithTag("ws16at-movable-shelf-0").assertExists()
+        compose.onNodeWithTag("ws16at-movable-shelf-1").assertExists()
+        compose.onNodeWithTag("ws16at-movable-shelf-2").assertDoesNotExist()
+        compose.onNodeWithTag("ws16bh-packed-shelf-0").assertExists()
+        compose.onNodeWithTag("ws16bh-packed-shelf-1").assertExists()
+        compose.onNodeWithTag("ws16bh-spine-" + woodland.id).assertExists()
+        compose.onNodeWithTag("ws16bh-spine-" + space.id).assertExists()
+        compose.onNodeWithTag("ws16bh-spine-" + garden.id).assertExists()
+        compose.onNodeWithTag("ws16bg-cover-" + woodland.id).assertDoesNotExist()
         compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
-        compose.onNodeWithTag("ws16bg-face-out-shelf-0").assertExists()
-        compose.onNodeWithTag("ws16bg-face-out-shelf-1").assertExists()
-        compose.onNodeWithTag("ws16bg-cover-" + woodland.id).assertExists()
-        compose.onNodeWithTag("ws16bg-cover-" + space.id).assertExists()
-        compose.onNodeWithTag("ws16bg-cover-" + garden.id).assertExists()
-        // No tall spines or synthetic future books in the new portrait mode.
-        compose.onNodeWithTag("ws16am-spine-" + woodland.id).assertDoesNotExist()
-        compose.onNodeWithTag("ws16bc-visible-future-1-1").assertDoesNotExist()
+        compose.onNodeWithTag("ws16bc-visible-future-0-3").assertDoesNotExist()
+        compose.onNodeWithText("3 books").assertExists()
 
-        val woodlandBounds = compose.onNodeWithTag("ws16bg-cover-" + woodland.id)
+        val woodlandBounds = compose.onNodeWithTag("ws16bh-spine-" + woodland.id)
             .fetchSemanticsNode().boundsInRoot
-        val spaceBounds = compose.onNodeWithTag("ws16bg-cover-" + space.id)
+        val spaceBounds = compose.onNodeWithTag("ws16bh-spine-" + space.id)
             .fetchSemanticsNode().boundsInRoot
-        val gardenBounds = compose.onNodeWithTag("ws16bg-cover-" + garden.id)
+        val gardenBounds = compose.onNodeWithTag("ws16bh-spine-" + garden.id)
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Woodland and Space face out on the upper shelf",
-            kotlin.math.abs(woodlandBounds.top - spaceBounds.top) < 2f)
-        assertTrue("Garden faces out on the lower shelf",
-            gardenBounds.top > woodlandBounds.bottom)
+        assertTrue("All owned volumes must be on the same first shelf",
+            kotlin.math.abs(woodlandBounds.top - gardenBounds.top) < 2f)
+        assertTrue("Spines pack side-by-side, not spaced hero items",
+            kotlin.math.abs(woodlandBounds.right - spaceBounds.left) < 4f)
 
         val titleBounds = compose.onNodeWithTag("ws16at-library-title")
             .fetchSemanticsNode().boundsInRoot
-        val topArtwork = compose.onNodeWithTag("ws16bg-art-" + woodland.id)
+        val topArt = compose.onNodeWithTag("ws16bh-art-" + woodland.id)
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Cover must clear the Library title plaque",
-            topArtwork.top >= titleBounds.bottom)
-
+        assertTrue("Spines clear the title plaque", topArt.top >= titleBounds.bottom)
         val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
             .fetchSemanticsNode().boundsInRoot
-        val bookCount = compose.onNodeWithTag("ws16at-real-count")
+        val count = compose.onNodeWithTag("ws16at-real-count")
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Book count must clear lower shelf carving",
-            bookCount.top > lowerShelf.bottom)
+        assertTrue("Count clears lower shelf", count.top > lowerShelf.bottom)
 
-        compose.onNodeWithTag("ws16bg-cover-" + garden.id).performClick()
+        compose.onNodeWithTag("ws16bh-spine-" + garden.id).performClick()
         compose.runOnIdle { assertEquals(garden.id, selected) }
+    }
+
+    @Test fun tallPortraitExpandsToThreeRealShelvesWithLargeCatalog() {
+        val many = (0 until 14).map { i ->
+            fixture(
+                when (i % 3) {
+                    0 -> WordTheme.WOODLAND
+                    1 -> WordTheme.SPACE
+                    else -> WordTheme.GARDEN
+                },
+                "volume-$i",
+                'a'
+            )
+        }
+        var selected: String? = null
+        compose.setContent {
+            GridMatesTheme {
+                Box(Modifier.width(360.dp).height(760.dp)) {
+                    WS16ATModularLibraryScene(
+                        books = many,
+                        onBack = {},
+                        onBookSelected = { selected = it },
+                        onPreviousArt = {}
+                    )
+                }
+            }
+        }
+        compose.onNodeWithTag("ws16bh-packed-shelf-0").assertExists()
+        compose.onNodeWithTag("ws16bh-packed-shelf-1").assertExists()
+        compose.onNodeWithTag("ws16bh-packed-shelf-2").assertExists()
+        compose.onNodeWithTag("ws16bh-spine-" + many.first().id).assertExists()
+        compose.onNodeWithTag("ws16bh-spine-" + many.last().id).assertExists()
+        compose.onNodeWithText("14 books").assertExists()
+        compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
+
+        val lastBinding = compose.onNodeWithTag("ws16bh-spine-" + many.last().id)
+            .fetchSemanticsNode().boundsInRoot
+        val firstBinding = compose.onNodeWithTag("ws16bh-spine-" + many.first().id)
+            .fetchSemanticsNode().boundsInRoot
+        assertTrue("Overflow goes onto lower real shelf",
+            lastBinding.top > firstBinding.bottom)
+
+        compose.onNodeWithTag("ws16bh-spine-" + many.last().id).performClick()
+        compose.runOnIdle { assertEquals(many.last().id, selected) }
     }
 }
