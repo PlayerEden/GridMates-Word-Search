@@ -155,3 +155,28 @@ internal fun WS16BICabinetPlaque(
         )
     }
 }
+
+/** Keep earlier AZ design as an intact fallback for compact/landscape modes. */
+@Composable
+internal fun WS16BIAdaptivePlaque(
+    label: String,
+    title: Boolean,
+    styled: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (styled) WS16BICabinetPlaque(label, title, modifier)
+    else Ws16AZCabinetPlaque(label, title, modifier)
+}
+
+@Composable
+internal fun WS16BIAdaptiveControl(
+    glyph: Ws16AZCabinetGlyph,
+    description: String,
+    onClick: () -> Unit,
+    styled: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    if (styled) WS16BICabinetControl(glyph, description, onClick, modifier, enabled)
+    else Ws16AZCabinetControl(glyph, description, onClick, modifier, enabled)
+}
