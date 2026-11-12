@@ -158,6 +158,7 @@ internal fun WS16AMSpineBay(
     futureTreatment: Boolean = false,
     showFutureVolumes: Boolean = true,
     useCleanSpines: Boolean = false,
+    useCurvedSpines: Boolean = false,
     drawContactShadow: Boolean = true,
     headClearance: Dp = 10.dp
 ) {
@@ -171,9 +172,10 @@ internal fun WS16AMSpineBay(
         // the PNG, not a second Compose image. For the modular cabinet, show
         // the preserved single-binding WS16AI source instead; no re-stretching
         // of the lettering or replacement of existing pinned images.
-        val profile = if (useCleanSpines) "clean" else
+        val profile = if (useCurvedSpines) "curved" else if (useCleanSpines) "clean" else
             if (shelfIndex % 2 == 0) "tall" else "standard"
         val bindingRatio = when (profile) {
+            "curved" -> 104f / 542f
             "clean" -> 104f / 542f
             "tall" -> 166f / 662f
             else -> 166f / 542f
@@ -208,8 +210,8 @@ internal fun WS16AMSpineBay(
                 ) {
                     if (drawContactShadow && (book != null || isFutureVisible)) {
                         Box(Modifier.align(Alignment.BottomCenter)
-                            .width(artWidth).height(4.dp)
-                            .background(Color(0x990F0806), RoundedCornerShape(50)))
+                            .width(artWidth * 0.76f).height(2.dp)
+                            .background(Color(0x4D0F0806), RoundedCornerShape(50)))
                     }
                     if (book != null) {
                         BookcaseSpineArt(
