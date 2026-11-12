@@ -45,7 +45,8 @@ class InteractiveCabinetTests(unittest.TestCase):
         # WS16AN real-phone acceptance refinement: books sit closer to the
         # illustrated contact plane, without stretching or shrinking tap slots.
         self.assertIn(".width(slot * slots).padding(bottom = 2.dp)",code)
-        self.assertIn(".width(artWidth).height(4.dp)",code)
+        self.assertIn(".width(artWidth * 0.76f).height(2.dp)",code)
+        self.assertIn("drawContactShadow && (book != null || isFutureVisible)",code)
         self.assertIn('testTag("ws16an-inlaid-book-count")',code)
         self.assertNotIn('Color(0xDD17382D)',code)
         self.assertIn('val hitSlot = if (fontScale >= 1.65f) 54.dp else 48.dp',code)
