@@ -208,9 +208,18 @@ internal fun WS16ATModularLibraryScene(
                             shelfIndex = shelfIndex,
                             slots = if (balancedSparseLayout) shelfBooks.size else slots,
                             slot = if (balancedSparseLayout) 60.dp else hitSlot,
-                            height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp),
+                            // Keep bindings clear of the title plaque instead
+                            // of forcing tall art up under the heading.
+                            height = (tierHeight - shelfContactDepth -
+                                if (balancedSparseLayout) 24.dp else 0.dp)
+                                .coerceAtLeast(60.dp),
                             futureTreatment = true,
                             showFutureVolumes = false,
+                            // WS16BE: use the clean ORIGINAL single-binding
+                            // sprite. WS16AO wider shoulder panels visually
+                            // duplicate each book even with no extra UI image.
+                            useCleanSpines = cabinetPortrait,
+                            drawContactShadow = !cabinetPortrait,
                             onBookSelected = onBookSelected
                         )
                         Box(Modifier.align(Alignment.BottomCenter)
