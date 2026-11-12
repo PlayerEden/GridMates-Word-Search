@@ -18,6 +18,12 @@
 
 **Latest code commit before CI:** [`70fa6e39674d0bd1a6b54066e2a44b626d759c14`](https://github.com/PlayerEden/GridMates-Word-Search/commit/70fa6e39674d0bd1a6b54066e2a44b626d759c14). Later documentation-only changes are `[skip ci]`.
 
+## Initial CI correction (same pass)
+
+First Android [#43175871386](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871386) and art [#43175871287](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871287) failed in source-only legacy WS16AM coverage: old test demanded the exact `width(artWidth).height(4.dp)` contact shadow. The actual intended code uses 76% width, 2dp height, and reduced opacity with explicit `drawContactShadow` control. No generator failure was reported. Corrected only the outdated test.
+
+**Current v65 code/test source:** [`3a5d9122621f62db6ec193075717797553e0539b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/3a5d9122621f62db6ec193075717797553e0539b). Current correct CI [Android #43176056684](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176056684) and [art/release #43176056697](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176056697) were running when recorded. **No verified APK yet**. The first failed run must not be cited as successful evidence.
+
 ## QA gate and rollback
 
 - **Android QA:** [run #43175871386](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871386) started, final result pending at journal creation.
