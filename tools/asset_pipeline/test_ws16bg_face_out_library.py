@@ -50,26 +50,21 @@ class FaceOutLibraryTests(unittest.TestCase):
         self.assertNotIn("BookFactoryBlankSpine", art)
         self.assertNotIn("onBookSelected(style)", art)
 
-    def test_portrait_catalog_pages_but_landscape_fallback_unchanged(self):
+    def test_face_out_preview_is_preserved_but_not_the_default_library(self):
+        # WS16BG was a useful real-cover A/B study. Owner explicitly
+        # selected scalable densely packed spines for the actual Library.
+        archived = (APP / "WS16BGFaceOutBookBay.kt").read_text()
         scene = (APP / "WS16ATModularLibraryScene.kt").read_text()
-        self.assertIn("val faceOutPortrait = cabinetPortrait && tierCount == 2", scene)
-        self.assertIn("val capacity = if (faceOutPortrait) 4 else slots * tierCount", scene)
-        self.assertIn("pageBooks.drop(tier * 2).take(2)", scene)
-        self.assertIn("WS16BGFaceOutBookBay(", scene)
+        self.assertIn("internal fun WS16BGFaceOutBookBay(", archived)
+        self.assertIn("WS16BHDenseSpineBay(", scene)
+        self.assertNotIn("WS16BGFaceOutBookBay(", scene)
         self.assertIn("WS16AMSpineBay(", scene)
-        self.assertIn("if (faceOutPortrait)", scene)
         self.assertIn("books.drop(page * capacity).take(capacity)", scene)
         self.assertIn("onBookSelected = onBookSelected", scene)
-        # Adding a fifth real book creates an actual new page, not a fake
-        # locked volume or silent truncation.
-        for count in range(0, 13):
-            pages = max(1, (count + 3) // 4)
-            self.assertEqual(sum(len(list(range(count))[i*4:(i+1)*4])
-                                 for i in range(pages)), count)
         gradle = (ROOT / "app/build.gradle.kts").read_text()
         match = re.search(r"versionCode\s*=.*\?:\s*(\d+)", gradle)
         self.assertIsNotNone(match)
-        self.assertGreaterEqual(int(match.group(1)), 66)
+        self.assertGreaterEqual(int(match.group(1)), 67)
         self.assertIn("qa-signing/wordsearch-qa.p12", gradle)
 
 if __name__ == "__main__":
