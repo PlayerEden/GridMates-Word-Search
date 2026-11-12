@@ -112,6 +112,8 @@ jobs:
         run: |
           python3 tools/asset_pipeline/build_ws16ae_books_v2.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ae_books_v2.py' -v
+      - name: Validate WS16BG real front covers and portrait bookcase paging
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bg_face_out_library.py' -v
       - name: Repair all three source-pinned WS16AF spine lettering masters
         run: |
           python3 tools/asset_pipeline/build_ws16af_spines_clean.py
