@@ -208,11 +208,11 @@ internal fun WS16ATModularLibraryScene(
                             shelfIndex = shelfIndex,
                             slots = if (balancedSparseLayout) shelfBooks.size else slots,
                             slot = if (balancedSparseLayout) 60.dp else hitSlot,
-                            // Keep bindings clear of the title plaque instead
-                            // of forcing tall art up under the heading.
-                            height = (tierHeight - shelfContactDepth -
-                                (if (balancedSparseLayout) 24.dp else 0.dp))
+                            // Keep the BOTTOM of the bay at the shelf-contact
+                            // plane; shrink only the image above that point.
+                            height = (tierHeight - shelfContactDepth)
                                 .coerceAtLeast(60.dp),
+                            headClearance = if (balancedSparseLayout) 34.dp else 10.dp,
                             futureTreatment = true,
                             showFutureVolumes = false,
                             // WS16BE: use the clean ORIGINAL single-binding
