@@ -1,3 +1,11 @@
+## WS16BD corrected v63 QA checkpoint — November 11, 2026
+
+Latest code source [`c54b4b18afbe9e2525238f47521fe770daea75f7`](https://github.com/PlayerEden/GridMates-Word-Search/commit/c54b4b18afbe9e2525238f47521fe770daea75f7), draft PR #131. Owner rejected WS16BC v62 Library's visual weight ("Meh") after real phone screenshots. New portrait sparse-catalog option spreads the 3 real books 2+1 over two balanced shelves, centers enlarged real 60dp spines, hides fake placeholder volumes and de-emphasizes Coming soon. Library click/selection/book detail/progress path, older renderer, signed package, current painted art, Home and LAN unchanged. QA versionCode 63.
+
+First [Android #43141264381](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141264381) and [art #43141264469](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141264469) FAILED before compilation due to stale test checking `slot = hitSlot`; corrected test accepts the new conditional 60dp sparse slot. **Latest [Android #43141513582](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513582) and [art/release #43141513574](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513574) IN PROGRESS**, no APK yet. Do not claim dual-green before checking both. Previously exact-verified v62 [artifact #13893295859](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43102415463/artifacts/13893295859) remains last owner-installed fallback; v63 physical acceptance pending. Do not merge PR or alter user saves.
+
+Next: inspect both corrected workflows, verify actual v63 APK and signer if green, share GitHub artifact and direct APK for side-by-side physical visual review. Full [WS16BD journal](devlog/2026-11-11_WS16BD_REAL_BOOK_LIBRARY_BALANCE.md).
+
 ## Active visual feedback — WS16BD real-book-first candidate (Nov 11, 2026)
 
 **Owner's v62 phone review:** Home still inviting but Library screenshot visually underwhelming; owner said **"Meh"**. It displays real Woodland/Space/Garden only on upper shelf while faded fake spines + "Coming soon" consume lower half. This is a **negative visual acceptance**, not a release go-ahead.
