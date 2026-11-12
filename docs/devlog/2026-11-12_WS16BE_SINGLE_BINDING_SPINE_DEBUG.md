@@ -24,12 +24,18 @@ The v63 user screenshot also shows upper book tops running beneath the `Your Lib
 
 1. `WS16AMSpineBay`: add optional `useCleanSpines` and `drawContactShadow` toggles (default **false / true** so legacy routes are untouched). When clean is enabled, select profile `clean` and true source ratio **104/542**, not the 166-wide enlarged book. Keep exact book IDs and click callbacks. Disable the 4dp contact ellipse when requested.
 2. `BookcaseWoodArtwork.kt`: make clean profile explicitly select the **original** `ws16ai/spines/$name.png`; keep existing `tall`/`standard` WS16AO images and fallback behavior intact for other paths. `ContentScale.Fit` preserves print proportions; no stretching or new asset rights.
-3. `WS16ATModularLibraryScene.kt`: only the tall portrait modular Library opts into the clean path (`useCleanSpines = cabinetPortrait`) and disables extra contact shadows (`drawContactShadow = !cabinetPortrait`). For sparse 2-shelf portrait display, reserve a further **24dp** of headroom to keep art below the title plaque. Continue 2+1 real-book layout, no future placeholders, count bay and safe overlay.
+3. `WS16ATModularLibraryScene.kt`: only the tall portrait modular Library opts into the clean path (`useCleanSpines = cabinetPortrait`) and disables extra contact shadows (`drawContactShadow = !cabinetPortrait`). For sparse 2-shelf portrait display, reserve a further **24dp** of image-only headroom (34dp total; 10dp baseline) to keep art below the title plaque **without moving its bottom off the shelf**. Continue 2+1 real-book layout, no future placeholders, count bay and safe overlay.
 4. `QaActualBookcaseAndroidTest.kt`: additionally assert that top real image bounds do not overlap the native Library title plaque. Existing selection, book placement and count checks remain.
 5. `test_ws16at_modular_library.py` and `test_ws16ao_spine_family.py`: preserve source-pinned original/derived files and fallback, assert the correct clean profile, optional shadow and reserved header clearance. The originally pinned 12 WS16AO images are **not changed or reapproved**.
 6. `app/build.gradle.kts`: debug QA `versionCode=64`, `versionName=0.9.20-clean-single-spines`; same application ID `com.playereden.gridmates.wordsearch.qa` and same existing QA key/certificate. Intended install-over v63 without uninstall.
 
 **Latest feature/test code source:** [`c82bf18e8e99b60baf9a3233b79baf3c1d4c1278`](https://github.com/PlayerEden/GridMates-Word-Search/commit/c82bf18e8e99b60baf9a3233b79baf3c1d4c1278). New CI runs must be read by commit SHA, not guessed.
+
+## Pre-build geometric correction
+
+An initial implementation reduced `WS16AMSpineBay`'s overall height by 24dp, which would also lift the bottom-aligned image away from the wooden contact plane. This was caught during code review **before sharing a v64 APK**. The corrected implementation keeps `height = (tierHeight - shelfContactDepth)` and introduces `headClearance: Dp = 10.dp` for image width/height calculation only; sparse portrait opts into 34dp total (24dp additional), so image tops clear the title while book feet remain shelf-anchored. Adjusted static tests accordingly, no art/source change.
+
+**Current corrected source:** [`8d8942dff9e50e966346fdbaef4c79c3d3ded504`](https://github.com/PlayerEden/GridMates-Word-Search/commit/8d8942dff9e50e966346fdbaef4c79c3d3ded504). First runs [Android #43173065798](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173065798) and [art #43173065828](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173065828) were cancelled/superseded. Corrected exact-source [Android QA #43173531241](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241) and [art/release #43173531335](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531335) were pending at journal update. These newer runs are the ones to verify.
 
 ## Build, rollback and release gates
 
