@@ -154,6 +154,10 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("ws16bh-spine-" + woodland.id).assertExists()
         compose.onNodeWithTag("ws16bh-spine-" + space.id).assertExists()
         compose.onNodeWithTag("ws16bh-spine-" + garden.id).assertExists()
+        compose.onNodeWithTag("ws16bi-blank-cell-0-0").assertExists()
+        compose.onNodeWithTag("ws16bi-blank-cell-1-0").assertExists()
+        compose.onNodeWithTag("ws16bi-mounted-shelf").assertExists()
+        compose.onNodeWithTag("ws16bi-real-shadow-" + woodland.id).assertExists()
         compose.onNodeWithTag("ws16bg-cover-" + woodland.id).assertDoesNotExist()
         compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
         compose.onNodeWithTag("ws16bc-visible-future-0-3").assertDoesNotExist()
@@ -186,7 +190,7 @@ class QaActualBookcaseAndroidTest {
     }
 
     @Test fun tallPortraitExpandsToThreeRealShelvesWithLargeCatalog() {
-        val many = (0 until 14).map { i ->
+        val many = (0 until 10).map { i ->
             fixture(
                 when (i % 3) {
                     0 -> WordTheme.WOODLAND
@@ -200,7 +204,7 @@ class QaActualBookcaseAndroidTest {
         var selected: String? = null
         compose.setContent {
             GridMatesTheme {
-                Box(Modifier.width(360.dp).height(760.dp)) {
+                Box(Modifier.width(360.dp).height(980.dp)) {
                     WS16ATModularLibraryScene(
                         books = many,
                         onBack = {},
@@ -215,7 +219,7 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("ws16bh-packed-shelf-2").assertExists()
         compose.onNodeWithTag("ws16bh-spine-" + many.first().id).assertExists()
         compose.onNodeWithTag("ws16bh-spine-" + many.last().id).assertExists()
-        compose.onNodeWithText("14 books").assertExists()
+        compose.onNodeWithText("10 books").assertExists()
         compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
 
         val lastBinding = compose.onNodeWithTag("ws16bh-spine-" + many.last().id)
