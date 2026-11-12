@@ -131,7 +131,7 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithText("Locked").assertDoesNotExist()
     }
 
-    @Test fun modularPortraitBalancesRealBooksAndKeepsCountOffCarving() {
+    @Test fun modularPortraitShowsPhysicalCoversAndOpensStableBookId() {
         var selected: String? = null
         compose.setContent {
             GridMatesTheme {
@@ -149,35 +149,40 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("ws16bc-count-bay").assertExists()
         compose.onNodeWithText("3 books").assertExists()
         compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
-        compose.onNodeWithTag("ws16bc-visible-future-0-3").assertDoesNotExist()
+        compose.onNodeWithTag("ws16bg-face-out-shelf-0").assertExists()
+        compose.onNodeWithTag("ws16bg-face-out-shelf-1").assertExists()
+        compose.onNodeWithTag("ws16bg-cover-" + woodland.id).assertExists()
+        compose.onNodeWithTag("ws16bg-cover-" + space.id).assertExists()
+        compose.onNodeWithTag("ws16bg-cover-" + garden.id).assertExists()
+        // No tall spines or synthetic future books in the new portrait mode.
+        compose.onNodeWithTag("ws16am-spine-" + woodland.id).assertDoesNotExist()
         compose.onNodeWithTag("ws16bc-visible-future-1-1").assertDoesNotExist()
-        val woodlandBounds = compose.onNodeWithTag("ws16am-spine-" + woodland.id)
+
+        val woodlandBounds = compose.onNodeWithTag("ws16bg-cover-" + woodland.id)
             .fetchSemanticsNode().boundsInRoot
-        val spaceBounds = compose.onNodeWithTag("ws16am-spine-" + space.id)
+        val spaceBounds = compose.onNodeWithTag("ws16bg-cover-" + space.id)
             .fetchSemanticsNode().boundsInRoot
-        val gardenBounds = compose.onNodeWithTag("ws16am-spine-" + garden.id)
+        val gardenBounds = compose.onNodeWithTag("ws16bg-cover-" + garden.id)
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Real Woodland and Space books share the upper shelf",
+        assertTrue("Woodland and Space face out on the upper shelf",
             kotlin.math.abs(woodlandBounds.top - spaceBounds.top) < 2f)
-        assertTrue("Real Garden book occupies the lower shelf",
+        assertTrue("Garden faces out on the lower shelf",
             gardenBounds.top > woodlandBounds.bottom)
-        // WS16BE: the original rounded single-binding source is narrower and
-        // its top must not disappear under the native Library heading.
+
         val titleBounds = compose.onNodeWithTag("ws16at-library-title")
             .fetchSemanticsNode().boundsInRoot
-        val topArtwork = compose.onNodeWithTag("ws16am-art-" + woodland.id)
+        val topArtwork = compose.onNodeWithTag("ws16bg-art-" + woodland.id)
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Real spine artwork must clear the Library title plaque",
+        assertTrue("Cover must clear the Library title plaque",
             topArtwork.top >= titleBounds.bottom)
 
         val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
             .fetchSemanticsNode().boundsInRoot
         val bookCount = compose.onNodeWithTag("ws16at-real-count")
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Book count must clear the lower shelf's carved apron",
+        assertTrue("Book count must clear lower shelf carving",
             bookCount.top > lowerShelf.bottom)
 
-        compose.onNodeWithTag("ws16am-spine-" + woodland.id).performClick()
-        compose.runOnIdle { assertEquals(woodland.id, selected) }
-    }
-}
+        compose.onNodeWithTag("ws16bg-cover-" + garden.id).performClick()
+        compose.runOnIdle { assertEquals(garden.id, selected) }
+    }}
