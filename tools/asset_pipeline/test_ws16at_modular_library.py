@@ -102,7 +102,7 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("drawContactShadow: Boolean = true", bay)
         self.assertIn("headClearance: Dp = 10.dp", bay)
         self.assertIn("(maxHeight - headClearance)", bay)
-        self.assertIn('val profile = if (useCleanSpines) "clean" else', bay)
+        self.assertIn('val profile = if (useCurvedSpines) "curved" else if (useCleanSpines) "clean" else', bay)
         self.assertIn('"clean" -> 104f / 542f', bay)
         self.assertIn('if (drawContactShadow && (book != null || isFutureVisible))', bay)
         self.assertIn('"clean" -> loadBookcaseAsset(context, "ws16ai/spines/$name.png")', art)
