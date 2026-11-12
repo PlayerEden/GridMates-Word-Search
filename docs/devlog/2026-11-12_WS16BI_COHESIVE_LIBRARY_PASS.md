@@ -20,6 +20,12 @@ Working branch `feature/ws14b-style-anchor-and-art-direction-2026-11-08`, [draft
 
 **Important:** No user progress, puzzle generation/seed, achievements, remote/local LAN, data schema, account features or play-screen art changed. Original generated painting rights remain unapproved for production; all WS16BI assets stay debug-only. Do not merge PR #131 or switch release art flags.
 
+## Initial CI failures and focused repairs
+
+- Exact source `4e4bea3d`: [Android #43293978365](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43293978365) and [art/release #43293978579](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43293978579) failed **before v68 art generation**. The inherited WS16BB source test assumed the fallback call was literally `Ws16BBMatchedCabinetShelf()`; the new fitted shelf correctly forwards `modifier`. Repaired the test in `dad1427f` without changing production behavior.
+- Corrected runs [Android #43294299041](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43294299041) and [art #43294299038](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43294299038) generated all four WS16BI images and failed at a strict **PNG corner alpha test**: the shelf's Gaussian mounting shadow left alpha 1 on an outside corner. In `4f58aa35` the generator was corrected to explicitly clear a 3px outer edge instead of weakening the test. This also protects against the earlier binding fringe/speck issue.
+- **Latest gameplay/asset generator source** [`4f58aa35521675b5ccad34239234bcf2fa2c0eb1`](https://github.com/PlayerEden/GridMates-Word-Search/commit/4f58aa35521675b5ccad34239234bcf2fa2c0eb1); newer [Android #43294624409](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43294624409) and [art/release #43294624433](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43294624433) **IN PROGRESS** when journal amended. Do not claim an APK or dual-green result until confirmed.
+
 ## Source CI and rollback
 
 - **Initial source:** [`4e4bea3df6946b0ae172cc96c7a0fc0031ccee3a`](https://github.com/PlayerEden/GridMates-Word-Search/commit/4e4bea3df6946b0ae172cc96c7a0fc0031ccee3a).
