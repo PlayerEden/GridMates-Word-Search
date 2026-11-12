@@ -148,15 +148,16 @@ internal fun WS16ATModularLibraryScene(
         // screens. Keep a slightly larger slot for increased font scaling.
         // Short/landscape layouts preserve the previous ordinary spine flow.
         val densePortrait = cabinetPortrait
-        val packedSlot = if (density.fontScale >= 1.65f) 42.dp else 36.dp
+        // Real and decorative bindings share nonoverlapping 48dp+ hit cells.
+        val packedSlot = if (density.fontScale >= 1.65f) 52.dp else 48.dp
         val activeSlot = if (densePortrait) packedSlot else hitSlot
         val slots = ((maxWidth - leftWidth - rightWidth).value / activeSlot.value)
             .toInt().coerceIn(1, 12)
         val tierCount = when {
             maxHeight < 480.dp -> 1
-            // Two shelves for a new collection; the third physical shelf
-            // appears on tall phones as soon as books need a second row.
-            densePortrait && maxHeight >= 740.dp && books.size > slots -> 3
+            // WS16BI: third tier ONLY when each book remains tall enough.
+            // At ordinary phone heights use two real shelves and pagination.
+            densePortrait && maxHeight >= 960.dp && books.size > slots -> 3
             maxHeight >= 830.dp && books.size > 2 * slots -> 3
             else -> 2
         }
@@ -228,7 +229,9 @@ internal fun WS16ATModularLibraryScene(
                                 slot = packedSlot,
                                 height = (tierHeight - shelfContactDepth)
                                     .coerceAtLeast(54.dp),
-                                onBookSelected = onBookSelected
+                                onBookSelected = onBookSelected,
+                                maxSlots = slots,
+                                showDecorativeBlanks = true
                             )
                         } else {
                             // Exact previous renderer remains a rollback for
@@ -253,16 +256,16 @@ internal fun WS16ATModularLibraryScene(
                             .fillMaxWidth()
                             .testTag("ws16at-home-shelf-$shelfIndex")) {
                             if (cabinetPortrait) {
-                                Ws16BBMatchedCabinetShelf()
+                                Ws16BIMountedCabinetShelf()
                             } else {
                                 Ws16EStorybookShelf()
                             }
                         }
                         // An entirely empty catalog may show an upcoming
                         // section; never compete with a real player's books.
-                        if (tier > 0 && pageBooks.isEmpty()) {
-                            Ws16AZCabinetPlaque(
-                                label = "Coming soon", title = false,
+                        if (!cabinetPortrait && tier > 0 && pageBooks.isEmpty()) {
+                            WS16BIAdaptivePlaque(
+                                label = "Coming soon", title = false, styled = cabinetPortrait,
                                 modifier = Modifier.align(Alignment.TopCenter)
                                     .padding(top = 14.dp)
                                     .testTag("ws16bb-upcoming-label")
@@ -280,9 +283,9 @@ internal fun WS16ATModularLibraryScene(
                             .testTag("ws16bc-count-bay"),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        Ws16AZCabinetPlaque(
+                        WS16BIAdaptivePlaque(
                             label = "${books.size} ${if (books.size == 1) "book" else "books"}",
-                            title = false,
+                            title = false, styled = cabinetPortrait,
                             modifier = Modifier.testTag("ws16at-real-count")
                         )
                     }
@@ -295,14 +298,15 @@ internal fun WS16ATModularLibraryScene(
         // shelf/book stage remain full-bleed behind visible or gesture bars.
         Box(Modifier.fillMaxSize().padding(safeContentPadding)
             .testTag("ws16aw-safe-overlays")) {
-        Ws16AZCabinetPlaque(
-            label = "Your Library", title = true,
+        WS16BIAdaptivePlaque(
+            label = "Your Library", title = true, styled = cabinetPortrait,
             modifier = Modifier.align(Alignment.TopCenter)
                 .padding(start = 62.dp, end = 62.dp,
                     top = (top - 58.dp).coerceAtLeast(38.dp))
                 .testTag("ws16at-library-title")
         )
-        Ws16AZCabinetControl(
+        WS16BIAdaptiveControl(
+            styled = cabinetPortrait,
             glyph = Ws16AZCabinetGlyph.BACK,
             description = "Back to Play", onClick = onBack,
             modifier = Modifier.align(Alignment.TopStart)
@@ -311,9 +315,9 @@ internal fun WS16ATModularLibraryScene(
         )
         if (tierCount == 1) {
             // Only truly compact single-tier layouts use the bottom placard.
-            Ws16AZCabinetPlaque(
+            WS16BIAdaptivePlaque(
                 label = "${books.size} ${if (books.size == 1) "book" else "books"}",
-                title = false,
+                title = false, styled = cabinetPortrait,
                 modifier = Modifier.align(Alignment.BottomCenter)
                     .padding(bottom = 12.dp)
                     .testTag("ws16at-real-count")
@@ -324,8 +328,9 @@ internal fun WS16ATModularLibraryScene(
                     .padding(bottom = (bottom - 9.dp).coerceAtLeast(46.dp))
                     .testTag("ws16at-pagination"),
                 verticalAlignment = Alignment.CenterVertically) {
-                Ws16AZCabinetControl(
-                    glyph = Ws16AZCabinetGlyph.PREVIOUS,
+                WS16BIAdaptiveControl(
+                    styled = cabinetPortrait,
+            glyph = Ws16AZCabinetGlyph.PREVIOUS,
                     description = "Previous bookcase",
                     enabled = pager.currentPage > 0,
                     onClick = {
@@ -333,13 +338,14 @@ internal fun WS16ATModularLibraryScene(
                     },
                     modifier = Modifier.testTag("ws16at-prev")
                 )
-                Ws16AZCabinetPlaque(
+                WS16BIAdaptivePlaque(
                     label = "${pager.currentPage + 1} / $pages",
-                    title = false,
+                    title = false, styled = cabinetPortrait,
                     modifier = Modifier.testTag("ws16at-page-label")
                 )
-                Ws16AZCabinetControl(
-                    glyph = Ws16AZCabinetGlyph.NEXT,
+                WS16BIAdaptiveControl(
+                    styled = cabinetPortrait,
+            glyph = Ws16AZCabinetGlyph.NEXT,
                     description = "Next bookcase",
                     enabled = pager.currentPage < pages - 1,
                     onClick = {
@@ -350,7 +356,8 @@ internal fun WS16ATModularLibraryScene(
             }
         }
         // Keep the old Library renderer one tap away for visual comparison.
-        Ws16AZCabinetControl(
+        WS16BIAdaptiveControl(
+            styled = cabinetPortrait,
             glyph = Ws16AZCabinetGlyph.ART_OPTIONS,
             description = "Previous Library artwork",
             onClick = onPreviousArt,
