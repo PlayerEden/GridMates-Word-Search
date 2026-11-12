@@ -158,7 +158,8 @@ internal fun WS16AMSpineBay(
     futureTreatment: Boolean = false,
     showFutureVolumes: Boolean = true,
     useCleanSpines: Boolean = false,
-    drawContactShadow: Boolean = true
+    drawContactShadow: Boolean = true,
+    headClearance: Dp = 10.dp
 ) {
     BoxWithConstraints(Modifier.fillMaxWidth().height(height)
         .testTag("ws16am-spine-shelf-" + shelfIndex)) {
@@ -178,7 +179,7 @@ internal fun WS16AMSpineBay(
             else -> 166f / 542f
         }
         val artWidth = minOf(slot - 2.dp,
-            (maxHeight - 10.dp).coerceAtLeast(24.dp) * bindingRatio)
+            (maxHeight - headClearance).coerceAtLeast(24.dp) * bindingRatio)
         val artHeight = artWidth / bindingRatio
         Row(
             modifier = Modifier.align(Alignment.BottomCenter)
