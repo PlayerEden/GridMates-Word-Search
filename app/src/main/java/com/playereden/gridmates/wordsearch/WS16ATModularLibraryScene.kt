@@ -151,6 +151,12 @@ internal fun WS16ATModularLibraryScene(
         }
         val capacity = slots * tierCount
         val pages = maxOf(1, (books.size + capacity - 1) / capacity)
+        // WS16BD: a sparse portrait collection should showcase the REAL
+        // books across both shelves, not give half the cabinet to fake volumes.
+        // Once there are more than one full row, return to catalog-order paging.
+        val balancedSparseLayout = tierCount == 2 &&
+            maxHeight >= maxWidth * 1.7f &&
+            pages == 1 && books.size in 2..slots
         val pager = rememberPagerState(pageCount = { pages })
         val scope = rememberCoroutineScope()
         val top = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.25f)
@@ -172,7 +178,9 @@ internal fun WS16ATModularLibraryScene(
         // Reserve only the space that the shelf/carved apron and native plaque
         // require. Use the remaining height for real books, not dead wood space.
         val shelfTierSpace = (available - countBayHeight).coerceAtLeast(1.dp)
-        val tierHeights = if (tierCount == 2) listOf(
+        val tierHeights = if (balancedSparseLayout) listOf(
+            shelfTierSpace * 0.50f, shelfTierSpace * 0.50f
+        ) else if (tierCount == 2) listOf(
             shelfTierSpace * 0.54f, shelfTierSpace * 0.46f
         ) else List(tierCount) { available / tierCount }
 
@@ -188,17 +196,21 @@ internal fun WS16ATModularLibraryScene(
             Column(Modifier.fillMaxSize().testTag("ws16at-page-$page")) {
                 repeat(tierCount) { tier ->
                     val shelfIndex = page * tierCount + tier
-                    val shelfBooks = pageBooks.drop(tier * slots).take(slots)
+                    val shelfBooks = if (balancedSparseLayout) {
+                        val topBooks = (pageBooks.size + 1) / 2
+                        if (tier == 0) pageBooks.take(topBooks) else pageBooks.drop(topBooks)
+                    } else pageBooks.drop(tier * slots).take(slots)
                     val tierHeight = tierHeights[tier]
                     Box(Modifier.fillMaxWidth().height(tierHeight)
                         .testTag("ws16at-movable-shelf-$shelfIndex")) {
                         WS16AMSpineBay(
                             books = shelfBooks,
-                            shelfIndex = shelfIndex, slots = slots,
-                            slot = hitSlot,
+                            shelfIndex = shelfIndex,
+                            slots = if (balancedSparseLayout) shelfBooks.size else slots,
+                            slot = if (balancedSparseLayout) 60.dp else hitSlot,
                             height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp),
                             futureTreatment = true,
-                            showFutureVolumes = tier > 0,
+                            showFutureVolumes = false,
                             onBookSelected = onBookSelected
                         )
                         Box(Modifier.align(Alignment.BottomCenter)
@@ -210,9 +222,9 @@ internal fun WS16ATModularLibraryScene(
                                 Ws16EStorybookShelf()
                             }
                         }
-                        // Locked/upcoming volumes are deliberately subdued:
-                        // only catalog books are full-color and clickable.
-                        if (tier > 0 && shelfBooks.isEmpty()) {
+                        // An entirely empty catalog may show an upcoming
+                        // section; never compete with a real player's books.
+                        if (tier > 0 && pageBooks.isEmpty()) {
                             Ws16AZCabinetPlaque(
                                 label = "Coming soon", title = false,
                                 modifier = Modifier.align(Alignment.TopCenter)
