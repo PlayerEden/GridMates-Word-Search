@@ -149,7 +149,14 @@ internal fun WS16ATModularLibraryScene(
             maxHeight >= 830.dp && books.size > 2 * slots -> 3
             else -> 2
         }
-        val capacity = slots * tierCount
+        // WS16BG: actual front covers, two per shelf, replace the tall
+        // source-bound spines ONLY in the high-res portrait cabinet.
+        // Four real books per page keeps every cover big enough to read;
+        // landscape/compact and older preview routes stay unchanged.
+        val cabinetPortrait = hasWs16baCabinetArt(LocalContext.current) &&
+            maxHeight >= maxWidth * 1.7f
+        val faceOutPortrait = cabinetPortrait && tierCount == 2
+        val capacity = if (faceOutPortrait) 4 else slots * tierCount
         val pages = maxOf(1, (books.size + capacity - 1) / capacity)
         // WS16BD: a sparse portrait collection should showcase the REAL
         // books across both shelves, not give half the cabinet to fake volumes.
@@ -162,8 +169,6 @@ internal fun WS16ATModularLibraryScene(
         val top = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.25f)
         val bottom = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.15f)
         val available = (maxHeight - top - bottom).coerceAtLeast(1.dp)
-        val cabinetPortrait = hasWs16baCabinetArt(LocalContext.current) &&
-            maxHeight >= maxWidth * 1.7f
         // WS16BC: measure the painted shelf's actual extension beneath its
         // book-contact plane. A bottom-anchored count used to cover the carving
         // on some aspect ratios, even when the wood looked fine in screenshots.
@@ -178,7 +183,7 @@ internal fun WS16ATModularLibraryScene(
         // Reserve only the space that the shelf/carved apron and native plaque
         // require. Use the remaining height for real books, not dead wood space.
         val shelfTierSpace = (available - countBayHeight).coerceAtLeast(1.dp)
-        val tierHeights = if (balancedSparseLayout) listOf(
+        val tierHeights = if (faceOutPortrait || balancedSparseLayout) listOf(
             shelfTierSpace * 0.50f, shelfTierSpace * 0.50f
         ) else if (tierCount == 2) listOf(
             shelfTierSpace * 0.54f, shelfTierSpace * 0.46f
@@ -196,35 +201,44 @@ internal fun WS16ATModularLibraryScene(
             Column(Modifier.fillMaxSize().testTag("ws16at-page-$page")) {
                 repeat(tierCount) { tier ->
                     val shelfIndex = page * tierCount + tier
-                    val shelfBooks = if (balancedSparseLayout) {
+                    val shelfBooks = if (faceOutPortrait) {
+                        pageBooks.drop(tier * 2).take(2)
+                    } else if (balancedSparseLayout) {
                         val topBooks = (pageBooks.size + 1) / 2
                         if (tier == 0) pageBooks.take(topBooks) else pageBooks.drop(topBooks)
                     } else pageBooks.drop(tier * slots).take(slots)
                     val tierHeight = tierHeights[tier]
                     Box(Modifier.fillMaxWidth().height(tierHeight)
                         .testTag("ws16at-movable-shelf-$shelfIndex")) {
-                        WS16AMSpineBay(
-                            books = shelfBooks,
-                            shelfIndex = shelfIndex,
-                            slots = if (balancedSparseLayout) shelfBooks.size else slots,
-                            slot = if (balancedSparseLayout) 60.dp else hitSlot,
-                            // Keep the BOTTOM of the bay at the shelf-contact
-                            // plane; shrink only the image above that point.
-                            height = (tierHeight - shelfContactDepth)
-                                .coerceAtLeast(60.dp),
-                            headClearance = if (balancedSparseLayout) 34.dp else 10.dp,
-                            futureTreatment = true,
-                            showFutureVolumes = false,
-                            // WS16BE: use the clean ORIGINAL single-binding
-                            // sprite. WS16AO wider shoulder panels visually
-                            // duplicate each book even with no extra UI image.
-                            // WS16BF: same single silhouette with corrected
-                            // alpha, convex lighting and subtle contact.
-                            useCleanSpines = cabinetPortrait,
-                            useCurvedSpines = cabinetPortrait,
-                            drawContactShadow = cabinetPortrait,
-                            onBookSelected = onBookSelected
-                        )
+                        if (faceOutPortrait) {
+                            WS16BGFaceOutBookBay(
+                                books = shelfBooks,
+                                height = (tierHeight - shelfContactDepth)
+                                    .coerceAtLeast(70.dp),
+                                onBookSelected = onBookSelected,
+                                modifier = Modifier.testTag(
+                                    "ws16bg-face-out-shelf-$shelfIndex"
+                                )
+                            )
+                        } else {
+                            // Exact previous renderer remains a rollback for
+                            // landscape and small-screen cabinet layouts.
+                            WS16AMSpineBay(
+                                books = shelfBooks,
+                                shelfIndex = shelfIndex,
+                                slots = if (balancedSparseLayout) shelfBooks.size else slots,
+                                slot = if (balancedSparseLayout) 60.dp else hitSlot,
+                                height = (tierHeight - shelfContactDepth)
+                                    .coerceAtLeast(60.dp),
+                                headClearance = if (balancedSparseLayout) 34.dp else 10.dp,
+                                futureTreatment = true,
+                                showFutureVolumes = false,
+                                useCleanSpines = cabinetPortrait,
+                                useCurvedSpines = cabinetPortrait,
+                                drawContactShadow = cabinetPortrait,
+                                onBookSelected = onBookSelected
+                            )
+                        }
                         Box(Modifier.align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .testTag("ws16at-home-shelf-$shelfIndex")) {
