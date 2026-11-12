@@ -51,8 +51,8 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("Ws16EStorybookShelf()",code)
         self.assertIn("val shelfContactDepth = 42.dp",code)
         self.assertIn("futureTreatment = true",code)
-        self.assertIn("height = (tierHeight - shelfContactDepth -",code)
-        self.assertIn("(if (balancedSparseLayout) 24.dp else 0.dp)",code)
+        self.assertIn("height = (tierHeight - shelfContactDepth)",code)
+        self.assertIn("headClearance = if (balancedSparseLayout) 34.dp else 10.dp",code)
         self.assertIn("books.drop(page * capacity).take(capacity)",code)
         # Default layout keeps 48/54dp hit slots; the sparse 2-tier showcase
         # explicitly uses larger 60dp catalog-only hit slots.
@@ -99,6 +99,8 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("drawContactShadow = !cabinetPortrait", scene)
         self.assertIn("useCleanSpines: Boolean = false", bay)
         self.assertIn("drawContactShadow: Boolean = true", bay)
+        self.assertIn("headClearance: Dp = 10.dp", bay)
+        self.assertIn("(maxHeight - headClearance)", bay)
         self.assertIn('val profile = if (useCleanSpines) "clean" else', bay)
         self.assertIn('"clean" -> 104f / 542f', bay)
         self.assertIn('if (drawContactShadow && (book != null || isFutureVisible))', bay)
