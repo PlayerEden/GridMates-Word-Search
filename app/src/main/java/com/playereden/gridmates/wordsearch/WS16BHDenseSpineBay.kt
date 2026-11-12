@@ -7,7 +7,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -17,12 +19,13 @@ import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.PuzzleBook
 
 /**
- * WS16BH: scalable, tightly packed real book bindings for the physical Library.
+ * WS16BI: real bindings FIRST in catalog order, then a few explicitly
+ * decorative, totally unlettered/unclickable future volumes.
  *
- * Each visible binding is a real PuzzleBook with a stable click ID, not a
- * decorative placeholder. Existing WS16BF 104x542 single-rounded spine art
- * is reused without new panels, scaling tricks or image-generation changes.
- * Covers remain reserved for the existing pull-out/book preview.
+ * Visual width and each 48dp minimum hit cell are separate. No overlapping
+ * hit targets between two neighboring real books; large catalogs paginate.
+ * Single rounded bindings have an ambient shadow projected onto backboard
+ * plus a tight shelf-contact shadow, never another fake book backing.
  */
 @Composable
 internal fun WS16BHDenseSpineBay(
@@ -31,7 +34,9 @@ internal fun WS16BHDenseSpineBay(
     slot: Dp,
     height: Dp,
     onBookSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxSlots: Int = 12,
+    showDecorativeBlanks: Boolean = false
 ) {
     BoxWithConstraints(
         modifier.fillMaxWidth().height(height)
@@ -39,16 +44,20 @@ internal fun WS16BHDenseSpineBay(
     ) {
         val bindingRatio = 104f / 542f
         val bindingWidth = minOf(
-            slot - 2.dp,
-            (maxHeight - 12.dp).coerceAtLeast(24.dp) * bindingRatio
+            slot - 3.dp,
+            (maxHeight - 4.dp).coerceAtLeast(24.dp) * bindingRatio
         ).coerceAtLeast(12.dp)
         val bindingHeight = bindingWidth / bindingRatio
-        if (books.isNotEmpty()) {
-            // Small collections make a tidy group centered on the shelf.
-            // With many books, the same group grows continuously, edge-to-edge.
+        // Environment decoration must not consume book IDs, capacity or taps.
+        val blanks = if (showDecorativeBlanks) {
+            (maxSlots - books.size).coerceAtLeast(0)
+                .coerceAtMost(if (books.isEmpty()) 4 else 2)
+        } else 0
+        val displayCount = books.size + blanks
+        if (displayCount > 0) {
             Row(
                 Modifier.align(Alignment.BottomCenter)
-                    .width(slot * books.size)
+                    .width(slot * displayCount)
                     .padding(bottom = 2.dp)
                     .testTag("ws16bh-real-book-row-$shelfIndex"),
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
@@ -65,13 +74,25 @@ internal fun WS16BHDenseSpineBay(
                             .testTag("ws16bh-spine-" + book.id),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        // One subdued contact strip; the artwork itself already
-                        // provides leather curvature. No second backing shape.
+                        // Soft cast on the backboard, clipped *behind* the real
+                        // rounded book; no hard-edged duplicate leather panel.
                         Box(
                             Modifier.align(Alignment.BottomCenter)
-                                .width(bindingWidth * 0.78f).height(2.dp)
+                                .offset(x = 2.dp, y = (-4).dp)
+                                .width(bindingWidth * .91f)
+                                .height((bindingHeight - 7.dp).coerceAtLeast(12.dp))
+                                .blur(5.dp)
                                 .background(
-                                    Color(0x550E0906),
+                                    Color(0x72130904),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .testTag("ws16bi-real-shadow-" + book.id)
+                        )
+                        Box(
+                            Modifier.align(Alignment.BottomCenter)
+                                .width(bindingWidth * 0.86f).height(3.dp)
+                                .background(
+                                    Color(0xA0110704),
                                     RoundedCornerShape(50)
                                 )
                         )
@@ -80,8 +101,29 @@ internal fun WS16BHDenseSpineBay(
                             fieldNotesArt = true,
                             modifier = Modifier.width(bindingWidth)
                                 .height(bindingHeight)
+                                .graphicsLayer { scaleX = 1.07f }
                                 .testTag("ws16bh-art-" + book.id),
                             profile = "curved"
+                        )
+                    }
+                }
+                repeat(blanks) { i ->
+                    Box(
+                        Modifier.width(slot).height(bindingHeight + 4.dp)
+                            .testTag("ws16bi-blank-cell-$shelfIndex-$i"),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        Box(
+                            Modifier.align(Alignment.BottomCenter)
+                                .width(bindingWidth * .8f).height(3.dp)
+                                .background(
+                                    Color(0x70110805), RoundedCornerShape(50)
+                                )
+                        )
+                        WS16BIUnletteredBlankSpine(
+                            index = shelfIndex * 5 + i,
+                            modifier = Modifier.width(bindingWidth)
+                                .height(bindingHeight)
                         )
                     }
                 }
