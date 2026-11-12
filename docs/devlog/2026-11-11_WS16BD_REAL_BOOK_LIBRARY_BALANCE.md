@@ -1,6 +1,6 @@
 # WS16BD — Real-book-first Library composition
 
-> **Quick status:** SOURCE COMMITTED / AUTOMATED QA IN PROGRESS / OWNER VISUAL APPROVAL PENDING (November 11, 2026). v63 is an experimental alternative to v62, not a confirmed improvement.
+> **Quick status:** DUAL-GREEN ANDROID/ART QA / v63 APK CHECKSUM, PACKAGE & SIGNER VERIFIED / OWNER VISUAL APPROVAL PENDING (November 11, 2026). v63 is an experimental alternative to v62, not an approved replacement.
 
 ## Who, what, where, why
 
@@ -38,8 +38,18 @@ First v63 code source `2cad9c47` failed [Android #43141264381](https://github.co
 
 **Latest candidate code/test commit:** [`c54b4b18afbe9e2525238f47521fe770daea75f7`](https://github.com/PlayerEden/GridMates-Word-Search/commit/c54b4b18afbe9e2525238f47521fe770daea75f7). Corrected [Android QA #43141513582](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513582) and independent [art/release #43141513574](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513574) **IN PROGRESS** at log update. No APK/owner handset approval yet; must verify exact source and package before delivery.
 
+## Final v63 source-matched build receipt
+
+- **Exact tested source:** [`c54b4b18afbe9e2525238f47521fe770daea75f7`](https://github.com/PlayerEden/GridMates-Word-Search/commit/c54b4b18afbe9e2525238f47521fe770daea75f7). Later documentation-only `[skip ci]` commits do not alter tested code.
+- **Android QA:** [run #43141513582](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513582) **SUCCESS**, including compilation, unit tests, lint, APK package identity, QA signing, packed artwork verifications and artifact upload.
+- **Independent debug/release art QA:** [run #43141513574](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513574) **SUCCESS**. Debug-only original book/cabinet art remains excluded from release. Independent signed Android build contents compared directly to Android QA.
+- **Owner install artifact:** [GitHub Android QA ZIP #13910520915](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513582/artifacts/13910520915), contains `app-debug.apk` (29,054,908 bytes). **APK SHA-256:** `53fb4dc9823e72e9b3fcfa78adf6837c22afc396243577739cfd7e8a7846ea5c`. **ZIP SHA-256:** `2810d928bac2c2124cfcc50134ffbb8bff032a9871ebf7132a363480233fe0ac`. A direct APK was extracted from this exact artifact in the conversation.
+- **Identity:** package `com.playereden.gridmates.wordsearch.qa`, versionCode `63`, versionName `0.9.19-balanced-real-book-library-qa`, signing cert SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`, unchanged from v62 QA. Install over v62 without uninstall/data reset.
+- **Second source-matched artifact:** independent [art-QA ZIP #13910046292](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513574/artifacts/13910046292); art APK SHA-256 `342e0f7bc9110b01b9029dffbae5f7fdaeb340f93778818a877246e61fe5cb59`. **All 339 unpacked entries and their bytes match standard Android APK exactly**, but archive hashes differ. Give owner standard Android artifact, do not claim binary identity.
+- **Limits:** No hardware screen/tap/real save-resume validation for v63. Only owner can accept that the real-book 2+1 presentation looks better than v62. Preserve previous dual-green/owner-installed v62 [artifact #13893295859](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43102415463/artifacts/13893295859) as rollback. PR #131 stays draft; no release acceptance of original illustration assets.
+
 ## Outcome and next step
 
 **Completed:** implementation, source/Android test changes, QA version bump, initiated independent dual-CI runs. The direction is a candidate, not an approved replacement for v62.
 
-**Next action:** Inspect both workflows and repair genuine failures; if both pass, extract Android QA APK, verify package/version/signer, inspect binary contents, and give owner a direct v63 APK and GitHub artifact for comparative screenshots. Verify tapping upper/lower spines and save/resume on the same installed QA app. If v63 looks worse, switch to a more structural Library UX proposal rather than another small spacing tweak.
+**Next action:** Owner installs the delivered v63 APK directly over v62 and sends comparison screenshots of the Library, plus checks real upper and lower spine selection > View pages, Back and save/resume. Do **not** claim real phone acceptance from CI. If v63 still looks underwhelming, plan a structural library UX redesign instead of another incremental shelf-spacing pass.
