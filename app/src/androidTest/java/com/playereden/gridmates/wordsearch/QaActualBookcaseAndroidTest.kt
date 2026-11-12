@@ -185,4 +185,5 @@ class QaActualBookcaseAndroidTest {
 
         compose.onNodeWithTag("ws16bg-cover-" + garden.id).performClick()
         compose.runOnIdle { assertEquals(garden.id, selected) }
-    }}
+    }
+}
