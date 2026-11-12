@@ -218,8 +218,11 @@ internal fun WS16ATModularLibraryScene(
                             // WS16BE: use the clean ORIGINAL single-binding
                             // sprite. WS16AO wider shoulder panels visually
                             // duplicate each book even with no extra UI image.
+                            // WS16BF: same single silhouette with corrected
+                            // alpha, convex lighting and subtle contact.
                             useCleanSpines = cabinetPortrait,
-                            drawContactShadow = !cabinetPortrait,
+                            useCurvedSpines = cabinetPortrait,
+                            drawContactShadow = cabinetPortrait,
                             onBookSelected = onBookSelected
                         )
                         Box(Modifier.align(Alignment.BottomCenter)
