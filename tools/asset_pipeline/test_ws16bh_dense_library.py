@@ -11,12 +11,12 @@ def layout(width: float, height: float, font_scale: float, count: int, highres: 
     right = width * 120 / 602
     dense = highres and height >= width * 1.7
     hit = 54 if font_scale >= 1.65 else 48
-    packed = 42 if font_scale >= 1.65 else 36
+    packed = 52 if font_scale >= 1.65 else 48
     slot = packed if dense else hit
     per_shelf = max(1, min(12, int((width-left-right) / slot)))
     if height < 480:
         tier_count = 1
-    elif dense and height >= 740 and count > per_shelf:
+    elif dense and height >= 960 and count > per_shelf:
         tier_count = 3
     elif height >= 830 and count > 2 * per_shelf:
         tier_count = 3
@@ -52,23 +52,23 @@ class DenseLibraryTests(unittest.TestCase):
     def test_woodland_space_garden_pack_first_shelf(self):
         dense, slots, tiers, capacity, pages = layout(360, 760, 1, 3, True)
         self.assertTrue(dense)
-        self.assertEqual((slots, tiers, pages), (5, 2, 1))
+        self.assertEqual((slots, tiers, pages), (4, 2, 1))
         self.assertEqual(list(range(3))[:slots], [0, 1, 2])
 
     def test_tall_screen_three_shelves_and_actual_pagination(self):
         dense, slots, tiers, capacity, pages = layout(360, 760, 1, 30, True)
         self.assertTrue(dense)
-        self.assertEqual((slots, tiers, capacity, pages), (5, 3, 15, 2))
+        self.assertEqual((slots, tiers, capacity, pages), (4, 2, 8, 4))
         # Font scaling remains safe: fewer volumes visible per real shelf.
         _, slots_large, tier_large, _, _ = layout(360, 760, 2, 30, True)
-        self.assertEqual((slots_large, tier_large), (5, 3))
+        self.assertEqual((slots_large, tier_large), (4, 2))
 
     def test_spines_not_covers_are_portrait_default(self):
         scene = (APP / "WS16ATModularLibraryScene.kt").read_text()
         art = (APP / "WS16BHDenseSpineBay.kt").read_text()
         self.assertIn("val densePortrait = cabinetPortrait", scene)
-        self.assertIn("val packedSlot = if (density.fontScale >= 1.65f) 42.dp else 36.dp", scene)
-        self.assertIn("densePortrait && maxHeight >= 740.dp && books.size > slots -> 3", scene)
+        self.assertIn("val packedSlot = if (density.fontScale >= 1.65f) 52.dp else 48.dp", scene)
+        self.assertIn("densePortrait && maxHeight >= 960.dp && books.size > slots -> 3", scene)
         self.assertIn("val capacity = slots * tierCount", scene)
         self.assertIn("pageBooks.drop(tier * slots).take(slots)", scene)
         self.assertIn("List(tierCount) { shelfTierSpace / tierCount }", scene)
