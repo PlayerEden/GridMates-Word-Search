@@ -131,7 +131,7 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithText("Locked").assertDoesNotExist()
     }
 
-    @Test fun modularPortraitCountClearsCarvingAndOnlyLowerShelfShowsFutureBooks() {
+    @Test fun modularPortraitBalancesRealBooksAndKeepsCountOffCarving() {
         var selected: String? = null
         compose.setContent {
             GridMatesTheme {
@@ -148,10 +148,19 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("ws16at-modular-library").assertExists()
         compose.onNodeWithTag("ws16bc-count-bay").assertExists()
         compose.onNodeWithText("3 books").assertExists()
-        compose.onNodeWithTag("ws16bb-upcoming-label").assertExists()
-        // Never make faded future volumes look like a fourth unlocked book.
+        compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
         compose.onNodeWithTag("ws16bc-visible-future-0-3").assertDoesNotExist()
-        compose.onNodeWithTag("ws16bc-visible-future-1-1").assertExists()
+        compose.onNodeWithTag("ws16bc-visible-future-1-1").assertDoesNotExist()
+        val woodlandBounds = compose.onNodeWithTag("ws16am-spine-" + woodland.id)
+            .fetchSemanticsNode().boundsInRoot
+        val spaceBounds = compose.onNodeWithTag("ws16am-spine-" + space.id)
+            .fetchSemanticsNode().boundsInRoot
+        val gardenBounds = compose.onNodeWithTag("ws16am-spine-" + garden.id)
+            .fetchSemanticsNode().boundsInRoot
+        assertTrue("Real Woodland and Space books share the upper shelf",
+            kotlin.math.abs(woodlandBounds.top - spaceBounds.top) < 2f)
+        assertTrue("Real Garden book occupies the lower shelf",
+            gardenBounds.top > woodlandBounds.bottom)
 
         val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
             .fetchSemanticsNode().boundsInRoot
