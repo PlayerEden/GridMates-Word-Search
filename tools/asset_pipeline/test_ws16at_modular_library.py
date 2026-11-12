@@ -51,7 +51,8 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("Ws16EStorybookShelf()",code)
         self.assertIn("val shelfContactDepth = 42.dp",code)
         self.assertIn("futureTreatment = true",code)
-        self.assertIn("height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp)",code)
+        self.assertIn("height = (tierHeight - shelfContactDepth -",code)
+        self.assertIn("(if (balancedSparseLayout) 24.dp else 0.dp)",code)
         self.assertIn("books.drop(page * capacity).take(capacity)",code)
         # Default layout keeps 48/54dp hit slots; the sparse 2-tier showcase
         # explicitly uses larger 60dp catalog-only hit slots.
@@ -89,6 +90,23 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("slot = if (balancedSparseLayout) 60.dp else hitSlot", scene)
         self.assertIn("if (tier == 0) pageBooks.take(topBooks) else pageBooks.drop(topBooks)", scene)
         self.assertIn("showFutureVolumes: Boolean = true", spines)
+
+    def test_ws16be_single_binding_and_no_stacked_shadow(self):
+        scene = (APP / "WS16ATModularLibraryScene.kt").read_text()
+        bay = (APP / "WS16AMInteractiveBookcaseScene.kt").read_text()
+        art = (APP / "BookcaseWoodArtwork.kt").read_text()
+        self.assertIn("useCleanSpines = cabinetPortrait", scene)
+        self.assertIn("drawContactShadow = !cabinetPortrait", scene)
+        self.assertIn("useCleanSpines: Boolean = false", bay)
+        self.assertIn("drawContactShadow: Boolean = true", bay)
+        self.assertIn('val profile = if (useCleanSpines) "clean" else', bay)
+        self.assertIn('"clean" -> 104f / 542f', bay)
+        self.assertIn('if (drawContactShadow && (book != null || isFutureVisible))', bay)
+        self.assertIn('"clean" -> loadBookcaseAsset(context, "ws16ai/spines/$name.png")', art)
+        self.assertIn('"tall", "standard" ->', art)
+        # Never silently replace the pinned 12-image wider family: fallback
+        # stays source-pinned, while only the modular portrait asks for clean.
+        self.assertIn('"ws16ao/spines/$profile/$name.png"', art)
 
     def test_ws16az_reusable_library_controls(self):
         scene=(APP/"WS16ATModularLibraryScene.kt").read_text()
