@@ -81,7 +81,11 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("val shelfOverhang = if (cabinetPortrait)", scene)
         self.assertIn("val countBayHeight = shelfOverhang + countGap + countPlaqueBudget", scene)
         self.assertIn('testTag("ws16bc-count-bay")', scene)
-        self.assertIn("showFutureVolumes = tier > 0", scene)
+        self.assertIn("showFutureVolumes = false", scene)
+        self.assertIn("val balancedSparseLayout = tierCount == 2", scene)
+        self.assertIn("slots = if (balancedSparseLayout) shelfBooks.size else slots", scene)
+        self.assertIn("slot = if (balancedSparseLayout) 60.dp else hitSlot", scene)
+        self.assertIn("if (tier == 0) pageBooks.take(topBooks) else pageBooks.drop(topBooks)", scene)
         self.assertIn("showFutureVolumes: Boolean = true", spines)
 
     def test_ws16az_reusable_library_controls(self):
