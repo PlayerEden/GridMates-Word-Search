@@ -74,9 +74,15 @@ private fun BookcaseSpineImage(name: String, modifier: Modifier, profile: String
     val context = LocalContext.current
     // WS16AO deliberately does not change the previous WS16AI fallback view.
     val bitmap = remember(context, name, profile) {
-        val candidate = if (profile == "tall" || profile == "standard") {
-            loadBookcaseAsset(context, "ws16ao/spines/$profile/$name.png")
-        } else null
+        val candidate = when (profile) {
+            // WS16BE: prefer the source-original SINGLE rounded binding.
+            // The WS16AO PNGs contain separately generated square shoulder
+            // panels that looked like a second book behind each real spine.
+            "clean" -> loadBookcaseAsset(context, "ws16ai/spines/$name.png")
+            "tall", "standard" ->
+                loadBookcaseAsset(context, "ws16ao/spines/$profile/$name.png")
+            else -> null
+        }
         candidate ?: loadBookcaseAsset(context, "ws16ai/spines/$name.png")
     }
     if (bitmap != null) {
