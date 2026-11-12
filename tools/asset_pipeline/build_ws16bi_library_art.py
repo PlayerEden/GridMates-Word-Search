@@ -95,6 +95,15 @@ def mounted_shelf() -> Image.Image:
         x=cx+side*18
         d.arc((x-42,89,x+42,124), 180 if side>0 else 0,
               340 if side>0 else 160, fill=(222,150,63,132),width=3)
+    # The soft shelf shadow should feather inside the asset, not leave alpha
+    # dust along the raster outermost pixels (old binding edge failure).
+    alpha=im.getchannel("A")
+    edge=ImageDraw.Draw(alpha)
+    edge.rectangle((0,0,W-1,2),fill=0)
+    edge.rectangle((0,H-3,W-1,H-1),fill=0)
+    edge.rectangle((0,0,2,H-1),fill=0)
+    edge.rectangle((W-3,0,W-1,H-1),fill=0)
+    im.putalpha(alpha)
     return im
 
 def blank(name: str, rgb: tuple[int,int,int]) -> Image.Image:
