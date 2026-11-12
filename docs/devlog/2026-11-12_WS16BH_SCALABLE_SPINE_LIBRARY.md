@@ -1,6 +1,6 @@
 # WS16BH — Spine-first, densely packed and scalable physical Library
 
-> **Status (November 12, 2026):** SOURCE COMMITTED / EXACT-SOURCE ANDROID + ART CI IN PROGRESS / OWNER PHONE APPROVAL PENDING. Do not mark v67 install-ready until both workflows, package identity, SHA, signer and exact artifact are verified.
+> **Status (November 12, 2026):** DUAL-GREEN ANDROID & ART/RELEASE QA / EXACT-SOURCE v67 APK VERIFIED AND DELIVERED / OWNER PHONE VISUAL & INTERACTION ACCEPTANCE PENDING.
 
 ## Who, what, where, why
 
@@ -27,11 +27,24 @@
 
 ## Verification and rollback
 
-- **Android QA run [#43192422437](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192422437): PENDING** at log creation.
-- **Independent art/release isolation [#43192423542](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192423542): IN PROGRESS** at log creation.
-- **Actual v67 APK:** Not yet verified or delivered. If any test or compile fails, diagnose exact job first and document corrected source/runs; don't label queued or previous artifacts v67.
+- **Android QA run [#43192422437](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192422437): SUCCESS** on exact feature/test SHA.
+- **Independent art/release isolation [#43192423542](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192423542): SUCCESS** on the same SHA.
+- **Actual v67 APK:** Verified and delivered; see exact APK SHA, signer and artifact receipt below.
 - **Last owner-installed build:** v66 [artifact #13929551769](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644879/artifacts/13929551769) (visual comparison and safe signed fallback; do not downgrade via direct install if Android disallows lower versionCode).
 - **Next exact action:** Check both workflows on current source; if dual-green, extract actual Android QA APK, verify versionCode 67, package, signer, SHA and packed clean spines; share direct APK and GitHub ZIP. Ask for on-phone Library screenshot, opening Woodland/Space/Garden and install-over progress retention. Record owner acceptance or precise next visual objection before any more art changes.
+
+## Final v67 source-matched APK receipt (November 12)
+
+- **Actual code/test source:** [`c75287c5a8a03e968208337bb68226629c69b9ad`](https://github.com/PlayerEden/GridMates-Word-Search/commit/c75287c5a8a03e968208337bb68226629c69b9ad), unchanged by subsequent `[skip ci]` documentation updates.
+- **Standard Android [#43192422437](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192422437): SUCCESS**, core/app tests, lint, Kotlin/Compose Android compilation, asset/source checks, signed debug APK, package ID and version verified.
+- **Independent art/release [#43192423542](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192423542): SUCCESS**, debug and release compilation, source-pinned artwork, zero QA-art promotion into release.
+- **Actual owner ZIP download:** [GitHub Android artifact #13930584152](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192422437/artifacts/13930584152), `GridMates-WordSearch-Android-QA`. Extracted `app-debug.apk` from this exact artifact, renamed in chat to `GridMates_WordSearch_WS16BH_v67.apk`; **29,383,061 bytes**, APK SHA-256 `01189576df4d0d977ebd74410a53911d2b58b42f538ff2831cdb39fc3bc48dcd`. ZIP size **28,914,855 bytes**, ZIP SHA-256 `f2903e037bfd19c5d3140d06edbbd2a4dce1fe76048649382f439d7fbbe3d078`.
+- **Android package/signing from actual CI:** `com.playereden.gridmates.wordsearch.qa`; versionCode **67**, versionName `0.9.23-scalable-spine-library-qa`, original QA signing cert SHA256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`, unchanged from v66. Supports install-over. No uninstall or data reset.
+- **Independent artifact:** [art-QA #13931387628](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43192423542/artifacts/13931387628), ZIP SHA256 `6e381ea8a17439c10cecc4e53ae3f9c453a9e126f420727563c6cbd31601cc70`. Its APK archive SHA256 `92926bae83c0683b667fc8443c942684958886f63c8adaa164f41341359877b1` differs, but direct comparison of ZIP-extracted APKs confirms **all 343 unpacked entries exactly match** in names and decompressed bytes. The Android QA artifact above is the installation reference.
+- **Packed assets:** Original cleaned `ws16bf` binding family (manifest and 3 real PNGs) and the 3 `ws16ae` covers remain byte-identical. No new asset files or release-art rights are implied.
+- **Open:** No owner phone screen/tap/resume verification of v67 yet. Do not claim visual acceptance or merge PR #131. v66 [artifact #13929551769](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644879/artifacts/13929551769) is the last owner-installed baseline. Reverse-version install may need a deliberate QA rollback; do not instruct uninstalling or clearing app data.
+
+**Next exact action:** Owner installs v67 over v66 and sends full Library screenshot; check smaller packed bindings, two/three shelf choice, legibility and touch selection, then taps Garden/Space/Woodland through cover preview and verifies saves. If needed make only owner-evidenced adjustments; spine-first architecture stays selected.
 
 ## Product decision for future volumes
 
