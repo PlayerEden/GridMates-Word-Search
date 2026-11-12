@@ -1,6 +1,6 @@
 # WS16BG — Front-facing physical collectible books in the Library
 
-> **Status (Nov 12, 2026):** Source implemented in draft PR #131; v66 Android and independent art/release QA in progress; OWNER phone visual acceptance not yet tested.
+> **Status (Nov 12, 2026):** EXACT-SOURCE DUAL-GREEN ANDROID + ART/RELEASE QA / VERIFIED SAME-SIGNED v66 APK DELIVERED / OWNER PHONE VISUAL ACCEPTANCE PENDING.
 
 ## Why, who and prior version
 
@@ -20,10 +20,17 @@
 
 **Initial implementation code commit:** [`a085a944529499c96513442634f92c1b6a061449`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a085a944529499c96513442634f92c1b6a061449).
 
-## Checks, rollback and next step
+## Final verified Android v66 build receipt
 
-- **Android QA run:** [#43187644879](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644879) started on initial source, final result PENDING at entry creation.
-- **Independent art/release run:** [#43187644703](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644703) started, final result PENDING.
-- **APK:** NOT YET VERIFIED OR DELIVERED. Check both CI conclusions and actual artifact, its version, signature, original cover SHA images and checksum before sharing.
-- **Rollback:** Prior owner-installed v65 [artifact #13924198630](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747/artifacts/13924198630) is the last verified binary; keep v64 etc. The current design is experimental.
-- **Owner QA:** If dual-green, share real APK and GitHub artifact, install-over only; ask for new portrait Library screenshot, book taps, saved progress, and first reaction to physical-cover styling. Review real art on phone before any further change or PR merge.
+- **Exact compiled code/test source:** [`a085a944529499c96513442634f92c1b6a061449`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a085a944529499c96513442634f92c1b6a061449). Later commits to journal/handoff have `[skip ci]` and do not alter APK contents.
+- **Android [#43187644879](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644879): SUCCESS**, including source-backed portrait-cover/paging tests, Kotlin compilation, core/app tests, lint, Android test compilation, APK assembly, packed image verifiers, unchanged test signer and Android package identity.
+- **Independent artwork/release [#43187644703](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644703): SUCCESS**, including Android debug and release compilation and debug-only art exclusion.
+- **Standard GitHub APK ZIP [artifact #13929551769](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644879/artifacts/13929551769)**: ZIP size 28,910,474 bytes, ZIP SHA-256 `199c8cb4df872f43d9c044778e68ee3ddaacc75ad0a11a9f0ee0877f0c62f87b`. ZIP contains `app-debug.apk`, extracted to conversation file `GridMates_WordSearch_WS16BG_v66.apk`, size **29,383,065 bytes**, SHA-256 `d7f31098e9bdd587a0ebbea4d2e0a652080a322c071059817731c63bed73a1ad`. Both direct APK and GitHub ZIP provided to owner.
+- **Verified Android ID from exact GitHub CI job:** `com.playereden.gridmates.wordsearch.qa`, `versionCode=66`, `versionName=0.9.22-face-out-collectible-books-qa`, same public QA certificate SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419` as v65. Intended same-app install-over without uninstall.
+- **Physical cover assets:** All three existing `ws16ae/covers/{woodland,space,garden}.png` still packaged, source-pinned. The crop is performed in Compose at runtime; **no new generated PNGs or altered source files**. Original art remains debug-only and not release-approved.
+- **Independent [art artifact #13929985979](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644703/artifacts/13929985979)**: ZIP SHA `9223f7b5f4d41cbcedfb53d6e3747201952bf95acedb3a8c612c53a0f6cfac9d`, Android APK SHA `4e78c14c8a5a19acd6c64ea310cc40a22a8228d760c2df42abefe21cefbdad33`. Although the APK archive hashes differ, **all 343 unpacked file entries have exactly matching names and byte contents** between both independent APKs.
+- **Owner physical testing remains open:** QA does not prove books touch carved wood convincingly, crop feels natural at owner's actual screen size, gestures/pagination work comfortably, or progress survives actual install. Prior owner-installed [v65 APK artifact #13924198630](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747/artifacts/13924198630) remains the last visually tested fallback. PR #131 remains draft/unmerged.
+
+## Next exact action
+
+Owner installs delivered v66 direct APK over v65 without uninstall and sends one full Library portrait screenshot. Visually assess front-facing cover size, title clearance, contact/page edges, page count and two-shelf composition. Tap Woodland/Space/Garden to verify stable book preview and View pages; inspect save/resume. If negative, develop a *single* targeted layout proposal based on that screenshot; don't return to endless spines or merge until the owner approves.
