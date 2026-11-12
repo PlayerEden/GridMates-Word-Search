@@ -18,7 +18,7 @@ class CabinetRefinementTests(unittest.TestCase):
         scene=(APP/"WS16ATModularLibraryScene.kt").read_text()
         shelf=(APP/"Ws16BBMatchedCabinetShelf.kt").read_text()
         self.assertIn("Ws16BIMountedCabinetShelf()",scene)
-        self.assertIn("Ws16BBMatchedCabinetShelf()", (APP/"Ws16BIMountedCabinetShelf.kt").read_text())
+        self.assertIn("Ws16BBMatchedCabinetShelf(modifier)", (APP/"Ws16BIMountedCabinetShelf.kt").read_text())
         self.assertIn("Ws16EStorybookShelf()",scene)
         self.assertIn("hasWs16baCabinetArt",scene)
         self.assertIn("ws16bb/shelf.png",shelf)
