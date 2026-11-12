@@ -1,6 +1,6 @@
 # WS16BF — Clean edges and curved leather binding, without double spines
 
-> **Status:** SOURCE COMMITTED / Android and art CI queued or running / owner phone approval pending. November 12, 2026. Do not call v65 approved until actual APK identity and owner visual test.
+> **Status:** DUAL-GREEN ANDROID/ART QA / EXACT APK SIGNATURE, PACKAGE, SHA VERIFIED / OWNER HANDSET VISUAL ACCEPTANCE PENDING (November 12, 2026).
 
 ## Who / why / evidence
 
@@ -23,6 +23,17 @@
 First Android [#43175871386](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871386) and art [#43175871287](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871287) failed in source-only legacy WS16AM coverage: old test demanded the exact `width(artWidth).height(4.dp)` contact shadow. The actual intended code uses 76% width, 2dp height, and reduced opacity with explicit `drawContactShadow` control. No generator failure was reported. Corrected only the outdated test.
 
 **Current v65 code/test source:** [`3a5d9122621f62db6ec193075717797553e0539b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/3a5d9122621f62db6ec193075717797553e0539b). Current correct CI [Android #43176056684](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176056684) and [art/release #43176056697](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176056697) were running when recorded. **No verified APK yet**. The first failed run must not be cited as successful evidence.
+
+## Verified v65 exact-source QA receipt (Nov 12)
+
+- **Delivered source/test commit:** [`930319ed181480caf69021c9a1a50578ec45abac`](https://github.com/PlayerEden/GridMates-Word-Search/commit/930319ed181480caf69021c9a1a50578ec45abac); subsequent documentation-only `[skip ci]` commits do not change the compiled code.
+- **Android QA [run #43176204747](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747): SUCCESS.** Source/generation checks, core/app tests, lint, Android assembly, packaged assets, QA certificate, exact package and actual file checksum verified.
+- **Independent art/release isolation [run #43176204757](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204757): SUCCESS.** Debug + release compiled; new `ws16bf` derived artwork is absent from the release build.
+- **GitHub Android ZIP artifact [#13924198630](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747/artifacts/13924198630)**: ZIP SHA-256 `aca401933ab96db2e4bb7c9e22822cda3358a7a5857eca6823c880ec637b6293`, containing `app-debug.apk` (29,366,673 bytes). **Extracted v65 APK SHA-256 `73989c2f2c71931d4d6b62bfe7309ddd8496dd48ddc7e2beff1bfa2398d84921`.** Direct APK extracted and supplied to owner in this ChatGPT conversation; GitHub artifact is durable.
+- **Identity from exact GitHub job logs:** `com.playereden.gridmates.wordsearch.qa`, `versionCode=65`, `versionName=0.9.21-curved-clean-spines-qa`, unchanged public QA certificate SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419` (matches v64). Installs over current QA version without uninstall.
+- **New assets:** `assets/ws16bf/manifest.json` identifies exactly three `QA-only`, unreleased 104×542 derived real spines. All three actual APK PNG hashes match the generated source manifest, and their physical alpha bounds are `(3,2,101,540)` with zero alpha outside; no fake second side panel. Alpha/motif/print are stored in one actual image. Original `ws16ai` and `ws16ao` PNG bytes untouched.
+- **Independent debug APK comparison:** [art workflow ZIP #13924148660](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204757/artifacts/13924148660) contains independently built APK SHA-256 `8d00c9c3e526955988d009a5006d870eb1b95fdb847bf3fac632f8b9f58938cd`. Different archive bytes from standard Android APK but **all 343 unpacked entries have identical names and contents**. The standard Android APK above is the installation candidate.
+- **Still OPEN:** real owner-phone visual comparison, actual book taps/back and saved-progress check. CI does not establish that curvature is attractive enough. PR #131 remains draft/unmerged; all generated artwork remains QA-only. Previous owner-installed [v64 artifact #13924000090](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241/artifacts/13924000090) remains the last real-phone rollback.
 
 ## QA gate and rollback
 
