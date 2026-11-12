@@ -53,7 +53,9 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("futureTreatment = true",code)
         self.assertIn("height = (tierHeight - shelfContactDepth).coerceAtLeast(60.dp)",code)
         self.assertIn("books.drop(page * capacity).take(capacity)",code)
-        self.assertIn("slot = hitSlot",code)
+        # Default layout keeps 48/54dp hit slots; the sparse 2-tier showcase
+        # explicitly uses larger 60dp catalog-only hit slots.
+        self.assertIn("slot = if (balancedSparseLayout) 60.dp else hitSlot", code)
         self.assertIn('testTag("ws16at-real-count")',code)
         self.assertIn('testTag("ws16at-pagination")',code)
         self.assertNotIn("BookFactoryBlankSpine(",code)
