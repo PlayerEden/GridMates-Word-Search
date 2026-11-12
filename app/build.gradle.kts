@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 65
-        versionName = "0.9.21-curved-clean-spines"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 66
+        versionName = "0.9.22-face-out-collectible-books"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
