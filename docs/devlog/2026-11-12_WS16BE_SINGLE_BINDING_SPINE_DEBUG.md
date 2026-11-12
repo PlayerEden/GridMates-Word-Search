@@ -1,6 +1,6 @@
 # WS16BE — Remove faux backing leather behind real book spines
 
-> **Status (Nov 12, 2026):** SOURCE COMMITTED / NEW EXACT-SOURCE CI PENDING / OWNER PHONE TEST PENDING. A passed automated build does not approve appearance.
+> **Status (Nov 12, 2026):** DUAL-GREEN ANDROID/ART QA / EXTRACTED APK HASH, PACKAGE AND SIGNER VERIFIED / OWNER PHONE VISUAL ACCEPTANCE PENDING. Automated build success does not approve appearance.
 
 ## Who / where / why
 
@@ -44,6 +44,17 @@ An initial implementation reduced `WS16AMSpineBay`'s overall height by 24dp, whi
 - **Preserved proven predecessor:** v63 [Android ZIP artifact #13910520915](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43141513582/artifacts/13910520915), SHA `53fb4dc9823e72e9b3fcfa78adf6837c22afc396243577739cfd7e8a7846ea5c` — **build-verified and owner-tested visually but artwork NOT approved**. v62 is the previous working visual variant. Avoid uninstalling or resetting player data.
 - **Unchanged:** all book IDs, progress and saves, puzzle rules, LAN, Home/Profile/Collection, illustrated cabinet, original PNG files, release-art isolation/rights; draft PR stays unmerged.
 
+## Final v64 verification and delivery (Nov 12)
+
+- **Exact application/test source:** [`8d8942dff9e50e966346fdbaef4c79c3d3ded504`](https://github.com/PlayerEden/GridMates-Word-Search/commit/8d8942dff9e50e966346fdbaef4c79c3d3ded504) (later journal-only commits are `[skip ci]`).
+- **Android [#43173531241](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241): SUCCESS.** Core/app tests, lint, compilation, signed QA APK assembly, package checks, unchanged QA certificate and all source-pinned book/cabinet artwork checks passed.
+- **Independent art/release [#43173531335](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531335): SUCCESS.** Both debug and release compiled, original QA-only generated assets remain out of release, signing check passed.
+- **GitHub Android ZIP [artifact #13924000090](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241/artifacts/13924000090)** contains `app-debug.apk`, **29,054,896 bytes**; extracted APK SHA-256 `654ef1af1b7ba54f323c37dc0103c82b5d80e370ee5d300b764812b9b45acf44`; ZIP SHA-256 `2ad94f13f7ca896e8b21ad6fad31e79cbf9c905447a495668a5c6b6c0e26ef71`. Direct APK and GitHub ZIP were provided to the owner in chat. Source of truth remains the GitHub artifact.
+- **Android identity (confirmed by CI `aapt` and `apksigner`):** `com.playereden.gridmates.wordsearch.qa`, versionCode **64**, versionName `0.9.20-clean-single-spines-qa`. Same public QA signing certificate SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419` as v63, so install over without uninstall/data loss expected.
+- **Independent [art artifact #13922349849](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531335/artifacts/13922349849)** ZIP SHA-256 `df17d3de029b3a99746cb0c59b114e5eb730dcae17a6e5e3714659c006c5b6a6`; its APK SHA-256 `32cb53e7a49d593d6d5950e9609848b9b98c4a3589a8562e9ee420bbd3104406` differs in archive bytes from standard Android APK, but direct comparison found the **same 339 names and identical uncompressed content bytes** in both. Do not call the signed APK archives byte-identical.
+- **No asset changes:** All packed `assets/` images in v64 are byte-identical to v63, including original clean `ws16ai/spines`, generated `ws16ao`, and cabinet. Runtime source selection and Compose shadow/headroom, not a new image, are the actual modification.
+- **Not tested yet:** Installation on owner's phone, physical visual quality, real spine taps, preserved saves and portrait clipping remain open. PR #131 stays draft; no generated illustration release approval.
+
 ## Next exact action
 
-Check CI on latest `c82bf18e`. If failure, inspect job logs and repair precisely. If dual-green, verify APK and share v64 for one phone screenshot of Library, top title and real-book tap/save test. If the single-binding art is clean but still visually underwhelming, then consider front-facing covers and a structural Library rethink rather than more faux-wide spines.
+Owner installs supplied v64 APK directly over v63 (no uninstall) and sends one full Library screenshot. Verify that the rounded spine is now a single shape, touches each shelf without overlapping the title, and that real Woodland/Space/Garden books still open with saved progress intact. If technically clean but aesthetically weak, pivot to front-facing illustrated book covers rather than regenerating faux-wide leather shoulders. Keep PR #131 draft.
