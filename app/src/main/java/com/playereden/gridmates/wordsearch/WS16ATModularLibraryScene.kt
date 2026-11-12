@@ -211,7 +211,7 @@ internal fun WS16ATModularLibraryScene(
                             // Keep bindings clear of the title plaque instead
                             // of forcing tall art up under the heading.
                             height = (tierHeight - shelfContactDepth -
-                                if (balancedSparseLayout) 24.dp else 0.dp)
+                                (if (balancedSparseLayout) 24.dp else 0.dp))
                                 .coerceAtLeast(60.dp),
                             futureTreatment = true,
                             showFutureVolumes = false,
