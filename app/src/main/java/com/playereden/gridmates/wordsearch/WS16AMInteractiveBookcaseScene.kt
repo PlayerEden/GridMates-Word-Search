@@ -156,15 +156,27 @@ internal fun WS16AMSpineBay(
     height: Dp,
     onBookSelected: (String) -> Unit,
     futureTreatment: Boolean = false,
-    showFutureVolumes: Boolean = true
+    showFutureVolumes: Boolean = true,
+    useCleanSpines: Boolean = false,
+    drawContactShadow: Boolean = true
 ) {
     BoxWithConstraints(Modifier.fillMaxWidth().height(height)
         .testTag("ws16am-spine-shelf-" + shelfIndex)) {
         // Publisher geometry is true pixel aspect, not a stretched cover.
         // Tall upper volumes and standard lower volumes share visible width,
         // while each keeps its unscaled typography and 48/54dp tap region.
-        val profile = if (shelfIndex % 2 == 0) "tall" else "standard"
-        val bindingRatio = if (profile == "tall") 166f / 662f else 166f / 542f
+        // WS16BE: the WS16AO wide sprite contains a second square leather
+        // silhouette BEHIND the original rounded binding. This is baked into
+        // the PNG, not a second Compose image. For the modular cabinet, show
+        // the preserved single-binding WS16AI source instead; no re-stretching
+        // of the lettering or replacement of existing pinned images.
+        val profile = if (useCleanSpines) "clean" else
+            if (shelfIndex % 2 == 0) "tall" else "standard"
+        val bindingRatio = when (profile) {
+            "clean" -> 104f / 542f
+            "tall" -> 166f / 662f
+            else -> 166f / 542f
+        }
         val artWidth = minOf(slot - 2.dp,
             (maxHeight - 10.dp).coerceAtLeast(24.dp) * bindingRatio)
         val artHeight = artWidth / bindingRatio
@@ -193,7 +205,7 @@ internal fun WS16AMSpineBay(
                         else Modifier.testTag("ws16am-future-" + shelfIndex + "-" + i)),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    if (book != null || isFutureVisible) {
+                    if (drawContactShadow && (book != null || isFutureVisible)) {
                         Box(Modifier.align(Alignment.BottomCenter)
                             .width(artWidth).height(4.dp)
                             .background(Color(0x990F0806), RoundedCornerShape(50)))
