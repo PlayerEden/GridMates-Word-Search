@@ -142,26 +142,32 @@ internal fun WS16ATModularLibraryScene(
         val hitSlot = if (density.fontScale >= 1.65f) 54.dp else 48.dp
         val leftWidth = maxWidth * (126f / 602f)
         val rightWidth = maxWidth * (120f / 602f)
-        val slots = ((maxWidth - leftWidth - rightWidth).value / hitSlot.value)
+        val cabinetPortrait = hasWs16baCabinetArt(LocalContext.current) &&
+            maxHeight >= maxWidth * 1.7f
+        // WS16BH: narrow *real* bindings pack together on tall portrait
+        // screens. Keep a slightly larger slot for increased font scaling.
+        // Short/landscape layouts preserve the previous ordinary spine flow.
+        val densePortrait = cabinetPortrait
+        val packedSlot = if (density.fontScale >= 1.65f) 42.dp else 36.dp
+        val activeSlot = if (densePortrait) packedSlot else hitSlot
+        val slots = ((maxWidth - leftWidth - rightWidth).value / activeSlot.value)
             .toInt().coerceIn(1, 12)
         val tierCount = when {
             maxHeight < 480.dp -> 1
+            // Two shelves for a new collection; the third physical shelf
+            // appears on tall phones as soon as books need a second row.
+            densePortrait && maxHeight >= 740.dp && books.size > slots -> 3
             maxHeight >= 830.dp && books.size > 2 * slots -> 3
             else -> 2
         }
-        // WS16BG: actual front covers, two per shelf, replace the tall
-        // source-bound spines ONLY in the high-res portrait cabinet.
-        // Four real books per page keeps every cover big enough to read;
-        // landscape/compact and older preview routes stay unchanged.
-        val cabinetPortrait = hasWs16baCabinetArt(LocalContext.current) &&
-            maxHeight >= maxWidth * 1.7f
-        val faceOutPortrait = cabinetPortrait && tierCount == 2
-        val capacity = if (faceOutPortrait) 4 else slots * tierCount
+        // Page capacity is computed ONLY from real available shelf slots.
+        // No fake, locked or future bindings take an index or a tap target.
+        val capacity = slots * tierCount
         val pages = maxOf(1, (books.size + capacity - 1) / capacity)
         // WS16BD: a sparse portrait collection should showcase the REAL
         // books across both shelves, not give half the cabinet to fake volumes.
         // Once there are more than one full row, return to catalog-order paging.
-        val balancedSparseLayout = tierCount == 2 &&
+        val balancedSparseLayout = !densePortrait && tierCount == 2 &&
             maxHeight >= maxWidth * 1.7f &&
             pages == 1 && books.size in 2..slots
         val pager = rememberPagerState(pageCount = { pages })
@@ -183,7 +189,12 @@ internal fun WS16ATModularLibraryScene(
         // Reserve only the space that the shelf/carved apron and native plaque
         // require. Use the remaining height for real books, not dead wood space.
         val shelfTierSpace = (available - countBayHeight).coerceAtLeast(1.dp)
-        val tierHeights = if (faceOutPortrait || balancedSparseLayout) listOf(
+        val tierHeights = if (densePortrait) {
+            // Always reserve count clearance even with three live shelves;
+            // dividing raw 'available' previously placed the bottom shelf
+            // underneath the lower cabinet count/base.
+            List(tierCount) { shelfTierSpace / tierCount }
+        } else if (balancedSparseLayout) listOf(
             shelfTierSpace * 0.50f, shelfTierSpace * 0.50f
         ) else if (tierCount == 2) listOf(
             shelfTierSpace * 0.54f, shelfTierSpace * 0.46f
@@ -201,8 +212,8 @@ internal fun WS16ATModularLibraryScene(
             Column(Modifier.fillMaxSize().testTag("ws16at-page-$page")) {
                 repeat(tierCount) { tier ->
                     val shelfIndex = page * tierCount + tier
-                    val shelfBooks = if (faceOutPortrait) {
-                        pageBooks.drop(tier * 2).take(2)
+                    val shelfBooks = if (densePortrait) {
+                        pageBooks.drop(tier * slots).take(slots)
                     } else if (balancedSparseLayout) {
                         val topBooks = (pageBooks.size + 1) / 2
                         if (tier == 0) pageBooks.take(topBooks) else pageBooks.drop(topBooks)
@@ -210,15 +221,14 @@ internal fun WS16ATModularLibraryScene(
                     val tierHeight = tierHeights[tier]
                     Box(Modifier.fillMaxWidth().height(tierHeight)
                         .testTag("ws16at-movable-shelf-$shelfIndex")) {
-                        if (faceOutPortrait) {
-                            WS16BGFaceOutBookBay(
+                        if (densePortrait) {
+                            WS16BHDenseSpineBay(
                                 books = shelfBooks,
+                                shelfIndex = shelfIndex,
+                                slot = packedSlot,
                                 height = (tierHeight - shelfContactDepth)
-                                    .coerceAtLeast(70.dp),
-                                onBookSelected = onBookSelected,
-                                modifier = Modifier.testTag(
-                                    "ws16bg-face-out-shelf-$shelfIndex"
-                                )
+                                    .coerceAtLeast(54.dp),
+                                onBookSelected = onBookSelected
                             )
                         } else {
                             // Exact previous renderer remains a rollback for
@@ -263,7 +273,7 @@ internal fun WS16ATModularLibraryScene(
                 // The live count belongs directly beneath the LAST painted
                 // shelf, after its full carved overhang; it is not a loose
                 // overlay positioned from the bottom of the screen.
-                if (tierCount == 2) {
+                if (tierCount >= 2) {
                     Spacer(Modifier.height(shelfOverhang + countGap))
                     Box(
                         Modifier.fillMaxWidth().height(countPlaqueBudget)
@@ -299,8 +309,8 @@ internal fun WS16ATModularLibraryScene(
                 .padding(start = 9.dp, top = 10.dp)
                 .testTag("ws16at-back")
         )
-        if (tierCount != 2) {
-            // Compact/overflow tier modes keep the existing bottom placard.
+        if (tierCount == 1) {
+            // Only truly compact single-tier layouts use the bottom placard.
             Ws16AZCabinetPlaque(
                 label = "${books.size} ${if (books.size == 1) "book" else "books"}",
                 title = false,
