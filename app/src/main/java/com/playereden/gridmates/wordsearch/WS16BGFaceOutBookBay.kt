@@ -1,16 +1,23 @@
 package com.playereden.gridmates.wordsearch
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -18,6 +25,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.PuzzleBook
+import com.playereden.gridmates.wordsearch.core.WordTheme
 
 /**
  * WS16BG: real cover-first display for the carved portrait cabinet.
@@ -50,9 +58,13 @@ internal fun WS16BGFaceOutBookBay(
             minOf(104.dp, availableWidth / 2f)
         }
         val usableHeight = (maxHeight - 24.dp).coerceAtLeast(70.dp)
-        val coverWidth = minOf(unitWidth - 10.dp, usableHeight * (480f / 640f))
+        // The actual painted-book bounds of the existing 480x640
+        // WS16AE artwork are x=12..468, y=65..574. Tight 460x513
+        // crops keep feet ON the shelf; no imaginary 65px empty margin.
+        val physicalRatio = 460f / 513f
+        val coverWidth = minOf(unitWidth - 10.dp, usableHeight * physicalRatio)
             .coerceAtLeast(36.dp)
-        val coverHeight = coverWidth * (640f / 480f)
+        val coverHeight = coverWidth / physicalRatio
 
         Row(
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -106,18 +118,63 @@ internal fun WS16BGFaceOutBookBay(
                                     RoundedCornerShape(topEnd = 3.dp, bottomEnd = 3.dp)
                                 )
                         )
-                        BookArt(
+                        WS16BGTrimmedCoverArt(
                             book.theme,
-                            BookArtKind.COVER,
                             modifier = Modifier.align(Alignment.CenterStart)
                                 .width(coverWidth).fillMaxHeight()
                                 .shadow(3.dp, RoundedCornerShape(3.dp))
-                                .testTag("ws16bg-art-" + book.id),
-                            fieldNotes = true
+                                .testTag("ws16bg-art-" + book.id)
                         )
                     }
                 }
             }
         }
+    }
+}
+
+/**
+ * Reuse precisely the existing illustrated Home-cover pixels. We crop only
+ * known transparent WS16AE margins (2px safety around physical page artwork).
+ * The original PNG, manifest, design master and SHA stay untouched. On a
+ * missing/unavailable debug-only cover we fall back to existing BookArt.
+ */
+@Composable
+private fun WS16BGTrimmedCoverArt(
+    theme: WordTheme,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val slug = when (theme) {
+        WordTheme.WOODLAND -> "woodland"
+        WordTheme.SPACE -> "space"
+        WordTheme.GARDEN -> "garden"
+    }
+    val bitmap = remember(context, slug) {
+        runCatching {
+            context.assets.open("ws16ae/covers/$slug.png").use { stream ->
+                BitmapFactory.decodeStream(stream)
+            }?.let { original ->
+                if (original.width == 480 && original.height == 640) {
+                    // Source alpha bounds: (12,65)..(468,574). There must
+                    // be no transparent 65px book-raising bottom margin.
+                    Bitmap.createBitmap(original, 10, 63, 460, 513)
+                } else original
+            }
+        }.getOrNull()
+    }
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = modifier
+        )
+    } else {
+        BookArt(
+            theme = theme,
+            kind = BookArtKind.COVER,
+            modifier = modifier,
+            fieldNotes = true
+        )
     }
 }
