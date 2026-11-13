@@ -49,7 +49,7 @@ class CarvedTitleTests(unittest.TestCase):
             new_top = max(top - 80, 16)
             # At the same safe inset this shifts the title meaningfully up.
             self.assertLessEqual(new_top, old_top - 20)
-            self.assertEqual(46, 46)  # fixed-height plaque, never a 2-line pill
+            self.assertLess(new_top + 46, old_top + 54)
             self.assertGreater(width - 2 * 66, 170)
 
     def test_install_over_public_qa_identity_and_pipeline_remain(self):
