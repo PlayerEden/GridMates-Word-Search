@@ -1,6 +1,6 @@
 # WS16BL — Tactile cabinet motion, responsive page dots and small visual clearance
 
-> **Status:** v71 code committed; exact-source Android and independent art/release QA IN PROGRESS. **Not yet verified or visually accepted on phone.** Date: November 12, 2026 local (Kentucky).
+> **Status:** EXACT-SOURCE v71 **DUAL-GREEN Android and independent art/release QA**, signed APK integrity/package verified and handed off. **On-phone visual and touch QA still OPEN.** Date: November 12, 2026 local (Kentucky).
 
 ## Owner screenshot / request
 
@@ -16,11 +16,21 @@ The owner previously requested that after finishing Library navigation, buttons,
 ## Verification evidence and decisions
 
 - **Current first exact-source build:** [`b409a89528c097a6f510be2945a0c78931ff53f5`](https://github.com/PlayerEden/GridMates-Word-Search/commit/b409a89528c097a6f510be2945a0c78931ff53f5) on existing [draft PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), branch `feature/ws14b-style-anchor-and-art-direction-2026-11-08`. Later documentation `[skip ci]` commits do not change compiled code.
-- **Standard Android QA:** [#43357902693](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902693) IN PROGRESS when logged.
-- **Independent art/release:** [#43357902682](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902682) IN PROGRESS when logged.
-- **NO v71 APK verified or shared at initial log creation.** Do not claim success until workflows finish, package/version/signing certificate verified, actual APK artifact bytes extracted, and original QA-only art isolation passed.
+- **Standard Android QA:** [#43357902693](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902693) later SUCCESS, see verified receipt below.
+- **Independent art/release:** [#43357902682](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902682) later SUCCESS, see verified receipt below.
+- **Initial documentation:** v71 APK was not yet available when first written; final dual-green and verified delivered APK are now recorded below.
 - Last owner screenshot/phone-tested version is **v70**: [standard GitHub artifact #14005763584](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355605367/artifacts/14005763584), APK SHA256 `0bb8e136168f55f1e04dd5bfdff0feeac10d6fcbd4941743012c2446dff5de51`. No uninstall/downgrade that risks saves. PR #131 stays draft and existing debug-only art stays unapproved for release.
+
+## Final v71 verification and download receipt
+
+- **Actual compiled feature/test source:** [`b409a89528c097a6f510be2945a0c78931ff53f5`](https://github.com/PlayerEden/GridMates-Word-Search/commit/b409a89528c097a6f510be2945a0c78931ff53f5). Later documentation `[skip ci]` changes do not alter the tested APK.
+- **Android QA [#43357902693](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902693): SUCCESS**, all 69 job steps passed, including core/app tests, Kotlin+Compose compile, lint, static motion/contract checks, full APK, SHA and pinned public QA signing certificate.
+- **Independent art/release [#43357902682](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902682): SUCCESS**, all 70 job steps passed, including separate debug+release compilation and strict QA-only art exclusion from release.
+- **Standard GitHub APK ZIP [artifact #14006713081](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902693/artifacts/14006713081):** 29,625,238 bytes, ZIP SHA256 `0ad07edc0e591951091cc9a1e5efd562ee324cd62130e50f216105825ca48234`. Extracted `app-debug.apk` delivered as direct `GridMates_WordSearch_WS16BL_v71.apk`: **30,095,757 bytes**, SHA256 `148513827e892e9e9b80f5c8b1cfbdf31d8a32c46e4922011a622b4d3d9a0eb1`. Both file paths verified in the active container.
+- **Actual CI-signed QA identity:** `com.playereden.gridmates.wordsearch.qa`, **versionCode 71**, versionName `0.9.27-library-tactile-polish-qa`; unchanged public QA signer SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`. Installs over v70 without uninstall/clear if Android accepts the standard package update.
+- **Independent art ZIP [artifact #14006654163](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902682/artifacts/14006654163):** 29,625,237 bytes, ZIP SHA `b518f6c7349090e556ba09d694449a97c0e9b347535c88db32e76215a756ce51`; independently signed APK 30,095,757 bytes, SHA `ed9c867c130e57c448493677761ec323bdad993744252a6834955ac139130d67`. Archive SHA differs as expected with independent signing. **All 358 decompressed ZIP entry paths and bytes match exactly across the two APKs**. Ten WS16BK files (`pager_rail.png`, eight `blanks/*.png`, manifest) preserved; **zero changed `assets/` bytes** compared to owner-installed v70.
+- **Still OPEN:** This QA success does not prove real handset press states look/feel correct, that user has navigated page2/page3, or that save retention has been physically checked. Owner must install over v70, test 1→2→3→2→1 and pressed/disabled hardware, and send one updated Library screenshot. Keep draft PR #131 unmerged, source-pinned art QA-only.
 
 ## Next concrete action
 
-Inspect both jobs; repair precise Kotlin/source/asset assertions if any, rerun and verify actual v71 signed Android APK/ZIP. User should test button press/hold release, disabled first-page left arrow, next/previous paging 1->2->3->2->1, soft active-dot movement, upper Back and menu, title/spine clearance and unchanged saved book selection. Capture full portrait screenshot(s). Then do not broaden into unrelated features until physical QA feedback.
+Owner installs the verified signed v71 QA APK directly over v70 (NO uninstall) and visually tests Back/menu and paging arrows for press-in/glint, disabled first-page left arrow, 1->2->3->2->1 navigation and soft active-dot selection, title/spine clearance, narrower pager rail and decorative contrast. Test real book selection + saved page and confirm blank books have no tap. Capture a full-screen Library screenshot and optionally one future bookcase page. Only after physical feedback make further changes; no PR merge or release-art promotion.
