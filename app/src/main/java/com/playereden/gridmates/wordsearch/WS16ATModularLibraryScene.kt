@@ -158,38 +158,39 @@ internal fun WS16ATModularLibraryScene(
             // WS16BI: third tier ONLY when each book remains tall enough.
             // At ordinary phone heights use two real shelves and pagination.
             densePortrait && maxHeight >= 960.dp && books.size > slots -> 3
-            maxHeight >= 830.dp && books.size > 2 * slots -> 3
+            !densePortrait && maxHeight >= 830.dp && books.size > 2 * slots -> 3
             else -> 2
         }
-        // Page capacity is computed ONLY from real available shelf slots.
-        // No fake, locked or future bindings take an index or a tap target.
+        // Real-book capacity never includes decorative inventory. Two future
+        // display cases remain browsable after the actual catalog, so the
+        // first 3-volume Library has 3 pages and always feels expandable.
         val capacity = slots * tierCount
-        val pages = maxOf(1, (books.size + capacity - 1) / capacity)
+        val realPageCount = maxOf(1, (books.size + capacity - 1) / capacity)
+        val futureBookcaseCount = if (densePortrait) 2 else 0
+        val pages = realPageCount + futureBookcaseCount
         // WS16BD: a sparse portrait collection should showcase the REAL
         // books across both shelves, not give half the cabinet to fake volumes.
         // Once there are more than one full row, return to catalog-order paging.
         val balancedSparseLayout = !densePortrait && tierCount == 2 &&
             maxHeight >= maxWidth * 1.7f &&
-            pages == 1 && books.size in 2..slots
+            realPageCount == 1 && books.size in 2..slots
         val pager = rememberPagerState(pageCount = { pages })
         val scope = rememberCoroutineScope()
         val top = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.25f)
         val bottom = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.15f)
         val available = (maxHeight - top - bottom).coerceAtLeast(1.dp)
-        // WS16BC: measure the painted shelf's actual extension beneath its
-        // book-contact plane. A bottom-anchored count used to cover the carving
-        // on some aspect ratios, even when the wood looked fine in screenshots.
+        // WS16BK: the bottom count plaque is gone. Reserve a bookcase pager
+        // mounting bay outside the shelf plane, never overlapping woodwork.
         val shelfContactDepth = 42.dp
         val shelfOverhang = if (cabinetPortrait) {
             ((maxWidth - leftWidth - rightWidth).coerceAtLeast(1.dp) *
                 (125f / 586f)).coerceIn(42.dp, 72.dp) - shelfContactDepth
         } else 0.dp
-        val countGap = if (density.fontScale >= 1.65f) 8.dp else 12.dp
-        val countPlaqueBudget = if (density.fontScale >= 1.65f) 52.dp else 38.dp
-        val countBayHeight = shelfOverhang + countGap + countPlaqueBudget
-        // Reserve only the space that the shelf/carved apron and native plaque
-        // require. Use the remaining height for real books, not dead wood space.
-        val shelfTierSpace = (available - countBayHeight).coerceAtLeast(1.dp)
+        val pagerGap = if (density.fontScale >= 1.65f) 8.dp else 12.dp
+        val pagerRailBudget = 62.dp
+        val pagerBayHeight = shelfOverhang + pagerGap + pagerRailBudget
+        // Reserve carved shelf overhang and pager rail clearance first.
+        val shelfTierSpace = (available - pagerBayHeight).coerceAtLeast(1.dp)
         val tierHeights = if (densePortrait) {
             // Always reserve count clearance even with three live shelves;
             // dividing raw 'available' previously placed the bottom shelf
@@ -209,8 +210,12 @@ internal fun WS16ATModularLibraryScene(
                 .padding(start = leftWidth, end = rightWidth, top = top, bottom = bottom)
                 .testTag("ws16at-bookcase-pages")
         ) { page ->
-            val pageBooks = books.drop(page * capacity).take(capacity)
-            Column(Modifier.fillMaxSize().testTag("ws16at-page-$page")) {
+            val isFutureBookcase = densePortrait && page >= realPageCount
+            val pageBooks = if (isFutureBookcase) emptyList() else
+                books.drop(page * capacity).take(capacity)
+            Column(Modifier.fillMaxSize()
+                .testTag(if (isFutureBookcase) "ws16bk-future-bookcase-$page"
+                         else "ws16at-page-$page")) {
                 repeat(tierCount) { tier ->
                     val shelfIndex = page * tierCount + tier
                     val shelfBooks = if (densePortrait) {
@@ -231,7 +236,8 @@ internal fun WS16ATModularLibraryScene(
                                     .coerceAtLeast(54.dp),
                                 onBookSelected = onBookSelected,
                                 maxSlots = slots,
-                                showDecorativeBlanks = true
+                                showDecorativeBlanks = true,
+                                fullPlaceholderShelf = isFutureBookcase
                             )
                         } else {
                             // Exact previous renderer remains a rollback for
@@ -273,22 +279,11 @@ internal fun WS16ATModularLibraryScene(
                         }
                     }
                 }
-                // The live count belongs directly beneath the LAST painted
-                // shelf, after its full carved overhang; it is not a loose
-                // overlay positioned from the bottom of the screen.
+                // Keep the carved lower apron clear. Bookcase navigation is
+                // rendered once as an overlay, NOT duplicated in every page.
                 if (tierCount >= 2) {
-                    Spacer(Modifier.height(shelfOverhang + countGap))
-                    Box(
-                        Modifier.fillMaxWidth().height(countPlaqueBudget)
-                            .testTag("ws16bc-count-bay"),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        WS16BIAdaptivePlaque(
-                            label = "${books.size} ${if (books.size == 1) "book" else "books"}",
-                            title = false, styled = cabinetPortrait,
-                            modifier = Modifier.testTag("ws16at-real-count")
-                        )
-                    }
+                    Spacer(Modifier.height(shelfOverhang + pagerGap + pagerRailBudget)
+                        .testTag("ws16bk-navigation-bay"))
                 }
             }
         }
@@ -316,47 +311,27 @@ internal fun WS16ATModularLibraryScene(
                 .padding(start = 9.dp, top = 10.dp)
                 .testTag("ws16at-back")
         )
-        if (tierCount == 1) {
-            // Only truly compact single-tier layouts use the bottom placard.
-            WS16BIAdaptivePlaque(
-                label = "${books.size} ${if (books.size == 1) "book" else "books"}",
-                title = false, styled = cabinetPortrait,
-                modifier = Modifier.align(Alignment.BottomCenter)
-                    .padding(bottom = 12.dp)
-                    .testTag("ws16at-real-count")
-            )
-        }
         if (pages > 1) {
-            Row(Modifier.align(Alignment.BottomCenter)
-                    .padding(bottom = (bottom - 9.dp).coerceAtLeast(46.dp))
-                    .testTag("ws16at-pagination"),
-                verticalAlignment = Alignment.CenterVertically) {
-                WS16BIAdaptiveControl(
-                    styled = cabinetPortrait,
-            glyph = Ws16AZCabinetGlyph.PREVIOUS,
-                    description = "Previous bookcase",
-                    enabled = pager.currentPage > 0,
-                    onClick = {
-                        scope.launch { pager.animateScrollToPage(pager.currentPage - 1) }
-                    },
-                    modifier = Modifier.testTag("ws16at-prev")
-                )
-                WS16BIAdaptivePlaque(
-                    label = "${pager.currentPage + 1} / $pages",
-                    title = false, styled = cabinetPortrait,
-                    modifier = Modifier.testTag("ws16at-page-label")
-                )
-                WS16BIAdaptiveControl(
-                    styled = cabinetPortrait,
-            glyph = Ws16AZCabinetGlyph.NEXT,
-                    description = "Next bookcase",
-                    enabled = pager.currentPage < pages - 1,
-                    onClick = {
-                        scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
-                    },
-                    modifier = Modifier.testTag("ws16at-next")
-                )
-            }
+            // Fixed bottom mounting rail, between carved shelf and cabinet
+            // base. Pages change together via swipe or these native controls.
+            WS16BKBookcasePager(
+                currentPage = pager.currentPage,
+                pageCount = pages,
+                styled = cabinetPortrait,
+                onPrevious = {
+                    if (pager.currentPage > 0) scope.launch {
+                        pager.animateScrollToPage(pager.currentPage - 1)
+                    }
+                },
+                onNext = {
+                    if (pager.currentPage < pages - 1) scope.launch {
+                        pager.animateScrollToPage(pager.currentPage + 1)
+                    }
+                },
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .padding(bottom = (bottom - 12.dp).coerceAtLeast(12.dp))
+                    .testTag("ws16at-pagination")
+            )
         }
         // Keep the old Library renderer one tap away for visual comparison.
         WS16BIAdaptiveControl(
