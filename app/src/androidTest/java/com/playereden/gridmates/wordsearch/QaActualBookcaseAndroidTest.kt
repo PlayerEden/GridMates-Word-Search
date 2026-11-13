@@ -161,7 +161,11 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("ws16bg-cover-" + woodland.id).assertDoesNotExist()
         compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
         compose.onNodeWithTag("ws16bc-visible-future-0-3").assertDoesNotExist()
-        compose.onNodeWithText("3 books").assertExists()
+        compose.onNodeWithText("3 books").assertDoesNotExist()
+        compose.onNodeWithTag("ws16bk-bookcase-pager").assertExists()
+        compose.onNodeWithTag("ws16bk-page-dots").assertExists()
+        compose.onNodeWithTag("ws16at-prev").assertExists()
+        compose.onNodeWithTag("ws16at-next").assertExists()
 
         val woodlandBounds = compose.onNodeWithTag("ws16bh-spine-" + woodland.id)
             .fetchSemanticsNode().boundsInRoot
@@ -190,9 +194,11 @@ class QaActualBookcaseAndroidTest {
             titleBounds.right <= menuBounds.left + 1f)
         val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
             .fetchSemanticsNode().boundsInRoot
-        val count = compose.onNodeWithTag("ws16at-real-count")
+        val pagerBounds = compose.onNodeWithTag("ws16bk-bookcase-pager")
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Count clears lower shelf", count.top > lowerShelf.bottom)
+        assertTrue("Bookcase pager must sit below the second wooden shelf",
+            pagerBounds.top > lowerShelf.bottom)
+        compose.onNodeWithTag("ws16at-real-count").assertDoesNotExist()
 
         compose.onNodeWithTag("ws16bh-spine-" + garden.id).performClick()
         compose.runOnIdle { assertEquals(garden.id, selected) }
@@ -228,7 +234,8 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithTag("ws16bh-packed-shelf-2").assertExists()
         compose.onNodeWithTag("ws16bh-spine-" + many.first().id).assertExists()
         compose.onNodeWithTag("ws16bh-spine-" + many.last().id).assertExists()
-        compose.onNodeWithText("10 books").assertExists()
+        compose.onNodeWithText("10 books").assertDoesNotExist()
+        compose.onNodeWithTag("ws16bk-bookcase-pager").assertExists()
         compose.onNodeWithTag("ws16bb-upcoming-label").assertDoesNotExist()
 
         val lastBinding = compose.onNodeWithTag("ws16bh-spine-" + many.last().id)
@@ -240,5 +247,44 @@ class QaActualBookcaseAndroidTest {
 
         compose.onNodeWithTag("ws16bh-spine-" + many.last().id).performClick()
         compose.runOnIdle { assertEquals(many.last().id, selected) }
+    }
+
+    @Test fun portraitBrowsesFutureWordlessBookcasesWithoutFakeOwnership() {
+        var selected: String? = null
+        compose.setContent {
+            GridMatesTheme {
+                Box(Modifier.width(360.dp).height(760.dp)) {
+                    WS16ATModularLibraryScene(
+                        books = catalog.books,
+                        onBack = {},
+                        onBookSelected = { selected = it },
+                        onPreviousArt = {}
+                    )
+                }
+            }
+        }
+        compose.onNodeWithTag("ws16bk-bookcase-pager").assertExists()
+        compose.onNodeWithTag("ws16bk-dot-0").assertExists()
+        compose.onNodeWithTag("ws16bk-dot-1").assertExists()
+        compose.onNodeWithTag("ws16bk-dot-2").assertExists()
+        compose.onNodeWithTag("ws16at-real-count").assertDoesNotExist()
+        compose.onNodeWithTag("ws16at-next").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("ws16bk-future-bookcase-1").assertExists()
+        compose.onNodeWithTag("ws16bi-blank-cell-2-0").assertExists()
+        compose.onNodeWithTag("ws16bi-blank-cell-3-0").assertExists()
+        compose.onNodeWithTag("ws16bh-spine-" + woodland.id).assertDoesNotExist()
+        compose.onNodeWithTag("ws16at-next").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("ws16bk-future-bookcase-2").assertExists()
+        compose.onNodeWithTag("ws16bi-blank-cell-4-0").assertExists()
+        compose.onNodeWithTag("ws16at-prev").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("ws16bk-future-bookcase-1").assertExists()
+        compose.onNodeWithTag("ws16at-prev").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("ws16bh-spine-" + woodland.id).assertExists()
+        compose.onNodeWithTag("ws16bh-spine-" + garden.id).performClick()
+        compose.runOnIdle { assertEquals(garden.id, selected) }
     }
 }
