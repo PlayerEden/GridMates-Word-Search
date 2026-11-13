@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 70
-        versionName = "0.9.26-future-bookcases-and-pager"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 71
+        versionName = "0.9.27-library-tactile-polish"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
