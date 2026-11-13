@@ -1,6 +1,6 @@
 # WS16BJ — Carved walnut Library title / headline clearance
 
-> **Status: v69 CODE COMMITTED / DUAL ANDROID + ART CI IN PROGRESS / OWNER VISUAL ACCEPTANCE PENDING.** Do not claim an installable verified APK until exact-source CI, signer, APK hash and packaged files pass. Date: November 12, 2026.
+> **Status: EXACT-SOURCE DUAL-GREEN ANDROID + ART/RELEASE QA / SIGNED v69 APK VERIFIED AND DELIVERED / OWNER PHONE VISUAL ACCEPTANCE PENDING.** Date: November 12, 2026.
 
 ## Owner screenshot and request
 
@@ -33,6 +33,17 @@ Under the v68 source, `WS16BICabinetPlaque(title=true)` gave that text a compara
 The first v69 Android [#43335903651](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903651) and independent art [#43335903647](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903647) runs reached Kotlin compilation; art run failed on one source import: `Unresolved reference 'matchParentSize'` in the new title component. The layout API is a `BoxScope` modifier, not a standalone directly imported extension. Fixed only the import list to match the established Compose pattern with `import androidx.compose.foundation.layout.*`, leaving the measured plaque, typography and book geometry unchanged.
 
 **Corrected source:** [`6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b). Current exact-source [Android QA #43336457623](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623) and [art/release #43336457635](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457635) were IN PROGRESS when recorded. Do not claim success or an available v69 APK until both final gates and package hashes are checked.
+
+## Final v69 verification receipt
+
+- **Actual compiled feature/test source:** [`6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b). The earlier `8c5b54fe` art build failed an incorrect standalone `matchParentSize` import; this corrected import was the *only* functional follow-up. Subsequent journal and handoff changes are `[skip ci]` documentation only.
+- **Android QA [#43336457623](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623): SUCCESS.** Source/static checks, Kotlin debug + androidTest compilation, unit tests, lint, packaged art SHA and QA package/signing verification passed.
+- **Independent debug/release QA [#43336457635](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457635): SUCCESS.** Both debug and release compiled; original QA-only assets remain excluded from release.
+- **Official standard APK ZIP [#13997661426](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623/artifacts/13997661426)**: `GridMates-WordSearch-Android-QA`, 29,138,866-byte ZIP, SHA-256 `59630e10c6fc572384c87530fb266c8fbb577a621bc231787f50b15de8c4e060`. Extracted `app-debug.apk` to the conversation as `GridMates_WordSearch_WS16BJ_v69.apk`, **29,616,032 bytes**, SHA-256 `4264caf65e89f0e8229502b7263206ea5e861f1198e3eb534d5713b2a5bcc2bd`. Direct APK and durable GitHub artifact both delivered.
+- **Verified package/version/signing from exact CI job:** `com.playereden.gridmates.wordsearch.qa`, **versionCode=69**, versionName=`0.9.25-carved-library-title-qa`, QA signing certificate SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`, identical to v68. Install directly over v68 without uninstalling/clearing app progress.
+- **Independent artifact [#13997586644](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457635/artifacts/13997586644)** has ZIP SHA-256 `573b171e08f9dcad1bd63ef4bd8f6bbe84bcdded70a88c9600114564ffc8bea0`; its APK has the same size 29,616,032 bytes but archive SHA `1b26286541b140bb3e159147f3661af721927e6d1d8455adc3a14466b76393c4`. The two independently built APKs have **all 348 uncompressed file names and bytes exactly matching**. Do not claim signed APK archive bytes themselves match.
+- **Original image regression:** Compared standard v69 APK to previously installed v68; **zero changed `assets/` content bytes**. Spine, filler, cabinet, shelf and cover PNGs are preserved exactly. v69 changes only code/layout/source tests, not pixel art or gameplay data.
+- **Still open:** actual v69 on-phone title placement, carved shape aesthetics, menu/lamp clearance, real spine taps/cover preview and save retention. CI green does not establish visual approval; draft PR #131 stays unmerged, no QA-only art promoted to a production build.
 
 ## Exit criteria
 
