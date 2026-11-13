@@ -27,7 +27,7 @@ class CarvedTitleTests(unittest.TestCase):
     def test_title_moves_up_without_repositioning_book_pagers(self):
         scene = (APP / "WS16ATModularLibraryScene.kt").read_text()
         self.assertIn('label = "Your Library", title = true, styled = cabinetPortrait', scene)
-        self.assertIn('top = (top - 80.dp).coerceAtLeast(16.dp)', scene)
+        self.assertIn('top = (top - 88.dp).coerceAtLeast(12.dp)', scene)
         self.assertIn('.padding(start = 66.dp, end = 66.dp,', scene)
         self.assertIn('testTag("ws16at-library-title")', scene)
         self.assertNotIn('top = (top - 58.dp).coerceAtLeast(38.dp)', scene)
@@ -46,7 +46,7 @@ class CarvedTitleTests(unittest.TestCase):
         for width, height in ((320, 680), (360, 760), (393, 851), (412, 915)):
             top = min(width * 198 / 602, height * .25)
             old_top = max(top - 58, 38)
-            new_top = max(top - 80, 16)
+            new_top = max(top - 88, 12)
             # At the same safe inset this shifts the title meaningfully up.
             self.assertLessEqual(new_top, old_top - 20)
             self.assertLess(new_top + 46, old_top + 54)
