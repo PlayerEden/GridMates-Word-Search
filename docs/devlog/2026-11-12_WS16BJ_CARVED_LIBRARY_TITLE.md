@@ -28,6 +28,12 @@ Under the v68 source, `WS16BICabinetPlaque(title=true)` gave that text a compara
 - **No verified v69 APK yet**. Check both workflows, repair actual failures at a new exact source SHA, and after dual-green inspect actual artifact/checksum, Android package/version/signing, unchanged artwork and release-art exclusion.
 - **Last installed v68 fallback** [GitHub ZIP artifact #13978378051](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43294624409/artifacts/13978378051); owner visually reviewed that version. Normal Android downgrades are not guaranteed to install over newer versions. Never ask to uninstall/clear saves to compare.
 
+## Initial CI result and corrective commit
+
+The first v69 Android [#43335903651](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903651) and independent art [#43335903647](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903647) runs reached Kotlin compilation; art run failed on one source import: `Unresolved reference 'matchParentSize'` in the new title component. The layout API is a `BoxScope` modifier, not a standalone directly imported extension. Fixed only the import list to match the established Compose pattern with `import androidx.compose.foundation.layout.*`, leaving the measured plaque, typography and book geometry unchanged.
+
+**Corrected source:** [`6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b). Current exact-source [Android QA #43336457623](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623) and [art/release #43336457635](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457635) were IN PROGRESS when recorded. Do not claim success or an available v69 APK until both final gates and package hashes are checked.
+
 ## Exit criteria
 
 Owner installs final signed v69 over v68, sends full Library screenshot. We should see the fitted carved title sitting higher beneath the arch, **no overlap with rounded real books**, clear text, lamp and side-control clearance, and unchanged shelf/spines/blank-books appearance. Confirm a real book still opens and saves persist. CI success is not owner visual approval; PR #131 stays draft/unmerged and QA artwork remains debug-only until explicitly accepted.
