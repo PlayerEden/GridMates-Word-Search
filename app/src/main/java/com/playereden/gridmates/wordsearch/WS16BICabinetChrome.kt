@@ -1,11 +1,18 @@
 package com.playereden.gridmates.wordsearch
 
+import android.animation.ValueAnimator
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -16,9 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -36,18 +45,46 @@ internal fun WS16BICabinetControl(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    Box(modifier.size(54.dp)
-        .semantics { contentDescription = description }
-        .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
-        contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(44.dp)) {
+    // WS16BL: move the inset metal plate, never shrink the 54dp touch
+    // target. System animation-off respects reduced-motion preference.
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val motionAllowed = ValueAnimator.areAnimatorsEnabled()
+    val inset by animateFloatAsState(
+        targetValue = if (enabled && pressed) 1f else 0f,
+        animationSpec = tween(durationMillis = if (motionAllowed) 115 else 0),
+        label = "ws16bl-cabinet-press"
+    )
+    Box(
+        modifier.size(54.dp)
+            .semantics { contentDescription = description }
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(
+            Modifier.size(44.dp)
+                .graphicsLayer {
+                    scaleX = 1f - .052f * inset
+                    scaleY = 1f - .052f * inset
+                    translationY = 1.5.dp.toPx() * inset
+                }
+                .testTag("ws16bl-animated-face")
+        ) {
             val u = 1.dp.toPx()
             val w = size.width
             val h = size.height
             val opacity = if (enabled) 1f else .38f
-            drawRoundRect(Color(0xA30E0805), topLeft = Offset(1.5f*u,3.5f*u),
-                size = Size(w-3f*u,h-2f*u),
-                cornerRadius = CornerRadius(5*u), alpha=opacity)
+            drawRoundRect(Color(0xA30E0805),
+                topLeft = Offset(1.5f*u, (3.5f + inset)*u),
+                size = Size(w-3f*u, h-2f*u),
+                cornerRadius = CornerRadius(5*u),
+                alpha=opacity*(1f-.25f*inset))
             drawRoundRect(
                 brush=Brush.verticalGradient(listOf(
                     Color(0xFFA66D32),Color(0xFF4A2513),
@@ -59,7 +96,16 @@ internal fun WS16BICabinetControl(
             drawRoundRect(
                 Color(0xFFE9BD6F),topLeft=Offset(2.2f*u,2*u),
                 size=Size(w-4.4f*u,h-6*u),cornerRadius=CornerRadius(3*u),
-                style=Stroke(1.4f*u),alpha=opacity
+                style=Stroke((1.4f+.4f*inset)*u),alpha=opacity
+            )
+            // Fleeting brass glint while pressed, restrained rather than neon.
+            drawLine(
+                Color(0xFFFFE3A2),
+                Offset(9*u, 4.2f*u),
+                Offset(w-9*u, 4.2f*u),
+                strokeWidth=(.8f+1.0f*inset)*u,
+                cap=StrokeCap.Round,
+                alpha=opacity*(.40f+.52f*inset)
             )
             drawRoundRect(
                 Color(0x9C180D08),topLeft=Offset(5*u,5*u),
@@ -74,7 +120,7 @@ internal fun WS16BICabinetControl(
                         center=Offset(cx-.3f*u,cy-.45f*u),alpha=opacity)
                 }
             }
-            val gold=Color(0xFFFFE0A4).copy(alpha=opacity)
+            val gold=Color(0xFFFFE0A4).copy(alpha=opacity*(.91f+.09f*inset))
             val stroke=2.8f*u
             if (glyph==Ws16AZCabinetGlyph.ART_OPTIONS) {
                 for(x in listOf(.33f,.5f,.67f)) {
