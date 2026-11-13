@@ -164,7 +164,11 @@ internal fun WS16BIAdaptivePlaque(
     styled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    if (styled) WS16BICabinetPlaque(label, title, modifier)
+    // WS16BJ is intentionally scoped to the feature title. Count labels and
+    // page numbers keep their compact v68 fittings, and the older AZ kit is
+    // still the fallback for compact/landscape scenes.
+    if (styled && title) WS16BJCarvedTitlePlaque(label, modifier)
+    else if (styled) WS16BICabinetPlaque(label, title, modifier)
     else Ws16AZCabinetPlaque(label, title, modifier)
 }
 
