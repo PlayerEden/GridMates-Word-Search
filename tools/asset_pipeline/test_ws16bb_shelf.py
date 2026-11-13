@@ -28,10 +28,10 @@ class CabinetRefinementTests(unittest.TestCase):
 
     def test_spaced_library_and_separate_count(self):
         scene=(APP/"WS16ATModularLibraryScene.kt").read_text()
-        self.assertIn("val countBayHeight = shelfOverhang + countGap + countPlaqueBudget",scene)
+        self.assertIn("val pagerBayHeight = shelfOverhang + pagerGap + pagerRailBudget",scene)
         self.assertIn("shelfTierSpace * 0.54f",scene)
         self.assertIn("shelfTierSpace * 0.46f",scene)
-        self.assertIn("ws16bc-count-bay",scene)
+        self.assertIn("ws16bk-navigation-bay",scene)
         self.assertIn("showFutureVolumes = false",scene)
         self.assertIn("val balancedSparseLayout = !densePortrait && tierCount == 2",scene)
         self.assertIn("WS16BHDenseSpineBay(",scene)
@@ -39,7 +39,7 @@ class CabinetRefinementTests(unittest.TestCase):
         self.assertIn('label = "Coming soon"',scene)
         self.assertIn("futureTreatment = true",scene)
         self.assertIn("if (tierCount == 2)",scene)
-        self.assertIn("ws16at-real-count",scene)
+        self.assertNotIn("ws16at-real-count",scene)
         self.assertIn("onBookSelected = onBookSelected",scene)
 
     def test_future_books_are_not_real_catalog_items(self):
