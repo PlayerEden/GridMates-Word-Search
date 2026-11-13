@@ -53,7 +53,9 @@ internal fun WS16BIUnletteredBlankSpine(
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize().alpha(0.62f)
+                // Still subdued versus 100%-opacity real books, but less
+                // transparent/flat than the v70 handset preview.
+                modifier = Modifier.fillMaxSize().alpha(0.75f)
             )
         }
     }
