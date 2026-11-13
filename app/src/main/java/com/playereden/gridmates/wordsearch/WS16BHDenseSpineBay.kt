@@ -36,7 +36,8 @@ internal fun WS16BHDenseSpineBay(
     onBookSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     maxSlots: Int = 12,
-    showDecorativeBlanks: Boolean = false
+    showDecorativeBlanks: Boolean = false,
+    fullPlaceholderShelf: Boolean = false
 ) {
     BoxWithConstraints(
         modifier.fillMaxWidth().height(height)
@@ -50,8 +51,9 @@ internal fun WS16BHDenseSpineBay(
         val bindingHeight = bindingWidth / bindingRatio
         // Environment decoration must not consume book IDs, capacity or taps.
         val blanks = if (showDecorativeBlanks) {
-            (maxSlots - books.size).coerceAtLeast(0)
-                .coerceAtMost(if (books.isEmpty()) 4 else 2)
+            val room = (maxSlots - books.size).coerceAtLeast(0)
+            if (fullPlaceholderShelf && books.isEmpty()) room
+            else room.coerceAtMost(if (books.isEmpty()) 4 else 2)
         } else 0
         val displayCount = books.size + blanks
         if (displayCount > 0) {
