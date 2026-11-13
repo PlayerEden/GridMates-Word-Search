@@ -36,7 +36,7 @@ class CarvedTitleTests(unittest.TestCase):
             "WS16BHDenseSpineBay(", "showDecorativeBlanks = true",
             "Ws16BIMountedCabinetShelf()", "val capacity = slots * tierCount",
             "books.drop(page * capacity).take(capacity)",
-            'testTag("ws16at-real-count")',
+            'WS16BKBookcasePager(',
             'testTag("ws16at-pagination")',
             "onBookSelected = onBookSelected",
         ):
