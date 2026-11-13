@@ -298,9 +298,10 @@ internal fun WS16ATModularLibraryScene(
             modifier = Modifier.align(Alignment.TopCenter)
                 // WS16BJ: raise the fitted title under the arch without
                 // intruding on crown lights or the back/menu tap targets.
-                // The smaller 46dp cartouche clears the top real spines.
+                // WS16BL: 8dp further up following the v70 handset screenshot;
+                // leave more book-top clearance without moving the spines.
                 .padding(start = 66.dp, end = 66.dp,
-                    top = (top - 80.dp).coerceAtLeast(16.dp))
+                    top = (top - 88.dp).coerceAtLeast(12.dp))
                 .testTag("ws16at-library-title")
         )
         WS16BIAdaptiveControl(
