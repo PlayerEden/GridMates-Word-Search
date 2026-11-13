@@ -57,7 +57,8 @@ class ModularLibraryTests(unittest.TestCase):
         # Default layout keeps 48/54dp hit slots; the sparse 2-tier showcase
         # explicitly uses larger 60dp catalog-only hit slots.
         self.assertIn("slot = if (balancedSparseLayout) 60.dp else hitSlot", code)
-        self.assertIn('testTag("ws16at-real-count")',code)
+        self.assertNotIn('testTag("ws16at-real-count")',code)
+        self.assertIn("WS16BKBookcasePager(",code)
         self.assertIn('testTag("ws16at-pagination")',code)
         self.assertNotIn("BookFactoryBlankSpine(",code)
 
@@ -82,8 +83,8 @@ class ModularLibraryTests(unittest.TestCase):
         scene = (APP / "WS16ATModularLibraryScene.kt").read_text()
         spines = (APP / "WS16AMInteractiveBookcaseScene.kt").read_text()
         self.assertIn("val shelfOverhang = if (cabinetPortrait)", scene)
-        self.assertIn("val countBayHeight = shelfOverhang + countGap + countPlaqueBudget", scene)
-        self.assertIn('testTag("ws16bc-count-bay")', scene)
+        self.assertIn("val pagerBayHeight = shelfOverhang + pagerGap + pagerRailBudget", scene)
+        self.assertIn('testTag("ws16bk-navigation-bay")', scene)
         self.assertIn("showFutureVolumes = false", scene)
         self.assertIn("val densePortrait = cabinetPortrait", scene)
         self.assertIn("val packedSlot = if (density.fontScale >= 1.65f) 52.dp else 48.dp", scene)
@@ -126,9 +127,12 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("Role.Button", kit)
         self.assertIn("contentDescription = description", kit)
         self.assertIn('label = "Your Library"', scene)
-        self.assertIn('testTag("ws16at-real-count")', scene)
-        for part in ("BACK", "PREVIOUS", "NEXT", "ART_OPTIONS"):
+        self.assertNotIn('testTag("ws16at-real-count")', scene)
+        pager=(APP/"WS16BKBookcasePager.kt").read_text()
+        for part in ("BACK", "ART_OPTIONS"):
             self.assertIn("Ws16AZCabinetGlyph."+part, scene)
+        for part in ("PREVIOUS", "NEXT"):
+            self.assertIn("Ws16AZCabinetGlyph."+part,pager)
         self.assertNotIn('Text("‹"', scene)
         self.assertNotIn('Text("⋯"', scene)
 
