@@ -1,6 +1,6 @@
 # WS16BK — Future bookcases, wordless decorative volumes and bottom-page hardware
 
-> **Status (November 12, 2026):** Source committed, exact-source Android & art/release QA queued/running, OWNER phone approval not yet requested; no v70 APK verified. This is a **functional/page architecture pass**. UI microanimations are intentionally **next pass WS16BL**.
+> **Status (November 12, 2026):** Exact-source **DUAL-GREEN Android QA + art/release isolation**, v70 APK SHA/package/certificate verified and delivered; **owner device visual/interaction approval pending**. This is a functional/page architecture pass; button animation remains the next **WS16BL** pass.
 
 ## Owner decision and visual evidence
 
@@ -30,11 +30,21 @@ New `test_ws16bk_future_bookcases.py` checks deterministic art hashes/bounds, al
 
 ## QA/rollback/owner gate
 
-- Android run: exact-source CI pending at initial log creation.
-- Art/release run: pending at initial log creation.
-- **No v70 APK delivered yet**. On failure, inspect and repair precise source/job, rerun both and retain failed build IDs.
+- Android and art/release workflows are now dual-green on exact v70 source. Artifact, SHA, signing, PNG bytes and release isolation are detailed below.
 - Last owner-installed v69 [artifact #13997661426](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623/artifacts/13997661426) is the visual fallback. Android downgrade installation after a newer code may require special handling; never tell owner to uninstall and lose saves.
 - **Visual acceptance:** owner screenshots page 1, page 2 and page 3, checks prev/next/dots and return to owned books, confirms blank taps do nothing, and confirms local progress survives install-over. CI-green is not phone approval. PR remains draft, art stays debug-only.
+
+## Verified v70 QA, signing and artifact receipt (Nov 12)
+
+- **Compiled source:** [`a0dbd705836910fbf5a2f7a486f6d6e936f059e8`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a0dbd705836910fbf5a2f7a486f6d6e936f059e8). Later documentation-only commits are `[skip ci]`, NOT newer app code.
+- **Standard Android [#43355605367](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355605367): SUCCESS.** Full source/test/Gradle/lint/debug APK flow plus packaged art checks. All 68 checked job steps passed.
+- **Independent art/release [#43355605467](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355605467): SUCCESS.** Debug and release compilation, art byte-verification and release isolation. All 69 checked steps passed.
+- **GitHub Android QA ZIP [artifact #14005763584](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355605367/artifacts/14005763584):** 29,622,707 bytes; ZIP SHA256 `c63d5e3f4ea2da15598096d96dade5df568cac47d720433debaab149fc065667`. Extracted `app-debug.apk` 30,095,765 bytes, SHA256 `0bb8e136168f55f1e04dd5bfdff0feeac10d6fcbd4941743012c2446dff5de51`. Delivered in this chat as `GridMates_WordSearch_WS16BK_v70.apk` with direct sandbox link and GitHub ZIP fallback.
+- **App identity from exact job:** `com.playereden.gridmates.wordsearch.qa`, `versionCode=70`, `versionName=0.9.26-future-bookcases-and-pager-qa`, unchanged public QA cert SHA256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`, same as v69. Install-over should preserve existing local data; **do not uninstall**.
+- **Independent art ZIP [#14006765026](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355605467/artifacts/14006765026):** 29,622,711 bytes, ZIP SHA `b2d1c3efc588498528147c33e6719aeb4078ad0503c8f8078e3f42d9f381c0f8`. Independently built APK SHA `65e9f163ce6b60adb8e953cb2aa7f5865053b459926924090dc402c5f1faa3e0`, same 30,095,765 bytes. **All 358 decompressed APK entries have identical names and content bytes** compared to the standard signed Android QA APK, although archive hashes differ; do not claim archives are byte-identical.
+- **Assets packaged:** `assets/ws16bk/blanks/{fern,dusk,clay,garnet,ochre,teal,violet,slate}.png`, `assets/ws16bk/pager_rail.png`, plus `manifest.json`, exactly 10 new debug files, and all 9 PNG hashes match manifest in both source build and actual APK. **Release art isolation PASSED**.
+- **First attempts corrected:** Initial [Android #43355180866](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355180866) / [art #43355180862](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355180862) failed an inherited assertion for deleted count label. Second [Android #43355447552](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355447552) / [art #43355447551](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43355447551) generated images and failed a source assertion that assumed unconditional future-page tagging. Both tests were precisely repaired without changing the new page model or suppressing art verification.
+- **OPEN:** On-phone v70 visual screenshot(s) for actual pages 1, 2 and 3; check arrows, dots, next/prev, inert blanks and real book taps/save retention. CI does NOT establish physical Android behavior. Draft PR #131 stays unmerged; WS16BK art QA-only. Prior v69 [artifact #13997661426](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623/artifacts/13997661426) remains verified owner-installed reference, not necessarily directly downgradeable.
 
 ## WS16BL — next pass, deliberately deferred
 
