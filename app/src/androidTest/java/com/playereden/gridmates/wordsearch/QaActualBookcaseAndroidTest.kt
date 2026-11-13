@@ -178,7 +178,16 @@ class QaActualBookcaseAndroidTest {
             .fetchSemanticsNode().boundsInRoot
         val topArt = compose.onNodeWithTag("ws16bh-art-" + woodland.id)
             .fetchSemanticsNode().boundsInRoot
-        assertTrue("Spines clear the title plaque", topArt.top >= titleBounds.bottom)
+        assertTrue("Carved title must leave a visible gap above the real spines",
+            topArt.top >= titleBounds.bottom + 10f)
+        val backBounds = compose.onNodeWithTag("ws16at-back")
+            .fetchSemanticsNode().boundsInRoot
+        val menuBounds = compose.onNodeWithTag("ws16at-previous-art")
+            .fetchSemanticsNode().boundsInRoot
+        assertTrue("Title must not crowd the Back touch target",
+            titleBounds.left >= backBounds.right - 1f)
+        assertTrue("Title must not crowd the artwork/options touch target",
+            titleBounds.right <= menuBounds.left + 1f)
         val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
             .fetchSemanticsNode().boundsInRoot
         val count = compose.onNodeWithTag("ws16at-real-count")
