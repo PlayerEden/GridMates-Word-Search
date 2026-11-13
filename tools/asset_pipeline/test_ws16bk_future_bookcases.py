@@ -82,7 +82,7 @@ class FutureBookcaseTests(unittest.TestCase):
         self.assertIn("val isFutureBookcase = densePortrait && page >= realPageCount",src)
         self.assertIn("books.drop(page * capacity).take(capacity)",src)
         self.assertIn("fullPlaceholderShelf = isFutureBookcase",src)
-        self.assertIn('testTag("ws16bk-future-bookcase-$page")',src)
+        self.assertIn('testTag(if (isFutureBookcase) "ws16bk-future-bookcase-$page"',src)
         self.assertIn("WS16BKBookcasePager(",src)
         self.assertNotIn('testTag("ws16at-real-count")',src)
         self.assertNotIn('label = "${books.size}',src)
