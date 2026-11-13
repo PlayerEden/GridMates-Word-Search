@@ -175,7 +175,8 @@ class ModularLibraryTests(unittest.TestCase):
                         modular.index('testTag("ws16aw-safe-overlays")'))
         self.assertLess(modular.index('WS16ATCabinetLayers(foreground = true'),
                         modular.index('testTag("ws16aw-safe-overlays")'))
-        self.assertIn('testTag("ws16at-real-count")', modular)
+        self.assertNotIn('testTag("ws16at-real-count")', modular)
+        self.assertIn('WS16BKBookcasePager(', modular)
         self.assertIn('testTag("ws16at-back")', modular)
         self.assertIn('testTag("ws16at-pagination")', modular)
 
