@@ -301,8 +301,11 @@ internal fun WS16ATModularLibraryScene(
         WS16BIAdaptivePlaque(
             label = "Your Library", title = true, styled = cabinetPortrait,
             modifier = Modifier.align(Alignment.TopCenter)
-                .padding(start = 62.dp, end = 62.dp,
-                    top = (top - 58.dp).coerceAtLeast(38.dp))
+                // WS16BJ: raise the fitted title under the arch without
+                // intruding on crown lights or the back/menu tap targets.
+                // The smaller 46dp cartouche clears the top real spines.
+                .padding(start = 66.dp, end = 66.dp,
+                    top = (top - 80.dp).coerceAtLeast(16.dp))
                 .testTag("ws16at-library-title")
         )
         WS16BIAdaptiveControl(
