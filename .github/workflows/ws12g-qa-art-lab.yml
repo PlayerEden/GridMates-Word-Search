@@ -154,6 +154,8 @@ jobs:
         run: |
           python3 tools/asset_pipeline/import_ws16bb_matched_shelf.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bb_shelf.py' -v
+      - name: Validate WS16BJ slim carved title and book clearance
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bj_carved_title.py' -v
       - name: Generate WS16BI mounted walnut shelf and wordless future bindings
         run: |
           python3 tools/asset_pipeline/build_ws16bi_library_art.py
