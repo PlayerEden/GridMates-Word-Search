@@ -102,7 +102,10 @@ internal fun GridMatesIllustratedLink(
     }
 }
 
-private fun DrawScope.drawGridMatesPaperFrame(
+/** Public-to-app paint primitive: one shared parchment/gold frame family for
+ * Home panels AND icon-only library controls. The native click target lives
+ * outside this purely decorative DrawScope function. */
+internal fun DrawScope.drawGridMatesPaperFrame(
     variant: GridMatesFrameVariant, enabled: Boolean, pressed: Boolean
 ) {
     val w = size.width
