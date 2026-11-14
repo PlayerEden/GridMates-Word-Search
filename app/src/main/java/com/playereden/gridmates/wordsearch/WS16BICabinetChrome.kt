@@ -33,9 +33,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /**
- * WS16BM: GridMates shared parchment/gold illustrated controls inside
- * the carved walnut environment. The painter is identical to the Home
- * feature-card painter and icons use the Home header's dark forest ink.
+ * WS16BN: the actual emerald Play-pill surface (green gradient, antique-gold
+ * rim and cream ink) now frames all carved-cabinet icon controls.
+ * Shared GridMates paint system; still mounted in the walnut environment.
  * WS16BL 115ms press-depth animation and 54dp hitboxes stay untouched.
  * All names, tap actions and enabled/disabled states remain native.
  */
@@ -78,10 +78,9 @@ internal fun WS16BICabinetControl(
                 }
                 .testTag("ws16bl-animated-face")
         ) {
-            // WS16BM: draw the EXACT frame used by Home's illustrated cards,
-            // not a separate dark-wood miniature button. Shared warm paper,
-            // dual antique-gold borders and corner leaf engravings stay in sync
-            // whenever GridMatesIllustratedFrame is updated app-wide.
+            // WS16BN: use the emerald enamel material from the actual Home
+            // Play pill, with a compact bevel and gold rim for icon controls.
+            // The shared frame painter stays the single app-wide source.
             val unit = 1.dp.toPx()
             drawRoundRect(
                 color = Color(0x66140C06),
@@ -90,13 +89,15 @@ internal fun WS16BICabinetControl(
                 cornerRadius = CornerRadius(14f*unit)
             )
             drawGridMatesPaperFrame(
-                variant = GridMatesFrameVariant.MEDIUM,
+                variant = GridMatesFrameVariant.GREEN_ICON,
                 enabled = enabled,
                 pressed = inset > .5f
             )
-            // Native dark-forest navigation and options icons match the shared
-            // headers, without changing the action their symbols describe.
-            val ink = Forest.copy(alpha = if (enabled) 1f else .43f)
+            // Gold-cream ink follows the primary Play action, while the
+            // disabled arrow loses contrast instead of losing its green face.
+            val ink = Color(0xFFFFF8E8).copy(
+                alpha = if (enabled) 1f else .38f
+            )
             // Keep icon strokes and a centered 24dp viewport aligned with
             // Ws16HomeHeader / Ws15BackHeader rather than overblown symbols.
             val icon = 24f*unit
