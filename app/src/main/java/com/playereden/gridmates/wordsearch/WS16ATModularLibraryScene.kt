@@ -178,7 +178,17 @@ internal fun WS16ATModularLibraryScene(
         val scope = rememberCoroutineScope()
         val top = (maxWidth * (198f / 602f)).coerceAtMost(maxHeight * 0.25f)
         val bottom = (maxWidth * (108f / 602f)).coerceAtMost(maxHeight * 0.15f)
-        val available = (maxHeight - top - bottom).coerceAtLeast(1.dp)
+        // WS16BN: translate the entire two-shelf stage downward as one unit.
+        // Raise neither the banner nor an individual shelf. The pager follows
+        // into the unused lower cabinet bay, retaining its woodwork clearance.
+        // Clamp the drop where the base/cabinet is shorter on narrow phones.
+        val stageDrop = if (densePortrait) 18.dp else 0.dp
+        val pagerDrop = if (densePortrait)
+            22.dp.coerceAtMost((bottom - 32.dp).coerceAtLeast(0.dp))
+            else 0.dp
+        val stageTop = top + stageDrop
+        val stageBottom = bottom - pagerDrop
+        val available = (maxHeight - stageTop - stageBottom).coerceAtLeast(1.dp)
         // WS16BK: the bottom count plaque is gone. Reserve a bookcase pager
         // mounting bay outside the shelf plane, never overlapping woodwork.
         val shelfContactDepth = 42.dp
@@ -192,9 +202,8 @@ internal fun WS16ATModularLibraryScene(
         // Reserve carved shelf overhang and pager rail clearance first.
         val shelfTierSpace = (available - pagerBayHeight).coerceAtLeast(1.dp)
         val tierHeights = if (densePortrait) {
-            // Always reserve count clearance even with three live shelves;
-            // dividing raw 'available' previously placed the bottom shelf
-            // underneath the lower cabinet count/base.
+            // Preserve the pager bay with three live shelves too; a raw
+            // stage-height division would push the bottom shelf into it.
             List(tierCount) { shelfTierSpace / tierCount }
         } else if (balancedSparseLayout) listOf(
             shelfTierSpace * 0.50f, shelfTierSpace * 0.50f
@@ -207,7 +216,8 @@ internal fun WS16ATModularLibraryScene(
         HorizontalPager(
             state = pager,
             modifier = Modifier.fillMaxSize()
-                .padding(start = leftWidth, end = rightWidth, top = top, bottom = bottom)
+                .padding(start = leftWidth, end = rightWidth,
+                    top = stageTop, bottom = stageBottom)
                 .testTag("ws16at-bookcase-pages")
         ) { page ->
             val isFutureBookcase = densePortrait && page >= realPageCount
@@ -313,8 +323,9 @@ internal fun WS16ATModularLibraryScene(
                 .testTag("ws16at-back")
         )
         if (pages > 1) {
-            // Fixed bottom mounting rail, between carved shelf and cabinet
-            // base. Pages change together via swipe or these native controls.
+            // WS16BN: lower the entire rail with the book stage, while still
+            // reserving clearance from the carved cabinet base and safe bars.
+            // Swipe and these native controls move the same real pager.
             WS16BKBookcasePager(
                 currentPage = pager.currentPage,
                 pageCount = pages,
@@ -330,7 +341,7 @@ internal fun WS16ATModularLibraryScene(
                     }
                 },
                 modifier = Modifier.align(Alignment.BottomCenter)
-                    .padding(bottom = (bottom - 12.dp).coerceAtLeast(12.dp))
+                    .padding(bottom = (bottom - pagerDrop - 12.dp).coerceAtLeast(12.dp))
                     .testTag("ws16at-pagination")
             )
         }
