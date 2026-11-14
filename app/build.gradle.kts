@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 71
-        versionName = "0.9.27-library-tactile-polish"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 72
+        versionName = "0.9.28-shared-gridmates-controls"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
