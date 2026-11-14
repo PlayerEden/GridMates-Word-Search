@@ -24,8 +24,8 @@ class MotionDepthTests(unittest.TestCase):
         self.assertIn("scaleX = 1f - .052f * inset", s)
         self.assertIn("translationY = 1.5.dp.toPx() * inset", s)
         self.assertIn("drawGridMatesPaperFrame(", s)
-        self.assertIn("GridMatesFrameVariant.MEDIUM", s)
-        self.assertIn("Forest.copy(", s)
+        self.assertIn("GridMatesFrameVariant.GREEN_ICON", s)
+        self.assertIn("Color(0xFFFFF8E8).copy(", s)
         self.assertNotIn("while (true)", s)
         self.assertNotIn("rememberInfiniteTransition", s)
 
