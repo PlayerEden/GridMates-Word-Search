@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
  * Native labels, icons, progress, click/ripple and focus remain independent.
  * Simple quiet app background: all hand-painted character belongs in objects.
  */
-internal enum class GridMatesFrameVariant { MEDIUM, FEATURE, PANEL, PRIMARY_PILL }
+internal enum class GridMatesFrameVariant { MEDIUM, FEATURE, PANEL, PRIMARY_PILL, GREEN_ICON }
 
 @Composable
 internal fun GridMatesIllustratedFrame(
@@ -113,15 +113,21 @@ internal fun DrawScope.drawGridMatesPaperFrame(
     if (w < 2f || h < 2f) return
     val u = 1.dp.toPx()
     val pill = variant == GridMatesFrameVariant.PRIMARY_PILL
-    val rad = if (pill) 26f*u else 16f*u
-    val opacity = if (enabled) 1f else .57f
+    // WS16BN: the same emerald enamel used on Home's Play pill is now
+    // a reusable compact icon treatment for every Library navigation button.
+    val greenIcon = variant == GridMatesFrameVariant.GREEN_ICON
+    val greenSurface = pill || greenIcon
+    val rad = if (pill) 26f*u else if (greenIcon) 14f*u else 16f*u
+    // A disabled control remains recognizably green; only its icon and
+    // highlights become quieter. Never wash out the entire face.
+    val opacity = if (greenIcon) 1f else if (enabled) 1f else .57f
     val touch = if (pressed) .92f else 1f
     val gold = Color(0xFFBC944A)
     val darkGold = Color(0xFF8B662B)
 
     // Frame center can stretch to any width; corners/ornaments are drawn anew.
     drawRoundRect(
-        brush = if (pill)
+        brush = if (greenSurface)
             Brush.verticalGradient(listOf(Color(0xFF416C49),
                 Color(0xFF28583F),Color(0xFF173F32)))
         else Brush.verticalGradient(listOf(
@@ -129,7 +135,7 @@ internal fun DrawScope.drawGridMatesPaperFrame(
         topLeft = Offset.Zero, size = Size(w,h),
         cornerRadius = CornerRadius(rad), alpha = opacity*touch
     )
-    if (!pill) {
+    if (!greenSurface) {
         // WS-16L: separate ink/aged-paper glazing from the touch surface.
         // Work is bounded by the existing rounded frame and drawn underneath
         // live labels/icons, never as a fixed-size rasterized button.
@@ -152,7 +158,7 @@ internal fun DrawScope.drawGridMatesPaperFrame(
         }
     }
     drawRoundRect(
-        color = if (pill) Color(0xFFE5C16F) else gold,
+        color = if (greenSurface) Color(0xFFE5C16F) else gold,
         topLeft = Offset(.9f*u,.9f*u),
         size = Size(w-1.8f*u,h-1.8f*u),
         cornerRadius = CornerRadius(rad-1*u),
@@ -161,17 +167,31 @@ internal fun DrawScope.drawGridMatesPaperFrame(
         alpha = opacity
     )
     if (w>12*u && h>12*u) drawRoundRect(
-        color = if (pill) Color(0xFF99722E) else Color(0xFFEDDEBE),
+        color = if (greenSurface) Color(0xFF99722E) else Color(0xFFEDDEBE),
         topLeft = Offset(3.2f*u,3.2f*u),
         size = Size(w-6.4f*u,h-6.4f*u),
         cornerRadius = CornerRadius((rad-4*u).coerceAtLeast(3*u)),
         style = Stroke(.8f*u), alpha = opacity*.80f
     )
 
-    if (pill) {
-        drawLine(Color(0xFFFFD987).copy(alpha=.65f),
-            Offset(15*u,3.5f*u), Offset((w-15*u).coerceAtLeast(15*u),3.5f*u),
+    if (greenSurface) {
+        // Same fine antique-gold specular as the Home Play pill. Icon-sized
+        // faces carry a short top glint and an inset bevel; no new sprite art.
+        val edge = if (greenIcon) 9f*u else 15f*u
+        drawLine(Color(0xFFFFD987).copy(alpha=if (enabled) .65f else .27f),
+            Offset(edge,3.5f*u), Offset((w-edge).coerceAtLeast(edge),3.5f*u),
             strokeWidth=.8f*u,cap=StrokeCap.Round)
+        if (greenIcon) {
+            drawLine(Color(0xFF0B2E23).copy(alpha=.38f),
+                Offset(10f*u,h-4.2f*u),Offset(w-10f*u,h-4.2f*u),
+                strokeWidth=1.1f*u,cap=StrokeCap.Round)
+            if (!enabled) {
+                // Muting the enamel slightly keeps unavailable arrows obvious
+                // without a gray/translucent parchment ghost.
+                drawRoundRect(color=Color(0x2A0A2118),
+                    cornerRadius=CornerRadius(rad))
+            }
+        }
         return
     }
 
