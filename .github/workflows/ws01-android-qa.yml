@@ -155,6 +155,8 @@ jobs:
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bb_shelf.py' -v
       - name: Validate WS16BJ slim carved title and book clearance
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bj_carved_title.py' -v
+      - name: Verify WS16BN actual Play-green buttons and lowered bookcase layout
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bn_green_layout.py' -v
       - name: Verify WS16BM shared GridMates paper controls and palette
         run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bm_shared_controls.py' -v
       - name: Verify WS16BL cabinet press depth, pager dots and accessibility
