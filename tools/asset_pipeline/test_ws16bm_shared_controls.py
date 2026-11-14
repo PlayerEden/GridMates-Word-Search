@@ -18,11 +18,11 @@ class SharedControlsTests(unittest.TestCase):
         self.assertIn("internal fun DrawScope.drawGridMatesPaperFrame(", shared)
         self.assertIn("drawGridMatesPaperFrame(variant, enabled, pressed)", shared)
         self.assertIn("drawGridMatesPaperFrame(", cabinet)
-        self.assertIn("variant = GridMatesFrameVariant.MEDIUM", cabinet)
+        self.assertIn("variant = GridMatesFrameVariant.GREEN_ICON", cabinet)
         self.assertIn("enabled = enabled,", cabinet)
         self.assertIn("pressed = inset > .5f", cabinet)
         self.assertIn("Brush.verticalGradient", shared)
-        self.assertIn("Color(0xFFFFFDF4)", shared)
+        self.assertIn("Color(0xFF416C49)", shared)
         self.assertIn("Color(0xFFBC944A)", shared)
         # Not an alternate dark-brown button surface.
         self.assertNotIn("Color(0xFFA66D32)", cabinet)
@@ -31,7 +31,7 @@ class SharedControlsTests(unittest.TestCase):
     def test_forest_home_glyphs_on_shared_24dp_icon_viewport(self):
         cabinet = (SRC/"WS16BICabinetChrome.kt").read_text()
         home = (SRC/"Ws16HomeHeader.kt").read_text()
-        self.assertIn("val ink = Forest.copy(", cabinet)
+        self.assertIn("val ink = Color(0xFFFFF8E8).copy(", cabinet)
         self.assertIn("val icon = 24f*unit", cabinet)
         self.assertIn("val stroke = 2.3f*unit", cabinet)
         self.assertIn("listOf(.25f,.50f,.75f)", cabinet)
