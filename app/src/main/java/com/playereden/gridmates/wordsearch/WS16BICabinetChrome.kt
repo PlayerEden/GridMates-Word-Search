@@ -212,6 +212,7 @@ internal fun WS16BIAdaptiveControl(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    if (styled) WS16BICabinetControl(glyph, description, onClick, modifier, enabled)
-    else Ws16AZCabinetControl(glyph, description, onClick, modifier, enabled)
+    // All Library orientations use one shared GridMates control family.
+    // Older AZ hardware remains available to archived QA scenes only.
+    WS16BICabinetControl(glyph, description, onClick, modifier, enabled)
 }
