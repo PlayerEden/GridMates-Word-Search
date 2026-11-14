@@ -37,7 +37,8 @@ class SharedControlsTests(unittest.TestCase):
         self.assertIn("listOf(.25f,.50f,.75f)", cabinet)
         self.assertIn("listOf(.25f, .50f, .75f)", home)
         self.assertIn("drawLine(Forest", home)
-        self.assertIn("pt(.16f,fraction),pt(.84f,fraction)", cabinet)
+        self.assertIn("drawCircle(ink,radius=1.85f*unit,center=pt(x,.50f))", cabinet)
+        self.assertIn("The Library opens artwork options, not the global Home menu", cabinet)
         self.assertIn("glyph == Ws16AZCabinetGlyph.ART_OPTIONS", cabinet)
         self.assertIn("glyph != Ws16AZCabinetGlyph.NEXT", cabinet)
 
