@@ -94,8 +94,8 @@ internal fun WS16BICabinetControl(
                 enabled = enabled,
                 pressed = inset > .5f
             )
-            // Native dark-forest icons match the actual Home header and
-            // Ws15BackHeader icons, with no lettering baked into assets.
+            // Native dark-forest navigation and options icons match the shared
+            // headers, without changing the action their symbols describe.
             val ink = Forest.copy(alpha = if (enabled) 1f else .43f)
             // Keep icon strokes and a centered 24dp viewport aligned with
             // Ws16HomeHeader / Ws15BackHeader rather than overblown symbols.
@@ -106,9 +106,11 @@ internal fun WS16BICabinetControl(
                 Offset(leftEdge + icon*x, topEdge + icon*y)
             val stroke = 2.3f*unit
             if (glyph == Ws16AZCabinetGlyph.ART_OPTIONS) {
-                for (fraction in listOf(.25f,.50f,.75f)) {
-                    drawLine(ink,pt(.16f,fraction),pt(.84f,fraction),
-                        strokeWidth=stroke,cap=StrokeCap.Round)
+                // The Library opens artwork options, not the global Home menu.
+                // Match Ws15BackHeader's native forest-green ellipsis so the
+                // control stays recognizable without misleading the player.
+                for (x in listOf(.25f,.50f,.75f)) {
+                    drawCircle(ink,radius=1.85f*unit,center=pt(x,.50f))
                 }
             } else {
                 val left = glyph != Ws16AZCabinetGlyph.NEXT
