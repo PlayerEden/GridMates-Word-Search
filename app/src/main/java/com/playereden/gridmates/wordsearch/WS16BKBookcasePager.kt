@@ -139,20 +139,22 @@ private fun WS16BKPageDots(
             )
             Canvas(Modifier.size(16.dp).testTag("ws16bk-dot-$page")) {
                 val radius = (2.8f + 1.5f * selectedAmount).dp.toPx()
+                // Library dot colors now derive from GridMates shared
+                // forest/cream/gold roles rather than a separate brass UI.
                 drawCircle(
-                    color = Color(0xFF93754E),
+                    color = Color(0xFF9EAA95),
                     radius = 2.8.dp.toPx(),
                     center = center
                 )
                 drawCircle(
-                    color = Color(0xFFFFDB97),
+                    color = StorybookTokens.warmPaper,
                     radius = radius,
                     center = center,
                     alpha = selectedAmount
                 )
                 if (selectedAmount > 0f) {
                     drawCircle(
-                        color = Color(0xFFEAC174),
+                        color = Gold,
                         radius = radius + 1.3.dp.toPx(),
                         center = center,
                         style = Stroke(1.dp.toPx()),
