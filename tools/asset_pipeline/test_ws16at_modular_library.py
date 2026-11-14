@@ -38,7 +38,8 @@ class ModularLibraryTests(unittest.TestCase):
         self.assertIn("WS16AMSpineBay(",code)
         self.assertIn("WS16ATCabinetLayers(foreground = false",code)
         self.assertIn("WS16ATCabinetLayers(foreground = true",code)
-        self.assertIn(".padding(start = leftWidth, end = rightWidth, top = top, bottom = bottom)",code)
+        self.assertIn(".padding(start = leftWidth, end = rightWidth,",code)
+        self.assertIn("top = stageTop, bottom = stageBottom)",code)
         self.assertIn(".coerceAtMost(maxHeight * 0.25f)",code)
         self.assertIn(".coerceAtMost(maxHeight * 0.15f)",code)
         self.assertLess(code.index("WS16ATCabinetLayers(foreground = false, modifier = Modifier.fillMaxSize())"),
