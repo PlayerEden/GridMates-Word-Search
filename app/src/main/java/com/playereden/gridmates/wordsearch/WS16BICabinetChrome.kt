@@ -33,9 +33,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /**
- * WS16BI cabinet hardware: fitted walnut plates and aged brass fittings.
- * Not generic pill buttons. All words/glyphs are native and readable.
- * The physical hit region is >= 48dp even though the visible fitting is 44dp.
+ * WS16BM: GridMates shared parchment/gold illustrated controls inside
+ * the carved walnut environment. The painter is identical to the Home
+ * feature-card painter and icons use the Home header's dark forest ink.
+ * WS16BL 115ms press-depth animation and 54dp hitboxes stay untouched.
+ * All names, tap actions and enabled/disabled states remain native.
  */
 @Composable
 internal fun WS16BICabinetControl(
@@ -76,66 +78,49 @@ internal fun WS16BICabinetControl(
                 }
                 .testTag("ws16bl-animated-face")
         ) {
-            val u = 1.dp.toPx()
+            // WS16BM: draw the EXACT frame used by Home's illustrated cards,
+            // not a separate dark-wood miniature button. Shared warm paper,
+            // dual antique-gold borders and corner leaf engravings stay in sync
+            // whenever GridMatesIllustratedFrame is updated app-wide.
+            val unit = 1.dp.toPx()
+            drawRoundRect(
+                color = Color(0x66140C06),
+                topLeft = Offset(2f*unit,3.2f*unit),
+                size = Size(size.width-4f*unit,size.height-3.5f*unit),
+                cornerRadius = CornerRadius(14f*unit)
+            )
+            drawGridMatesPaperFrame(
+                variant = GridMatesFrameVariant.MEDIUM,
+                enabled = enabled,
+                pressed = inset > .5f
+            )
+            // Native dark-forest icons match the actual Home header and
+            // Ws15BackHeader icons, with no lettering baked into assets.
+            val ink = Forest.copy(alpha = if (enabled) 1f else .43f)
             val w = size.width
             val h = size.height
-            val opacity = if (enabled) 1f else .38f
-            drawRoundRect(Color(0xA30E0805),
-                topLeft = Offset(1.5f*u, (3.5f + inset)*u),
-                size = Size(w-3f*u, h-2f*u),
-                cornerRadius = CornerRadius(5*u),
-                alpha=opacity*(1f-.25f*inset))
-            drawRoundRect(
-                brush=Brush.verticalGradient(listOf(
-                    Color(0xFFA66D32),Color(0xFF4A2513),
-                    Color(0xFF28170D))),
-                topLeft=Offset(1*u,1*u),
-                size=Size(w-2*u,h-4*u),cornerRadius=CornerRadius(4*u),
-                alpha=opacity
-            )
-            drawRoundRect(
-                Color(0xFFE9BD6F),topLeft=Offset(2.2f*u,2*u),
-                size=Size(w-4.4f*u,h-6*u),cornerRadius=CornerRadius(3*u),
-                style=Stroke((1.4f+.4f*inset)*u),alpha=opacity
-            )
-            // Fleeting brass glint while pressed, restrained rather than neon.
-            drawLine(
-                Color(0xFFFFE3A2),
-                Offset(9*u, 4.2f*u),
-                Offset(w-9*u, 4.2f*u),
-                strokeWidth=(.8f+1.0f*inset)*u,
-                cap=StrokeCap.Round,
-                alpha=opacity*(.40f+.52f*inset)
-            )
-            drawRoundRect(
-                Color(0x9C180D08),topLeft=Offset(5*u,5*u),
-                size=Size(w-10*u,h-12*u),cornerRadius=CornerRadius(2*u),
-                style=Stroke(.9f*u),alpha=opacity
-            )
-            for (cx in listOf(7.5f*u,w-7.5f*u)) {
-                for (cy in listOf(7.5f*u,h-9f*u)) {
-                    drawCircle(Color(0xFF30180B),radius=2.4f*u,
-                        center=Offset(cx,cy),alpha=opacity)
-                    drawCircle(Color(0xFFFFD28A),radius=1.25f*u,
-                        center=Offset(cx-.3f*u,cy-.45f*u),alpha=opacity)
-                }
-            }
-            val gold=Color(0xFFFFE0A4).copy(alpha=opacity*(.91f+.09f*inset))
-            val stroke=2.8f*u
-            if (glyph==Ws16AZCabinetGlyph.ART_OPTIONS) {
-                for(x in listOf(.33f,.5f,.67f)) {
-                    drawCircle(gold,radius=2.4f*u,center=Offset(w*x,h*.47f))
+            val stroke = 2.55f*unit
+            if (glyph == Ws16AZCabinetGlyph.ART_OPTIONS) {
+                // Same three horizontal lines as the Home menu glyph.
+                for (fraction in listOf(.30f,.50f,.70f)) {
+                    drawLine(
+                        color = ink,
+                        start = Offset(w*.25f,h*fraction),
+                        end = Offset(w*.75f,h*fraction),
+                        strokeWidth = stroke,
+                        cap = StrokeCap.Round
+                    )
                 }
             } else {
                 val left = glyph != Ws16AZCabinetGlyph.NEXT
-                val start = if(left) .69f else .31f
-                val tip = if(left) .30f else .70f
-                val mid = if(left) .49f else .51f
-                drawLine(gold,Offset(w*start,h*.47f),Offset(w*tip,h*.47f),
+                val tail = if (left) .74f else .26f
+                val tip = if (left) .26f else .74f
+                val bend = if (left) .49f else .51f
+                drawLine(ink, Offset(w*tail,h*.50f),Offset(w*tip,h*.50f),
                     strokeWidth=stroke,cap=StrokeCap.Round)
-                drawLine(gold,Offset(w*mid,h*.28f),Offset(w*tip,h*.47f),
+                drawLine(ink, Offset(w*bend,h*.28f),Offset(w*tip,h*.50f),
                     strokeWidth=stroke,cap=StrokeCap.Round)
-                drawLine(gold,Offset(w*tip,h*.47f),Offset(w*mid,h*.66f),
+                drawLine(ink, Offset(w*tip,h*.50f),Offset(w*bend,h*.72f),
                     strokeWidth=stroke,cap=StrokeCap.Round)
             }
         }
