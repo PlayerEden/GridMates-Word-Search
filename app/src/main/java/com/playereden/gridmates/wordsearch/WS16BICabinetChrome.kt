@@ -97,30 +97,29 @@ internal fun WS16BICabinetControl(
             // Native dark-forest icons match the actual Home header and
             // Ws15BackHeader icons, with no lettering baked into assets.
             val ink = Forest.copy(alpha = if (enabled) 1f else .43f)
-            val w = size.width
-            val h = size.height
-            val stroke = 2.55f*unit
+            // Keep icon strokes and a centered 24dp viewport aligned with
+            // Ws16HomeHeader / Ws15BackHeader rather than overblown symbols.
+            val icon = 24f*unit
+            val leftEdge = (size.width-icon)/2f
+            val topEdge = (size.height-icon)/2f
+            fun pt(x: Float, y: Float) =
+                Offset(leftEdge + icon*x, topEdge + icon*y)
+            val stroke = 2.3f*unit
             if (glyph == Ws16AZCabinetGlyph.ART_OPTIONS) {
-                // Same three horizontal lines as the Home menu glyph.
-                for (fraction in listOf(.30f,.50f,.70f)) {
-                    drawLine(
-                        color = ink,
-                        start = Offset(w*.25f,h*fraction),
-                        end = Offset(w*.75f,h*fraction),
-                        strokeWidth = stroke,
-                        cap = StrokeCap.Round
-                    )
+                for (fraction in listOf(.25f,.50f,.75f)) {
+                    drawLine(ink,pt(.16f,fraction),pt(.84f,fraction),
+                        strokeWidth=stroke,cap=StrokeCap.Round)
                 }
             } else {
                 val left = glyph != Ws16AZCabinetGlyph.NEXT
-                val tail = if (left) .74f else .26f
-                val tip = if (left) .26f else .74f
-                val bend = if (left) .49f else .51f
-                drawLine(ink, Offset(w*tail,h*.50f),Offset(w*tip,h*.50f),
+                val tail = if (left) .82f else .18f
+                val tip = if (left) .18f else .82f
+                val bend = if (left) .46f else .54f
+                drawLine(ink,pt(tail,.50f),pt(tip,.50f),
                     strokeWidth=stroke,cap=StrokeCap.Round)
-                drawLine(ink, Offset(w*bend,h*.28f),Offset(w*tip,h*.50f),
+                drawLine(ink,pt(bend,.22f),pt(tip,.50f),
                     strokeWidth=stroke,cap=StrokeCap.Round)
-                drawLine(ink, Offset(w*tip,h*.50f),Offset(w*bend,h*.72f),
+                drawLine(ink,pt(tip,.50f),pt(bend,.78f),
                     strokeWidth=stroke,cap=StrokeCap.Round)
             }
         }
