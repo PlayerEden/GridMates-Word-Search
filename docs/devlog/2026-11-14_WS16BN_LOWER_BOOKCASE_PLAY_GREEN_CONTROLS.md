@@ -1,6 +1,6 @@
 # WS16BN — Lower bookcase composition and true Home Play-green controls
 
-> November 14, 2026. **v73 source committed; initial Android + art/release QA IN PROGRESS; owner phone visual/tap approval OPEN.** Preserve the v72 installed APK as the safe comparison until v73 is verified.
+> November 14, 2026. **Exact-source v73 Android and art/release CI DUAL-GREEN; signed APK verified and delivered. Owner's on-phone visual/tap approval remains OPEN.**
 
 ## Owner evidence and decision
 
@@ -24,10 +24,21 @@ Do not substitute another broad cabinet redesign, new volume assets, saved-game 
 
 - Active draft [PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131) on `feature/ws14b-style-anchor-and-art-direction-2026-11-08`; do not merge until owner visual acceptance.
 - First exact-source commit [`7f4347c7fc93bf436a64179aafe338877ccc683d`](https://github.com/PlayerEden/GridMates-Word-Search/commit/7f4347c7fc93bf436a64179aafe338877ccc683d).
-- [Independent art/release #43584113826](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113826): IN PROGRESS when journal created.
-- [Android QA #43584113831](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113831): IN PROGRESS when journal created.
-- No verified v73 APK or signing receipt yet at initial entry. Fix any build failures at an exact new source SHA and rerun both before sharing.
+- [Independent art/release #43584113826](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113826): later SUCCESS; see receipt below.
+- [Android QA #43584113831](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113831): later SUCCESS; see receipt below.
+- Initial status had no v73 APK. Both CI builds and actual APK are now verified; see detailed receipt below.
 - Last user-installed v72: verified [Android GitHub ZIP artifact #14109290802](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240449/artifacts/14109290802); APK SHA256 `0f7a57662cf8cf380b5e48ee2c0da8e6461a57ad1946135b90301cf6f6c29b53`. Do not instruct uninstall to downgrade.
+
+## Final exact-source v73 build and package receipt
+
+- **Compiled app/test source:** [`7f4347c7fc93bf436a64179aafe338877ccc683d`](https://github.com/PlayerEden/GridMates-Word-Search/commit/7f4347c7fc93bf436a64179aafe338877ccc683d). Later documentation-only `[skip ci]` commits do not change the tested APK source.
+- **Android QA [#43584113831](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113831): SUCCESS**, all 71 completed steps. Validated core/app unit tests, source regressions including new Play-green and stage geometry tests, lint, debug APK, packaged source art and signer/version.
+- **Independent debug/release art QA [#43584113826](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113826): SUCCESS**, all 72 completed steps. Compiled independent debug and release and verified previous wordless spines, shelves and extra QA artwork remain entirely out of release binaries.
+- **Standard Android GitHub artifact [#14109493425](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113831/artifacts/14109493425):** extracted ZIP `GridMates_WordSearch_WS16BN_v73_QA.zip` **29,623,945 bytes** with SHA-256 `0a67d25617b121e60aeffb1e1ca75fe5738dcaea314fa4b77ccb21343f7b66ed`. Its `app-debug.apk` was copied to this conversation as **`GridMates_WordSearch_WS16BN_v73.apk`**, size **30,095,761 bytes**, SHA-256 **`b63e4943862ce333653e69dcb332fa61573dd008e65188467af03f9a9ef75c07`**. Exact container paths were checked, APK bytes extracted and app identity read from completed CI.
+- **App identity:** `com.playereden.gridmates.wordsearch.qa`, versionCode **73**, versionName `0.9.29-play-green-library-layout-qa`. **QA signer SHA256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`**, unchanged from owner-installed v72. Install directly OVER v72; do not uninstall or clear saves.
+- **Independent art GitHub artifact [#14109816110](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43584113826/artifacts/14109816110)**: ZIP **29,623,944 bytes** SHA-256 `95b3ebd0b5a57d7f025502699a3e18538e022a65db996b3ab3e9976e751c7ed0`; independently signed APK 30,095,761 bytes SHA-256 `cca5c2de1161f3e358475a462ef334cab224d4127f269766d9e66016ea5db248`. Signed outer APK ZIP archive hashes differ, but **all 358 decompressed entry names and contents match byte-for-byte** between the two independently compiled APKs.
+- **Artwork baseline:** Comparing the standard v73 APK directly with owner-installed v72 APK, **all 217 `assets/` files remain exactly identical**; no new/generated artwork, book title, puzzle content or visual asset mutation in this pass. Only renderer/layout logic changes.
+- **Open only:** owner's physical v73 screenshot and UX approval—confirm banner gap and visually mounted lower pager, Play-green button material/disabled states, consistent motion and preserved real-book taps/saved progress. CI is not device visual approval. Draft PR #131 remains unmerged.
 
 ## Physical acceptance gate
 
