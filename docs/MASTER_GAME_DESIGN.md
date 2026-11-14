@@ -10,6 +10,14 @@
 
 ---
 
+## WS-14H2 — Regular illustrated book size ceiling (Nov 9, 2026)
+
+**Owner-directed product decision:** Regular Puzzle Books use **12×12, 15×15 and 20×20 maximum**; screenshots of the compact bulb header on 12/15/20 support this layout. Boards **25×25 and 30×30** are intentional **optional large-board Free Play** choices, not required paperback progression. The existing V2 `bookPresets` and V3 `largePresets` / Solo `soloPresets` support exactly this without engine changes. Future UI may group these large options under **Large Puzzles**, but they are not a new generator or new save format. Keep existing published IDs/hashes/saves and any historical content intact. 100×100 Marathon remains a separate future R&D concept.
+
+**WS-14I source follow-up (Nov 9):** The original total 4-step hint quota on 20×20 was removed in favor of **3 progressive clues per remaining word** (maximum 3 × published targets). [Green exact-source Android/art QA](devlog/2026-11-09_WS14I_HINT_RELIABILITY_AND_20X20_TRACE_TEST_RECEIPT.md) confirms core tests, compiled 20×20 gesture test and a QA APK; **physical word tracing, 5-tap hint use and save/reopen are still pending owner confirmation**. No hint-schema or saved puzzle ID migration. Earlier observation below is historical.
+
+**Important unresolved gameplay QA:** the new 20×20 Hint bulb displays “No hints available” at 0/24 in one owner screenshot. Current rule allows four total 20×20 hint steps before returning null, and storage failures can also produce null; investigate actual reason, then improve feedback and consider hint accessibility without silently changing scoring. Positive visual layout reaction does not prove successful word tracing, precision selection, zoom or persistence. Source/playtest detail: [WS-14H2 device review](devlog/2026-11-09_WS14H2_PHONE_SPACING_AND_BOOK_SIZE_CEILING.md).
+
 ## WS-09 owner playtest direction — foundation before expansion (November 7, 2026)
 
 The owner and a family player reviewed **15 actual v0.8.5 Android phone screenshots**. Agreed direction: zero-radius **square actual grid** without clipped corner letters, responsive book-style side margins, calm/readable paperback presentation, and simpler pre-game mode/theme/board/challenge selection instead of configuring the puzzle after entering it. Support multiple unfinished Solo puzzles and eventually one **continuous** 100×100 Marathon board with optional regional navigation (regions are not separate puzzles). Improve giant-board panning, 2-tap selection, word-list accessibility, Home, Records, Collections, Fonts and Settings. Preserve small puzzles, content/difficulty independence, and readable typography. **Do not treat 100×100 as already feasible/implemented.**

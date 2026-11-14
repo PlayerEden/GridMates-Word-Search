@@ -47,6 +47,37 @@ class QaArtLabAndroidTest {
         compose.onNodeWithText("Test Puzzle Books").assertExists()
     }
 
+    @Test fun ws14NativeReviewShowsActualImportStatusWithoutChangingBookState() {
+        val availability = ws14ReadAvailability(
+            InstrumentationRegistry.getInstrumentation().targetContext
+        )
+        val packaged = availability.values.sumOf {
+            (if (it.cover) 1 else 0) + (if (it.spine) 1 else 0)
+        }
+
+        compose.onNodeWithText("View Library Artwork").performScrollTo().performClick()
+        compose.onNodeWithText("Review WS-14 assets").performClick()
+        compose.onNodeWithText("Illustrated Books").assertExists()
+        compose.onNodeWithText(
+            "$packaged of 6 WS-14 cover and spine assets bundled for QA."
+        ).assertExists()
+        compose.onNodeWithText("Study A · Original", useUnmergedTree = true).assertExists()
+        compose.onNodeWithText("Study B · Illustrated", useUnmergedTree = true).assertExists()
+        compose.onNodeWithText("Back to WS-12 lab").performClick()
+        compose.onNodeWithText("Back to Play").performClick()
+        compose.onNodeWithText("Test Puzzle Books").assertExists()
+    }
+
+    @Test fun availabilityMappingDoesNotInventAssets() {
+        val empty = ws14ThemeAvailability(emptySet(), emptySet())
+        assertTrue(empty.values.none { it.cover || it.spine })
+        val partial = ws14ThemeAvailability(
+            setOf("woodland.png"), setOf("garden.png"))
+        assertTrue(partial.getValue(com.playereden.gridmates.wordsearch.core.WordTheme.WOODLAND).cover)
+        assertFalse(partial.getValue(com.playereden.gridmates.wordsearch.core.WordTheme.SPACE).cover)
+        assertTrue(partial.getValue(com.playereden.gridmates.wordsearch.core.WordTheme.GARDEN).spine)
+    }
+
     @Test fun artPreviewDoesNotBecomeBookProgressOrACollectionReward() {
         // This is a content/packaging policy test. The QA art asset IDs cannot
         // overlap active reward IDs and are never registered as new book pages.

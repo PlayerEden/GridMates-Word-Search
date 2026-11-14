@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -23,8 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -174,6 +178,85 @@ internal fun StorybookModeCard(
                     .testTag("storybook-mode-action")
             ) {
                 Text(actionLabel)
+            }
+        }
+    }
+}
+
+/**
+ * WS-14C: short, consistently styled launcher for Daily, Nearby and Books.
+ *
+ * Uses actual native buttons, text and state. Unlike a flattened illustration,
+ * this adapts to 320dp phones and 200% font scale without clipped actions.
+ * Optional individual artwork is decorative and never replaces the CTA.
+ */
+@Composable
+internal fun StorybookQuickEntry(
+    eyebrow: String,
+    title: String,
+    actionLabel: String,
+    onAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    actionDescription: String? = null,
+    @DrawableRes artResource: Int? = null,
+    modeGlyph: Ws15ModeGlyph? = null
+) {
+    BoxWithConstraints(modifier.fillMaxWidth().testTag("storybook-quick-entry")) {
+        // Home content is 324dp wide on a 360dp phone after screen gutters.
+        // Keep its actions inline there to preserve first-fold Nearby access.
+        val stacked = maxWidth < 270.dp || LocalDensity.current.fontScale >= 1.6f
+        // On phone-width cards, a conventional forward action leaves enough
+        // width for the entire section name; accessibility keeps its label.
+        val iconAction = !stacked &&
+            (maxWidth < 420.dp || LocalDensity.current.fontScale >= 1.25f)
+        val buttonModifier = Modifier.heightIn(min = StorybookTokens.touchTarget)
+            .then(if (stacked) Modifier.fillMaxWidth() else Modifier)
+            .then(if (actionDescription.isNullOrBlank()) Modifier else
+                Modifier.semantics { contentDescription = actionDescription })
+        StorybookFrame(Modifier.fillMaxWidth()) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (artResource != null) {
+                    StorybookIllustration(
+                        resourceId = artResource,
+                        modifier = Modifier.size(StorybookTokens.illustratedCardArt)
+                            .testTag("storybook-quick-art")
+                    )
+                } else if (modeGlyph != null) {
+                    Ws15ModeEmblem(modeGlyph, Modifier.testTag("ws15-quick-mode-icon"))
+                }
+                Column(Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(eyebrow.uppercase(),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold, color = Gold,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(title, style = MaterialTheme.typography.titleSmall,
+                        color = Forest, fontWeight = FontWeight.SemiBold,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+                if (!stacked) {
+                    if (iconAction) {
+                        Ws15ForwardActionButton(
+                            onClick = onAction,
+                            actionDescription = actionDescription ?: actionLabel
+                        )
+                    } else {
+                        Button(onClick = onAction, modifier = buttonModifier
+                            .testTag("storybook-quick-action")) {
+                            Text(actionLabel, maxLines = 2)
+                        }
+                    }
+                }
+            }
+            if (stacked) {
+                Button(onClick = onAction, modifier = buttonModifier
+                    .testTag("storybook-quick-action")) {
+                    Text(actionLabel)
+                }
             }
         }
     }

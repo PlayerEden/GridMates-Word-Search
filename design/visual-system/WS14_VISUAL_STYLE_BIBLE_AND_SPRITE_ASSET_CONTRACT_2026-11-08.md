@@ -2,6 +2,8 @@
 
 **State: design proposal / unapproved.** This is written against the owner's November 8, 2026 three-screen Play / Puzzle Books / Collection reference image. The concept image is *not* a sprite atlas. Every production sprite must be created, isolated, reviewed and exported separately.
 
+> **WS-14E cross-GridMates update (November 9):** The owner now wants a shared series-wide visual identity and very restrained optional motion, not constant decorative animation. The **GridMates** wordmark is **not registered**; do **not** ship **®**. See [GridMates shared identity, art-library reuse and motion contract](../../docs/GRIDMATES_SHARED_VISUAL_IDENTITY_AND_MOTION_2026-11-09.md) and [WS-14E journal entry](../../docs/devlog/2026-11-09_WS14E_GRIDMATES_IDENTITY_AND_MOTION_DESIGN.md). This is a proposal; actual animated assets are not created by this document.
+
 ## Design intent: Cozy Paperback Library
 
 **Keywords:** warm, inviting, collectible, storybook, gently nostalgic, soft but crisp, purposeful detail, friendly, tactile.

@@ -40,7 +40,12 @@ import com.playereden.gridmates.wordsearch.core.WoodlandCollection
  * broad storage permissions; the player explicitly chooses where data goes.
  */
 @Composable
-internal fun SoloSettingsScreen(store: SoloStore) {
+internal fun SoloSettingsScreen(
+    store: SoloStore,
+    onPreviewArtwork: (() -> Unit)? = null,
+    displayMode: DisplayMode = DisplayMode.STANDARD,
+    onDisplayModeChange: (DisplayMode) -> Unit = {}
+) {
     val context = LocalContext.current
     var message by rememberSaveable { mutableStateOf("") }
     var pendingImport by remember { mutableStateOf<SoloProfile?>(null) }
@@ -122,17 +127,18 @@ internal fun SoloSettingsScreen(store: SoloStore) {
         )
     }
 
-    PaperEyebrow("Your app & saved progress")
-    Text("Settings & backup", color = Forest, fontWeight = FontWeight.Bold,
-        style = MaterialTheme.typography.headlineMedium)
-    Text("Your Solo, Daily, nearby results and collections are stored on this device.",
-        color = Muted, style = MaterialTheme.typography.bodyMedium)
+    StorybookHeading(
+        eyebrow = "GridMates · Settings",
+        title = "Settings & backup",
+        subtitle = "Your progress stays on this device"
+    )
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("Keep your progress")
-        Text("Backup & restore", color = Forest,
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.titleLarge)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.BACKUP,
+            title = "Backup & restore",
+            subtitle = "Keep your progress"
+        )
         Text("Puzzles save automatically. Export a backup before uninstalling, " +
             "clearing app storage, or switching phones. Uninstalling removes " +
             "your locally saved progress.",
@@ -172,22 +178,55 @@ internal fun SoloSettingsScreen(store: SoloStore) {
             "and profile/collections. Restore asks before replacing progress. " +
             "Older backups without a Duel journal restore with zero Duel results.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
-        Text("Export saves a file to a location you choose. Restore asks before " +
-            "replacing your current Word Search progress.",
-            color = Muted, style = MaterialTheme.typography.bodySmall)
-        Text("QA update note: v0.5.8 and earlier used a different debug signer. " +
-            "Export a backup first, then uninstall the old QA app, install " +
-            "v0.5.9, and Restore backup. From v0.5.9 onward, install newer " +
-            "QA APKs over the existing app to keep its data. Do not clear " +
-            "storage or uninstall without a verified backup.",
+        Text("Before reinstalling, export a backup and verify the file. " +
+            "If Android reports a signing conflict, uninstalling removes " +
+            "the local save. Restore your backup after reinstalling.",
             color = Muted, style = MaterialTheme.typography.bodySmall)
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("Puzzle feel")
-        Text("Gameplay preferences", color = Forest,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.PREFERENCES,
+            title = "Display mode",
+            subtitle = "Choose how Android system bars appear"
+        )
+        Text("Current mode: " + displayMode.label,
+            color = Forest, style = MaterialTheme.typography.labelLarge)
+        Row(Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (displayMode == DisplayMode.STANDARD) {
+                Button(onClick = { onDisplayModeChange(DisplayMode.STANDARD) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Standard")
+                }
+                OutlinedButton(onClick = { onDisplayModeChange(DisplayMode.FULLSCREEN) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Fullscreen")
+                }
+            } else {
+                OutlinedButton(onClick = { onDisplayModeChange(DisplayMode.STANDARD) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Standard")
+                }
+                Button(onClick = { onDisplayModeChange(DisplayMode.FULLSCREEN) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text("Fullscreen")
+                }
+            }
+        }
+        Text("Standard keeps Android's controls visible over parchment. " +
+            "Fullscreen hides the status and navigation bars; swipe in from " +
+            "a screen edge to reveal them temporarily. This device remembers " +
+            "your choice, and you can switch back at any time.",
+            color = Muted, style = MaterialTheme.typography.bodySmall)
+    }
+
+    PaperPanel(Modifier.fillMaxWidth()) {
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.PREFERENCES,
+            title = "Gameplay preferences",
+            subtitle = "Puzzle feel"
+        )
         Text("Adjust sound and gentle vibrations while playing: " +
             "open a puzzle, choose Options, then Feedback settings. " +
             "Your preferences remain on this device.",
@@ -204,10 +243,10 @@ internal fun SoloSettingsScreen(store: SoloStore) {
     }
 
     PaperPanel(Modifier.fillMaxWidth()) {
-        PaperEyebrow("About")
-        Text("About Word Search", color = Forest,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold)
+        Ws15SectionHeading(
+            glyph = Ws15SectionGlyph.JOURNAL,
+            title = "About Word Search"
+        )
         Text("Good puzzles. Good company.", color = Muted)
         Text("Play Solo or Daily without a connection. Nearby games use the " +
             "same Wi-Fi and share your display name with a partner. " +
@@ -218,6 +257,23 @@ internal fun SoloSettingsScreen(store: SoloStore) {
                 .versionName
         }.getOrNull().orEmpty().ifEmpty { "Unknown" },
             color = Muted, style = MaterialTheme.typography.labelMedium)
+    }
+    if (onPreviewArtwork != null) {
+        // Keep developer art review accessible without occupying the Play menu.
+        // QA-only app builds provide this route; regular builds do not.
+        PaperPanel(Modifier.fillMaxWidth()) {
+            Ws15SectionHeading(
+                glyph = Ws15SectionGlyph.ARTWORK,
+                title = "Artwork comparison",
+                subtitle = "Preview tools"
+            )
+            Text("Review candidate book artwork in this test build.",
+                color = Muted, style = MaterialTheme.typography.bodySmall)
+            OutlinedButton(onClick = onPreviewArtwork,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text("View artwork previews")
+            }
+        }
     }
     store.warning?.let {
         Text(it, color = Gold, style = MaterialTheme.typography.bodyMedium)

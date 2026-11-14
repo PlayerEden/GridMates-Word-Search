@@ -1,0 +1,26 @@
+# WS-16AA — Actual shelf and parchment source art; dual-green Android QA
+**Date:** November 10, 2026. **Status:** SOURCE/ANDROID QA VERIFIED; owner physical phone acceptance and release rights pending. Draft PR #131 remains unmerged.
+
+## Owner request
+The owner clarified that shadows should remain, but the earlier gray rectangular halo was ugly; removing all shelf shading looked too flat beside the existing painted books. Increase physical top/front/underside/corbel volume and restore natural book contact with soft alpha shadows. Slightly enrich the parchment material without visible repeating patterns or legibility loss. Preserve already approved Home composition, saved puzzles and controls. See [WS16AA production brief](../design/WS16AA_DIMENSIONAL_SHELF_AND_PARCHMENT_ART_PRODUCTION_BRIEF_2026-11-10.md).
+
+## Implementation
+- Actual source assets committed: SIX original standalone vector illustration masters under design/visual-system/masters/ws16aa/: shelf-rail, shelf-left, shelf-right, shelf-carving, shelf-contact and paper-tooth. New files are independent assets, not a fixed screenshot of the game. They use painted-style shading and irregular organic grain but **are vector-authored**, not a promise of photoreal or hand-painted bitmap appearance.
+- design/visual-system/ws16aa-art-register.json records Git blob SHA pins, output dimensions, candidate/release permission state. tools/asset_pipeline/render_ws16aa.py verifies exact source blob hashes and exports local PNGs with source/export SHA-256 manifest. tools/asset_pipeline/test_ws16aa_art.py and verify_ws16aa_apk.py check asset/source correctness and APK isolation.
+- Ws16GShelfArtwork.kt now draws the 42dp WS16AA painted rail, independent fixed-width corbels, center carving and a warm contact shadow on the top plane, but keeps original WS16G assets/Canvas fallback intact. GridMatesParchmentBackground.kt keeps its existing native parchment and adds an optional lightly tinted 384px paper-tooth tile in debug only. No game logic, camera, carousel, input, book IDs, save schema, user font unlocks or package identity changed.
+- GitHub Actions standard Android and independent art/release workflows now generate these real PNGs before building APKs, verify packaged hashes, and ensure ZERO candidate assets in release.
+
+## Source and failure correction
+- Integration commit [f1adb65a](https://github.com/PlayerEden/GridMates-Word-Search/commit/f1adb65aac65fc00478caa65b0ba6181a15071f7). First Android and art runs failed early only because a source test looked for a literal string instead of a constructed path; actual source rendering and hash checks already passed.
+- Corrected source commit [b8adce02](https://github.com/PlayerEden/GridMates-Word-Search/commit/b8adce02d87b0747238e52a0c5138d9c9bb617c8).
+- [Android QA #42898700114](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42898700114) **SUCCESS** including core/app tests, AndroidTest source compilation, lint, source-pinned debug APK.
+- [Independent debug/release Art QA #42898700175](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42898700175) **SUCCESS** including actual release artifact isolation.
+- Preferred [GitHub Android artifact #13801572729](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42898700114/artifacts/13801572729), ZIP containing app-debug.apk. Direct APK in conversation named WS16AA_Dimensional_Shelf_Parchment_QA.apk: **15,758,974 bytes**, SHA-256 **972c877074d9f54840f06a1a20149630977c88f5a9a68e61055cc7eeb4040b7a**.
+- Independently extracted APK from [art artifact #13800773928](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42898700175/artifacts/13800773928) has different *outer* package SHA 2f7017ac9b354b59137f9547cf0e8c6af33a8163070885d1650039bc5261fc24, but **ALL 267 APK internal files match bit-for-bit**. Seven new debug items are rail.png, left.png, right.png, carving.png, contact.png, parchment.png and manifest.json.
+
+## Acceptance and rollback
+- The first actual Android owner visual review is PENDING. New artwork still has owner_approved=false, release_approved=false. Both automated workflows are verified, not proof of on-phone usability or visual approval.
+- Verify Home Woodland/Space/Garden, carousel gestures, book tap, whole Continue Solo card, Android Back, text readability, shelf bounds and paper texture in Fullscreen/Standard. Capture screenshot without developer overlay and compare to previous WS16Y/WS16Z.
+- If still vector-clean instead of richly painted, add V2 genuine painterly bitmap masters rather than repeatedly tweaking shadows. Keep this V1 and legacy artwork for rollback.
+- Previously compiled and visually reviewed baseline: [prior Android artifact #13799831994](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42893343550/artifacts/13799831994); earlier byte-checked WS16Y [artifact #13797149827](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/42889659113/artifacts/13797149827). Do not uninstall or clear saved game data to compare.
+- Next action after screenshot: accept/adjust shelf and paper V2, then return to gameplay/page/hint/save QA.

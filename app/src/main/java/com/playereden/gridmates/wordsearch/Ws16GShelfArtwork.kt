@@ -1,0 +1,202 @@
+package com.playereden.gridmates.wordsearch
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+
+/**
+ * WS-16G debug-only layered bitmap shelf from eight independent, versioned SVGs.
+ * Release APK never bundles candidate assets: safely falls back to Canvas.
+ * Book covers, buttons, IDs, progress and interaction remain independently native.
+ */
+
+/** WS16AA: candidate painted assets. One native shelf with five independently
+ * rendered local illustrations; no book artwork or touch handling baked into it.
+ * All image loading happens once per Context. Release has none of these files.
+ */
+
+/**
+ * WS-16AB: an actual generated painted shelf, exported from the original
+ * transparent 2172x724 artwork as a review-sized 720x149 WebP.
+ * This is a single QA image, NOT a procedural redraw or a screenshot.
+ * Android release does not contain the candidate asset.
+ */
+private fun readWs16AbShelf(context: Context): Bitmap? = runCatching {
+    context.assets.open("ws16ab/painted-shelf-v1.webp").use {
+        BitmapFactory.decodeStream(it)
+            ?: error("WS16AB painted shelf could not be decoded")
+    }
+}.getOrNull()
+
+@Composable
+private fun Ws16AbShelf(bitmap: Bitmap, modifier: Modifier) {
+    // The existing 42dp shelf starts at the correct 204dp book baseline in
+    // the 252dp carousel. The new illustrated piece is 50dp deep, so move it
+    // down 8dp relative to the existing bottom alignment. This preserves
+    // where books touch the *top* of the shelf while adding a true underside.
+    Box(modifier.offset(y = 8.dp).fillMaxWidth().height(50.dp)
+        .qaTrackBounds("Wooden shelf").testTag("ws16e-storybook-shelf")) {
+        ShelfPart(bitmap, Modifier.fillMaxWidth().height(50.dp))
+    }
+}
+
+private fun readWs16AaShelf(context: Context): Map<String, Bitmap>? = runCatching {
+    listOf("rail", "left", "right", "carving", "contact").associateWith { key ->
+        context.assets.open("ws16aa/" + key + ".png").use {
+            BitmapFactory.decodeStream(it) ?: error("WS16AA invalid " + key)
+        }
+    }
+}.getOrNull()
+
+@Composable
+private fun Ws16AaShelf(art: Map<String, Bitmap>, modifier: Modifier) {
+    Box(modifier.fillMaxWidth().height(42.dp)
+        .qaTrackBounds("Wooden shelf").testTag("ws16e-storybook-shelf")) {
+        // Source-painted material and volumetric apron; repeatable neutral
+        // center has no fixed knot or medallion that could be stretched.
+        ShelfPart(art.getValue("rail"),
+            Modifier.align(Alignment.TopCenter).fillMaxWidth().height(42.dp))
+        // Corbels do not distort when Android display widths change.
+        ShelfPart(art.getValue("left"),
+            Modifier.align(Alignment.BottomStart).width(36.dp).height(42.dp))
+        ShelfPart(art.getValue("right"),
+            Modifier.align(Alignment.BottomEnd).width(36.dp).height(42.dp))
+        // Warm book contact sits ON the top plane; transparent edges,
+        // no rectangular gray bar beneath the silhouette.
+        ShelfPart(art.getValue("contact"),
+            Modifier.align(Alignment.TopCenter).offset(y = 3.dp)
+                .fillMaxWidth(.55f).height(7.dp))
+        ShelfPart(art.getValue("carving"),
+            Modifier.align(Alignment.Center).offset(y = 6.dp)
+                .width(92.dp).height(25.dp))
+    }
+}
+
+private fun readShelfPieces(context: Context): Map<String, Bitmap>? = runCatching {
+    // Keep the legacy contact-shadow PNG in the QA source registry for
+    // provenance, but don't load/draw its wide diffuse halo on Home.
+    listOf("top", "front", "apron", "bracket-left", "bracket-right",
+        "medallion").associateWith { name ->
+        context.assets.open("ws16g/shelf/" + name + ".png").use {
+            BitmapFactory.decodeStream(it) ?: error("WS16G bad PNG: " + name)
+        }
+    }
+}.getOrNull()
+
+@Composable
+private fun ShelfPart(bitmap: Bitmap, modifier: Modifier) {
+    Image(bitmap = bitmap.asImageBitmap(), contentDescription = null,
+        contentScale = ContentScale.FillBounds, modifier = modifier)
+}
+
+@Composable
+internal fun Ws16EStorybookShelf(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val ws16ab = remember(context) { readWs16AbShelf(context) }
+    if (ws16ab != null) {
+        Ws16AbShelf(ws16ab, modifier)
+        return
+    }
+    // Keep V1 illustrated components and release Canvas fallback untouched.
+    val ws16aa = remember(context) { readWs16AaShelf(context) }
+    if (ws16aa != null) {
+        Ws16AaShelf(ws16aa, modifier)
+        return
+    }
+    // Exact WS16G fallback remains for release and missing-candidate cases.
+    val art = remember(context) { readShelfPieces(context) }
+    if (art == null) {
+        androidx.compose.foundation.layout.Box(
+            modifier.fillMaxWidth().height(42.dp)) {
+            Ws16ECanvasShelfFallback()
+            Ws16TShelfPatina(Modifier.align(Alignment.Center))
+        }
+        return
+    }
+    Box(modifier.fillMaxWidth().height(42.dp).qaTrackBounds("Wooden shelf").testTag("ws16e-storybook-shelf")) {
+        ShelfPart(art.getValue("apron"),
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(24.dp))
+        ShelfPart(art.getValue("front"),
+            Modifier.align(Alignment.TopCenter).offset(y = 10.dp).fillMaxWidth().height(20.dp))
+        ShelfPart(art.getValue("bracket-left"),
+            Modifier.align(Alignment.BottomStart).width(26.dp).height(34.dp))
+        ShelfPart(art.getValue("bracket-right"),
+            Modifier.align(Alignment.BottomEnd).width(26.dp).height(34.dp))
+        ShelfPart(art.getValue("top"),
+            Modifier.align(Alignment.TopCenter).offset(y = 3.dp).fillMaxWidth().height(10.dp))
+        // WS-16W: physically localized book weight, not a full-width
+        // gray rectangle below the shelf or a repeated ambient drop shadow.
+        ShelfBookContact(
+            Modifier.align(Alignment.TopCenter).fillMaxWidth().height(12.dp)
+        )
+        // Irregular, transparent glaze sits above stretched grain panels,
+        // below the crisp independent gold carving.
+        Ws16TShelfPatina(Modifier.align(Alignment.Center))
+        ShelfPart(art.getValue("medallion"),
+            Modifier.align(Alignment.TopCenter).offset(y = 17.dp).width(84.dp).height(18.dp))
+    }
+}
+
+@Composable
+internal fun Ws16GBookcaseBackboard(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val backing = remember(context) {
+        runCatching {
+            context.assets.open("ws16g/shelf/backboard.png").use {
+                BitmapFactory.decodeStream(it)
+            }
+        }.getOrNull()
+    }
+    if (backing != null) {
+        Image(bitmap = backing.asImageBitmap(), contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = modifier.testTag("ws16g-bookcase-backboard"))
+    }
+}
+
+/**
+ * A short, warm contact shadow confined to the walnut's TOP face.
+ * Centered under the hero book and feathered away before reaching the shelf
+ * brackets. It never paints anything below the shelf silhouette.
+ */
+@Composable
+private fun ShelfBookContact(modifier: Modifier) {
+    Canvas(modifier) {
+        val w = size.width
+        val u = 1.dp.toPx()
+        if (w <= 0f) return@Canvas
+        val center = Offset(w * .5f, 6f * u)
+        drawOval(
+            brush = Brush.radialGradient(
+                colors = listOf(
+                    Color(0x2E472514), Color(0x14472514),
+                    Color.Transparent
+                ),
+                center = center,
+                radius = w * .30f
+            ),
+            topLeft = Offset(w * .235f, 3.1f * u),
+            size = Size(w * .53f, 5.6f * u)
+        )
+    }
+}

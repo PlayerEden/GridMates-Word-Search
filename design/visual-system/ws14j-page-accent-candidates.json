@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "family": "PAGE_ACCENTS",
+  "status": "CANDIDATE_ONLY",
+  "assets": [
+    {
+      "stable_asset_id": "PAGE_ACCENT_WOODLAND_V1",
+      "theme": "Woodland",
+      "usage": "compact book-page header artwork (proposed)",
+      "state": "GENERATED_UNREVIEWED",
+      "rights_status": "PENDING_REVIEW",
+      "owner_approved": false,
+      "release_approved": false,
+      "source_provenance": "Original assistant-authored SVG vector illustration; not derived from the unrelated generated status-board concepts.",
+      "master_path": "design/visual-system/masters/ws14j-page-accent-woodland-v1.svg",
+      "master_format": "image/svg+xml",
+      "master_bytes": 4272,
+      "master_sha256": "a757ac3a5be430cb3fc2ae2ea32f4e6513baf8887a66dbd2818c76ef5d7fbb80",
+      "master_canvas_px": [
+        512,
+        512
+      ],
+      "export_path": "design/visual-system/exports/ws14j-page-accent-woodland-v1-128.png",
+      "export_format": "image/png",
+      "export_dimensions_px": [
+        128,
+        128
+      ],
+      "export_bytes": 2745,
+      "export_sha256": "747af7c99b76b7ed38c91460409fd9d32a24decd1c1412991d9c364a3f3b331b",
+      "export_rendering": "CairoSVG raster followed by 48-color optimized PNG quantization; alpha retained",
+      "transparency": true,
+      "alpha_bbox_xyxy": [
+        13,
+        10,
+        113,
+        123
+      ],
+      "android_debug_integrated": true,
+      "android_release_integrated": false,
+      "visual_review": "Candidate source transferred and configured in QA-only Android header; owner still needs exact-build phone review at 32dp; not release-approved",
+      "fallback": "Existing native WS-12 theme emblem or text",
+      "debug_asset_path": "app/src/debug/assets/ws14j/page-accents/woodland.png"
+    }
+  ]
+}

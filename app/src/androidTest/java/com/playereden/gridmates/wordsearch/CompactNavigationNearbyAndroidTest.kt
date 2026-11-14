@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -23,7 +24,7 @@ import java.io.File
 class CompactNavigationNearbyAndroidTest {
     @get:Rule val rule = createComposeRule()
 
-    @Test fun fourNavigationItemsKeepFullAccessibleNames() {
+    @Test fun profileAndMenuReplaceBottomTabsAtLargeFontScale() {
         val ctx = InstrumentationRegistry.getInstrumentation().targetContext
         val file = "ws05i_nav_" + System.nanoTime() + ".json"
         val store = SoloStore(ctx, file)
@@ -37,13 +38,17 @@ class CompactNavigationNearbyAndroidTest {
                     }
                 }
             }
-            rule.onNodeWithText("Stats").assertExists()
-            rule.onNodeWithText("Items").assertExists()
-            rule.onNodeWithText("Setup").assertExists()
-            rule.onNodeWithContentDescription("Open Collection").performClick()
+            rule.onNodeWithContentDescription("Open Play").assertDoesNotExist()
+            rule.onNodeWithContentDescription("Open player profile").performClick()
+            rule.onNodeWithText("Player profile").assertExists()
+            rule.onNodeWithTag("ws16c-profile-collection").performScrollTo().performClick()
             rule.onNodeWithText("Your Collection").assertExists()
-            rule.onNodeWithContentDescription("Open Settings").performClick()
+            rule.onNodeWithContentDescription("Back to Profile").performScrollTo().performClick()
+            rule.onNodeWithContentDescription("Back to Home").performClick()
+            rule.onNodeWithContentDescription("Open menu").performClick()
+            rule.onNodeWithText("Settings & backup").performClick()
             rule.onNodeWithText("Settings & backup").assertExists()
+            rule.onNodeWithContentDescription("Back to Home").performClick()
         } finally {
             rooms.leaveRoom()
             File(ctx.filesDir, file).delete()

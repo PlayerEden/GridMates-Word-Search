@@ -1,0 +1,50 @@
+# WS16BJ — Carved walnut Library title / headline clearance
+
+> **Status: EXACT-SOURCE DUAL-GREEN ANDROID + ART/RELEASE QA / SIGNED v69 APK VERIFIED AND DELIVERED / OWNER PHONE VISUAL ACCEPTANCE PENDING.** Date: November 12, 2026.
+
+## Owner screenshot and request
+
+Owner installed WS16BI v68 and supplied a real Android Library screenshot, responding **“That's a whole lot better. Now the library plaque could be better/more themed, also moved up to not block the books.”** The spine-first collection, slightly wider tappable Woodland/Space/Garden bindings, wordless decorative blank volumes, stronger shadows and revised physical shelves are visually more promising. Owner's remaining problem is specifically the **generic-looking top “Your Library” rectangular nameplate** overlapping the upper part of real books. This pass is **title-only**, not another bookshelf redesign. The other shelf/count/buttons remain intact.
+
+## Repro / visual diagnosis
+
+In `WS16ATModularLibraryScene.kt`, the portrait title previously used
+`.padding(start = 62.dp, end = 62.dp, top = (top - 58.dp).coerceAtLeast(38.dp))`.
+Under the v68 source, `WS16BICabinetPlaque(title=true)` gave that text a comparatively thick flat rectangular wood/brass UI slab with 11dp text vertical padding. The owner screenshot shows the plaque's lower edge visually covering the rounded tops of the real first-shelf bindings. Cabinet crown and bulbs are otherwise already approved as the visual context.
+
+## Source changes
+
+1. New independent, no-asset `WS16BJCarvedTitlePlaque.kt`: **46dp total height**, physically shaped walnut cartouche with tapered shoulders, a very slight curved crest/underside, an inset aged-brass edge, paired carved foliage at the ends and tiny mounting studs, small top/bottom light engraving. Text remains native `Text`, one-line, readable cream serif with no baked raster words. No touch interaction; no new art, fonts, licensing or permissions.
+2. `WS16BIAdaptivePlaque` now chooses `WS16BJCarvedTitlePlaque` **only if `styled && title`**. The existing v68 compact count, page labels and other cabinet plaques keep their current appearance; non-portrait/compact/landscape falls back to the original AZ rendering. The back/menu controls are unchanged.
+3. `WS16ATModularLibraryScene.kt` positions the title **22dp higher on a typical tall portrait**: `.padding(start = 66.dp, end = 66.dp, top = (top - 80.dp).coerceAtLeast(16.dp))`. It is inset 4dp further from controls on either side and shorter vertically, leaving extra clearance beneath it so book tops can be seen without moving books or changing tier/shelf dimensions.
+4. New `test_ws16bj_carved_title.py` validates carved shape/text, title-only routing, position, non-overlapping button area, unchanged spine-first paging, signature/package contract. Both GitHub QA workflows execute this source suite. `QaActualBookcaseAndroidTest.kt` additionally asserts 10 pixels of positive clearance above the upper real spine and unobstructed Back/menu hit zones in the 360×760 portrait fixture (instrumented source compilation is part of CI, actual device execution requires hardware/emulator).
+5. Default `versionCode=69`, `versionName=0.9.25-carved-library-title`; same QA package `com.playereden.gridmates.wordsearch.qa` and established public QA signing certificate. This should **install directly over v68 without uninstall**. No saved-game, puzzle rules, LAN, catalog, art asset or monetization change.
+
+## Source and verification
+
+- **Latest feature/test source at initial QA** [`8c5b54fe4606ee943c1b634a784e0af9f8f1c102`](https://github.com/PlayerEden/GridMates-Word-Search/commit/8c5b54fe4606ee943c1b634a784e0af9f8f1c102). GitHub draft [PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), branch `feature/ws14b-style-anchor-and-art-direction-2026-11-08`. Documentation-only `[skip ci]` commits after code don't alter compiled APK.
+- **Android QA** [#43335903651](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903651) — IN PROGRESS.
+- **Independent art/release isolation** [#43335903647](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903647) — IN PROGRESS.
+- **No verified v69 APK yet**. Check both workflows, repair actual failures at a new exact source SHA, and after dual-green inspect actual artifact/checksum, Android package/version/signing, unchanged artwork and release-art exclusion.
+- **Last installed v68 fallback** [GitHub ZIP artifact #13978378051](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43294624409/artifacts/13978378051); owner visually reviewed that version. Normal Android downgrades are not guaranteed to install over newer versions. Never ask to uninstall/clear saves to compare.
+
+## Initial CI result and corrective commit
+
+The first v69 Android [#43335903651](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903651) and independent art [#43335903647](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43335903647) runs reached Kotlin compilation; art run failed on one source import: `Unresolved reference 'matchParentSize'` in the new title component. The layout API is a `BoxScope` modifier, not a standalone directly imported extension. Fixed only the import list to match the established Compose pattern with `import androidx.compose.foundation.layout.*`, leaving the measured plaque, typography and book geometry unchanged.
+
+**Corrected source:** [`6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b). Current exact-source [Android QA #43336457623](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623) and [art/release #43336457635](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457635) were IN PROGRESS when recorded. Do not claim success or an available v69 APK until both final gates and package hashes are checked.
+
+## Final v69 verification receipt
+
+- **Actual compiled feature/test source:** [`6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/6bb4cc16fb6aef23f88674f1e8313c1ee4823a7b). The earlier `8c5b54fe` art build failed an incorrect standalone `matchParentSize` import; this corrected import was the *only* functional follow-up. Subsequent journal and handoff changes are `[skip ci]` documentation only.
+- **Android QA [#43336457623](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623): SUCCESS.** Source/static checks, Kotlin debug + androidTest compilation, unit tests, lint, packaged art SHA and QA package/signing verification passed.
+- **Independent debug/release QA [#43336457635](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457635): SUCCESS.** Both debug and release compiled; original QA-only assets remain excluded from release.
+- **Official standard APK ZIP [#13997661426](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457623/artifacts/13997661426)**: `GridMates-WordSearch-Android-QA`, 29,138,866-byte ZIP, SHA-256 `59630e10c6fc572384c87530fb266c8fbb577a621bc231787f50b15de8c4e060`. Extracted `app-debug.apk` to the conversation as `GridMates_WordSearch_WS16BJ_v69.apk`, **29,616,032 bytes**, SHA-256 `4264caf65e89f0e8229502b7263206ea5e861f1198e3eb534d5713b2a5bcc2bd`. Direct APK and durable GitHub artifact both delivered.
+- **Verified package/version/signing from exact CI job:** `com.playereden.gridmates.wordsearch.qa`, **versionCode=69**, versionName=`0.9.25-carved-library-title-qa`, QA signing certificate SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`, identical to v68. Install directly over v68 without uninstalling/clearing app progress.
+- **Independent artifact [#13997586644](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43336457635/artifacts/13997586644)** has ZIP SHA-256 `573b171e08f9dcad1bd63ef4bd8f6bbe84bcdded70a88c9600114564ffc8bea0`; its APK has the same size 29,616,032 bytes but archive SHA `1b26286541b140bb3e159147f3661af721927e6d1d8455adc3a14466b76393c4`. The two independently built APKs have **all 348 uncompressed file names and bytes exactly matching**. Do not claim signed APK archive bytes themselves match.
+- **Original image regression:** Compared standard v69 APK to previously installed v68; **zero changed `assets/` content bytes**. Spine, filler, cabinet, shelf and cover PNGs are preserved exactly. v69 changes only code/layout/source tests, not pixel art or gameplay data.
+- **Still open:** actual v69 on-phone title placement, carved shape aesthetics, menu/lamp clearance, real spine taps/cover preview and save retention. CI green does not establish visual approval; draft PR #131 stays unmerged, no QA-only art promoted to a production build.
+
+## Exit criteria
+
+Owner installs final signed v69 over v68, sends full Library screenshot. We should see the fitted carved title sitting higher beneath the arch, **no overlap with rounded real books**, clear text, lamp and side-control clearance, and unchanged shelf/spines/blank-books appearance. Confirm a real book still opens and saves persist. CI success is not owner visual approval; PR #131 stays draft/unmerged and QA artwork remains debug-only until explicitly accepted.

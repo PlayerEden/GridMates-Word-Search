@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs>
+<linearGradient id="paper" x2="0" y2="1"><stop stop-color="#FFF4D7"/><stop offset=".48" stop-color="#F4DCA7"/><stop offset="1" stop-color="#CDA768"/></linearGradient>
+<linearGradient id="green" x2="0" y2="1"><stop stop-color="#367C51"/><stop offset=".55" stop-color="#23573D"/><stop offset="1" stop-color="#123B2D"/></linearGradient>
+<linearGradient id="gold" x2="0" y2="1"><stop stop-color="#FFE9A2"/><stop offset=".42" stop-color="#F3BF48"/><stop offset="1" stop-color="#A66C19"/></linearGradient>
+<linearGradient id="wood" x2="0" y2="1"><stop stop-color="#E8A85E"/><stop offset=".48" stop-color="#B76E33"/><stop offset="1" stop-color="#6B371C"/></linearGradient>
+<linearGradient id="rust" x2="0" y2="1"><stop stop-color="#E89950"/><stop offset=".5" stop-color="#C46A27"/><stop offset="1" stop-color="#8B3B19"/></linearGradient>
+<linearGradient id="sky" x2="0" y2="1"><stop stop-color="#9BC7BF"/><stop offset="1" stop-color="#E6E9B4"/></linearGradient>
+<radialGradient id="shadow"><stop stop-color="#402514" stop-opacity=".34"/><stop offset="1" stop-color="#402514" stop-opacity="0"/></radialGradient>
+<linearGradient id="leaf" x2="0" y2="1"><stop stop-color="#92B65C"/><stop offset="1" stop-color="#3E713F"/></linearGradient>
+</defs>
+<ellipse cx="254" cy="437" rx="123" ry="25" fill="url(#shadow)"/>
+<path d="M170 69Q170 55 183 52L329 53Q342 55 343 69L343 423L256 366L169 424Z" fill="#5B361D" opacity=".35" transform="translate(7 8)"/>
+<path d="M168 58Q170 49 183 49L331 49Q343 50 343 63L343 409L256 352L168 410Z" fill="url(#green)" stroke="#5D391E" stroke-width="11" stroke-linejoin="round"/>
+<path d="M190 76Q254 80 322 75L322 371L257 328L189 371Z" stroke="#F5C85D" stroke-width="8" fill="none" stroke-linejoin="round"/>
+<path d="M203 94L202 352M309 94L310 352" stroke="#F8DF87" opacity=".58" stroke-width="3" stroke-dasharray="8 13"/>
+<path d="M244 302C255 247 269 210 293 148" stroke="#E9BD59" stroke-width="8" stroke-linecap="round" fill="none"/>
+<g fill="url(#gold)" stroke="#98651E" stroke-width="3">
+<path d="M262 259Q213 243 210 207Q248 204 266 245Z"/>
+<path d="M275 222Q316 200 317 174Q281 168 271 208Z"/>
+<path d="M284 185Q240 169 242 140Q278 142 291 174Z"/>
+<path d="M247 280Q209 289 198 262Q225 246 251 271Z"/>
+<path d="M296 162Q319 143 305 120Q283 125 290 156Z"/>
+</g>
+<path d="M254 114Q265 102 276 114" fill="none" stroke="#F9E69E" stroke-width="4" stroke-linecap="round"/>
+<g fill="#FFF3C3" opacity=".18"><circle cx="148" cy="218" r="3"/><circle cx="169" cy="296" r="2"/><circle cx="347" cy="144" r="2"/><circle cx="319" cy="326" r="3"/><circle cx="232" cy="105" r="2"/></g></svg>

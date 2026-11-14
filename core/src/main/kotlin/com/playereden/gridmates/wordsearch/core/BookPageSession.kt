@@ -162,7 +162,13 @@ object BookPageSessionRules {
         ))
     }
 
-    /** Independent three-step hints; never auto-finds a word or alters Solo. */
+    /**
+     * Three progressive clues *per unfound word*. Prior experimental UI
+     * exhausted all hints on a 20×20 page after four taps even when 24 words
+     * remained. There is no arbitrary page-wide quota now: at most 3 × the
+     * published target count can ever be persisted, preserving GMWS v1 bounds.
+     * Hints still never claim words or alter Solo.
+     */
     fun hint(
         catalog: BookCatalog, journal: BookPageSessionJournal,
         bookId: String, pageId: String
@@ -171,19 +177,11 @@ object BookPageSessionRules {
         val old = requireNotNull(session(journal, bookId, pageId)) { "No active page" }
         val board = puzzle(catalog, bookId, pageId)
         if (WordSearchRules.complete(board, old.foundIds)) return journal to null
-        val allowance = when {
-            board.size >= 30 -> 8
-            board.size >= 25 -> 6
-            board.size >= 20 -> 4
-            board.size >= 15 -> 3
-            else -> 2
-        }
-        if (old.hints.values.sum() >= allowance) return journal to null
         val chosen = board.targets.firstOrNull {
             it.id !in old.foundIds && (old.hints[it.id] ?: 0) in 1..2
         } ?: board.targets.firstOrNull {
             it.id !in old.foundIds && (old.hints[it.id] ?: 0) == 0
-        } ?: return journal to null
+        } ?: return journal to null // Every remaining word already has its full three hints.
         val count = old.hints[chosen.id] ?: 0
         val changed = old.copy(hints = old.hints + (chosen.id to count + 1))
         return replace(catalog, journal, changed) to chosen

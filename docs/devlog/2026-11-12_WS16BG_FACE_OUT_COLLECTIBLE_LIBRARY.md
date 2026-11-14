@@ -1,0 +1,36 @@
+# WS16BG — Front-facing physical collectible books in the Library
+
+> **Status (Nov 12, 2026):** EXACT-SOURCE DUAL-GREEN ANDROID + ART/RELEASE QA / VERIFIED SAME-SIGNED v66 APK DELIVERED / OWNER PHONE VISUAL ACCEPTANCE PENDING.
+
+## Why, who and prior version
+
+- **Owner review:** After installing [WS16BF v65](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747/artifacts/13924198630) and sharing a portrait Library screenshot, owner saw cleaner edges but tall spines still did not resemble physical books; prior feedback also called out flatness, title overlap and sparse wooden empty space. Owner asked to continue after the proposal to prioritize illustrated front covers instead of further spine polishing.
+- **Old known-good build, not visual approval:** v65 Android [#43176204747](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747) and independent art [#43176204757](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204757) both passed. v65 APK SHA-256 `73989c2f2c71931d4d6b62bfe7309ddd8496dd48ddc7e2beff1bfa2398d84921`, code65, same long-lived QA signing certificate. Physical screenshot shown but appearance not approved.
+- **Where:** Existing draft [PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), `feature/ws14b-style-anchor-and-art-direction-2026-11-08`. Do not merge or replace original art in place.
+
+## What changed (source only)
+
+1. New `WS16BGFaceOutBookBay.kt`: displays the real Woodland, Space, Garden, and future actual catalog covers on carved shelves. Uses the exact **existing WS16AE painted front cover PNGs** (same artwork as Home). Crops only their empty periphery: 480×640 original image has alpha bounds near x12–468, y65–574; render-time crop `Bitmap.createBitmap(original, 10, 63, 460, 513)` preserves every painted pixel with 2px breathing room. This addresses the previous floating-book risk caused by the 65px top/66px bottom transparent margins.
+2. A native 6dp **right-hand page edge** using an antique-paper gradient, soft shadow, and a slight ±2° planar/±5° perspective turn add physicality. This is a **narrow book thickness**, not the earlier false second spine/backing panel. The front is a single image; no fake future books or painted click regions are created.
+3. `WS16ATModularLibraryScene.kt`: opt into face-out covers only in the high-res portrait two-tier cabinet. Show **two real covers per shelf**, four per page; page only actual catalog entries. Current three volumes = Woodland + Space upper, Garden lower. Five or more books create a new real page. The existing `WS16AMSpineBay` route remains for landscape/compact/older views. Existing cabinet art, gold shelves, count plaque, and upper/secondary navigation untouched.
+4. Callbacks use `onBookSelected(book.id)`; open-the-book dialog, View pages, Solo/Daily, achievements, profiles, local saves, LAN and unlocks are not changed. Book covers are limited to existing source-backed debug art; release-only fallback is already handled by `BookArt`. No new image rights or production approvals.
+5. `QaActualBookcaseAndroidTest.kt` portrait test now checks 3 real cover tags, 2+1 placement, missing fake spines, no title collision, lower-count clearance and Garden's correct stable ID on tap.
+6. `test_ws16bg_face_out_library.py` and both Github QA workflows test original cover alpha/source geometry, render-time crop, real-only paging and Android contract. No new generated image assets or need for a binary Git upload.
+7. QA app default `versionCode=66`, `versionName=0.9.22-face-out-collectible-books`, unchanged `com.playereden.gridmates.wordsearch.qa` debug package and established QA test certificate. Intended install directly over v65; **never uninstall/reset**.
+
+**Initial implementation code commit:** [`a085a944529499c96513442634f92c1b6a061449`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a085a944529499c96513442634f92c1b6a061449).
+
+## Final verified Android v66 build receipt
+
+- **Exact compiled code/test source:** [`a085a944529499c96513442634f92c1b6a061449`](https://github.com/PlayerEden/GridMates-Word-Search/commit/a085a944529499c96513442634f92c1b6a061449). Later commits to journal/handoff have `[skip ci]` and do not alter APK contents.
+- **Android [#43187644879](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644879): SUCCESS**, including source-backed portrait-cover/paging tests, Kotlin compilation, core/app tests, lint, Android test compilation, APK assembly, packed image verifiers, unchanged test signer and Android package identity.
+- **Independent artwork/release [#43187644703](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644703): SUCCESS**, including Android debug and release compilation and debug-only art exclusion.
+- **Standard GitHub APK ZIP [artifact #13929551769](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644879/artifacts/13929551769)**: ZIP size 28,910,474 bytes, ZIP SHA-256 `199c8cb4df872f43d9c044778e68ee3ddaacc75ad0a11a9f0ee0877f0c62f87b`. ZIP contains `app-debug.apk`, extracted to conversation file `GridMates_WordSearch_WS16BG_v66.apk`, size **29,383,065 bytes**, SHA-256 `d7f31098e9bdd587a0ebbea4d2e0a652080a322c071059817731c63bed73a1ad`. Both direct APK and GitHub ZIP provided to owner.
+- **Verified Android ID from exact GitHub CI job:** `com.playereden.gridmates.wordsearch.qa`, `versionCode=66`, `versionName=0.9.22-face-out-collectible-books-qa`, same public QA certificate SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419` as v65. Intended same-app install-over without uninstall.
+- **Physical cover assets:** All three existing `ws16ae/covers/{woodland,space,garden}.png` still packaged, source-pinned. The crop is performed in Compose at runtime; **no new generated PNGs or altered source files**. Original art remains debug-only and not release-approved.
+- **Independent [art artifact #13929985979](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43187644703/artifacts/13929985979)**: ZIP SHA `9223f7b5f4d41cbcedfb53d6e3747201952bf95acedb3a8c612c53a0f6cfac9d`, Android APK SHA `4e78c14c8a5a19acd6c64ea310cc40a22a8228d760c2df42abefe21cefbdad33`. Although the APK archive hashes differ, **all 343 unpacked file entries have exactly matching names and byte contents** between both independent APKs.
+- **Owner physical testing remains open:** QA does not prove books touch carved wood convincingly, crop feels natural at owner's actual screen size, gestures/pagination work comfortably, or progress survives actual install. Prior owner-installed [v65 APK artifact #13924198630](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747/artifacts/13924198630) remains the last visually tested fallback. PR #131 remains draft/unmerged.
+
+## Next exact action
+
+Owner installs delivered v66 direct APK over v65 without uninstall and sends one full Library portrait screenshot. Visually assess front-facing cover size, title clearance, contact/page edges, page count and two-shelf composition. Tap Woodland/Space/Garden to verify stable book preview and View pages; inspect save/resume. If negative, develop a *single* targeted layout proposal based on that screenshot; don't return to endless spines or merge until the owner approves.

@@ -13,7 +13,7 @@ class NearbyCoopUiEntryTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun nearbyRoomControlsAreReachableWithoutStartingAConnection() {
-        compose.onNodeWithContentDescription("Open Nearby co-op")
+        compose.onNodeWithContentDescription("Open Together on local Wi-Fi")
             .performScrollTo().performClick()
         compose.onNodeWithText("Play Together").assertExists()
         compose.onNodeWithText("Host Co-op game").assertExists()
@@ -34,6 +34,6 @@ class NearbyCoopUiEntryTest {
         compose.onNodeWithText("Co-op").performScrollTo().performClick()
         compose.onNodeWithText("Host Co-op game").assertExists()
         compose.onNodeWithText("← Back to Play").performScrollTo().performClick()
-        compose.onNodeWithText("Continue Solo").assertExists()
+        compose.onNodeWithText("Continue").assertExists()
     }
 }

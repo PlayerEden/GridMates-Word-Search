@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
@@ -45,6 +46,29 @@ class StorybookVisualKitAndroidTest {
         compose.onNodeWithTag("storybook-mode-art").assertDoesNotExist()
         compose.onNodeWithText("Open Daily").performClick()
         compose.runOnIdle { assertEquals(1, actionCount) }
+    }
+
+    @Test fun compactLauncherHasUsableNativeActionAtLargeFontSize() {
+        var opened = 0
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
+                GridMatesTheme {
+                    Box(Modifier.width(320.dp).height(450.dp)) {
+                        StorybookQuickEntry(
+                            eyebrow = "04 · Puzzle library · QA only",
+                            title = "Puzzle Books",
+                            actionLabel = "Test Puzzle Books",
+                            onAction = { opened++ }
+                        )
+                    }
+                }
+            }
+        }
+        compose.onNodeWithTag("storybook-quick-entry").assertExists()
+        compose.onNodeWithTag("storybook-quick-action").assertIsDisplayed()
+        compose.onNodeWithTag("storybook-quick-art").assertDoesNotExist()
+        compose.onNodeWithText("Test Puzzle Books").performClick()
+        compose.runOnIdle { assertEquals(1, opened) }
     }
 
     @Test fun largeFontsKeepNativeHeaderAndActionRatherThanBakingTextIntoSprites() {

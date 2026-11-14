@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="88 53 365 395" role="img" aria-label="Watercolor woodland sprig with oak leaf, fern and tiny mushroom">
+  <defs>
+    <linearGradient id="sage" x1=".15" y1=".1" x2=".9" y2=".9"><stop stop-color="#C8D5A1"/><stop offset=".38" stop-color="#8BA36B"/><stop offset="1" stop-color="#44694E"/></linearGradient>
+    <linearGradient id="fern" x1=".1" y1=".15" x2=".93" y2="1"><stop stop-color="#A5BB86"/><stop offset=".55" stop-color="#668C65"/><stop offset="1" stop-color="#355E4A"/></linearGradient>
+    <linearGradient id="cap" x1=".15" y1=".1" x2=".85" y2=".9"><stop stop-color="#DBA06D"/><stop offset=".45" stop-color="#BE6F47"/><stop offset="1" stop-color="#8D4934"/></linearGradient>
+    <linearGradient id="stalk" x1="0" y1="0" x2="1" y2=".6"><stop stop-color="#FFF5D7"/><stop offset=".6" stop-color="#E9D6AA"/><stop offset="1" stop-color="#B99572"/></linearGradient>
+  </defs>
+  <!-- All elements are on fully transparent canvas; slight down/right paper-book ink shadow -->
+  <path d="M160 400 C207 348 222 290 236 219 S255 142 279 110" fill="none" stroke="#594D3A" stroke-opacity=".2" stroke-width="16" stroke-linecap="round" transform="translate(6 6)"/>
+  <path d="M160 400 C207 348 222 290 236 219 S255 142 279 110" fill="none" stroke="#5B6546" stroke-width="12" stroke-linecap="round"/>
+  <path d="M161 395 C200 345 223 285 236 219 S255 142 278 113" fill="none" stroke="#BEAF7B" stroke-width="3" stroke-linecap="round"/>
+  <!-- Hand-painted fernlets, left and right on a graceful stem -->
+  <g stroke="#345642" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" fill="url(#fern)">
+    <path d="M222 290 C165 274 126 242 125 215 C169 215 209 241 230 268 Q232 278 222 290 Z"/>
+    <path d="M231 267 C274 248 300 222 312 198 C270 197 238 215 231 246 Q227 257 231 267 Z"/>
+    <path d="M232 243 C180 220 155 188 158 166 C198 180 226 204 238 226 Q241 236 232 243 Z"/>
+    <path d="M242 213 C287 190 310 168 314 147 C281 151 253 169 239 194 Z"/>
+    <path d="M248 184 C214 161 202 138 208 116 C232 131 250 149 255 169 Z"/>
+    <path d="M264 149 C287 134 297 117 301 95 C279 105 264 115 258 137 Z"/>
+  </g>
+  <g fill="none" stroke="#E6E6B7" stroke-opacity=".53" stroke-width="3" stroke-linecap="round">
+    <path d="M222 279 L155 236"/><path d="M238 253 L292 213"/><path d="M235 234 L171 180"/><path d="M248 203 L301 155"/><path d="M249 173 L215 132"/>
+  </g>
+  <!-- Small single oak leaf on a diagonal twig -->
+  <path d="M230 313 Q288 296 320 255" fill="none" stroke="#806848" stroke-width="8" stroke-linecap="round"/>
+  <path d="M319 260 C303 239 312 217 322 208 C328 196 322 183 330 175 C340 168 345 180 350 179 C355 158 373 155 382 165 C386 172 378 182 382 187 C396 180 412 192 408 204 C406 212 394 213 398 223 C410 238 397 253 385 252 C371 264 344 276 319 260 Z" fill="url(#sage)" stroke="#3E6048" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M319 261 Q354 222 383 181 M344 234 l-12 -28 M360 216 l29 -11 M374 195 l3 31" fill="none" stroke="#E5E3AF" stroke-opacity=".86" stroke-width="4" stroke-linecap="round"/>
+  <!-- Tiny friendly mushroom tucked next to the botanical sprig -->
+  <path d="M323 356 Q325 338 328 330 Q341 325 350 334 L353 367 Q340 376 324 370 Z" fill="url(#stalk)" stroke="#6B634C" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M283 331 Q285 298 306 287 Q331 273 354 290 Q380 305 383 332 Q372 343 342 346 Q307 349 283 331 Z" fill="url(#cap)" stroke="#6A4938" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M292 333 Q334 350 376 332" fill="none" stroke="#F5D5A0" stroke-width="6" stroke-linecap="round"/>
+  <path d="M299 318 Q314 295 335 290" fill="none" stroke="#FFE5BD" stroke-opacity=".5" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="318" cy="310" rx="7" ry="5" fill="#F9E9C1"/><ellipse cx="348" cy="303" rx="9" ry="6" fill="#F9E9C1"/><ellipse cx="355" cy="325" rx="5" ry="4" fill="#F9E9C1"/>
+  <!-- One grounding clump; no framing decoration -->
+  <path d="M139 414 Q148 399 160 407 Q171 386 185 393 Q193 385 204 395" fill="none" stroke="#678467" stroke-width="10" stroke-linecap="round"/>
+  <path d="M146 419 Q184 427 207 402" fill="none" stroke="#766747" stroke-width="6" stroke-linecap="round" stroke-opacity=".55"/>
+</svg>

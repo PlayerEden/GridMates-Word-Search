@@ -3,6 +3,8 @@ package com.playereden.gridmates.wordsearch
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -16,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BookCatalog
+import com.playereden.gridmates.wordsearch.core.BookProgressRules
 
 /**
  * WS-11D2B: actual internal route from Library -> Book -> Page -> Book.
@@ -33,26 +36,48 @@ internal fun BookLibraryFlow(
     sessionStore: BookPageSessionStore,
     boardFontId: String,
     onExit: () -> Unit,
-    showPrototypeArt: Boolean = false
+    showPrototypeArt: Boolean = false,
+    /** Home may send an existing catalog book straight into the next safe page. */
+    initialBookId: String? = null,
+    safeContentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    var bookId by remember(catalog) { mutableStateOf<String?>(null) }
-    var pageId by remember(catalog) { mutableStateOf<String?>(null) }
+    val initialBook = initialBookId?.takeIf { catalog.book(it) != null }
+    val directFromHome = initialBook != null
+    // Reuse published book and local progress validation; a fully solved book
+    // enters details for replay/page choice instead of silently resetting.
+    val initialPage = remember(catalog, initialBook, progressStore) {
+        initialBook?.takeUnless { progressStore.blocked || sessionStore.blocked }
+            ?.let { book ->
+                runCatching {
+                    BookProgressRules.continuePage(catalog, progressStore.progress, book)
+                }.getOrNull()?.id
+            }
+    }
+    var bookId by remember(catalog, initialBook) { mutableStateOf(initialBook) }
+    var pageId by remember(catalog, initialBook) { mutableStateOf(initialPage) }
     var update by remember(catalog) { mutableIntStateOf(0) }
     var feedback by remember(catalog) { mutableStateOf<String?>(null) }
     // QA-only in-memory style choice: does NOT affect book progress or saves.
     // The owner's current preference is the more detailed Study B, while
     // keeping Study A available as an immediate, lossless visual rollback.
     var fieldNotesArt by remember(catalog) { mutableStateOf(showPrototypeArt) }
+    // WS-16F: Home is the swipe carousel; Full Library defaults to the
+    // multi-book physical bookcase instead of duplicating the Home showcase.
+    // Preview options still allow the older swipe view for QA comparison.
+    var horizontalLibrary by remember(catalog) { mutableStateOf(false) }
+    var focusedBookId by remember(catalog) {
+        mutableStateOf(catalog.books.firstOrNull()?.id)
+    }
 
     val unavailable = progressStore.blocked || sessionStore.blocked
     val snapshot = remember(update, pageId, bookId) { progressStore.progress }
 
     if (unavailable) {
         BackHandler(onBack = onExit)
-        Column(Modifier.fillMaxSize().padding(18.dp),
+        Column(Modifier.fillMaxSize().padding(safeContentPadding).padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
             TextButton(onClick = onExit) { Text("Back to Play") }
-            PaperEyebrow("Puzzle Books")
+            PaperEyebrow("Your Library")
             Text(progressStore.warning ?: sessionStore.warning
                 ?: "Book progress cannot be opened safely. Original files were preserved.")
         }
@@ -63,6 +88,7 @@ internal fun BookLibraryFlow(
         pageId != null && bookId != null -> {
             val activeBook = requireNotNull(bookId)
             val activePage = requireNotNull(pageId)
+            Box(Modifier.fillMaxSize().padding(safeContentPadding)) {
             BookPageGameplayScreen(
                 catalog = catalog,
                 bookId = activeBook,
@@ -73,8 +99,11 @@ internal fun BookLibraryFlow(
                 showPrototypeArt = showPrototypeArt,
                 fieldNotesArt = fieldNotesArt,
                 onBack = {
-                    pageId = null
-                    update++
+                    if (directFromHome) onExit()
+                    else {
+                        pageId = null
+                        update++
+                    }
                 },
                 onNextPage = { nextBook, nextPage ->
                     if (nextBook == activeBook &&
@@ -84,11 +113,14 @@ internal fun BookLibraryFlow(
                     }
                 }
             )
+            }
         }
         bookId != null -> {
-            BackHandler { bookId = null }
+            BackHandler {
+                if (directFromHome) onExit() else bookId = null
+            }
             val currentBook = requireNotNull(bookId)
-            Column(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().padding(safeContentPadding)) {
                 if (feedback != null) {
                     Text(feedback.orEmpty(), modifier = Modifier.padding(12.dp))
                 }
@@ -96,7 +128,10 @@ internal fun BookLibraryFlow(
                     catalog = catalog,
                     progress = snapshot,
                     bookId = currentBook,
-                    onBack = { bookId = null; feedback = null },
+                    onBack = {
+                        if (directFromHome) onExit()
+                        else { bookId = null; feedback = null }
+                    },
                     onPlayPage = { selectedBook, selectedPage ->
                         if (selectedBook == currentBook &&
                             catalog.page(selectedBook, selectedPage) != null) {
@@ -130,7 +165,14 @@ internal fun BookLibraryFlow(
                 onToggleArt = if (showPrototypeArt) {
                     { fieldNotesArt = !fieldNotesArt }
                 } else null,
+                showHorizontalBrowser = horizontalLibrary,
+                onToggleLayout = if (showPrototypeArt) {
+                    { horizontalLibrary = !horizontalLibrary }
+                } else null,
+                initialFocusedBookId = focusedBookId,
+                onFocusedBookChanged = { focusedBookId = it },
                 onBack = onExit,
+                safeContentPadding = safeContentPadding,
                 onOpenBook = { selectedBook ->
                     if (catalog.book(selectedBook) != null) {
                         bookId = selectedBook

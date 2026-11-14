@@ -1,0 +1,81 @@
+{
+  "schema": "ws16as.modular-art.v1",
+  "source_sheet_sha256": "c1e42abaaef55b05aba8493637e3bc702376fd4078bd07699c504f1a21941264",
+  "source_dimensions": [
+    1017,
+    1547
+  ],
+  "bookcase_assembled_dimensions": [
+    602,
+    1120
+  ],
+  "original_kit_sha256": "db91d99ed5e2f628dcd1e7244f64f1c30e891f57b891324a5021d797a258d8ee",
+  "qa_candidate": true,
+  "on_device_tested": false,
+  "books_baked_into_shell": false,
+  "shelves_baked_into_shell": false,
+  "plaques_baked_into_shell": false,
+  "ui_text_baked_into_shell": false,
+  "shell_parts": {
+    "top_crown": {
+      "filename": "assets/shell/top_crown.png",
+      "source_crop": [
+        0,
+        0,
+        602,
+        198
+      ],
+      "width": 602,
+      "height": 198,
+      "sha256": "c4365f20bf839e504cd5828fdacf2f89187a4770c72911e955de1a7b3ccebc63"
+    },
+    "left_pilaster": {
+      "filename": "assets/shell/left_pilaster.png",
+      "source_crop": [
+        0,
+        198,
+        126,
+        1012
+      ],
+      "width": 126,
+      "height": 814,
+      "sha256": "caea09cae3e4114b99fa6fd7c8b9a3d736471b389864b9efb28b8c2f58d21dd9"
+    },
+    "recessed_backboard": {
+      "filename": "assets/shell/recessed_backboard.png",
+      "source_crop": [
+        126,
+        198,
+        482,
+        1012
+      ],
+      "width": 356,
+      "height": 814,
+      "sha256": "6d63a53556cbc8ae7059418d8210ca79796becfa7e8642b217debca696c17c64"
+    },
+    "right_pilaster": {
+      "filename": "assets/shell/right_pilaster.png",
+      "source_crop": [
+        482,
+        198,
+        602,
+        1012
+      ],
+      "width": 120,
+      "height": 814,
+      "sha256": "843346dca3c6f711bd5d2d55076e664bcece16131a17efbffb27d996434a9e98"
+    },
+    "bottom_base": {
+      "filename": "assets/shell/bottom_base.png",
+      "source_crop": [
+        0,
+        1012,
+        602,
+        1120
+      ],
+      "width": 602,
+      "height": 108,
+      "sha256": "1192023c1f02efd042a4e75fc5d3ec56a45bdff6f573c741a0a0f0b0112578a2"
+    }
+  }
+}

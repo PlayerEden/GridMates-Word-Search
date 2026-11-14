@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs>
+<linearGradient id="paper" x2="0" y2="1"><stop stop-color="#FFF4D7"/><stop offset=".48" stop-color="#F4DCA7"/><stop offset="1" stop-color="#CDA768"/></linearGradient>
+<linearGradient id="green" x2="0" y2="1"><stop stop-color="#367C51"/><stop offset=".55" stop-color="#23573D"/><stop offset="1" stop-color="#123B2D"/></linearGradient>
+<linearGradient id="gold" x2="0" y2="1"><stop stop-color="#FFE9A2"/><stop offset=".42" stop-color="#F3BF48"/><stop offset="1" stop-color="#A66C19"/></linearGradient>
+<linearGradient id="wood" x2="0" y2="1"><stop stop-color="#E8A85E"/><stop offset=".48" stop-color="#B76E33"/><stop offset="1" stop-color="#6B371C"/></linearGradient>
+<linearGradient id="rust" x2="0" y2="1"><stop stop-color="#E89950"/><stop offset=".5" stop-color="#C46A27"/><stop offset="1" stop-color="#8B3B19"/></linearGradient>
+<linearGradient id="sky" x2="0" y2="1"><stop stop-color="#9BC7BF"/><stop offset="1" stop-color="#E6E9B4"/></linearGradient>
+<radialGradient id="shadow"><stop stop-color="#402514" stop-opacity=".34"/><stop offset="1" stop-color="#402514" stop-opacity="0"/></radialGradient>
+<linearGradient id="leaf" x2="0" y2="1"><stop stop-color="#92B65C"/><stop offset="1" stop-color="#3E713F"/></linearGradient>
+</defs>
+<ellipse cx="264" cy="438" rx="195" ry="28" fill="url(#shadow)"/>
+<g transform="rotate(-15 182 263)">
+<rect x="85" y="119" width="216" height="270" rx="12" fill="url(#wood)" stroke="#74411D" stroke-width="12"/>
+<rect x="113" y="150" width="162" height="213" fill="#FBE7B7" stroke="url(#gold)" stroke-width="8"/>
+<rect x="128" y="167" width="132" height="177" fill="url(#sky)"/>
+<path d="M128 291L167 235L205 287L233 249L260 293V344H128Z" fill="#477B54"/><path d="M128 332Q191 306 259 339V345H128Z" fill="#A5B86C"/>
+</g>
+<g transform="rotate(8 315 265)">
+<rect x="206" y="90" width="224" height="289" rx="13" fill="url(#wood)" stroke="#6C3C1D" stroke-width="13"/>
+<rect x="236" y="119" width="164" height="229" fill="#FFE9BC" stroke="url(#gold)" stroke-width="9"/>
+<rect x="249" y="136" width="139" height="197" fill="url(#sky)"/>
+<circle cx="346" cy="189" r="26" fill="#F9D879"/>
+<path d="M248 293L280 251L310 281L342 228L388 291V332H248Z" fill="#608A66"/>
+<path d="M249 318Q295 280 345 315Q368 300 389 312V333H249Z" fill="#B2BE7F"/>
+</g>
+<path d="M151 406Q121 380 119 357Q158 359 168 397Z" fill="url(#leaf)" stroke="#436E37" stroke-width="6"/>
+<path d="M176 416Q186 374 206 366Q222 396 194 418Z" fill="url(#leaf)" stroke="#436E37" stroke-width="6"/>
+<path d="M413 401Q442 370 459 394Q454 421 411 420Z" fill="url(#leaf)" stroke="#436E37" stroke-width="6"/></svg>

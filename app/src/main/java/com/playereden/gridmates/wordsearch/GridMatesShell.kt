@@ -3,8 +3,12 @@ package com.playereden.gridmates.wordsearch
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,8 +26,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,8 +37,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -54,86 +56,34 @@ import com.playereden.gridmates.wordsearch.core.SoloProgressRules
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
 
 private enum class Page(val label: String) {
-    PLAY("Play"), BOOKS_QA("Books QA"), ART_LAB("Art Lab"), RECORDS("Records"), COLLECTION("Collection"),
+    PLAY("Play"), PROFILE("Profile"), BOOKS_QA("Books QA"), ART_LAB("Art Lab"), RECORDS("Records"), COLLECTION("Collection"),
     SETTINGS("Settings"), HELP("Help"), NEARBY("Nearby"), PUZZLE("Puzzle"), DAILY("Daily"), DAILY_PUZZLE("Daily Puzzle"),
     MY_PUZZLES("My Puzzles"), SOLO_SETUP("New Puzzle")
 }
 
 @Composable
-private fun GridMatesNavGlyph(page: Page, selected: Boolean) {
-    val ink = if (selected) Forest else Muted
-    Canvas(Modifier.size(22.dp)) {
-        val w = size.width
-        val h = size.height
-        val stroke = 2.dp.toPx()
-        when (page) {
-            Page.PLAY -> {
-                val roof = Path().apply {
-                    moveTo(w * 0.12f, h * 0.46f)
-                    lineTo(w * 0.50f, h * 0.14f)
-                    lineTo(w * 0.88f, h * 0.46f)
-                }
-                drawPath(roof, ink, style = Stroke(width = stroke,
-                    cap = StrokeCap.Round, join = StrokeJoin.Round))
-                drawRect(ink, topLeft = Offset(w * 0.24f, h * 0.46f),
-                    size = Size(w * 0.52f, h * 0.40f),
-                    style = Stroke(width = stroke))
-            }
-            Page.RECORDS -> {
-                for (i in 0..2) {
-                    val barHeight = h * (0.25f + i * 0.20f)
-                    drawRoundRect(ink,
-                        topLeft = Offset(w * (0.13f + i * 0.27f), h * 0.89f - barHeight),
-                        size = Size(w * 0.16f, barHeight),
-                        cornerRadius = CornerRadius(stroke * 0.5f))
-                }
-            }
-            Page.COLLECTION -> {
-                for (row in 0..1) for (col in 0..1) {
-                    drawRoundRect(ink,
-                        topLeft = Offset(w * (0.16f + col * 0.39f),
-                            h * (0.16f + row * 0.39f)),
-                        size = Size(w * 0.28f, h * 0.28f),
-                        cornerRadius = CornerRadius(stroke),
-                        style = Stroke(width = stroke))
-                }
-            }
-            Page.SETTINGS -> {
-                drawCircle(ink, radius = w * 0.29f, style = Stroke(width = stroke))
-                drawCircle(ink, radius = w * 0.11f)
-                for (i in 0..7) {
-                    val angle = i * Math.PI / 4.0
-                    val dx = kotlin.math.cos(angle).toFloat()
-                    val dy = kotlin.math.sin(angle).toFloat()
-                    drawLine(ink,
-                        Offset(w * 0.5f + dx * w * 0.33f, h * 0.5f + dy * h * 0.33f),
-                        Offset(w * 0.5f + dx * w * 0.44f, h * 0.5f + dy * h * 0.44f),
-                        strokeWidth = stroke, cap = StrokeCap.Round)
-                }
-            }
-            else -> Unit
-        }
-    }
-}
-
-@Composable
 internal fun GridMatesShell(
     soloStore: SoloStore, nearbyRooms: NearbyRoomViewModel,
-    qaBookshelf: QaBookshelfRuntime? = null
+    qaBookshelf: QaBookshelfRuntime? = null,
+    displayMode: DisplayMode = DisplayMode.STANDARD,
+    onDisplayModeChange: (DisplayMode) -> Unit = {}
 ) {
     val context = LocalContext.current
     val defaultQaRuntime = remember(context) { QaBookshelfRuntime(context) }
     val qa = qaBookshelf ?: defaultQaRuntime
+    var devOverlay by remember(context) { mutableStateOf(GridMatesDevTools.load(context)) }
     var pageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
+    var homeFocusedBookId by rememberSaveable { mutableStateOf<String?>(null) }
+    var homeBookIntent by rememberSaveable { mutableStateOf<String?>(null) }
     var soloSetupReturnPage by rememberSaveable { mutableStateOf(Page.PLAY.name) }
+    // Profile-origin sections should return to Profile; Menu-origin sections to Home.
+    var sectionReturnPageName by rememberSaveable { mutableStateOf(Page.PLAY.name) }
     fun openSoloSetup(origin: Page) {
         if (origin == Page.PUZZLE) soloStore.flush()
         soloSetupReturnPage = origin.name
         pageName = Page.SOLO_SETUP.name
     }
     val page = Page.entries.firstOrNull { it.name == pageName } ?: Page.PLAY
-    val compactNavigation = LocalConfiguration.current.screenWidthDp < 360 ||
-        LocalDensity.current.fontScale >= 1.5f
     // A new page must start from its top, not inherit the previous tab's
     // scroll offset and appear mysteriously halfway down.
     val pageScroll = remember(page) { ScrollState(0) }
@@ -146,42 +96,31 @@ internal fun GridMatesShell(
         pageName = when (page) {
             Page.DAILY_PUZZLE -> Page.DAILY.name
             Page.SOLO_SETUP -> soloSetupReturnPage
+            Page.COLLECTION, Page.RECORDS -> sectionReturnPageName
             else -> Page.PLAY.name
         }
     }
 
-    Scaffold(
-        containerColor = Cream,
-        bottomBar = {
-            if (page != Page.PUZZLE && page != Page.DAILY_PUZZLE &&
-                page != Page.NEARBY && page != Page.SOLO_SETUP &&
-                page != Page.BOOKS_QA && page != Page.ART_LAB) NavigationBar(containerColor = Paper) {
-                Page.entries.filter {
-                    it == Page.PLAY || it == Page.RECORDS ||
-                        it == Page.COLLECTION || it == Page.SETTINGS
-                }.forEach { item ->
-                    NavigationBarItem(
-                        modifier = Modifier.semantics {
-                            contentDescription = "Open " + item.label
-                        },
-                        selected = item == page,
-                        onClick = { pageName = item.name },
-                        icon = { GridMatesNavGlyph(item, item == page) },
-                        label = {
-                            val shortLabel = when (item) {
-                                Page.RECORDS -> "Stats"
-                                Page.COLLECTION -> "Items"
-                                Page.SETTINGS -> "Setup"
-                                else -> "Play"
-                            }
-                            Text(if (compactNavigation) shortLabel else item.label,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                    )
-                }
-            }
-        }
-    ) { contentPadding ->
+    // WS-16C: Profile/Menu own the secondary destinations. No duplicate footer.
+    // GM_SHARED: quiet, flexible paper behind every native screen.
+    BoxWithConstraints(Modifier.fillMaxSize().qaObserveTouches()) {
+        // WS-16N: use spare height rather than shrinking the book. Short
+        // displays and enlarged text retain natural scrolling.
+        val compactHome = page == Page.PLAY &&
+            displayMode == DisplayMode.FULLSCREEN &&
+            maxHeight >= 690.dp && maxHeight < 960.dp &&
+            LocalDensity.current.fontScale < 1.30f
+        GridMatesParchmentBackground()
+        // WS-16I: purely decorative Home foliage, behind the transparent
+        // Scaffold. Neither icons, live copy nor touch regions are obscured.
+        if (page == Page.PLAY) Ws16IHomeEdgeDecor(displayMode)
+        Scaffold(
+            containerColor = androidx.compose.ui.graphics.Color.Transparent,
+            // Standard respects visible bars/cutout; fullscreen also reserves
+            // critical system-gesture edges even when bars themselves are hidden.
+            contentWindowInsets = if (displayMode == DisplayMode.FULLSCREEN)
+                WindowInsets.safeGestures else WindowInsets.safeDrawing
+        ) { contentPadding ->
         if (page == Page.NEARBY) {
             Box(Modifier.fillMaxSize().padding(contentPadding)) {
                 NearbyCoopScreen(soloStore, nearbyRooms, onBack = {
@@ -194,14 +133,19 @@ internal fun GridMatesShell(
             val progressStore = qa.progressStore
             val sessionStore = qa.sessionStore
             if (progressStore != null && sessionStore != null) {
-                Box(Modifier.fillMaxSize().padding(contentPadding)) {
+                Box(Modifier.fillMaxSize()) {
                     BookLibraryFlow(
                         catalog = qa.catalog,
                         progressStore = progressStore,
                         sessionStore = sessionStore,
                         boardFontId = soloStore.effectiveBoardFontId,
-                        onExit = { pageName = Page.PLAY.name },
-                        showPrototypeArt = qa.enabled
+                        onExit = {
+                            homeBookIntent = null
+                            pageName = Page.PLAY.name
+                        },
+                        showPrototypeArt = qa.enabled,
+                        safeContentPadding = contentPadding,
+                        initialBookId = homeBookIntent
                     )
                 }
             } else {
@@ -221,7 +165,10 @@ internal fun GridMatesShell(
                         pageName = if (page == Page.DAILY_PUZZLE)
                             Page.DAILY.name else Page.PLAY.name
                     },
-                    onRecords = { pageName = Page.RECORDS.name },
+                    onRecords = {
+                        sectionReturnPageName = Page.PLAY.name
+                        pageName = Page.RECORDS.name
+                    },
                     onNewPuzzle = if (page == Page.DAILY_PUZZLE) null
                         else { { openSoloSetup(Page.PUZZLE) } }
                 )
@@ -231,23 +178,88 @@ internal fun GridMatesShell(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .verticalScroll(pageScroll)
-                .padding(horizontal = 18.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                 .padding(horizontal = 18.dp, vertical = when {
+                    compactHome -> 3.dp
+                    page == Page.PLAY -> 6.dp
+                    else -> 20.dp
+                }),
+            verticalArrangement = Arrangement.spacedBy(when {
+                compactHome -> 3.dp
+                page == Page.PLAY -> 6.dp
+                else -> 16.dp
+            })
         ) {
+            if (page == Page.RECORDS || page == Page.COLLECTION ||
+                page == Page.SETTINGS) {
+                val target = if (page == Page.RECORDS || page == Page.COLLECTION)
+                    sectionReturnPageName else Page.PLAY.name
+                Ws15BackHeader(
+                    title = page.label,
+                    onBack = { pageName = target },
+                    backLabel = if (target == Page.PROFILE.name)
+                        "Back to Profile" else "Back to Home"
+                )
+            }
             when (page) {
-                Page.PLAY -> HomeScreen(soloStore,
-                    onHelp = { pageName = Page.HELP.name },
-                    onSolo = { pageName = Page.PUZZLE.name },
-                    onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
-                    onNewSolo = { openSoloSetup(Page.PLAY) },
-                    onDaily = { pageName = Page.DAILY.name },
-                    onNearby = { pageName = Page.NEARBY.name },
-                    onQaBooks = if (qa.enabled) {
-                        { pageName = Page.BOOKS_QA.name }
-                    } else null,
-                    onArtLab = if (qa.enabled) {
-                        { pageName = Page.ART_LAB.name }
-                    } else null)
+                Page.PROFILE -> Ws16CProfileHub(
+                    store = soloStore,
+                    onHome = { pageName = Page.PLAY.name },
+                    onCollection = {
+                        sectionReturnPageName = Page.PROFILE.name
+                        pageName = Page.COLLECTION.name
+                    },
+                    onRecords = {
+                        sectionReturnPageName = Page.PROFILE.name
+                        pageName = Page.RECORDS.name
+                    },
+                    onMyPuzzles = { pageName = Page.MY_PUZZLES.name }
+                )
+                Page.PLAY -> {
+                    val booksAvailable = qa.enabled &&
+                        qa.progressStore != null && qa.sessionStore != null &&
+                        qa.progressStore?.blocked == false &&
+                        qa.sessionStore?.blocked == false
+                    Ws16HomeScreen(
+                        store = soloStore,
+                        catalog = if (booksAvailable) qa.catalog else null,
+                        bookProgress = if (booksAvailable) qa.progressStore?.progress else null,
+                        initialFocusedBookId = homeFocusedBookId,
+                        onFocusedBookChanged = { homeFocusedBookId = it },
+                        onPlayBook = { book ->
+                            if (booksAvailable && qa.catalog.book(book) != null) {
+                                homeFocusedBookId = book
+                                homeBookIntent = book
+                                pageName = Page.BOOKS_QA.name
+                            }
+                        },
+                        onFullShelf = {
+                            if (booksAvailable) {
+                                homeBookIntent = null
+                                pageName = Page.BOOKS_QA.name
+                            }
+                        },
+                        onCollection = {
+                            sectionReturnPageName = Page.PLAY.name
+                            pageName = Page.COLLECTION.name
+                        },
+                        onProfile = { pageName = Page.PROFILE.name },
+                        onSettings = { pageName = Page.SETTINGS.name },
+                        onRecords = {
+                            sectionReturnPageName = Page.PLAY.name
+                            pageName = Page.RECORDS.name
+                        },
+                        onHelp = { pageName = Page.HELP.name },
+                        onSolo = { pageName = Page.PUZZLE.name },
+                        onMyPuzzles = { pageName = Page.MY_PUZZLES.name },
+                        onNewSolo = { openSoloSetup(Page.PLAY) },
+                        onDaily = { pageName = Page.DAILY.name },
+                        onNearby = { pageName = Page.NEARBY.name },
+                        showQuickPlayPreview = qa.enabled,
+                        displayMode = displayMode,
+                        onDisplayModeChange = onDisplayModeChange,
+                        compactHome = compactHome
+                    )
+                }
                 Page.MY_PUZZLES -> SavedSoloScreen(soloStore,
                     onBack = { pageName = Page.PLAY.name },
                     onNewSolo = { openSoloSetup(Page.MY_PUZZLES) },
@@ -267,9 +279,33 @@ internal fun GridMatesShell(
                     onBack = { pageName = Page.PLAY.name })
                 Page.RECORDS -> SoloRecordsScreen(soloStore.profile)
                 Page.COLLECTION -> CollectionScreen(soloStore)
-                Page.SETTINGS -> SoloSettingsScreen(soloStore)
+                Page.SETTINGS -> {
+                    SoloSettingsScreen(
+                        soloStore,
+                        onPreviewArtwork = if (qa.enabled) {
+                            { pageName = Page.ART_LAB.name }
+                        } else null,
+                        displayMode = displayMode,
+                        onDisplayModeChange = onDisplayModeChange
+                    )
+                    if (GridMatesDevTools.available) {
+                        GridMatesDevTools.Controls(devOverlay) { changed ->
+                            devOverlay = changed
+                            GridMatesDevTools.save(context, changed)
+                        }
+                    }
+                }
                 Page.HELP -> HelpScreen(onBack = { pageName = Page.PLAY.name })
             }
+        }
+        }
+        // Painted last, but with no pointer target or hitbox:
+        // existing menu clicks, book swipes and Android Back keep working.
+        if (GridMatesDevTools.available) {
+            GridMatesDevTools.Overlay(
+                flags = devOverlay,
+                home = page == Page.PLAY
+            )
         }
     }
 }
@@ -293,8 +329,7 @@ private fun Heading(eyebrow: String, heading: String) {
 private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
     onMyPuzzles: () -> Unit, onNewSolo: () -> Unit,
     onDaily: () -> Unit, onNearby: () -> Unit,
-    onQaBooks: (() -> Unit)? = null,
-    onArtLab: (() -> Unit)? = null) {
+    onQaBooks: (() -> Unit)? = null) {
     val run = store.profile.active
     val puzzle = remember(run.puzzleId) { SoloProgressRules.puzzle(run) }
     val finished = WordSearchRules.complete(puzzle, run.foundIds)
@@ -325,7 +360,12 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
         Row(Modifier.fillMaxWidth(),
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
-            PaperEyebrow("01 · Solo")
+            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Ws15ModeEmblem(Ws15ModeGlyph.SOLO,
+                    Modifier.testTag("ws15-solo-mode-icon"))
+                PaperEyebrow("01 · Solo")
+            }
             if (!finished) TextButton(onClick = onNewSolo) {
                 Text("New puzzle")
             }
@@ -351,64 +391,31 @@ private fun HomeScreen(store: SoloStore, onHelp: () -> Unit, onSolo: () -> Unit,
         }
     }
 
-    PaperPanel(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                PaperEyebrow("02 · A little every day")
-                Text("Daily puzzle", style = MaterialTheme.typography.titleSmall,
-                    color = Forest, fontWeight = FontWeight.SemiBold, maxLines = 2)
-            }
-            Button(onClick = onDaily) { Text("Open Daily", maxLines = 1) }
-        }
-    }
+    StorybookQuickEntry(
+        eyebrow = "02 · Daily",
+        title = "Daily puzzle",
+        actionLabel = "Open Daily",
+        onAction = onDaily,
+        modeGlyph = Ws15ModeGlyph.DAILY
+    )
 
-    PaperPanel(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                PaperEyebrow("03 · Together is better")
-                Text("Same Wi-Fi", style = MaterialTheme.typography.titleSmall,
-                    color = Forest, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            }
-            Button(onClick = onNearby, modifier = Modifier.semantics {
-                contentDescription = "Open Nearby co-op"
-            }) {
-                Text("Play Together", maxLines = 2)
-            }
-        }
-    }
+    StorybookQuickEntry(
+        eyebrow = "03 · Together",
+        title = "Same Wi-Fi",
+        actionLabel = "Play Together",
+        actionDescription = "Open Nearby co-op",
+        onAction = onNearby,
+        modeGlyph = Ws15ModeGlyph.TOGETHER
+    )
 
     if (onQaBooks != null) {
-        PaperPanel(Modifier.fillMaxWidth()) {
-            PaperEyebrow("04 · DEVELOPMENT PREVIEW · NOT FINAL CONTENT")
-            Text("Puzzle Books — TEST ONLY", color = Forest,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold)
-            Text("Try Woodland, Space and Garden test books. " +
-                "Your ordinary Solo and Daily games are separate.",
-                color = Muted, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onQaBooks,
-                modifier = Modifier.fillMaxWidth().height(48.dp)) {
-                Text("Test Puzzle Books")
-            }
-        }
-    }
-
-    if (onArtLab != null) {
-        PaperPanel(Modifier.fillMaxWidth()) {
-            PaperEyebrow("05 · ART STUDY · NOT FINAL ARTWORK")
-            Text("Library Art Lab — TEST ONLY", color = Forest,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold)
-            Text("Compare Woodland, Space and Garden book covers, spines, " +
-                "emblems, chapter markers and rewards. Original books remain unchanged.",
-                color = Muted, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onArtLab,
-                modifier = Modifier.fillMaxWidth().height(48.dp)) {
-                Text("View Library Artwork")
-            }
-        }
+        StorybookQuickEntry(
+            eyebrow = "04 · Books",
+            title = "Puzzle Books",
+            actionLabel = "Explore books",
+            onAction = onQaBooks,
+            modeGlyph = Ws15ModeGlyph.BOOKS
+        )
     }
 
     TextButton(onClick = onHelp, modifier = Modifier.fillMaxWidth()) {

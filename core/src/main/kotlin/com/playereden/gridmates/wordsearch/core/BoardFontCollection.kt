@@ -22,7 +22,7 @@ data class BoardFontProgress(
  * kept as a small Android device preference, not part of the puzzle seed.
  */
 object BoardFontCollection {
-    const val DEFAULT_ID = "atkinson"
+    const val DEFAULT_ID = GridMatesTypographyRoles.BOARD_STARTER
 
     val definitions: List<BoardFontDefinition> = listOf(
         BoardFontDefinition("atkinson", "Readable Print",
@@ -35,6 +35,19 @@ object BoardFontCollection {
             "Friendly handwriting for a paper-puzzle mood.", "one_daily")
     )
     private val byId = definitions.associateBy { it.id }
+
+    /** Cosmetic unlocks never include the two permanent brand typefaces. */
+    val unlockableFontIds: Set<String> = definitions
+        .filter { it.requiredAchievementId != null }
+        .map { it.id }
+        .toSet()
+
+    init {
+        require(definitions.any { it.id == DEFAULT_ID && it.requiredAchievementId == null })
+        require(unlockableFontIds.intersect(GridMatesTypographyRoles.brandFontIds).isEmpty()) {
+            "Never offer a GridMates identity font as a board achievement unlock"
+        }
+    }
 
     fun unlocked(profile: SoloProfile): Set<String> {
         val earned = WordSearchAchievements.progress(profile)

@@ -14,13 +14,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -28,6 +35,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -35,6 +43,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BookCatalog
 import com.playereden.gridmates.wordsearch.core.BookLibraryProgress
@@ -42,9 +51,10 @@ import com.playereden.gridmates.wordsearch.core.BookProgressRules
 import com.playereden.gridmates.wordsearch.core.PuzzleBook
 
 /**
- * WS-13A. Actual book objects standing on wooden shelves, rather than cards.
- * Rows stay lazy for a growing catalog. No invented empty/locked books.
- * Opt-in QA-only until content and artwork have been approved.
+ * WS-16H1: A real, expandable spine-out bookcase instead of another cover gallery.
+ * No synthetic books or fake locked volume placeholders. Additional rows appear
+ * only as the real catalog grows; one additional empty shelf is physical scenery.
+ * Selection previews the existing cover and then routes through real book details.
  */
 @Composable
 internal fun BookcaseBookshelfScreen(
@@ -54,186 +64,283 @@ internal fun BookcaseBookshelfScreen(
     onOpenBook: (String) -> Unit,
     fieldNotesArt: Boolean,
     onToggleArt: (() -> Unit)?,
-    modifier: Modifier = Modifier
+    onToggleLayout: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    safeContentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     BoxWithConstraints(modifier.fillMaxSize().testTag("real-bookcase-screen")) {
         val fontScale = LocalDensity.current.fontScale
-        val columns = when {
-            maxWidth < 310.dp || fontScale >= 1.65f -> 1
-            maxWidth >= 700.dp && fontScale <= 1.25f -> 3
-            else -> 2
+        val slotWidth = if (fontScale >= 1.65f) 54.dp else 48.dp
+        val slotsPerShelf = ((maxWidth - 46.dp).value / slotWidth.value)
+            .toInt().coerceIn(1, 16)
+        val capacity = slotsPerShelf * 2
+        val pageCount = maxOf(1, (catalog.books.size + capacity - 1) / capacity)
+        val pager = rememberPagerState(pageCount = { pageCount })
+        val scope = rememberCoroutineScope()
+        var selectedBookId by rememberSaveable { mutableStateOf<String?>(null) }
+        var previewToolsOpen by remember { mutableStateOf(false) }
+        // QA-only empty-background inspection; regular books are one tap away.
+        var emptyCabinetPreview by rememberSaveable { mutableStateOf(false) }
+        // Keep the working WS16AI bookcase as a manually selectable QA rollback.
+        var immersiveBooksPreview by rememberSaveable { mutableStateOf(true) }
+        val context = LocalContext.current
+        // Only the verified five-piece QA art can enable this experiment.
+        // When available, show it first for immediate phone review; the old
+        // illustrated case remains one tap away from the top QA escape.
+        val modularAssetsAvailable = remember(context) {
+            hasWs16atCabinetArt(context)
         }
-        val rows = catalog.books.chunked(columns)
+        var modularPreview by rememberSaveable(modularAssetsAvailable) {
+            mutableStateOf(modularAssetsAvailable)
+        }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().testTag("bookcase-lazy-shelves"),
-            contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(17.dp)
-        ) {
-            item(key = "bookshelf-title") {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                        Text("Back to Play")
+        if (fieldNotesArt && modularPreview && modularAssetsAvailable) {
+            WS16ATModularLibraryScene(
+                books = catalog.books,
+                onBack = onBack,
+                onBookSelected = { selectedBookId = it },
+                onPreviousArt = { modularPreview = false },
+                safeContentPadding = safeContentPadding,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else if (fieldNotesArt && immersiveBooksPreview) {
+            WS16AMInteractiveBookcaseScene(
+                books = catalog.books,
+                onBack = onBack,
+                onBookSelected = { selectedBookId = it },
+                onInspectEmpty = {
+                    immersiveBooksPreview = false
+                    emptyCabinetPreview = true
+                },
+                onOldCase = {
+                    immersiveBooksPreview = false
+                    emptyCabinetPreview = false
+                },
+                onModularCase = if (modularAssetsAvailable) {
+                    { modularPreview = true }
+                } else null,
+                modifier = Modifier.fillMaxSize().padding(safeContentPadding)
+            )
+        } else if (fieldNotesArt && emptyCabinetPreview) {
+            WS16ALImmersiveEmptyLibraryScene(
+                bookCount = catalog.books.size,
+                onBack = onBack,
+                onShowBooks = {
+                    immersiveBooksPreview = true
+                    emptyCabinetPreview = false
+                },
+                onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
+                    { previewToolsOpen = true }
+                } else null,
+                modifier = Modifier.fillMaxSize().padding(safeContentPadding)
+            )
+        } else {
+        Column(Modifier.fillMaxSize().padding(safeContentPadding).padding(horizontal = 6.dp, vertical = 7.dp)) {
+            Ws15BackHeader(
+                title = "Your Library",
+                subtitle = "Browse your puzzle books",
+                onBack = onBack,
+                backLabel = "Back to Play",
+                onPreviewOptions = if (onToggleLayout != null || onToggleArt != null) {
+                    { previewToolsOpen = true }
+                } else null
+            )
+            if (fieldNotesArt) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (emptyCabinetPreview) "Inspect the empty bookcase artwork"
+                        else "Tap a spine to pull out a book.",
+                        style = MaterialTheme.typography.bodyMedium, color = Muted,
+                        modifier = Modifier.weight(1f).padding(start = 12.dp))
+                    TextButton(
+                        onClick = { emptyCabinetPreview = !emptyCabinetPreview },
+                        modifier = Modifier.heightIn(min = 48.dp)
+                            .testTag("bookcase-empty-background-preview")
+                    ) { Text(if (emptyCabinetPreview) "Show books" else "Empty art") }
+                    TextButton(
+                        onClick = {
+                            immersiveBooksPreview = true
+                            emptyCabinetPreview = false
+                        },
+                        modifier = Modifier.testTag("ws16am-return-to-immersive")
+                    ) { Text("New case") }
+                }
+            } else {
+                Text("Tap a spine to pull out a book.",
+                    style = MaterialTheme.typography.bodyMedium, color = Muted,
+                    modifier = Modifier.padding(start = 12.dp, bottom = 4.dp))
+            }
+            HorizontalPager(
+                state = pager,
+                modifier = Modifier.fillMaxWidth().weight(1f)
+                    .testTag("bookcase-lazy-shelves")
+            ) { page ->
+                val first = page * capacity
+                val pageBooks = catalog.books.drop(first).take(capacity)
+                BoxWithConstraints(Modifier.fillMaxSize()
+                    .testTag("bookcase-page-$page")) {
+                    if (fieldNotesArt && emptyCabinetPreview) {
+                        // WS16AK: six source-exact wood modules, no baked book art or
+                        // clickable catalog objects in this controlled visual study.
+                        WS16AKEmptyBookcaseBackground(Modifier.fillMaxSize())
+                    } else {
+                    BookcaseWoodParts(Modifier.fillMaxSize(), fieldNotesArt)
+                    val tierHeight = (maxHeight - 65.dp).coerceAtLeast(100.dp) / 2
+                    Column(Modifier.fillMaxSize()
+                        .padding(start = 8.dp, end = 8.dp, top = 43.dp, bottom = 20.dp),
+                        verticalArrangement = Arrangement.SpaceBetween) {
+                        SpineOutShelfRow(page * 2, pageBooks.take(slotsPerShelf),
+                            slotsPerShelf, slotWidth, tierHeight, fieldNotesArt,
+                            onSelect = { selectedBookId = it })
+                        SpineOutShelfRow(page * 2 + 1, pageBooks.drop(slotsPerShelf),
+                            slotsPerShelf, slotWidth, tierHeight, fieldNotesArt,
+                            onSelect = { selectedBookId = it })
                     }
-                    StorybookHeading(
-                        eyebrow = "GridMates · Puzzle Library",
-                        title = "Puzzle Books",
-                        subtitle = "Your bookshelf · Choose a book to open."
-                    )
-                    Text("Prototype artwork · final illustrations can change",
-                        color = Muted, style = MaterialTheme.typography.labelSmall)
-                    Text(if (fieldNotesArt) "Illustrated study B · Field Notes"
-                         else "Original study A · Quiet Paperbacks",
-                         color = Forest, style = MaterialTheme.typography.labelMedium)
-                    if (onToggleArt != null) {
-                        OutlinedButton(onClick = onToggleArt,
-                            modifier = Modifier.heightIn(min = 48.dp)) {
-                            Text(if (fieldNotesArt) "Show original art (A)"
-                                 else "Try more illustrated art (B)")
+                    }
+                }
+            }
+            if (pageCount > 1) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(enabled = pager.currentPage > 0,
+                        onClick = { scope.launch {
+                            pager.animateScrollToPage(pager.currentPage - 1)
+                        } }, modifier = Modifier.testTag("bookcase-previous-page")) {
+                        Text("Previous")
+                    }
+                    Text("${pager.currentPage + 1} of $pageCount",
+                        style = MaterialTheme.typography.labelMedium, color = Forest,
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                            .testTag("bookcase-page-count"))
+                    TextButton(enabled = pager.currentPage < pageCount - 1,
+                        onClick = { scope.launch {
+                            pager.animateScrollToPage(pager.currentPage + 1)
+                        } }, modifier = Modifier.testTag("bookcase-next-page")) {
+                        Text("Next")
+                    }
+                }
+            }
+            Text("${catalog.books.size}" +
+                    (if (catalog.books.size == 1) " book" else " books") +
+                    " in your library",
+                style = MaterialTheme.typography.labelMedium, color = Muted,
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp),
+                textAlign = TextAlign.Center)
+        }
+        } // end WS16AL QA scene vs existing interactive bookcase
+
+        val chosen = selectedBookId?.let { catalog.book(it) }
+        if (chosen != null) {
+            val completed = BookProgressRules.completedCount(catalog, progress, chosen.id)
+            val total = catalog.pages(chosen.id).size
+            AlertDialog(
+                onDismissRequest = { selectedBookId = null },
+                modifier = Modifier.testTag("library-pulled-book-dialog"),
+                title = {
+                    Text(chosen.title.removeSuffix(" · TEST BOOK"),
+                        color = Forest, style = MaterialTheme.typography.titleLarge)
+                },
+                text = {
+                    Column(Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                        BookArt(chosen.theme, BookArtKind.COVER,
+                            Modifier.width(144.dp).height(192.dp)
+                                .testTag("library-pulled-cover-" + chosen.id),
+                            fieldNotes = fieldNotesArt)
+                        Text(chosen.chapters.size.toString() +
+                            (if (chosen.chapters.size == 1) " chapter" else " chapters") +
+                            " · " + completed + " of " + total + " pages completed",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Ink, textAlign = TextAlign.Center)
+                        if (chosen.title.endsWith(" · TEST BOOK")) {
+                            Text("TEST BOOK", style = MaterialTheme.typography.labelSmall,
+                                color = Muted)
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val id = chosen.id
+                        selectedBookId = null
+                        onOpenBook(id)
+                    }, modifier = Modifier.heightIn(min = 48.dp)
+                        .testTag("library-view-pages")) {
+                        Text("View pages")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { selectedBookId = null },
+                        modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text("Back to shelf")
+                    }
+                }
+            )
+        }
+        if (previewToolsOpen) {
+            Ws15LibraryPreviewDialog(
+                fieldNotesArt = fieldNotesArt,
+                onToggleArt = onToggleArt,
+                onToggleLayout = onToggleLayout,
+                onDismiss = { previewToolsOpen = false },
+                layoutActionLabel = "Try swipe library"
+            )
+        }
+    }
+}
+
+/** Two complete physical shelf tiers inside each modular cabinet page. */
+@Composable
+private fun SpineOutShelfRow(
+    index: Int, books: List<PuzzleBook>, slotsPerRow: Int,
+    slotWidth: Dp, tierHeight: Dp, fieldNotesArt: Boolean,
+    onSelect: (String) -> Unit
+) {
+    BoxWithConstraints(Modifier.fillMaxWidth().height(tierHeight)
+        .testTag("bookcase-shelf-$index")) {
+        // Tightly cropped 104x542 original spine sources: visible wood bindings
+        // nearly fill each 48dp hit zone without nonuniform image distortion.
+        val spineHeight = (maxHeight - 49.dp).coerceIn(75.dp, 235.dp)
+        val spineWidth = (spineHeight * (104f / 542f))
+            .coerceAtMost(slotWidth - 2.dp)
+        val rowInset = ((maxWidth - (slotWidth * slotsPerRow)) / 2)
+            .coerceAtLeast(0.dp)
+        Row(Modifier.align(Alignment.BottomStart)
+            .padding(start = rowInset, bottom = 35.dp),
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
+            verticalAlignment = Alignment.Bottom) {
+            for (slot in 0 until slotsPerRow) {
+                val book = books.getOrNull(slot)
+                if (book != null) {
+                    Box(Modifier.width(slotWidth).height(spineHeight + 4.dp)
+                        .semantics { contentDescription = "Pull out " +
+                            book.title.removeSuffix(" · TEST BOOK") }
+                        .clickable(role = Role.Button) { onSelect(book.id) }
+                        .testTag("library-spine-" + book.id),
+                        contentAlignment = Alignment.BottomCenter) {
+                        BookcaseSpineArt(book.theme, fieldNotesArt,
+                            Modifier.width(spineWidth).height(spineHeight)
+                                .testTag("book-spine-" + book.id))
+                    }
+                } else {
+                    val style = listOf("linen", "night", "burgundy")[
+                        (index * slotsPerRow + slot) % 3]
+                    Box(Modifier.width(slotWidth).height(spineHeight + 4.dp)
+                        .semantics { contentDescription = "Future volume, coming soon" }
+                        .testTag("library-future-volume-$index-$slot"),
+                        contentAlignment = Alignment.BottomCenter) {
+                        if (fieldNotesArt) {
+                            BookcaseFutureSpineArt(style,
+                                Modifier.width(spineWidth).height(spineHeight))
                         }
                     }
                 }
             }
-            itemsIndexed(rows, key = { _, row -> "shelf:" + row.first().id }) { index, row ->
-                BookcaseShelfRow(index, row, columns, catalog, progress,
-                    onOpenBook, fieldNotesArt)
-            }
-            item(key = "bookshelf-footer") {
-                Text(
-                    catalog.books.size.toString() +
-                        (if (catalog.books.size == 1) " book" else " books") +
-                        " on your shelf",
-                    style = MaterialTheme.typography.labelMedium, color = Muted,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
         }
-    }
-}
-
-@Composable
-private fun BookcaseShelfRow(
-    shelfIndex: Int,
-    books: List<PuzzleBook>,
-    columns: Int,
-    catalog: BookCatalog,
-    progress: BookLibraryProgress,
-    onOpenBook: (String) -> Unit,
-    fieldNotesArt: Boolean
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth().testTag("bookcase-shelf-$shelfIndex"),
-        verticalArrangement = Arrangement.spacedBy(1.dp)
-    ) {
-        Text("SHELF " + (shelfIndex + 1),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold, color = Muted,
-            modifier = Modifier.padding(start = 7.dp, bottom = 4.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.Bottom) {
-            books.forEach { book ->
-                Box(Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) {
-                    BookStandingArt(book, fieldNotesArt) { onOpenBook(book.id) }
-                }
-            }
-            repeat(columns - books.size) { Box(Modifier.weight(1f)) }
+        Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+            .testTag("wooden-shelf-plank-$index")) {
+            Ws16EStorybookShelf()
         }
-        WoodenShelfPlank(shelfIndex)
-        Row(Modifier.fillMaxWidth().padding(top = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.Top) {
-            books.forEach { book ->
-                val completed = BookProgressRules.completedCount(catalog, progress, book.id)
-                val total = catalog.pages(book.id).size
-                Column(
-                    modifier = Modifier.weight(1f).testTag("shelf-label-" + book.id),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(1.dp)
-                ) {
-                    Text(book.title.removeSuffix(" · TEST BOOK"),
-                        color = Forest, fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center, maxLines = 2)
-                    if (book.title.endsWith(" · TEST BOOK")) {
-                        Text("TEST BOOK · " + book.chapters.size +
-                                (if (book.chapters.size == 1) " chapter" else " chapters"),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Muted, textAlign = TextAlign.Center)
-                    }
-                    Text("$completed of $total pages completed", color = Ink,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.Center)
-                    TextButton(onClick = { onOpenBook(book.id) },
-                        modifier = Modifier.heightIn(min = 48.dp)
-                            .testTag("shelf-open-" + book.id)) {
-                        Text(if (completed == total) "Read again"
-                             else if (completed > 0) "Continue book" else "Open book")
-                    }
-                }
-            }
-            repeat(columns - books.size) { Box(Modifier.weight(1f)) }
-        }
-    }
-}
-
-@Composable
-private fun BookStandingArt(
-    book: PuzzleBook,
-    fieldNotesArt: Boolean,
-    onOpen: () -> Unit
-) {
-    Box(
-        modifier = Modifier.height(164.dp)
-            .semantics { contentDescription = "Open " + book.title.removeSuffix(" · TEST BOOK") }
-            .clickable(role = Role.Button, onClick = onOpen)
-            .testTag("shelf-cover-select-" + book.id),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(3.dp),
-            verticalAlignment = Alignment.Bottom) {
-            BookArt(book.theme, BookArtKind.COVER,
-                Modifier.width(108.dp).height(148.dp).testTag("book-cover-" + book.id),
-                fieldNotes = fieldNotesArt)
-            BookArt(book.theme, BookArtKind.SPINE,
-                Modifier.width(13.dp).height(130.dp).testTag("book-spine-" + book.id),
-                fieldNotes = fieldNotesArt)
-        }
-    }
-}
-
-/** Restrained, native-vector woodgrain and a subtle lip for physical shelf depth. */
-@Composable
-private fun WoodenShelfPlank(index: Int) {
-    Canvas(Modifier.fillMaxWidth().height(23.dp).testTag("wooden-shelf-plank-$index")) {
-        val faceHeight = size.height * 0.77f
-        val radius = 3.dp.toPx()
-        drawRoundRect(
-            brush = Brush.verticalGradient(listOf(
-                Color(0xFFE8D5B1), Color(0xFFB99B75), Color(0xFF927450)
-            )),
-            cornerRadius = CornerRadius(radius, radius),
-            size = Size(size.width, faceHeight)
-        )
-        drawLine(Color(0xFFF7E9CB),
-            Offset(3.dp.toPx(), 3.dp.toPx()),
-            Offset(size.width - 3.dp.toPx(), 3.dp.toPx()),
-            strokeWidth = 1.5.dp.toPx())
-        drawRoundRect(
-            brush = Brush.verticalGradient(listOf(
-                Color(0xFF927450), Color(0xFF6F573E)
-            )),
-            topLeft = Offset(0f, faceHeight),
-            size = Size(size.width, size.height - faceHeight),
-            cornerRadius = CornerRadius(radius, radius)
-        )
-        drawLine(Color(0xFF806748).copy(alpha = 0.37f),
-            Offset(size.width * 0.18f, size.height * 0.44f),
-            Offset(size.width * 0.39f, size.height * 0.44f),
-            strokeWidth = 0.8.dp.toPx())
-        drawLine(Color(0xFF806748).copy(alpha = 0.28f),
-            Offset(size.width * 0.67f, size.height * 0.53f),
-            Offset(size.width * 0.83f, size.height * 0.53f),
-            strokeWidth = 0.8.dp.toPx())
     }
 }

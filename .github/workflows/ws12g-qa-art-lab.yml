@@ -13,6 +13,7 @@ on:
       - 'tools/asset_pipeline/**'
       - 'design/asset-pipeline/**'
       - 'design/visual-system/**'
+      - 'tools/ci/**'
       - '.github/workflows/ws12g-qa-art-lab.yml'
   pull_request:
     paths:
@@ -56,27 +57,249 @@ jobs:
             ofl/ibmplexmono
             ofl/dmmono
             ofl/patrickhand
+            ofl/literata
       - name: Import original reviewed font resources and licenses
         run: |
           python3 -m pip install --disable-pip-version-check --user fonttools==4.59.2
           python3 scripts/import_font_library.py --source _approved_fonts
-      - name: Install pinned build-only SVG renderer (no Android runtime dependency)
-        run: python3 -m pip install --disable-pip-version-check --user CairoSVG==2.8.2
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.11.1'
-      - name: Guard exact original artwork SHA and optional illustrated study source
-        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
+      - name: Import six QA sprites from the hash-pinned original sheet
+        if: ${{ hashFiles('design/visual-system/masters/ws14-generated-asset-sheet-original.png') != '' }}
+        run: |
+          python3 -m pip install --disable-pip-version-check --user Pillow==12.3.0
+          python3 tools/asset_pipeline/import_ws14_candidate_sheet.py
       - name: Check WS-14 real-art registry integrity and approval gates
         run: |
           python3 tools/asset_pipeline/validate_ws14_assets.py
           python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_asset_registry.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14_cover_import.py' -v
+      - name: Verify original WS-14J Woodland artwork and debug source copy
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14j_page_accent.py' -v
+      - name: Install pinned build-only SVG renderer (no Android runtime dependency)
+        run: python3 -m pip install --disable-pip-version-check --user CairoSVG==2.8.2
+      - name: Render three original WS-14K2 theme motifs into debug-only Android assets
+        run: |
+          python3 tools/asset_pipeline/render_ws14k2_gameplay_motifs.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws14k2_gameplay_motifs.py' -v
+      - name: Render 8 SHA-pinned WS16G shelf pieces into debug-only PNG assets
+        run: |
+          python3 tools/asset_pipeline/render_ws16g_shelf.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16g_shelf_art.py' -v
+      - name: Render WS16H illustrated Home icons to debug-only sprites
+        run: |
+          python3 tools/asset_pipeline/render_ws16h_home.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16h_home.py' -v
+      - name: Render five WS16I storybook botanical Home overlays
+        run: |
+          python3 tools/asset_pipeline/render_ws16i_home_decor.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16i_home_decor.py' -v
+      - name: Render two distinct WS16M header emblems into QA assets
+        run: |
+          python3 tools/asset_pipeline/render_ws16m_brand.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16m_brand.py' -v
+      - name: Render six source-pinned WS16AA painted shelf and paper assets
+        run: |
+          python3 tools/asset_pipeline/render_ws16aa.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16aa_art.py' -v
+      - name: Verify actual WS16AB shelf asset, original-file provenance and native integration
+        run: |
+          python3 tools/asset_pipeline/verify_ws16ab_apk.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ab_shelf.py' -v
+      - name: Build source-pinned WS16AD geometry proofs and 3 blank book pairs
+        run: |
+          python3 tools/asset_pipeline/build_ws16ad_book_factory.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ad_book_factory.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ad_spine_policy.py' -v
+      - name: Rebuild all three WS16AE V2 painted books and spines
+        run: |
+          python3 tools/asset_pipeline/build_ws16ae_books_v2.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ae_books_v2.py' -v
+      - name: Verify WS16BH densely packed scalable real spines
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bh_dense_library.py' -v
+      - name: Validate WS16BG real front covers and portrait bookcase paging
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bg_face_out_library.py' -v
+      - name: Repair all three source-pinned WS16AF spine lettering masters
+        run: |
+          python3 tools/asset_pipeline/build_ws16af_spines_clean.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16af_spines_clean.py' -v
+      - name: Render WS16AI approved-walnut modular cabinet and tight book spines
+        run: |
+          python3 tools/asset_pipeline/build_ws16ai_bookcase.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ai_bookcase.py' -v
+      - name: Rebuild 12 textured WS16AO tall and standard physical book spines
+        run: |
+          python3 tools/asset_pipeline/build_ws16ao_spine_family.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ao_spine_family.py' -v
+      - name: Render WS16BF three clean curved bindings from source-pinned WS16AI
+        run: |
+          python3 tools/asset_pipeline/build_ws16bf_curved_spines.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bf_curved_spines.py' -v
+      - name: Reproduce WS16AK illustrated empty cabinet from pinned 1024px master
+        run: |
+          python3 tools/asset_pipeline/build_ws16ak_ci.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ak_ci.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16al_immersive_shell.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16am_immersive_bookcase.py' -v
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16at_modular_library.py' -v
+      - name: Reassemble original WS16AS art kit from hash-pinned source parts
+        if: ${{ hashFiles('design/visual-system/masters/ws16as/manifest.json') != '' }}
+        run: python3 tools/asset_pipeline/assemble_ws16as_github_kit.py
+      - name: Extract original WS16AS five-part painted shell from hash-pinned ZIP
+        if: ${{ hashFiles('design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip') != '' }}
+        run: python3 tools/asset_pipeline/import_ws16as_modular_library.py --kit design/visual-system/masters/ws16as/WS16AS_Modular_Library_Art_Kit.zip
+      - name: Generate 5 source-aligned WS16BA high-resolution portrait cabinet PNGs
+        run: |
+          python3 tools/asset_pipeline/build_ws16ba_hi_res.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16ba_hi_res.py' -v
+      - name: Import hash-pinned independent WS16BB cabinet-matched shelf
+        run: |
+          python3 tools/asset_pipeline/import_ws16bb_matched_shelf.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bb_shelf.py' -v
+      - name: Validate WS16BJ slim carved title and book clearance
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bj_carved_title.py' -v
+      - name: Verify WS16BN actual Play-green buttons and lowered bookcase layout
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bn_green_layout.py' -v
+      - name: Verify WS16BM shared GridMates paper controls and palette
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bm_shared_controls.py' -v
+      - name: Verify WS16BL cabinet press depth, pager dots and accessibility
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bl_motion_depth.py' -v
+      - name: Generate WS16BI mounted walnut shelf and wordless future bindings
+        run: |
+          python3 tools/asset_pipeline/build_ws16bi_library_art.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bi_library_cohesion.py' -v
+      - name: Generate WS16BK future bookcases and walnut pager assets
+        run: |
+          python3 tools/asset_pipeline/build_ws16bk_future_bookcase_assets.py
+          python3 -m unittest discover -s tools/asset_pipeline -p 'test_ws16bk_future_bookcases.py' -v
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install SHA-256 pinned Gradle 8.11.1 from official distribution
+        run: bash tools/ci/install_pinned_gradle.sh
+      # Cache/validate Gradle without re-provisioning an HTTP-504-prone distribution.
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Verify active Gradle is pinned
+        run: gradle --version | grep -F 'Gradle 8.11.1'
+      - name: Guard exact original artwork SHA and optional illustrated study source
+        run: python3 -m unittest discover -s tools/asset_pipeline -p 'test_field_notes_study.py' -v
       - name: Compile Android DEBUG with both A/B art studies and RELEASE without them
         run: gradle --no-daemon :core:test :app:assembleDebug :app:assembleRelease --console=plain
+      - name: Verify stable QA signing certificate for install-over updates
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -f "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" | tee /tmp/ws-signature.txt
+          grep -iF '75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419' /tmp/ws-signature.txt || {
+            echo "::error::Wrong QA signing identity; reject update APK."; exit 1;
+          }
+      - name: Verify WS16AK illustrated cabinet only in debug APK
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ak_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify exact WS16AS five-part shell and release isolation
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16as_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16BB QA-only matched shelf absent from release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16bb_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16BK future bookcases QA-only assets and release isolation
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16bk_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16BI QA-only shelf and blank bindings and release exclusion
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16bi_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify source-pinned WS16BA debug APK and release isolation
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ba_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16AI cabinet sprites stay in debug only
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ai_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify all WS16AO painted spine family bytes in debug and absent in release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ao_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16bf_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16AF corrected spines in QA and zero in release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16af_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify all WS16AE V2 painted book art is debug-only
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ae_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16AD source-matched book art is absent in release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ad_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16AB painted shelf in debug and not release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16ab_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16AA new painted artwork is debug-only and source-matched
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -name '*.apk' -print -quit)"
+          test -n "$RELEASE"
+          python3 tools/asset_pipeline/verify_ws16aa_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
+      - name: Verify WS16G shelf PNGs in debug only and absent in release
+        run: |
+          python3 tools/asset_pipeline/verify_ws16g_shelf_apks.py app/build/outputs/apk/debug/app-debug.apk "$(find app/build/outputs/apk/release -name '*.apk' -print -quit)"
+      - name: Verify WS16H illustrated action assets isolated from release
+        run: |
+          python3 tools/asset_pipeline/verify_ws16h_home_apk.py app/build/outputs/apk/debug/app-debug.apk "$(find app/build/outputs/apk/release -name '*.apk' -print -quit)"
+      - name: Verify WS16I Home decorations isolated from release
+        run: |
+          python3 tools/asset_pipeline/verify_ws16i_home_decor_apk.py app/build/outputs/apk/debug/app-debug.apk "$(find app/build/outputs/apk/release -name '*.apk' -print -quit)"
+      - name: Verify WS16M new wordmark emblems never enter release
+        run: |
+          python3 tools/asset_pipeline/verify_ws16m_brand_apk.py app/build/outputs/apk/debug/app-debug.apk "$(find app/build/outputs/apk/release -name '*.apk' -print -quit)"
+      - name: Verify WS-14 actual original cover exports and debug/release asset isolation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, zipfile
+          data=json.loads(pathlib.Path("design/visual-system/ws14-art-register.json").read_text())
+          qa=pathlib.Path("app/build/outputs/apk/debug/app-debug.apk")
+          releases=list(pathlib.Path("app/build/outputs/apk/release").glob("*.apk"))
+          assert qa.is_file() and releases, "Missing debug or release APK"
+          expected={}
+          for art in data["assets"]:
+              if art["purpose"] not in ("front-cover-art", "spine-ornament-art"):
+                  continue
+              assert art["status"] in ("QA_INTEGRATED","GENERATED_UNREVIEWED"), "Artwork review state must remain non-release"
+              for item in art["exports"]:
+                  if item["android_source_set"] == "debug":
+                      src=pathlib.Path(item["path"])
+                      assert src.is_file() and src.as_posix().startswith("app/src/debug/assets/ws14/")
+                      folder = "books" if art["purpose"] == "front-cover-art" else "spines"
+                      assert src.parent.name == folder, "Unexpected folder for WS-14 sprite"
+                      expected["assets/ws14/"+folder+"/"+src.name]=item["sha256"]
+          with zipfile.ZipFile(qa) as apk:
+              actual={p for p in apk.namelist() if p.startswith("assets/ws14/")}
+              assert actual == set(expected), ("Missing or unexpected WS-14 QA sprites",actual,expected)
+              for name,digest in expected.items():
+                  assert hashlib.sha256(apk.read(name)).hexdigest()==digest, name
+          with zipfile.ZipFile(releases[0]) as apk:
+              assert not [p for p in apk.namelist() if p.startswith("assets/ws14/")], "WS-14 QA ART LEAKED INTO RELEASE"
+          print("WS-14 cover/spine sprites verified:", len(expected), "debug-only; zero in release")
+          PY
       - name: Verify each exact-source A/B SVG and PNG inside QA and zero in release
         shell: bash
         run: |
@@ -131,19 +354,41 @@ jobs:
               assert not [x for x in z.namelist() if x.startswith('assets/ws12/')], 'PROTOTYPE ART LEAKED TO RELEASE'
           print('PASS: 18 original and 18 new alt source SVGs, plus 36 SHA-matched native PNGs in QA; ZERO in release.')
           PY
+      - name: Assert WS-14J page accent in debug only and absent from release
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, zipfile
+          item=json.loads(Path('design/visual-system/ws14j-page-accent-candidates.json').read_text())['assets'][0]
+          entry='assets/ws14j/page-accents/woodland.png'
+          with zipfile.ZipFile('app/build/outputs/apk/debug/app-debug.apk') as apk:
+              present=[n for n in apk.namelist() if n.startswith('assets/ws14j/')]
+              assert present == [entry], present
+              assert hashlib.sha256(apk.read(entry)).hexdigest() == item['export_sha256']
+          release=list(Path('app/build/outputs/apk/release').glob('*.apk'))
+          assert release, 'No release APK for isolation check'
+          with zipfile.ZipFile(release[0]) as apk:
+              assert not any(n.startswith('assets/ws14j/') for n in apk.namelist()), 'WS-14J candidate leaked to release'
+          print('PASS WS-14J: exact Woodland PNG in QA, zero WS-14J bytes in release')
+          PY
+      - name: Verify all three WS-14K2 motifs in QA and none in release
+        run: |
+          RELEASE="$(find app/build/outputs/apk/release -type f -name '*.apk' -print -quit)"
+          test -n "$RELEASE" || { echo "::error::Missing release APK"; exit 1; }
+          python3 tools/asset_pipeline/verify_ws14k2_apk.py app/build/outputs/apk/debug/app-debug.apk "$RELEASE"
       - name: Upload install-over QA Art Lab APK
         uses: actions/upload-artifact@v4
         with:
-          name: GRIDMATES-WS14A-VISUAL-KIT-ANDROID-V57-QA-ONLY
+          name: GridMates-WordSearch-Debug-ArtQA
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
       - name: Clarify source and execution limits
         run: |
           {
             echo '### WS-14A unified native visual components · unapproved art remains isolated'
             echo 'Debug APK has 18 original + 18 illustrated SVG art and 36 matched native PNG images; release has none.'
-            echo 'QA v57 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
+            echo 'QA v61 installs over compatible existing signed QA builds; current Solo/Daily/books stores untouched.'
             echo 'Android instrumentation test source is compiled by the separate standard Android QA flow, not executed here.'
             echo 'The artwork is unapproved; QA prototype art is already integrated into book cards and does not affect save/unlock logic.'
           } >> "$GITHUB_STEP_SUMMARY"

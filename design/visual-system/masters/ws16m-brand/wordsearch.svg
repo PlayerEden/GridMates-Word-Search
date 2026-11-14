@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs>
+ <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3C7655"/><stop offset=".6" stop-color="#20553E"/><stop offset="1" stop-color="#12372B"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F9E4A0"/><stop offset=".5" stop-color="#DFAD48"/><stop offset="1" stop-color="#9B6024"/></linearGradient>
+ <linearGradient id="paper" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#FFF9E7"/><stop offset="1" stop-color="#EFD8A9"/></linearGradient>
+</defs>
+<!-- Word Search's independent grid-and-pencil insignia -->
+<path d="M32 30Q32 21 44 21H207Q222 23 222 38V212Q221 226 208 227H43Q31 227 31 214Z" fill="#5A3E29" opacity=".23" transform="translate(5 6)"/>
+<path d="M31 27Q31 19 44 19H207Q220 19 220 33V211Q220 223 207 223H44Q31 223 31 210Z" fill="url(#paper)" stroke="url(#green)" stroke-width="13"/>
+<path d="M47 39H204V207H47Z" fill="none" stroke="#D4A653" stroke-width="4"/>
+<path d="M99 42V203M150 42V203M49 92H202M49 145H202" stroke="#245C44" stroke-opacity=".86" stroke-width="9" stroke-linecap="round"/>
+<!-- Selected diagonal line and handmade pencil overlay -->
+<path d="M68 181L181 64" stroke="#E8B747" stroke-width="26" stroke-linecap="round" opacity=".55"/>
+<g transform="rotate(42 125 117)">
+ <rect x="112" y="16" width="29" height="154" rx="8" fill="url(#gold)" stroke="#946128" stroke-width="5"/>
+ <path d="M112 31H141M112 145H141" stroke="#F8E6B3" stroke-width="5"/>
+ <path d="M112 168H141L127 199Z" fill="#E2B883" stroke="#825529" stroke-width="5" stroke-linejoin="round"/>
+ <path d="M122 187L127 199L132 187Z" fill="#305942"/>
+ <rect x="112" y="16" width="29" height="19" rx="6" fill="#3A7655" stroke="#1B4639" stroke-width="4"/>
+</g>
+<path d="M48 208Q72 201 88 207M173 43Q188 38 204 45" stroke="#EFD58B" stroke-width="4" fill="none" opacity=".8"/>
+</svg>

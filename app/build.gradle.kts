@@ -12,8 +12,8 @@ android {
         applicationId = "com.playereden.gridmates.wordsearch"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 57
-        versionName = "0.9.13-visual-kit-foundation"
+        versionCode = providers.gradleProperty("qaVersionCode").orNull?.toInt() ?: 73
+        versionName = "0.9.29-play-green-library-layout"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -56,6 +56,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation(platform("androidx.compose:compose-bom:2025.04.01"))
     implementation("androidx.compose.ui:ui")

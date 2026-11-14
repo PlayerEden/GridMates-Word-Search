@@ -1,0 +1,538 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-09",
+  "project": "GridMates: Word Search",
+  "milestone": "WS-16G2_BATCH1",
+  "status": "WS16H_SIX_ACTIONS_AND_SPINE_OUT_LIBRARY_DUAL_GREEN__OWNER_PHONE_REVIEW_PENDING",
+  "draft_pr": 131,
+  "branch": "feature/ws14b-style-anchor-and-art-direction-2026-11-08",
+  "scope_note": "20 distinct UI rendering roles, of which WS_BOOKCASE_ROW_SHELF_V1 is a reuse/composition role rather than a duplicate bitmap. Existing vector references and Compose analogs do not count as finished painterly exports.",
+  "art_direction": "Hand-painted cozy paperback library reference; warm parchment, walnut carving, forest-green/gold, native live copy",
+  "no_release_approval_claimed": true,
+  "export_root": "design/visual-system/exports/ws16g-batch1/",
+  "items": [
+    {
+      "id": "GM_BG_PARCHMENT_MAIN_V1",
+      "scope": "GM_SHARED",
+      "group": "Foundation",
+      "priority": 1,
+      "role": "Soft continuous parchment base",
+      "brief": "Warm ivory fibers, minimal speckling, very faint organic amber edge wash; no visible repeating motif.",
+      "design_master_size": "1024×1024 seamless tile plus separately composited native edge wash",
+      "alpha": "opaque",
+      "assembly": "repeatable tile/native full-viewport fill; edge wash independent",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/shared/gm-parchment-tile-v1.svg",
+        "design/visual-system/modular/masters/shared/gm-parchment-edge-wash-v1.svg"
+      ],
+      "existing_runtime_correspondence": "GridMatesParchmentBackground.kt",
+      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
+      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "GM_FRAME_PANEL_LIGHT_V1",
+      "scope": "GM_SHARED",
+      "group": "Foundation",
+      "priority": 1,
+      "role": "General paper panel",
+      "brief": "Soft cream paper inset, thin uneven antique gold border, little corner brush flourishes, negligible internal texture.",
+      "design_master_size": "1024×256 landscape; 4 separate corners + horizontal/vertical edge strips",
+      "alpha": "transparent center OR low-opacity paper fill independently",
+      "assembly": "9-slice-safe frame components, fixed corner caps",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/shared/gm-frame-panel-v1.svg"
+      ],
+      "existing_runtime_correspondence": "GridMatesIllustratedFrames.kt",
+      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
+      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "GM_FRAME_PANEL_FEATURE_V1",
+      "scope": "GM_SHARED",
+      "group": "Foundation",
+      "priority": 1,
+      "role": "Continue/featured action frame",
+      "brief": "Slightly richer gold double edge, lower warm cast shadow, corners restrained so live subtitle stays clear.",
+      "design_master_size": "1280×320 landscape; independent corners and edges",
+      "alpha": "transparent/ivory interior optional layer",
+      "assembly": "9-slice/cap-composition; no stretched gold corners",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/shared/gm-frame-feature-v1.svg"
+      ],
+      "existing_runtime_correspondence": "GridMatesIllustratedFrames.kt",
+      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
+      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "GM_BTN_PRIMARY_V1",
+      "scope": "GM_SHARED",
+      "group": "Foundation",
+      "priority": 1,
+      "role": "Play/primary CTA frame",
+      "brief": "Forest-green enameled pill, narrow antique brass bezel, subtle painted inner highlight; no letters.",
+      "design_master_size": "720×240 master for 120–240dp wide pills",
+      "alpha": "transparent outside silhouette",
+      "assembly": "nine-patch or cap/center; native label, focus/pressed state",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/shared/gm-pill-primary-v1.svg"
+      ],
+      "existing_runtime_correspondence": "GridMatesIllustratedFrames.kt",
+      "source_status": "EXISTING_VECTOR_REFERENCE__PAINTERLY_MASTER_NOT_PRODUCED",
+      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "GM_DIVIDER_SHORT_V1",
+      "scope": "GM_SHARED",
+      "group": "Foundation",
+      "priority": 2,
+      "role": "Under-title gold divider",
+      "brief": "Fine tapering gold flourish with tiny centered leaf; not overly ornate; thin line extends natively.",
+      "design_master_size": "512×96 ornament center; line native",
+      "alpha": "transparent",
+      "assembly": "fixed-size center motif + native scalable rules",
+      "existing_reference_paths": [],
+      "existing_runtime_correspondence": "none; new intended artwork",
+      "source_status": "PLANNED_NO_SOURCE",
+      "production_status": "PAINTERLY_MASTER_AND_EXPORT_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "WS_SHELF_TOP_V1",
+      "scope": "WS_THEME",
+      "group": "Shelf",
+      "priority": 1,
+      "role": "Book-contact top plank",
+      "brief": "Amber walnut top, beveled front edge, short horizontal grain, warm overhead highlights; flat enough for books to stand.",
+      "design_master_size": "1024×96 horizontal repeat-safe midsection",
+      "alpha": "transparent outside shape",
+      "assembly": "repeat center x; rounded end caps separate",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16e-shelf-top-v1.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-top-v1.svg",
+      "new_svg_sha256": "4329ebc3667fdbe3b71afe2f2f41fc7fefc10bc485595988c3a87dc63d3b8105"
+    },
+    {
+      "id": "WS_SHELF_FRONT_V1",
+      "scope": "WS_THEME",
+      "group": "Shelf",
+      "priority": 1,
+      "role": "Repeatable walnut shelf fascia",
+      "brief": "Carved walnut grain in subtle bands, realistic thickness and deep brown underside, no stretched central medallion.",
+      "design_master_size": "1024×160 repeatable center rail",
+      "alpha": "transparent outside rail",
+      "assembly": "tile center horizontally, don't scale decorative ends",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16e-shelf-front-center-v1.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-front-v1.svg",
+      "new_svg_sha256": "d61cc6f6f5955e9758121d5a11aab13b49fe4b59f45ac1063453e3f485cc755b"
+    },
+    {
+      "id": "WS_SHELF_APRON_CARVED_V1",
+      "scope": "WS_THEME",
+      "group": "Shelf",
+      "priority": 1,
+      "role": "Decorative scalloped underside",
+      "brief": "Deep walnut face with soft carved lobes, recessed panel bevel and painterly wood modeling, less linear than existing Canvas.",
+      "design_master_size": "1024×160 wide scalloped segment",
+      "alpha": "transparent outside apron silhouette",
+      "assembly": "modular left/right contours + quiet stretch-safe center",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16f-carved-shelf-apron-v2.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-apron-v1.svg",
+      "new_svg_sha256": "c589228e9828b0a4bf1208f81d67fd0515b7aa19428bc4c249d3fef9a7d5996a"
+    },
+    {
+      "id": "WS_SHELF_BRACKET_LEFT_V1",
+      "scope": "WS_THEME",
+      "group": "Shelf",
+      "priority": 1,
+      "role": "Left walnut side bracket",
+      "brief": "Chunky curved carved shelf support, softly chipped/highlighted edges, weight-bearing silhouette like reference.",
+      "design_master_size": "256×320 portrait",
+      "alpha": "transparent",
+      "assembly": "fixed-aspect cap on left; mirror not assumed",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16e-shelf-end-left-v1.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-bracket-left-v1.svg",
+      "new_svg_sha256": "28430f6a26fda520132e10ae69f0d0fc603d836becf8396877ed9efa0d8dad94"
+    },
+    {
+      "id": "WS_SHELF_BRACKET_RIGHT_V1",
+      "scope": "WS_THEME",
+      "group": "Shelf",
+      "priority": 1,
+      "role": "Right walnut side bracket",
+      "brief": "Handcrafted symmetrical companion to left with individual asymmetric woodgrain and consistent illumination.",
+      "design_master_size": "256×320 portrait",
+      "alpha": "transparent",
+      "assembly": "fixed-aspect cap on right; no horizontal stretching",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16e-shelf-end-right-v1.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-bracket-right-v1.svg",
+      "new_svg_sha256": "173bf826696d5aba3b1c31b86e4f1ab0a92eeac66f8ab080fdcf2fcc111af57c"
+    },
+    {
+      "id": "WS_SHELF_CENTER_ORNAMENT_V1",
+      "scope": "WS_THEME",
+      "group": "Shelf",
+      "priority": 2,
+      "role": "Separate gold-leaf wood carving",
+      "brief": "Antique-gold foliage curl and small central oak leaf; carved into/attached to dark apron; single high-read focal flourish.",
+      "design_master_size": "512×180 wide",
+      "alpha": "transparent",
+      "assembly": "fixed center, hide/scale modestly when width constrained",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16e-shelf-leaf-medallion-v1.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-medallion-v1.svg",
+      "new_svg_sha256": "103f9024af8e245ddc29a896631e6817d404ee25a8e339b394e52715b25159e6"
+    },
+    {
+      "id": "WS_SHELF_CONTACT_SHADOW_V1",
+      "scope": "WS_THEME",
+      "group": "Shelf",
+      "priority": 1,
+      "role": "Grounding shadow under books",
+      "brief": "Subtle soft charcoal-brown ambient occlusion, tight near base with wider weak feather; no literal ground.",
+      "design_master_size": "1024×96 wide alpha-gradient",
+      "alpha": "transparent fading to zero",
+      "assembly": "position beneath cover bottoms, top of shelf; no input",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16e-shelf-contact-shadow-v1.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16EStorybookShelf.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-shelf-contact-shadow-v1.svg",
+      "new_svg_sha256": "1b054ebfde296ed712c12213b8fd258dac1e26a7d71586fb4f8f72b83fb1f4a0"
+    },
+    {
+      "id": "WS_BOOKCASE_BACKBOARD_V1",
+      "scope": "WS_THEME",
+      "group": "Library",
+      "priority": 1,
+      "role": "Wood backboard behind actual shelf rows",
+      "brief": "Dark subdued walnut planks, gently vertical grain; contrast tuned so book covers pop; no painted fake books.",
+      "design_master_size": "1024×1024 seamless/tileable panel",
+      "alpha": "opaque or transparent boundary outside panel",
+      "assembly": "tile by populated rows; wood uprights on separate existing geometry",
+      "existing_reference_paths": [
+        "design/visual-system/modular/masters/wordsearch/ws16f-bookcase-backboard-v1.svg"
+      ],
+      "existing_runtime_correspondence": "BookcaseBookshelfScreen.kt",
+      "source_status": "SVG_ART_MASTER_CREATED_UNREVIEWED",
+      "production_status": "EIGHT_SVG_QA_RENDERED_AND_APK_VERIFIED__OWNER_ART_REVIEW_PENDING",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false,
+      "new_svg_candidate_path": "design/visual-system/masters/ws16g-batch1/ws16g-bookcase-backboard-v1.svg",
+      "new_svg_sha256": "60b64d5ba9ed6b81f9497149f2c53c41030bfd31538f3bf061084a125559566a"
+    },
+    {
+      "id": "WS_BOOKCASE_ROW_SHELF_V1",
+      "scope": "WS_THEME",
+      "group": "Library",
+      "priority": 2,
+      "role": "Multi-shelf reassembly recipe (not duplicate art)",
+      "brief": "Reuse exact WS_SHELF_TOP/FRONT/APRON/BRACKETS/CENTER/SHADOW family with a narrower visual scale and consistent contact.",
+      "design_master_size": "no new bitmap; layout composition recipe",
+      "alpha": "composed layers",
+      "assembly": "real rows only: 1/2/3 live book-column densities",
+      "existing_reference_paths": [],
+      "existing_runtime_correspondence": "BookcaseBookshelfScreen.kt, Ws16EStorybookShelf.kt",
+      "source_status": "PLANNED_NO_SOURCE",
+      "production_status": "COMPOSITE_RECIPE_PENDING_INTEGRATION",
+      "source_master_path": null,
+      "source_sha256": null,
+      "export_paths": [],
+      "export_sha256": [],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "WS_ACTION_CONTINUE_V1",
+      "scope": "WS_THEME",
+      "group": "Actions",
+      "priority": 1,
+      "role": "Continue illustration",
+      "brief": "Forest-green hanging satin bookmark with little embroidered oak sprig, warm stitching/shadow.",
+      "design_master_size": "512×512, 12% transparent padding",
+      "alpha": "transparent",
+      "assembly": "display 36–48dp inside live framed card",
+      "existing_reference_paths": [
+        "design/visual-system/masters/ws16b-continue-action.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/continue.svg",
+      "source_sha256": "862c3e07315d42b7791ab8a8cceb35f43116012f9946d86870586724968caab4",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/continue.png"
+      ],
+      "export_sha256": [
+        "7ede9c1fa2009a3eb74055677ec6a10a31ea469b9a87d0891ace3054b6ddf0ba"
+      ],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "WS_ACTION_DAILY_V1",
+      "scope": "WS_THEME",
+      "group": "Actions",
+      "priority": 1,
+      "role": "Daily puzzle illustration",
+      "brief": "Small creamy tear-off calendar with sage binding, ochre star and tiny leaf at base, no date numerals.",
+      "design_master_size": "512×512, 12% transparent padding",
+      "alpha": "transparent",
+      "assembly": "display 36–48dp; native Daily Puzzle label",
+      "existing_reference_paths": [
+        "design/visual-system/masters/ws16b-daily-action.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/daily.svg",
+      "source_sha256": "e3146d8266e90a4f6b784807c599eeaff5e05684a8ba9f09d5a377fecc9cbfed",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/daily.png"
+      ],
+      "export_sha256": [
+        "dfaa99be938ed5a28c2949761686e775a2f320cd6265d11607254afad8883e36"
+      ],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "WS_ACTION_TOGETHER_V1",
+      "scope": "WS_THEME",
+      "group": "Actions",
+      "priority": 1,
+      "role": "Local co-op illustration",
+      "brief": "Two friendly woodland squirrels facing one another on a small stump; clean paired silhouette at 32dp, not a fine-detail scene.",
+      "design_master_size": "512×512, 12% transparent padding",
+      "alpha": "transparent",
+      "assembly": "display 30–44dp; native Together text, Wi-Fi accessible label",
+      "existing_reference_paths": [
+        "design/visual-system/masters/ws16b-together-action.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/together.svg",
+      "source_sha256": "1b788cce06ac82023e2fe46842cdf0b4069115f32fb252485eeb1d12989055ab",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/together.png"
+      ],
+      "export_sha256": [
+        "b08de5eef8b875b8d3c60fa68c0bb89e783245ca6bba167c659817b13d01c164"
+      ],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "WS_ACTION_QUICKPLAY_V1",
+      "scope": "WS_THEME",
+      "group": "Actions",
+      "priority": 1,
+      "role": "Future mixed-word mode illustration",
+      "brief": "Two overlapping blank letter-tile shapes with simple A/B if legitimately illustrated? Prefer no typography: checker-letter squares + curled arrow and tiny ivy.",
+      "design_master_size": "512×512, 12% transparent padding",
+      "alpha": "transparent",
+      "assembly": "display 40–48dp; NOT an enabled playable mode until generator exists",
+      "existing_reference_paths": [
+        "design/visual-system/masters/ws16b-quick-action.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/quick.svg",
+      "source_sha256": "c4169e7d1210da5558fadb5b584810a0da2bc15f68befaa6f392e04cf7277c13",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/quick.png"
+      ],
+      "export_sha256": [
+        "85401ba412922530b7b525cd986246d26279a8ceb294bf4eeab7d23d4c86bcd6"
+      ],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "WS_ACTION_FULL_LIBRARY_V1",
+      "scope": "WS_THEME",
+      "group": "Actions",
+      "priority": 2,
+      "role": "Open complete puzzle library",
+      "brief": "Four compact vintage spines in forest, russet, ochre and olive, resting on a tiny shelf; no labels on spines.",
+      "design_master_size": "512×512, 12% transparent padding",
+      "alpha": "transparent",
+      "assembly": "display 36–48dp, native Full Library text",
+      "existing_reference_paths": [],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/full-library.svg",
+      "source_sha256": "d52a2cc5983ee7eb39296b6bcd6317c8877f0b52a142d14339652dc6882b3dd8",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/full-library.png"
+      ],
+      "export_sha256": [
+        "c954ef7a79543573da1b6b7c55f9fce571d126954d745399b9120f5028e6e1b5"
+      ],
+      "owner_art_approval": false,
+      "release_approval": false
+    },
+    {
+      "id": "WS_ACTION_COLLECTION_V1",
+      "scope": "WS_THEME",
+      "group": "Actions",
+      "priority": 2,
+      "role": "Unlockables/collection illustration",
+      "brief": "Two layered vintage picture frames, forest landscape in front and small gold botanical accent; distinct from a book stack.",
+      "design_master_size": "512×512, 12% transparent padding",
+      "alpha": "transparent",
+      "assembly": "display 36–48dp, native Collection text",
+      "existing_reference_paths": [
+        "design/visual-system/masters/ws16d-collection-gallery-shortcut.svg"
+      ],
+      "existing_runtime_correspondence": "Ws16HIllustratedAction.kt consumes debug assets; release falls back to original Canvas",
+      "source_status": "SIX_ORIGINAL_SVG_MASTERS_CREATED_UNREVIEWED",
+      "production_status": "QA_INTEGRATED_SVG_RENDERED_256RGBA__OWNER_PHONE_REVIEW_PENDING",
+      "source_master_path": "design/visual-system/masters/ws16h-home/collection.svg",
+      "source_sha256": "0143fd3cbc8ed07f88216a5e66bc8ae26913cb1a8d9291601de7bd22fa884310",
+      "export_paths": [
+        "app/src/debug/assets/ws16h/actions/collection.png"
+      ],
+      "export_sha256": [
+        "6a34a34ed26a1eb76fa86920910b96c1b9f0a746c599f7acd98a75a0d7f0f566"
+      ],
+      "owner_art_approval": false,
+      "release_approval": false
+    }
+  ],
+  "current_art_source_note": "Eight original versioned GitHub SVG masters are imported by tools/asset_pipeline/render_ws16g_shelf.py into app/src/debug/assets/ws16g/shelf and consumed by Ws16GShelfArtwork.kt on Home and Your Library with Canvas fallback in release. Image-generated contact-sheet PNG cutouts were created in conversation only, not imported into app. Owner artwork and real phone approval pending.",
+  "candidate_png_pack": {
+    "storage": "ChatGPT personal Library",
+    "path": "/Game Design/GridMates Word Search/WS16G_Batch1_candidate_sprites.zip",
+    "sha256": "a4a3f9bf097dc61209cac52a1225655e629a022284354c4f478fc40515619aa9",
+    "source_original_sha256": "e0fc50537512cfc4561dfa49652003999e91f589730f1e1c1392b8e14948f74a",
+    "image_count": 26,
+    "status": "CANDIDATE_ALPHA_UNREVIEWED_NOT_GITHUB_NOT_APK"
+  },
+  "corrected_qa_code_sha": "d9c228f379ab99728696f20fcccd3295b14d460b",
+  "qa_check_status": "ANDROID_AND_ART_SUCCESS_SOURCE_D9C228F__ZERO_WS16G_ASSETS_IN_RELEASE",
+  "qa_artifact": {
+    "source_commit": "26ccb63e097f4385b46f094b3859efc5758bccdd",
+    "standard_run": 42749504771,
+    "art_run": 42749504688,
+    "standard_artifact_id": 13732658725,
+    "apk_sha256": "5e9361eecfe7a1b06ecccebcb8169c67ae0961756b288c91dd4d5f52fcba03f3",
+    "status": "DUAL_GREEN_NOT_OWNER_APPROVED",
+    "new_raster_action_icons": 6
+  },
+  "previous_qa_artifact": {
+    "workflow_standard_run": 42744842244,
+    "workflow_art_run": 42744842181,
+    "standard_artifact_id": 13730138987,
+    "apk_sha256": "eca5964ff7b43e3f54e156d49e0f48735d61397dc039b789ffc78990959463b8",
+    "status": "QA_VERIFIED_NOT_OWNER_APPROVED",
+    "source_commit": "d9c228f379ab99728696f20fcccd3295b14d460b"
+  }
+}

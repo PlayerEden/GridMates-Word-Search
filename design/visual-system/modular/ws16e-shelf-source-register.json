@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "visual_system": "gridmates-word-search-cozy-paperback",
+  "assets": [
+    {
+      "asset_id": "WS_SHELF_TOP_V1",
+      "family": "WS16E_SHELF",
+      "purpose": "walnut top bevel",
+      "theme": "word-search-neutral",
+      "status": "GENERATED_UNREVIEWED",
+      "source": {
+        "path": "design/visual-system/modular/masters/wordsearch/ws16e-shelf-top-v1.svg",
+        "sha256": "7f3107a7827b77c8a32a96333aa098ecf7c401ebef38332d97123f395825e921",
+        "rights_status": "PENDING_REVIEW",
+        "rights_notes": "Original hand-authored editable SVG master. Overall design direction is approved; isolated file not owner-approved."
+      },
+      "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
+    },
+    {
+      "asset_id": "WS_SHELF_FRONT_CENTER_V1",
+      "family": "WS16E_SHELF",
+      "purpose": "repeatable front face",
+      "theme": "word-search-neutral",
+      "status": "GENERATED_UNREVIEWED",
+      "source": {
+        "path": "design/visual-system/modular/masters/wordsearch/ws16e-shelf-front-center-v1.svg",
+        "sha256": "b76c0fc14802f0e51a8d2ed997a53ec0b4fac7e8541e0d803d25532a73888ac4",
+        "rights_status": "PENDING_REVIEW",
+        "rights_notes": "Original hand-authored editable SVG master. Overall design direction is approved; isolated file not owner-approved."
+      },
+      "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
+    },
+    {
+      "asset_id": "WS_SHELF_END_LEFT_V1",
+      "family": "WS16E_SHELF",
+      "purpose": "left carved bracket",
+      "theme": "word-search-neutral",
+      "status": "GENERATED_UNREVIEWED",
+      "source": {
+        "path": "design/visual-system/modular/masters/wordsearch/ws16e-shelf-end-left-v1.svg",
+        "sha256": "2968f1ecdbda82992b7973285259eeefaa745dc10627d70d832608d62c6cf23b",
+        "rights_status": "PENDING_REVIEW",
+        "rights_notes": "Original hand-authored editable SVG master. Overall design direction is approved; isolated file not owner-approved."
+      },
+      "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
+    },
+    {
+      "asset_id": "WS_SHELF_END_RIGHT_V1",
+      "family": "WS16E_SHELF",
+      "purpose": "right carved bracket",
+      "theme": "word-search-neutral",
+      "status": "GENERATED_UNREVIEWED",
+      "source": {
+        "path": "design/visual-system/modular/masters/wordsearch/ws16e-shelf-end-right-v1.svg",
+        "sha256": "495eacecaec2c5aa26a2e026fa6924ceb4e4f3b1cf418d61c2104d807077e99a",
+        "rights_status": "PENDING_REVIEW",
+        "rights_notes": "Original hand-authored editable SVG master. Overall design direction is approved; isolated file not owner-approved."
+      },
+      "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
+    },
+    {
+      "asset_id": "WS_SHELF_LEAF_MEDALLION_V1",
+      "family": "WS16E_SHELF",
+      "purpose": "gold leaf center ornament",
+      "theme": "word-search-neutral",
+      "status": "GENERATED_UNREVIEWED",
+      "source": {
+        "path": "design/visual-system/modular/masters/wordsearch/ws16e-shelf-leaf-medallion-v1.svg",
+        "sha256": "1f4b73b78881535c784946366535ecdc9733eca7e5ed7758dec5d33659f70440",
+        "rights_status": "PENDING_REVIEW",
+        "rights_notes": "Original hand-authored editable SVG master. Overall design direction is approved; isolated file not owner-approved."
+      },
+      "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
+    },
+    {
+      "asset_id": "WS_SHELF_CONTACT_SHADOW_V1",
+      "family": "WS16E_SHELF",
+      "purpose": "transparent book contact shadow",
+      "theme": "word-search-neutral",
+      "status": "GENERATED_UNREVIEWED",
+      "source": {
+        "path": "design/visual-system/modular/masters/wordsearch/ws16e-shelf-contact-shadow-v1.svg",
+        "sha256": "408a3dc83695630df021476c75af872245830fbbea4bb75a4f52486748abd800",
+        "rights_status": "PENDING_REVIEW",
+        "rights_notes": "Original hand-authored editable SVG master. Overall design direction is approved; isolated file not owner-approved."
+      },
+      "notes": "Editable source master only; no packaged raster export. Native runtime Compose drawing is analogous but not pixel-identical."
+    }
+  ]
+}

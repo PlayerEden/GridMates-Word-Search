@@ -83,11 +83,17 @@ class BookPageGameplayScreenAndroidTest {
                 }
             }
             compose.waitForIdle()
-            compose.onNodeWithText("Woodland Volume I · Page 1").assertExists()
+            compose.onNodeWithText("Woodland Volume I").assertExists()
+            compose.onNodeWithText("Page 1").assertExists()
+            compose.onNodeWithContentDescription("Back to book").assertExists()
+            compose.onNodeWithText("Trace words", substring = true).assertDoesNotExist()
             compose.onNodeWithText("1 of 12 words found", substring = true).assertExists()
             // Reuses the same zoom/precise gesture primitive as ordinary Solo.
-            compose.onNodeWithContentDescription("Select a word without dragging")
-                .assertExists()
+            compose.onNodeWithContentDescription("Puzzle tools").assertExists()
+            compose.onNodeWithContentDescription("Notice history").assertExists()
+            compose.onNodeWithContentDescription("Puzzle tools").performClick()
+            compose.onNodeWithText("Select by row and column").assertExists()
+            compose.onNodeWithText("Done").performClick()
             // A book exposes all targets in one scrollable list, instead of
             // showing only two targets plus a six-page word-list pager.
             compose.onNodeWithText("○ " + puzzle.targets.last().word).assertExists()

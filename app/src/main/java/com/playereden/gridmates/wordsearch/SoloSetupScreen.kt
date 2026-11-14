@@ -48,7 +48,7 @@ internal fun SoloSetupScreen(
     val challenge = PuzzleChallenge.valueOf(challengeName)
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        PaperEyebrow("SOLO · BEFORE YOU PLAY")
+        PaperEyebrow("CUSTOM · BEFORE YOU PLAY")
         TextButton(onClick = onBack) { Text("Cancel") }
     }
     Text("New puzzle", style = MaterialTheme.typography.headlineSmall,

@@ -77,15 +77,15 @@ class QaBookPresentationStateAndroidTest {
                 }
             }
         }
-        compose.onNodeWithText("Continue reading").assertExists().performClick()
+        compose.onNodeWithText("Continue solving").assertExists().performClick()
         compose.runOnIdle { assertEquals(third.id, selectedPage) }
         compose.onNodeWithTag("book-volume-complete-" + book.id).assertDoesNotExist()
 
         compose.onNodeWithTag("book-detail-list")
             .performScrollToNode(hasText("Page 3 · Next page"))
         compose.onNodeWithText("Page 3 · Next page").assertExists()
-        compose.onNodeWithText("Play page 3").assertExists()
-        compose.onNodeWithText("Bookmark saved").assertExists()
+        compose.onNodeWithText("Play").assertExists()
+        compose.onNodeWithText("Saved").assertExists()
         compose.onNodeWithTag("book-bookmark-" + third.id).assertExists()
         compose.onNodeWithTag("book-page-complete-" + third.id).assertDoesNotExist()
 
@@ -116,7 +116,7 @@ class QaBookPresentationStateAndroidTest {
         }
         compose.onNodeWithTag("book-volume-complete-" + book.id).assertExists()
         compose.onNodeWithText("Book complete · You can revisit any page.").assertExists()
-        compose.onNodeWithText("Continue reading").assertDoesNotExist()
+        compose.onNodeWithText("Continue solving").assertDoesNotExist()
         compose.onNodeWithTag("book-detail-list")
             .performScrollToNode(hasText("Page 3 · Completed"))
         compose.onNodeWithText("Page 3 · Completed").assertExists()

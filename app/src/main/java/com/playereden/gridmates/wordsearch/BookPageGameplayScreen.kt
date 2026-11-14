@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.graphics.Color
+import com.playereden.gridmates.wordsearch.core.WordTheme
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,12 +28,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.playereden.gridmates.wordsearch.core.BookCatalog
@@ -40,6 +46,27 @@ import com.playereden.gridmates.wordsearch.core.GridPoint
 import com.playereden.gridmates.wordsearch.core.WordSearchPuzzle
 import com.playereden.gridmates.wordsearch.core.WordSearchRules
 import kotlinx.coroutines.delay
+
+/**
+ * WS-14G QA layout specimen: use the existing theme's miniature emblem
+ * without changing word-grid touch geometry, page content or save data.
+ * When accessibility text is enlarged or width is tight, native text wins.
+ * Completed and bookmarked pages already have a themed status illustration.
+ */
+internal fun shouldShowBookPageHeaderEmblem(
+    qaArtworkEnabled: Boolean,
+    completed: Boolean,
+    bookmarked: Boolean,
+    viewportWidthDp: Float,
+    fontScale: Float
+): Boolean = qaArtworkEnabled && !completed && !bookmarked &&
+    viewportWidthDp >= 320f && fontScale < 1.5f
+
+/** Record meaningful hints and finds, not ordinary missed letter traces. */
+internal fun shouldRememberBookPageNotice(message: String): Boolean =
+    message.isNotBlank() &&
+        message != "No matching word in that selection." &&
+        message != "You've already found that word."
 
 /**
  * WS-11D2B — a real book-page playing screen, independent of SoloStore.
@@ -76,9 +103,11 @@ internal fun BookPageGameplayScreen(
     var initialized by remember(catalog, bookId, pageId) { mutableStateOf(false) }
     var error by remember(catalog, bookId, pageId) { mutableStateOf<String?>(null) }
     var revision by remember(catalog, bookId, pageId) { mutableIntStateOf(0) }
-    var status by remember(catalog, bookId, pageId) {
-        mutableStateOf("Trace the words on your puzzle page.")
-    }
+    // Do not reserve screen height for a generic instruction. Show only meaningful feedback.
+    var status by remember(catalog, bookId, pageId) { mutableStateOf("") }
+    val noticeHistory = remember(catalog, bookId, pageId) { mutableStateListOf<String>() }
+    var noticeHistoryOpen by remember(catalog, bookId, pageId) { mutableStateOf(false) }
+    var toolsOpen by remember(catalog, bookId, pageId) { mutableStateOf(false) }
     var practice by remember(catalog, bookId, pageId) { mutableStateOf(false) }
     var practiceFound by remember(catalog, bookId, pageId) { mutableStateOf(emptySet<String>()) }
 
@@ -180,7 +209,7 @@ internal fun BookPageGameplayScreen(
             ClaimStatus.ALREADY_FOUND -> status = "You've already found that word."
             ClaimStatus.INVALID -> status = if (sessionStore.warning != null)
                 "The selection could not be saved. Your earlier progress was preserved."
-                else "Try selecting a word from the list."
+                else "No matching word in that selection."
         }
     }
 
@@ -207,6 +236,27 @@ internal fun BookPageGameplayScreen(
             it.id !in wordsFound && (active?.hints?.get(it.id) ?: 0) >= 3
         }.map { it.positions }
 
+    // All notice and hint feedback is transient and kept in in-session history.
+    // Never write notice history to the GMWS/GMWB save schema.
+    LaunchedEffect(status) {
+        val message = status
+        if (message.isNotBlank()) {
+            if (shouldRememberBookPageNotice(message) &&
+                noticeHistory.firstOrNull() != message) {
+                noticeHistory.add(0, message)
+                if (noticeHistory.size > 30) noticeHistory.removeAt(noticeHistory.lastIndex)
+            }
+            delay(when {
+                message == "No matching word in that selection." -> 1200L
+                message.startsWith("Hint:") -> 4000L
+                message.contains("could not", ignoreCase = true) ||
+                    message.contains("recovery", ignoreCase = true) -> 6500L
+                else -> 2600L
+            })
+            if (status == message) status = ""
+        }
+    }
+
     val next = if (committed) {
         runCatching {
             BookProgressRules.continuePage(catalog, progressStore.progress, bookId)
@@ -214,8 +264,13 @@ internal fun BookPageGameplayScreen(
     } else null
 
     BoxWithConstraints(
-        Modifier.fillMaxSize().background(Cream).padding(horizontal = 12.dp, vertical = 6.dp)
+        Modifier.fillMaxSize()
+            .background(if (showPrototypeArt) bookPageThemePaperTint(book.theme) else Cream)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
+        // Resolve once in this BoxWithConstraints scope: nested Row scopes cannot
+        // access the implicit maxWidth receiver (previous WS-14G compile error).
+        val contentWidthDp = maxWidth.value
         val landscape = maxWidth > maxHeight * 1.2f
         val enlarged = LocalDensity.current.fontScale >= 1.5f
         val viewport = if (landscape) {
@@ -227,50 +282,53 @@ internal fun BookPageGameplayScreen(
         }
         val choose: (GridPoint, GridPoint) -> Unit = { start, end -> select(start, end) }
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            // WS-14K1 first real-phone refinement: one control row instead
+            // of a separate back/save row and an oversized book title row.
+            // Native labels remain accessible; no art or gesture hot-spots.
             Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text("Back to book")
+                BookPageBackButton(onBack = onBack)
+                // Keep the theme illustration at the word list, not in the
+                // crowded title row. Real handset review showed "Woodl...".
+                Column(Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                    Text(book.title.removeSuffix(" · TEST BOOK"),
+                        color = Forest, fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    val pageNumber = catalog.pages(bookId).indexOfFirst {
+                        it.id == pageId
+                    } + 1
+                    Text("Page $pageNumber" + when {
+                        practice -> " · Practice (unsaved)"
+                        committed -> " · Completed"
+                        else -> ""
+                    }, color = Muted, style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                Text(
-                    if (practice) "Practice · unsaved" else
-                        if (committed) "Completed page" else "Progress saved on device",
-                    color = Muted, style = MaterialTheme.typography.labelMedium
+                BookPageToolsButton(onClick = { toolsOpen = true })
+                BookPageNoticeHistoryButton(
+                    hasNotices = noticeHistory.isNotEmpty(),
+                    onClick = { noticeHistoryOpen = true }
                 )
-            }
-            Row(Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                val bookmarked = pageId ==
-                    progressStore.progress.volumes[bookId]?.bookmarkedPageId
-                if (showPrototypeArt && committed) {
-                    BookArt(book.theme, BookArtKind.COMPLETION, Modifier.width(39.dp).height(39.dp),
-                        fieldNotes = fieldNotesArt)
-                } else if (showPrototypeArt && bookmarked) {
-                    BookArt(book.theme, BookArtKind.BOOKMARK, Modifier.width(17.dp).height(49.dp),
-                        fieldNotes = fieldNotesArt)
-                }
-                Text(book.title.removeSuffix(" · TEST BOOK") + " · Page " + (
-                    catalog.pages(bookId).indexOfFirst { it.id == pageId } + 1),
-                    color = Forest, fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(1f))
-            }
-            Text(
-                wordsFound.size.toString() + " of " + board.targets.size +
-                    " words found · " +
-                    ((active?.elapsedSeconds ?: 0L) / 60L).toString() + "m " +
-                    ((active?.elapsedSeconds ?: 0L) % 60L).toString() + "s",
-                color = Ink, style = MaterialTheme.typography.bodyMedium
-            )
-            PaperProgress(wordsFound.size, board.targets.size)
-            if (!practice && !committed) {
-                OutlinedButton(
-                    onClick = {
+                if (!practice && !committed) {
+                    // Icon-only hint, with a full 48dp touch target and an
+                    // accessibility description. Same durable hint policy.
+                    BookPageHintButton(enabled = canEdit, onClick = {
                         val hint = sessionStore.hint(bookId, pageId)
                         if (hint == null) {
-                            status = "No hints available. Keep looking!"
+                            val saved = sessionStore.session(bookId, pageId)
+                            val allRevealed = board.targets
+                                .filterNot { it.id in saved?.foundIds.orEmpty() }
+                                .all { (saved?.hints?.get(it.id) ?: 0) >= 3 }
+                            status = when {
+                                sessionStore.warning != null || sessionStore.blocked ->
+                                    "Hint could not be saved. Your earlier progress is safe."
+                                allRevealed ->
+                                    "All remaining words have full hints. Follow the highlights."
+                                else -> "Hint unavailable right now. Try reopening this page."
+                            }
                         } else {
                             revision++
                             val step = sessionStore.session(bookId, pageId)
@@ -282,11 +340,17 @@ internal fun BookPageGameplayScreen(
                                 else -> "Hint: " + hint.word + " is highlighted on the grid."
                             }
                         }
-                    },
-                    enabled = canEdit,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                ) { Text("Hint") }
+                    })
+                }
             }
+            Text(
+                wordsFound.size.toString() + " of " + board.targets.size +
+                    " words found · " +
+                    ((active?.elapsedSeconds ?: 0L) / 60L).toString() + "m " +
+                    ((active?.elapsedSeconds ?: 0L) % 60L).toString() + "s",
+                color = Ink, style = MaterialTheme.typography.bodyMedium
+            )
+            PaperProgress(wordsFound.size, board.targets.size)
             if (committed && !practice) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
@@ -311,26 +375,41 @@ internal fun BookPageGameplayScreen(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                 ) { Text("Finish practice") }
             }
-            Text(status, style = MaterialTheme.typography.bodyMedium,
-                color = Forest, maxLines = if (enlarged) 3 else 2)
             if (landscape) {
                 Row(Modifier.fillMaxWidth().weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(Modifier.width(viewport), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         ZoomableWordGrid(board, wordsFound, hintPaths, viewport,
-                            choose, onStep = {}, boardFontId = boardFontId)
+                            choose, onStep = {}, boardFontId = boardFontId,
+                            compactControls = true,
+                            zoomConsoleVisible = toolsOpen,
+                            onDismissZoomConsole = { toolsOpen = false })
                     }
                     WordList(board, wordsFound, daily = false,
-                        modifier = Modifier.weight(1f).fillMaxHeight(), scrollAll = true)
+                        modifier = Modifier.weight(1f).fillMaxHeight(), scrollAll = true,
+                        bookThemeAccent = showPrototypeArt)
                 }
             } else {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     ZoomableWordGrid(board, wordsFound, hintPaths, viewport,
-                        choose, onStep = {}, boardFontId = boardFontId)
+                        choose, onStep = {}, boardFontId = boardFontId,
+                            compactControls = true,
+                            zoomConsoleVisible = toolsOpen,
+                            onDismissZoomConsole = { toolsOpen = false })
                 }
                 WordList(board, wordsFound, daily = false,
-                    modifier = Modifier.fillMaxWidth().weight(1f), scrollAll = true)
+                    modifier = Modifier.fillMaxWidth().weight(1f), scrollAll = true,
+                        bookThemeAccent = showPrototypeArt)
             }
+        }
+        // Overlays paint ABOVE gameplay without taking any board/list height.
+        if (status.isNotBlank()) {
+            BookPageNoticeOverlay(message = status,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp))
+        }
+        if (noticeHistoryOpen) {
+            BookPageNoticeHistoryDialog(notices = noticeHistory.toList(),
+                onDismiss = { noticeHistoryOpen = false })
         }
     }
 }

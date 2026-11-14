@@ -122,11 +122,20 @@ class BookPageSessionTest {
         ))
         assertEquals(2, session.hints.values.sum())
         assertTrue(session.foundIds.isEmpty()) // hints do NOT silently solve
-        val (same, noExtra) = BookPageSessionRules.hint(
+        // A short book no longer burns out after two hint taps: continue the
+        // three-stage clue for a word, then choose another unsolved word.
+        val (third, sameWord) = BookPageSessionRules.hint(
             f.catalog, journal, "woodland-volume-one", "woodland-page-one"
         )
-        assertNull(noExtra)
-        assertEquals(journal, same)
+        assertNotNull(sameWord)
+        assertEquals(3, third.sessions.single().hints.values.sum())
+        val (fourth, nextWord) = BookPageSessionRules.hint(
+            f.catalog, third, "woodland-volume-one", "woodland-page-one"
+        )
+        assertNotNull(nextWord)
+        assertNotEquals(sameWord?.id, nextWord?.id)
+        assertEquals(4, fourth.sessions.single().hints.values.sum())
+        assertTrue(fourth.sessions.single().foundIds.isEmpty())
     }
 
     @Test fun partialFileCodecRoundTripAndCanonicalBytes() {

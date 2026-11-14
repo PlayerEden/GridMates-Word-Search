@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "milestone": "WS-16AB",
+  "asset_id": "WS16AB_PAINTED_SHELF_SINGLE_V1",
+  "role": "HOME_QA_CANDIDATE",
+  "android_source_set": "debug",
+  "android_path": "app/src/debug/assets/ws16ab/painted-shelf-v1.webp",
+  "apk_path": "assets/ws16ab/painted-shelf-v1.webp",
+  "generated_original_filename": "ornate_walnut_shelf_with_golden_oak_motif.png",
+  "original_dimensions": [
+    2172,
+    724
+  ],
+  "original_sha256": "d381a6fdbb21f4d1929a6cab275f5191de29d2692e62c42ef4350bcbb090a1eb",
+  "export_format": "WebP lossily compressed from original transparent illustration with alpha",
+  "export_dimensions": [
+    720,
+    149
+  ],
+  "export_bytes": 16310,
+  "export_sha256": "c7680df007c7fa9bab3d2ccbeefd5b12a727229db64c41ddb7dee7bc529d7895",
+  "git_blob_sha1": "cc08af2e2773d75f7bd840bc7c665982c10874df",
+  "source": "Generated original art via ChatGPT image generation November 10 2026, optimized for mobile QA; full-resolution original is a separate generated conversation asset, not included in GitHub.",
+  "owner_approved": false,
+  "release_approved": false,
+  "qa_only": true,
+  "release_fallback": "WS16AA then WS16G then native Canvas",
+  "notes": "Single complete high-depth painted shelf for visual owner phone QA. Fixed 50dp asset height; 8dp internal offset maintains book-to-top baseline in existing carousel; no other layouts adjusted."
+}

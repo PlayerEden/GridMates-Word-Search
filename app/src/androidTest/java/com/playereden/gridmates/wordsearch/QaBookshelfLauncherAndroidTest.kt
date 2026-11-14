@@ -1,8 +1,9 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import org.junit.Assert.assertEquals
@@ -17,17 +18,20 @@ class QaBookshelfLauncherAndroidTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun homeHasClearlyLabeledTestBookLauncherAndCanOpenAnActualVolume() {
-        compose.onNodeWithText("Test Puzzle Books").performScrollTo().performClick()
+        compose.onNodeWithTag("ws16-full-shelf").performScrollTo().performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Puzzle Books").assertExists()
+        compose.onNodeWithText("Your Library").assertExists()
+        // The native bookcase displays the actual spine; tap to pull out
+        // the illustrated cover, then route into the existing chapters.
+        compose.onNodeWithTag("library-spine-woodland-qa-volume-one").assertExists()
+        compose.onNodeWithTag("library-spine-woodland-qa-volume-one").performClick()
         compose.onNodeWithText("Woodland").assertExists()
-        compose.onAllNodesWithText("TEST BOOK · 2 chapters")[0].assertExists()
-        compose.onAllNodesWithText("Open book")[0].performClick()
+        compose.onNodeWithTag("library-view-pages").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Getting Started · TEST").assertExists()
-        compose.onNodeWithText("Start reading").assertExists()
-        compose.onNodeWithText("Back to Puzzle Books").performClick()
+        compose.onNodeWithText("Getting Started").assertExists()
+        compose.onNodeWithText("Start solving").assertExists()
+        compose.onNodeWithTag("ws15-back").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Puzzle Books").assertExists()
+        compose.onNodeWithText("Your Library").assertExists()
     }
 }

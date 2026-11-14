@@ -1,0 +1,45 @@
+# WS16BF — Clean edges and curved leather binding, without double spines
+
+> **Status:** DUAL-GREEN ANDROID/ART QA / EXACT APK SIGNATURE, PACKAGE, SHA VERIFIED / OWNER HANDSET VISUAL ACCEPTANCE PENDING (November 12, 2026).
+
+## Who / why / evidence
+
+- **Owner:** Submitted actual v64 Android Library screenshot and reported `"There's a lot of specks on the edges of the spines they also feel 'flat'"`. These concerns are separate: fringe pixels and insufficient material depth. Earlier v63 complaint was a full-width faux backing behind the book.
+- **Starting point:** Verified owner-installed v64 [Android artifact #13924000090](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241/artifacts/13924000090), SHA-256 `654ef1af1b7ba54f323c37dc0103c82b5d80e370ee5d300b764812b9b45acf44`, dual-green [Android #43173531241](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241) and [art #43173531335](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531335); v64 appearance not approved by owner. Existing [PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131) is draft/unmerged.
+- **Evidence:** Inspection of v64 APK `assets/ws16ai/spines/{woodland,space,garden}.png` (104×542 RGBA) found fringe alpha values and small colored or white slivers on original outer edges. This is not an extra Compose sprite. The book remains visually flat because its face is evenly lit and the v64 renderer removed the only contact shadow.
+
+## Actual source implementation
+
+1. **New reproducible generator** `tools/asset_pipeline/build_ws16bf_curved_spines.py`: build ONLY three playable 104×542 spines using original pinned `ws16ai` source PNGs, preserving printed graphic location and **without any wider second leather backing**. Replace colored edge fringing with one 104px rounded mask; smoothly reconstruct the first/last edge pixels from dark leather palette, suppress the source's top/bottom bright artifacts, and apply a left highlight/right shadow gradient within the single silhouette. Save PNGs and a manifest containing exact source+output SHA-256 under `app/src/debug/assets/ws16bf/`. Original WS16AI and wider WS16AO binaries are untouched.
+2. **Runtime:** `BookcaseWoodArtwork.kt` loads `ws16bf/spines/$name.png` only for a new `curved` profile; falls back to unchanged original `ws16ai` safely. `WS16AMSpineBay` uses real 104:542 proportions and a much subtler 2dp / 30%-opacity contact shadow for the curved portrait path. Existing book ID/click handler, 2+1 shelf distribution, title clearance, cabinet, Home/Profile/Collection, LAN and saved progress are unchanged.
+3. **CI:** Both `.github/workflows/ws01-android-qa.yml` and `ws12g-qa-art-lab.yml` generate the source-pinned artwork and run `test_ws16bf_curved_spines.py`. The independent `verify_ws16bf_apk.py` ensures all three exact derived PNGs/manifest appear in debug and none in release. The tests enforce no out-of-silhouette edge alpha, deterministic render, original dimensions and runtime integration. Existing art/source verifiers remain.
+4. **Build:** `app/build.gradle.kts` versionCode **65**, versionName `0.9.21-curved-clean-spines` (debug suffix `-qa`). Same package `com.playereden.gridmates.wordsearch.qa` and same public QA test key. This remains a debug-only visual candidate; not a production art approval.
+5. **Original artwork rights:** Still QA only; no new licensed or externally sourced pixels. User progress, save schema, unlocks, and multiplayer unchanged.
+
+**Latest code commit before CI:** [`70fa6e39674d0bd1a6b54066e2a44b626d759c14`](https://github.com/PlayerEden/GridMates-Word-Search/commit/70fa6e39674d0bd1a6b54066e2a44b626d759c14). Later documentation-only changes are `[skip ci]`.
+
+## Initial CI correction (same pass)
+
+First Android [#43175871386](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871386) and art [#43175871287](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871287) failed in source-only legacy WS16AM coverage: old test demanded the exact `width(artWidth).height(4.dp)` contact shadow. The actual intended code uses 76% width, 2dp height, and reduced opacity with explicit `drawContactShadow` control. No generator failure was reported. Corrected only the outdated test.
+
+**Current v65 code/test source:** [`3a5d9122621f62db6ec193075717797553e0539b`](https://github.com/PlayerEden/GridMates-Word-Search/commit/3a5d9122621f62db6ec193075717797553e0539b). Current correct CI [Android #43176056684](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176056684) and [art/release #43176056697](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176056697) were running when recorded. **No verified APK yet**. The first failed run must not be cited as successful evidence.
+
+## Verified v65 exact-source QA receipt (Nov 12)
+
+- **Delivered source/test commit:** [`930319ed181480caf69021c9a1a50578ec45abac`](https://github.com/PlayerEden/GridMates-Word-Search/commit/930319ed181480caf69021c9a1a50578ec45abac); subsequent documentation-only `[skip ci]` commits do not change the compiled code.
+- **Android QA [run #43176204747](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747): SUCCESS.** Source/generation checks, core/app tests, lint, Android assembly, packaged assets, QA certificate, exact package and actual file checksum verified.
+- **Independent art/release isolation [run #43176204757](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204757): SUCCESS.** Debug + release compiled; new `ws16bf` derived artwork is absent from the release build.
+- **GitHub Android ZIP artifact [#13924198630](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204747/artifacts/13924198630)**: ZIP SHA-256 `aca401933ab96db2e4bb7c9e22822cda3358a7a5857eca6823c880ec637b6293`, containing `app-debug.apk` (29,366,673 bytes). **Extracted v65 APK SHA-256 `73989c2f2c71931d4d6b62bfe7309ddd8496dd48ddc7e2beff1bfa2398d84921`.** Direct APK extracted and supplied to owner in this ChatGPT conversation; GitHub artifact is durable.
+- **Identity from exact GitHub job logs:** `com.playereden.gridmates.wordsearch.qa`, `versionCode=65`, `versionName=0.9.21-curved-clean-spines-qa`, unchanged public QA certificate SHA-256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419` (matches v64). Installs over current QA version without uninstall.
+- **New assets:** `assets/ws16bf/manifest.json` identifies exactly three `QA-only`, unreleased 104×542 derived real spines. All three actual APK PNG hashes match the generated source manifest, and their physical alpha bounds are `(3,2,101,540)` with zero alpha outside; no fake second side panel. Alpha/motif/print are stored in one actual image. Original `ws16ai` and `ws16ao` PNG bytes untouched.
+- **Independent debug APK comparison:** [art workflow ZIP #13924148660](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43176204757/artifacts/13924148660) contains independently built APK SHA-256 `8d00c9c3e526955988d009a5006d870eb1b95fdb847bf3fac632f8b9f58938cd`. Different archive bytes from standard Android APK but **all 343 unpacked entries have identical names and contents**. The standard Android APK above is the installation candidate.
+- **Still OPEN:** real owner-phone visual comparison, actual book taps/back and saved-progress check. CI does not establish that curvature is attractive enough. PR #131 remains draft/unmerged; all generated artwork remains QA-only. Previous owner-installed [v64 artifact #13924000090](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241/artifacts/13924000090) remains the last real-phone rollback.
+
+## QA gate and rollback
+
+- **Android QA:** [run #43175871386](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871386) started, final result pending at journal creation.
+- **Art/release isolation:** [run #43175871287](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43175871287) started, final result pending at journal creation.
+- **v65 APK:** not yet verified or delivered. Must retrieve artifact, confirm exact commit, signer, package, version and SHA before claiming readiness.
+- **Owner fallback:** v64 already installed [artifact #13924000090](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43173531241/artifacts/13924000090); preserve progress by install-over with same signer, never uninstall/clear app data.
+- **Known limitations:** Unit/source checks and CI cannot evaluate whether shading looks genuinely like a leather book on the owner's phone. Physical screenshot / tap / save-resume review remains required. Keep PR #131 draft; art QA-only.
+- **Next exact action:** inspect both workflows (especially new per-pixel asset tests). Repair any true failure on same branch; on dual-green inspect actual APK and deliver signed v65 visual comparison. If visually flat even after clean shading, move toward front-facing illustrated covers rather than another fake extra panel.
