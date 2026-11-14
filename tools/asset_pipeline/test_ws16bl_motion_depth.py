@@ -23,7 +23,9 @@ class MotionDepthTests(unittest.TestCase):
         self.assertIn('testTag("ws16bl-animated-face")', s)
         self.assertIn("scaleX = 1f - .052f * inset", s)
         self.assertIn("translationY = 1.5.dp.toPx() * inset", s)
-        self.assertIn("strokeWidth=(.8f+1.0f*inset)*u", s)
+        self.assertIn("drawGridMatesPaperFrame(", s)
+        self.assertIn("GridMatesFrameVariant.MEDIUM", s)
+        self.assertIn("Forest.copy(", s)
         self.assertNotIn("while (true)", s)
         self.assertNotIn("rememberInfiniteTransition", s)
 
