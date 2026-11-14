@@ -1,11 +1,13 @@
 package com.playereden.gridmates.wordsearch
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -164,7 +166,7 @@ class QaActualBookcaseAndroidTest {
         compose.onNodeWithText("3 books").assertDoesNotExist()
         compose.onNodeWithTag("ws16bk-bookcase-pager").assertExists()
         compose.onNodeWithTag("ws16bk-page-dots").assertExists()
-        compose.onNodeWithTag("ws16at-prev").assertExists()
+        compose.onNodeWithTag("ws16at-prev").assertExists().assertIsNotEnabled()
         compose.onNodeWithTag("ws16at-next").assertExists()
 
         val woodlandBounds = compose.onNodeWithTag("ws16bh-spine-" + woodland.id)
@@ -247,6 +249,41 @@ class QaActualBookcaseAndroidTest {
 
         compose.onNodeWithTag("ws16bh-spine-" + many.last().id).performClick()
         compose.runOnIdle { assertEquals(many.last().id, selected) }
+    }
+
+    @Test fun portraitSafeInsetsLeaveTitleClearAndNavigationBelowShelves() {
+        compose.setContent {
+            GridMatesTheme {
+                CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
+                    Box(Modifier.width(360.dp).height(760.dp)) {
+                        WS16ATModularLibraryScene(
+                            books = catalog.books,
+                            onBack = {}, onBookSelected = {},
+                            onPreviousArt = {},
+                            // Simulate real phone status/navigation overlap:
+                            // Library controls live inside the safe overlay.
+                            safeContentPadding = PaddingValues(top = 42.dp)
+                        )
+                    }
+                }
+            }
+        }
+        val title = compose.onNodeWithTag("ws16at-library-title")
+            .fetchSemanticsNode().boundsInRoot
+        val upper = compose.onNodeWithTag("ws16bh-art-" + woodland.id)
+            .fetchSemanticsNode().boundsInRoot
+        assertTrue("Book tops must clear the title on inset Android screens",
+            upper.top >= title.bottom + 12f)
+        val lowerShelf = compose.onNodeWithTag("ws16at-movable-shelf-1")
+            .fetchSemanticsNode().boundsInRoot
+        val pager = compose.onNodeWithTag("ws16bk-bookcase-pager")
+            .fetchSemanticsNode().boundsInRoot
+        assertTrue("Moving the rail down must not intersect the lower shelf",
+            pager.top > lowerShelf.bottom)
+        compose.onNodeWithTag("ws16at-prev").assertIsNotEnabled()
+        compose.onNodeWithTag("ws16at-next").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("ws16bk-future-bookcase-1").assertExists()
     }
 
     @Test fun portraitBrowsesFutureWordlessBookcasesWithoutFakeOwnership() {
