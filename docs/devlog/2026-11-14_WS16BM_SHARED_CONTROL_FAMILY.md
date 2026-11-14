@@ -1,6 +1,6 @@
 # WS16BM — Main-menu visual controls reused inside the Library
 
-**Date:** 2026-11-14. **Status at first write:** v72 source committed / Android QA & independent art/release jobs running / on-phone visual approval OPEN. This is a visual unification pass, not a gameplay update.
+**Date:** 2026-11-14. **Final status:** EXACT-SOURCE v72 **DUAL-GREEN Android and independent art/release QA**, verified APK delivered; **owner visual and touch acceptance OPEN**. This is a visual unification pass, not a gameplay update.
 
 ## Why
 
@@ -28,10 +28,21 @@ We inspected both source families before editing:
 
 - Draft [PR #131](https://github.com/PlayerEden/GridMates-Word-Search/pull/131), branch `feature/ws14b-style-anchor-and-art-direction-2026-11-08`, remains unmerged.
 - Latest code/test source at first QA: [`72745e88ea944a195c696dd7366b52df2644a64c`](https://github.com/PlayerEden/GridMates-Word-Search/commit/72745e88ea944a195c696dd7366b52df2644a64c).
-- Android QA [#43582240449](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240449): IN PROGRESS at initial journal write.
-- Independent art/release [#43582240576](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240576): IN PROGRESS at initial journal write.
-- **No verified v72 APK yet**. Verify both runs conclude SUCCESS on same code SHA; obtain the actual standard GitHub Android artifact, check versionCode 72, package and unchanged signer, inspect APK SHA and compare independently built artifact's decompressed entry content. Do not invent a direct APK or claim visual approval.
+- Android QA [#43582240449](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240449): later SUCCESS; see exact verification receipt below.
+- Independent art/release [#43582240576](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240576): later SUCCESS; see exact verification receipt below.
+- The initially pending v72 APK was verified and delivered; see receipt below. Owner phone visual approval remains pending.
 - Last owner-installed/tested v71: [standard GitHub APK ZIP #14006713081](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43357902693/artifacts/14006713081), QA APK SHA `148513827e892e9e9b80f5c8b1cfbdf31d8a32c46e4922011a622b4d3d9a0eb1`. Preserve as comparison; do not uninstall/lose saves for rollback.
+
+## Final v72 verification and install-over handoff (November 14, 2026)
+
+- **Exact compiled code/test source:** [`72745e88ea944a195c696dd7366b52df2644a64c`](https://github.com/PlayerEden/GridMates-Word-Search/commit/72745e88ea944a195c696dd7366b52df2644a64c), unchanged by subsequent `[skip ci]` documentation commits.
+- **Android QA [#43582240449](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240449): SUCCESS**, 70 checked steps with app+core tests, Kotlin/Compose compilation, lint and signed APK/art source checks.
+- **Independent debug/release [#43582240576](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240576): SUCCESS**, 71 checked steps including source artwork verification and no QA-only source art promoted into release.
+- **Source-matched GitHub standard QA ZIP [artifact #14109290802](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240449/artifacts/14109290802):** 29,623,797 bytes, archive SHA256 `ff8815bebb58f31dc03011e786f051a0529a934bdf3799f29e47ece62db5d112`. Contains `app-debug.apk` extracted and delivered to the user as `GridMates_WordSearch_WS16BM_v72.apk`, **30,095,753 bytes**, APK SHA256 `0f7a57662cf8cf380b5e48ee2c0da8e6461a57ad1946135b90301cf6f6c29b53`. Exact sandbox path exists and was file-verified. The GitHub ZIP remains an external download fallback.
+- **Signer/app identity from completed CI job:** `com.playereden.gridmates.wordsearch.qa`, **versionCode=72**, versionName `0.9.28-shared-gridmates-controls-qa`; signer SHA256 `75cc3c896247d71fbd51f7a3ed41f90c8218a8a5a70df8c0f6b494b5cc23d419`, unchanged from v71. Direct install-over v71, **do not uninstall or clear saves**.
+- **Independent art ZIP [artifact #14109201183](https://github.com/PlayerEden/GridMates-Word-Search/actions/runs/43582240576/artifacts/14109201183):** ZIP 29,623,798 bytes, SHA256 `12f2d67c79539cd2a7aa3c80b14757fa3da97a7b3df4e9e977a24d27fc2ee2b5`. Its APK SHA256 `ac422a39ad3917c5fe83e79a24f4dcc908c5837c90e5814b2c3b74685e4bf66b` differs at outer signed APK archive level, but **all 358 decompressed APK paths and content bytes match exactly** between the two separate builds. Never claim the signed APK zip archives are byte-identical.
+- **Artwork regression:** compared verified v72 APK to the previously delivered v71 APK: **all 217 packaged `assets/` contents and paths are byte-identical**, including shell, shelf, real spines and eight wordless decorative bindings. No new art binaries and no release-art rights promotion.
+- **Still open:** user on-phone v72 screenshot and button feel, Back vs artwork-options click, 3-page pager/disabled states, real book preview and saved progress. CI-success does NOT establish visual approval. Draft PR #131 stays unmerged.
 
 ## Acceptance
 
